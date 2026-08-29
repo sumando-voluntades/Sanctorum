@@ -9,19 +9,12 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script id="tailwind-config">
     tailwind.config = {
-      darkMode: "class",
       theme: {
         extend: {
           colors: {
             primary: "#8a5100", 
-            "primary-container": "#f39200",
             secondary: "#b50062", 
-            "secondary-container": "#e2007c",
             surface: "#f6fafe", 
-            "surface-container-low": "#f0f4f8", 
-            "surface-container-lowest": "#ffffff",
-            "on-surface": "#171c1f",
-            "on-surface-variant": "#544434"
           },
           fontFamily: { 
             sans: ["Quicksand", "sans-serif"], 
@@ -35,112 +28,1171 @@
 </head>
 <body class="bg-surface text-slate-800 min-h-screen">
   
+  <!-- ================= SIDE NAV BAR ================= -->
   <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
     <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
     <nav class="flex-1 px-4 space-y-2">
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-orange-600 font-bold border-r-4 border-orange-500 bg-orange-50 transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">folder_shared</span><span class="font-medium">Expedientes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda_admin.html"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">folder_shared</span><span class="font-medium">Expedientes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda_admin.html"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_publicaciones_admin.html"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_reportes_admin.html"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos_admin.html"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
     </nav>
     <div class="px-6 mt-auto space-y-4">
-      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="inicio.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
+      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
       <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
     </div>
   </aside>
 
   <main class="ml-72 min-h-screen flex flex-col">
+    <!-- ================= TOP NAV BAR ================= -->
     <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
       <div class="flex items-center flex-1">
         <div class="relative w-full max-w-md">
           <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-          <input id="buscador_principal" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar expedientes clínicos..." type="text" />
+          <input id="buscador_principal" oninput="aplicarFiltros()" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar por ID, paciente o tutor..." type="text" />
         </div>
       </div>
       <div class="flex items-center gap-4 ml-8 relative">
-        <button onclick="document.getElementById('modalNotificaciones').classList.toggle('hidden')" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span class="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
-        <button class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors"><span class="material-symbols-outlined">settings</span></button>
+        <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
         <div class="h-8 w-px bg-slate-200 mx-2"></div>
         <a href="perfil_admin.html" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
           <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
           <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
         </a>
 
+        <!-- Panel de Notificaciones -->
         <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center"><h3 class="font-bold text-sm">Notificaciones</h3><span class="text-xs bg-slate-700 px-2 py-1 rounded-full">3 Nuevas</span></div>
-            <div class="max-h-80 overflow-y-auto divide-y divide-slate-100">
-                <div class="p-4 hover:bg-slate-50 transition-colors cursor-pointer"><div class="flex gap-3"><div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">folder_shared</span></div><div><p class="text-sm font-bold text-slate-800">Nuevo Expediente</p><p class="text-xs text-slate-500 mt-0.5">Se ha creado un nuevo registro clínico.</p></div></div></div>
+            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
+              <h3 class="font-bold text-sm">Notificaciones</h3>
+              <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
+            </div>
+            <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
             </div>
             <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
         </div>
       </div>
     </header>
 
-    <div class="p-8 flex-1">
+    <div class="p-8 flex-1 w-full overflow-hidden">
+      <!-- ENCABEZADO -->
       <div class="flex justify-between items-end mb-10">
         <div>
           <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Expedientes Clínicos</h2>
-          <p class="text-slate-500 max-w-xl">Gestión visual y seguimiento psicológico de los beneficiarios.</p>
+          <p class="text-slate-500 max-w-xl">Registro y seguimiento psicológico confidencial de beneficiarios.</p>
         </div>
-        <button class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-secondary to-secondary-container text-white rounded-full font-bold shadow-xl hover:scale-105 transition-all"><span class="material-symbols-outlined">add</span> Nuevo Expediente</button>
+        <button onclick="abrirModalNuevoExpediente()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-[#b50062] to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
+          <span class="material-symbols-outlined">add</span> Nuevo Expediente
+        </button>
       </div>
 
-      <div class="flex flex-wrap gap-4 mb-8 bg-white p-4 rounded-2xl shadow-sm items-center">
+      <!-- BARRA DE FILTROS -->
+      <div class="flex flex-wrap gap-4 mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 items-center w-full">
         <span class="text-sm font-bold text-slate-400 px-2 uppercase tracking-widest text-[10px]">Filtrar por:</span>
-        <select class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-secondary/20 text-slate-600"><option>Especialista Asignado</option><option>Dra. Elena</option></select>
-        <select class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-secondary/20 text-slate-600"><option>Estatus Escolar</option><option>Regular</option></select>
-        <select class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-secondary/20 text-slate-600"><option>Fecha de Ingreso</option><option>Último mes</option></select>
+        <select id="filtro_especialista" onchange="aplicarFiltros()" class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer">
+            <option value="Todos">Cualquier Especialista</option>
+            <!-- Llenado dinámicamente -->
+        </select>
+        <select id="filtro_estatus" onchange="aplicarFiltros()" class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer">
+            <option value="Todos">Cualquier Estatus</option>
+            <option value="ACTIVO">Activos</option>
+            <option value="EN PAUSA">En Pausa</option>
+            <option value="ALTA">Alta Clínica</option>
+        </select>
+        <button onclick="limpiarFiltros()" class="ml-auto p-2.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"><span class="material-symbols-outlined text-slate-600">refresh</span></button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        <div class="flex flex-col gap-6">
-          <div class="flex items-center gap-2 px-2"><span class="w-3 h-3 bg-secondary rounded-full"></span><h3 class="font-bold text-slate-700 font-plus uppercase text-sm">En Evaluación</h3><span class="ml-2 px-2 py-0.5 bg-secondary-fixed text-secondary text-xs font-bold rounded-full">1</span></div>
-          <div class="space-y-6">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-100 hover:scale-[1.02] transition-all">
-                <h4 class="text-lg font-bold text-slate-800 mb-1">Mateo Herrera</h4><p class="text-xs text-slate-500 mb-4">Primaria Benito Juárez</p><button class="w-full py-2 bg-slate-100 text-slate-600 font-bold rounded-full text-xs hover:bg-blue-500 hover:text-white">Asignar Especialista</button>
+      <!-- TABLA DE EXPEDIENTES -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden w-full">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 text-slate-400 text-xs uppercase tracking-widest border-b border-slate-100">
+                        <th class="px-6 py-5 font-bold whitespace-nowrap">ID</th>
+                        <th class="px-6 py-5 font-bold whitespace-nowrap">Nombre del Beneficiario</th>
+                        <th class="px-6 py-5 font-bold whitespace-nowrap">Tutor Responsable</th>
+                        <th class="px-6 py-5 font-bold whitespace-nowrap">Escuela de Procedencia</th>
+                        <th class="px-6 py-5 font-bold whitespace-nowrap">Especialista Asignado</th>
+                        <th class="px-6 py-5 font-bold whitespace-nowrap text-center">Estatus</th>
+                        <th class="px-6 py-5 font-bold whitespace-nowrap text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="lista_expedientes" class="divide-y divide-slate-50">
+                    <!-- Filas inyectadas por JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINACIÓN -->
+        <div class="p-6 border-t border-slate-100 flex items-center justify-between bg-white flex-wrap gap-4">
+            <p class="text-sm font-bold text-slate-500">Mostrando <span id="rango_mostrado" class="text-slate-800">0</span> de <span class="text-slate-800" id="total_registros">0</span> expedientes</p>
+            <div id="controles_paginacion_expedientes" class="flex items-center gap-2">
+                <!-- Inyectado por JS -->
             </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-6">
-          <div class="flex items-center gap-2 px-2"><span class="w-3 h-3 bg-primary rounded-full"></span><h3 class="font-bold text-slate-700 font-plus uppercase text-sm">Tratamiento Activo</h3><span class="ml-2 px-2 py-0.5 bg-primary-fixed text-primary text-xs font-bold rounded-full">1</span></div>
-          <div class="space-y-6">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-100 hover:scale-[1.02] transition-all border-l-4 border-l-primary">
-                <h4 class="text-lg font-bold text-slate-800 mb-1">Sofía García</h4><p class="text-xs text-slate-500 mb-2">Colegio San Agustín</p><div class="flex items-center gap-2 mb-4 bg-slate-50 p-2 rounded-lg text-xs font-bold text-slate-600"><span class="material-symbols-outlined text-sm">psychology</span> Dra. Elena Rivas</div><button class="w-full py-2 bg-slate-100 text-slate-600 font-bold rounded-full text-xs hover:bg-[#f39200] hover:text-white">Agregar Nota</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-6">
-          <div class="flex items-center gap-2 px-2"><span class="w-3 h-3 bg-green-500 rounded-full"></span><h3 class="font-bold text-slate-700 font-plus uppercase text-sm">Altas Clínicas</h3><span class="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">0</span></div>
-          <div class="space-y-6"></div>
-        </div>
-
-        <div class="flex flex-col gap-6 opacity-70">
-          <div class="flex items-center gap-2 px-2"><span class="w-3 h-3 bg-slate-400 rounded-full"></span><h3 class="font-bold text-slate-600 font-plus uppercase text-sm">En Pausa</h3><span class="ml-2 px-2 py-0.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-full">0</span></div>
-          <div class="space-y-6"></div>
         </div>
       </div>
     </div>
   </main>
 
+  <!-- ================= MODAL: NUEVO EXPEDIENTE ================= -->
+  <div id="modalNuevo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10">
+    <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="modalNuevoContent">
+      <div class="bg-gradient-to-r from-primary to-orange-500 px-8 py-6 text-white flex justify-between items-center shrink-0">
+        <div><h3 class="text-2xl font-bold font-plus">Apertura de Expediente</h3></div>
+        <button type="button" onclick="cerrarModalNuevo()" class="text-white/80 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
+      </div>
+      <div class="p-8 bg-white overflow-y-auto max-h-[75vh]">
+          <form id="formNuevoExpediente" onsubmit="guardarExpediente(event)" class="space-y-6">
+            <h4 class="font-bold text-slate-800 border-b pb-2">Datos del Beneficiario (Paciente)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Nombre Completo</label><input id="nom_paciente" type="text" required class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30"></div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Fecha de Nacimiento</label><input id="f_nacimiento" type="date" required class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30"></div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Género</label>
+                    <select id="sel_genero" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30">
+                        <option value="">No especificado</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Colonia (Puebla)</label><input id="input_colonia" type="text" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30" placeholder="Ej. Centro Histórico"></div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Escuela de Procedencia</label>
+                    <select id="sel_escuela" onchange="toggleNuevaEscuela()" required class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30 mb-2">
+                        <option value="">Cargando escuelas...</option>
+                    </select>
+                    <input id="input_nueva_escuela" type="text" placeholder="Escribe el nombre de la nueva escuela..." class="hidden w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/30">
+                </div>
+            </div>
+
+            <h4 class="font-bold text-slate-800 border-b pb-2 mt-6">Datos del Tutor</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Nombre del Tutor</label><input id="nom_tutor" type="text" required class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30"></div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Teléfono de Contacto</label><input id="tel_tutor" type="tel" required class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30"></div>
+                <div class="md:col-span-2"><label class="block text-sm font-bold text-slate-700 mb-1">Correo del Tutor</label><input id="correo_tutor" type="email" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30" placeholder="Para avisos de citas"></div>
+            </div>
+
+            <h4 class="font-bold text-slate-800 border-b pb-2 mt-6">Asignación Clínica</h4>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Especialista Asignado</label>
+                <select id="sel_especialista" required class="w-full px-4 py-3 bg-blue-50 border border-blue-100 text-blue-800 font-bold rounded-xl outline-none cursor-pointer">
+                    <option value="">Cargando especialistas...</option>
+                </select>
+            </div>
+            
+            <div class="pt-6 flex gap-4">
+                <button type="button" onclick="cerrarModalNuevo()" class="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors">Cancelar</button>
+                <button type="submit" class="flex-1 py-4 bg-primary text-white font-bold rounded-full shadow-xl hover:bg-orange-700 hover:scale-[1.02] transition-all">Crear Expediente</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: DETALLE / NOTAS CLÍNICAS (RF-01) ================= -->
+  <div id="modalDetalle" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10">
+    <div class="bg-white rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="modalDetalleContent">
+      <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-8 py-6 text-white flex justify-between items-center shrink-0">
+        <div>
+            <h3 class="text-xl font-bold font-plus flex items-center gap-2"><span class="material-symbols-outlined">folder_shared</span> Expediente Clínico</h3>
+            <p id="det_id" class="text-slate-300 text-sm font-mono mt-1"></p>
+        </div>
+        <button type="button" onclick="cerrarModalDetalle()" class="text-white/80 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
+      </div>
+      
+      <div class="p-8 bg-white overflow-y-auto max-h-[75vh]">
+          
+          <!-- Cabecera del Paciente -->
+          <div class="flex items-center gap-6 mb-8 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+              <div class="w-16 h-16 rounded-full bg-white border-2 border-slate-200 shadow-sm flex items-center justify-center text-slate-400">
+                  <span class="material-symbols-outlined text-3xl">face</span>
+              </div>
+              <div class="flex-1">
+                  <h2 id="det_nombre" class="text-2xl font-bold text-slate-800">Cargando...</h2>
+                  <p id="det_escuela" class="text-sm text-slate-500 font-medium"></p>
+              </div>
+              <div class="text-right">
+                  <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Estatus</p>
+                  <div class="text-right">
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Estatus</p>
+                    <select id="det_estatus" onchange="cambiarEstatusExpediente(this.value)" class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-[#f0f4f8] border-none focus:ring-2 cursor-pointer outline-none">
+                        <option value="ACTIVO">ACTIVO</option>
+                        <option value="EN PAUSA">EN PAUSA</option>
+                        <option value="ALTA">ALTA</option>
+                    </select>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Pestañas de Navegación -->
+          <div class="border-b border-slate-200 mb-6 flex gap-6">
+              <button id="tabBtn_notas" onclick="cambiarTab('notas')" class="pb-3 border-b-2 border-secondary text-secondary font-bold text-sm transition-all">Notas de Evolución</button>
+              <button id="tabBtn_datos" onclick="cambiarTab('datos')" class="pb-3 border-b-2 border-transparent text-slate-400 font-bold text-sm hover:text-slate-600 transition-all">Datos Generales</button>
+              <button id="tabBtn_docs" onclick="cambiarTab('docs')" class="pb-3 border-b-2 border-transparent text-slate-400 font-bold text-sm hover:text-slate-600 transition-all">Documentos</button>
+          </div>
+
+          <!-- CONTENIDO: NOTAS -->
+          <div id="tab_notas" class="tab-content block">
+              <div class="bg-rose-50 border border-rose-100 rounded-xl p-4 mb-6 flex gap-3">
+                  <span class="material-symbols-outlined text-rose-500">lock</span>
+                  <div>
+                      <p class="text-sm text-rose-800 font-bold">Información Confidencial</p>
+                      <p class="text-xs text-rose-600 mt-1">Este espacio es privado. Solo el especialista asignado y coordinación tienen acceso.</p>
+                  </div>
+              </div>
+              <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-sm">
+                <label class="block text-sm font-bold text-slate-700 mb-3 border-b pb-2">Registrar Avance de Sesión</label>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+                    <select id="nota_tipo" class="w-full bg-[#f0f4f8] border-none rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-medium text-slate-600">
+                        <option value="Ordinaria">Sesión Ordinaria</option>
+                        <option value="Evaluación">Evaluación</option>
+                        <option value="Intervención">Intervención en Crisis</option>
+                        <option value="Cierre">Cierre</option>
+                    </select>
+                    
+                    <select id="nota_modalidad" class="w-full bg-[#f0f4f8] border-none rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-medium text-slate-600">
+                        <option value="Presencial">Presencial</option>
+                        <option value="Virtual">Virtual</option>
+                    </select>
+                    
+                    <select id="nota_asistencia" class="w-full bg-[#f0f4f8] border-none rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-medium text-slate-600">
+                        <option value="Asistió">Asistió</option>
+                        <option value="Canceló con aviso">Canceló con aviso</option>
+                        <option value="Faltó sin aviso">Faltó sin aviso</option>
+                    </select>
+                    
+                    <select id="nota_riesgo" class="w-full bg-green-50 border-none text-green-700 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold transition-colors" onchange="cambiarColorRiesgo(this)">
+                        <option value="Bajo">Riesgo Bajo (Verde)</option>
+                        <option value="Medio">Riesgo Medio (Amarillo)</option>
+                        <option value="Alto">Riesgo Alto (Rojo)</option>
+                    </select>
+                </div>
+            
+                <textarea id="texto_nueva_nota" rows="3" class="w-full bg-[#f0f4f8] border-none rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" placeholder="Redacta los detalles y observaciones clínicas..."></textarea>
+                
+                <div class="flex justify-end mt-3">
+                    <button type="button" onclick="guardarNota()" class="px-6 py-2 bg-blue-600 text-white font-bold rounded-full text-sm hover:bg-blue-700 transition-colors">Guardar Nota</button>
+                </div>
+              </div>
+              <h4 class="font-bold text-slate-800 mb-4">Historial de Sesiones</h4>
+              <div id="contenedor_notas" class="space-y-4 border-l-2 border-slate-100 ml-3 pl-6">
+                  <!-- Inyectado por JS -->
+              </div>
+          </div>
+
+          <!-- CONTENIDO: DATOS GENERALES -->
+          <div id="tab_datos" class="tab-content hidden space-y-4">
+            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 mb-4">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h4 class="font-bold text-slate-800">Información del Beneficiario</h4>
+                    <button type="button" onclick="toggleEditarBeneficiario()" id="btn_editar_beneficiario" class="text-xs font-bold text-secondary hover:underline">Editar</button>
+                </div>
+                <div id="vista_beneficiario" class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                    <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Fecha de Ingreso</p><p id="dg_ingreso" class="font-medium text-slate-700">-</p></div>
+                    <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Género</p><p id="dg_genero" class="font-medium text-slate-700">-</p></div>
+                    <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Edad</p><p id="dg_edad" class="font-medium text-slate-700">-</p></div>
+                    <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Colonia</p><p id="dg_colonia" class="font-medium text-slate-700">-</p></div>
+                    <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Especialista Asignado</p><p id="dg_especialista" class="font-medium text-slate-700">-</p></div>
+                </div>
+                <div id="edicion_beneficiario" class="hidden grid grid-cols-2 gap-4 text-sm">
+                    <div class="col-span-2"><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Nombre completo</label><input id="edit_ben_nombre" type="text" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
+                    <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Fecha de Nacimiento</label><input id="edit_ben_fecha_nac" type="date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
+                    <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Escuela</label><input id="edit_ben_escuela" type="text" placeholder="Nombre de la escuela" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
+                    <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Género</label>
+                        <select id="edit_ben_genero" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none">
+                            <option value="">No especificado</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Colonia</label><input id="edit_ben_colonia" type="text" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
+                    <div class="col-span-2 flex gap-2 justify-end">
+                        <button type="button" onclick="toggleEditarBeneficiario()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-full">Cancelar</button>
+                        <button type="button" onclick="guardarBeneficiario()" class="px-4 py-2 text-xs font-bold text-white bg-secondary hover:bg-pink-700 rounded-full">Guardar</button>
+                    </div>
+                </div>
+            </div>
+              <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                  <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h4 class="font-bold text-slate-800">Información del Tutor <span class="text-[10px] font-normal text-slate-400 normal-case">(contacto de emergencia)</span></h4>
+                    <button type="button" onclick="toggleEditarTutor()" id="btn_editar_tutor" class="text-xs font-bold text-secondary hover:underline">Editar</button>
+                  </div>
+                  <div id="vista_tutor" class="grid grid-cols-2 gap-4 text-sm">
+                      <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Nombre del Tutor</p><p id="dg_tutor" class="font-medium text-slate-700">-</p></div>
+                      <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Teléfono</p><p id="dg_tel_tutor" class="font-medium text-slate-700">-</p></div>
+                      <div class="col-span-2"><p class="text-slate-400 font-bold text-xs uppercase mb-1">Correo</p><p id="dg_correo_tutor" class="font-medium text-slate-700">-</p></div>
+                  </div>
+                  <div id="edicion_tutor" class="hidden grid grid-cols-2 gap-4 text-sm">
+                      <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Nombre del Tutor</label><input id="edit_tutor_nombre" type="text" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
+                      <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Teléfono</label><input id="edit_tutor_telefono" type="tel" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
+                      <div class="col-span-2"><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Correo</label><input id="edit_tutor_correo" type="email" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
+                      <div class="col-span-2 flex gap-2 justify-end">
+                          <button type="button" onclick="toggleEditarTutor()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-full">Cancelar</button>
+                          <button type="button" onclick="guardarTutor()" class="px-4 py-2 text-xs font-bold text-white bg-secondary hover:bg-pink-700 rounded-full">Guardar</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- CONTENIDO: DOCUMENTOS -->
+          <div id="tab_docs" class="tab-content hidden">
+              <div class="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center bg-slate-50 mb-6 hover:bg-slate-100 transition-colors">
+                  <span class="material-symbols-outlined text-4xl text-slate-400 mb-2">cloud_upload</span>
+                  <p class="font-bold text-slate-700 mb-1">Subir nuevo documento</p>
+                  <p class="text-xs text-slate-500 mb-4">PDF, JPG o PNG (Max 5MB)</p>
+                  <input type="file" id="file_upload" class="hidden" accept=".pdf, .jpg, .jpeg, .png" onchange="subirDocumentoCloudinary(event)">
+                  <button onclick="document.getElementById('file_upload').click()" class="px-6 py-2 bg-slate-800 text-white font-bold rounded-full text-sm hover:bg-slate-900 transition-all" id="btn_upload_text">Seleccionar Archivo</button>
+              </div>
+              <h4 class="font-bold text-slate-800 mb-4">Archivos Guardados</h4>
+              <div id="contenedor_documentos" class="space-y-3">
+                  <!-- Inyectado por JS -->
+              </div>
+          </div>
+
+      </div>
+    </div>
+  </div>
+
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const token = localStorage.getItem('token_sanctorum');
-        if(!token) { window.location.replace("login.html"); return; }
+    // Decodifica el payload de un JWT de forma segura: los JWT usan base64url
+    // (con '-' y '_' en vez de '+' y '/', y sin padding '='), y pueden contener
+    // caracteres UTF-8 (acentos, ñ, etc.). atob() a secas falla o corrompe esos casos.
+    function decodeJWT(token) {
+        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4 !== 0) base64 += '=';
+        const binario = atob(base64);
+        const jsonPayload = decodeURIComponent(
+            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(jsonPayload);
+    }
+
+    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
+    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
+    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
+    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
+    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
+
+    function obtenerNotifDescartadas() {
+        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
+    }
+    function guardarNotifDescartadas(lista) {
+        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
+    }
+
+    function toggleNotificaciones() {
+        const panel = document.getElementById('modalNotificaciones');
+        const estabaOculto = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        if (estabaOculto) cargarNotificaciones();
+    }
+
+    async function cargarNotificaciones() {
+        const cont = document.getElementById('lista_notificaciones');
         try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            document.getElementById('nav_user_name').innerText = payload.nombre.split(' ')[0];
-        } catch (e) { 
-            localStorage.removeItem('token_sanctorum');
-            window.location.replace("login.html");
+            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
+            const json = await res.json();
+            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
+
+            const descartadas = obtenerNotifDescartadas();
+            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
+                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
+                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
+                titulo: a.titulo, detalle: a.detalle || ''
+            }));
+
+            if (json.data.solicitudes_pendientes > 0) {
+                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
+                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
+            }
+            if (json.data.insumos_bajo_stock > 0) {
+                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
+                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
+            }
+
+            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
+            actualizarPuntoNotificaciones(notificaciones.length);
+
+            if (notificaciones.length === 0) {
+                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
+                return;
+            }
+
+            cont.innerHTML = notificaciones.map(n => `
+                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
+                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
+                    </div>
+                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>`).join('');
+        } catch (e) {
+            console.error("Error al cargar notificaciones:", e);
+            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
         }
+    }
+
+    function actualizarPuntoNotificaciones(cantidad) {
+        const punto = document.getElementById('punto_notificaciones');
+        if (!punto) return;
+        punto.classList.toggle('hidden', cantidad === 0);
+    }
+
+    function descartarNotificacion(id) {
+        const descartadas = obtenerNotifDescartadas();
+        if (!descartadas.includes(id)) descartadas.push(id);
+        guardarNotifDescartadas(descartadas);
+        cargarNotificaciones();
+    }
+
+    function limpiarTodasNotificaciones() {
+        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
+            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
+            if (match) {
+                const descartadas = obtenerNotifDescartadas();
+                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
+                guardarNotifDescartadas(descartadas);
+            }
+        });
+        cargarNotificaciones();
+    }
+
+    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
+    // entra directo por URL a una página no permitida para su rol, lo redirige.
+    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
+    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
+    function aplicarRestriccionesNav(rol, especialidad) {
+        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
+        const permisos = {
+            'dashboard_admin.html': [1, 3],
+            'gestion_expedientes_admin.html': esPsico ? [1, 2] : [1],
+            'gestion_voluntariado_admin.html': [1, 3],
+            'inventario_admin.html': [1, 3],
+            'agenda_admin.html': [1, 2, 3, 4],
+            'gestion_publicaciones_admin.html': [1, 2, 3, 4],
+            'gestion_reportes_admin.html': [1, 2, 3, 4],
+            'aliados_donativos_admin.html': [1, 3]
+        };
+
+        document.querySelectorAll('aside nav a[href]').forEach(a => {
+            const pagina = a.getAttribute('href');
+            const permitidos = permisos[pagina];
+            if (permitidos && !permitidos.includes(rol)) {
+                a.remove();
+            }
+        });
+
+        const paginaActual = window.location.pathname.split('/').pop();
+        const permitidosActual = permisos[paginaActual];
+        if (permitidosActual && !permitidosActual.includes(rol)) {
+            window.location.replace('agenda_admin.html');
+        }
+    }
+
+    const API_URL = 'http://localhost:3000/api';
+
+    // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
+    function authHeaders() {
+        return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
+    }
+
+    // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
+    // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
+    // pedirla de nuevo en cada subida.
+    let _cloudinaryConfigCache = null;
+    async function obtenerConfigCloudinary() {
+        if (_cloudinaryConfigCache) return _cloudinaryConfigCache;
+        // Nota: en este archivo API_URL ya incluye el sufijo /api, así que no lo repetimos.
+        const res = await fetch(`${API_URL}/config/cloudinary`);
+        const json = await res.json();
+        _cloudinaryConfigCache = { cloudName: json.cloud_name, uploadPreset: json.upload_preset };
+        return _cloudinaryConfigCache;
+    }
+
+    let expedienteActualId = null;
+    let expedienteActualFechaNac = '';
+    let expedienteActualEscuela = '';
+    let usuarioActual = null;
+    window.expedientesDB = [];
+    let paginaExpedientesActual = 1;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Carga de credenciales visuales
+        const token = localStorage.getItem('token_sanctorum');
+        if (!token) { window.location.replace("login.html"); return; }
+        try {
+            usuarioActual = decodeJWT(token);
+            aplicarRestriccionesNav(usuarioActual.rol, usuarioActual.especialidad);
+            document.getElementById('nav_user_name').innerText = usuarioActual.nombre.split(' ')[0];
+            cargarNotificaciones();
+            verificarAccesoDocumento(usuarioActual);
+        } catch (e) {
+            window.location.replace("login.html");
+            return;
+        }
+
+        cargarDatosIniciales();
     });
+
+    // Bloquea el acceso si el usuario (Especialista/Psicólogo) todavía no tiene
+    // aprobado su documento profesional -- solo puede ver su Perfil.
+    function verificarAccesoDocumento(usuario) {
+        if (usuario.rol !== 2 && usuario.rol !== 3) return;
+        fetch(`${API_URL}/usuarios/${usuario.id}`)
+            .then(r => r.json())
+            .then(j => {
+                const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
+                if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
+                    window.location.replace('perfil_admin.html');
+                }
+            })
+            .catch(() => {});
+    }
 
     function cerrarSesion() {
         localStorage.removeItem('token_sanctorum');
         window.location.replace("login.html");
+    }
+
+    // ================= CARGA DE DATOS PRINCIPALES =================
+    async function cargarDatosIniciales() {
+        try {
+            const resCat = await fetch(`${API_URL}/catalogos_expedientes`);
+            const cat = await resCat.json();
+
+            if (cat.success) {
+                const selEspecialista = document.getElementById('sel_especialista');
+                const selEscuela = document.getElementById('sel_escuela');
+                const filtroEspecialista = document.getElementById('filtro_especialista');
+
+                // Especialistas (Psicólogos)
+                selEspecialista.innerHTML = '<option value="">Selecciona un psicólogo</option>';
+                filtroEspecialista.innerHTML = '<option value="Todos">Cualquier Especialista</option>';
+
+                cat.especialistas.forEach(esp => {
+                    selEspecialista.innerHTML += `<option value="${esp.id_usuario}">${esp.nombre_completo}</option>`;
+                    filtroEspecialista.innerHTML += `<option value="${esp.nombre_completo}">${esp.nombre_completo}</option>`;
+                });
+
+                // Si quien abre el modal es un psicólogo, se preselecciona a sí mismo por defecto.
+                if (usuarioActual && usuarioActual.rol === 2 && (usuarioActual.especialidad || '').toLowerCase().includes('psic')) {
+                    selEspecialista.value = usuarioActual.id;
+                }
+
+                // Escuelas
+                selEscuela.innerHTML = '<option value="">Selecciona una escuela...</option><option value="0">Ninguna / No aplica</option>';
+                cat.escuelas.forEach(esc => {
+                    selEscuela.innerHTML += `<option value="${esc.id_escuela}">${esc.nombre_escuela}</option>`;
+                });
+                selEscuela.innerHTML += '<option value="otra" class="font-bold text-primary">Otra escuela (Escribir...)</option>';
+            }
+
+            cargarExpedientes();
+        } catch (error) {
+            console.error("Error al cargar los catálogos:", error);
+        }
+    }
+
+    async function cargarExpedientes() {
+        try {
+            const res = await fetch(`${API_URL}/expedientes`, { headers: authHeaders() });
+            const data = await res.json();
+
+            if (data.success) {
+                window.expedientesDB = data.data;
+                renderExpedientes(data.data);
+            }
+        } catch (error) {
+            console.error("Error al cargar los expedientes:", error);
+        }
+    }
+
+    // ================= FUNCIONES AUXILIARES =================
+    function calcularEdad(fechaString) {
+        if (!fechaString) return 'N/A';
+        const hoy = new Date();
+        const fechaNac = new Date(fechaString);
+        let edad = hoy.getFullYear() - fechaNac.getFullYear();
+        const m = hoy.getMonth() - fechaNac.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) edad--;
+        return edad + " años";
+    }
+
+    function cambiarColorRiesgo(select) {
+        select.className = "w-full border-none rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold transition-colors";
+        if (select.value === 'Bajo') select.classList.add('bg-green-50', 'text-green-700');
+        else if (select.value === 'Medio') select.classList.add('bg-yellow-50', 'text-yellow-700');
+        else select.classList.add('bg-red-50', 'text-red-700');
+    }
+
+    // ================= FUNCIONES DE LA TABLA =================
+    function renderControlesPaginacionExpedientes(totalPaginas) {
+        const cont = document.getElementById('controles_paginacion_expedientes');
+        if (totalPaginas <= 1) { cont.innerHTML = ''; return; }
+
+        let botones = `<button onclick="irAPaginaExpedientes(${paginaExpedientesActual - 1})" ${paginaExpedientesActual === 1 ? 'disabled' : ''} class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"><span class="material-symbols-outlined text-sm">chevron_left</span></button>`;
+
+        // Mostramos como máximo 5 números de página para no saturar la barra.
+        let inicio = Math.max(1, paginaExpedientesActual - 2);
+        let fin = Math.min(totalPaginas, inicio + 4);
+        inicio = Math.max(1, fin - 4);
+
+        for (let p = inicio; p <= fin; p++) {
+            const activo = p === paginaExpedientesActual;
+            botones += `<button onclick="irAPaginaExpedientes(${p})" class="w-10 h-10 rounded-full font-bold transition-colors ${activo ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">${p}</button>`;
+        }
+
+        botones += `<button onclick="irAPaginaExpedientes(${paginaExpedientesActual + 1})" ${paginaExpedientesActual === totalPaginas ? 'disabled' : ''} class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"><span class="material-symbols-outlined text-sm">chevron_right</span></button>`;
+
+        cont.innerHTML = botones;
+    }
+
+    function irAPaginaExpedientes(pagina) {
+        paginaExpedientesActual = pagina;
+        renderExpedientes(window.expedientesFiltradosActuales || window.expedientesDB);
+    }
+
+    function renderExpedientes(lista) {
+        const tbody = document.getElementById('lista_expedientes');
+        tbody.innerHTML = '';
+
+        const total = lista.length;
+        document.getElementById('total_registros').innerText = total;
+
+        if (total === 0) {
+            document.getElementById('rango_mostrado').innerText = '0';
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-slate-400 font-medium">No se encontraron expedientes.</td></tr>`;
+            document.getElementById('controles_paginacion_expedientes').innerHTML = '';
+            return;
+        }
+
+        // ---- Paginación: 10 registros por página ----
+        const POR_PAGINA = 10;
+        const totalPaginas = Math.ceil(total / POR_PAGINA);
+        if (paginaExpedientesActual > totalPaginas) paginaExpedientesActual = totalPaginas;
+        if (paginaExpedientesActual < 1) paginaExpedientesActual = 1;
+        const inicio = (paginaExpedientesActual - 1) * POR_PAGINA;
+        const paginaDatos = lista.slice(inicio, inicio + POR_PAGINA);
+
+        document.getElementById('rango_mostrado').innerText = `${inicio + 1} - ${Math.min(inicio + POR_PAGINA, total)}`;
+        renderControlesPaginacionExpedientes(totalPaginas);
+
+        paginaDatos.forEach(exp => {
+            let badgeClass = "";
+            if (exp.estatus === "ACTIVO") badgeClass = "bg-green-100 text-green-700";
+            else if (exp.estatus === "EN PAUSA") badgeClass = "bg-orange-100 text-orange-700";
+            else badgeClass = "bg-slate-200 text-slate-600";
+
+            const fechaIngresoFormateada = exp.ingreso ? new Date(exp.ingreso).toLocaleDateString('es-MX') : 'N/A';
+            const partes = (exp.especialista || 'N A').split(' ');
+            const iniciales_esp = partes.length > 1 ? (partes[0][0] + partes[1][0]).toUpperCase() : (exp.especialista || 'NA').substring(0, 2).toUpperCase();
+
+            const edad = exp.fecha_nacimiento ? calcularEdad(exp.fecha_nacimiento) : 'N/A';
+            const genero = exp.genero || 'No especificado';
+            const colonia = exp.colonia_puebla || 'No especificada';
+            const fechaNacRaw = exp.fecha_nacimiento ? new Date(exp.fecha_nacimiento).toISOString().split('T')[0] : '';
+            const escuelaRaw = (exp.escuela === 'N/A') ? '' : exp.escuela;
+
+            tbody.innerHTML += `
+                <tr class="hover:bg-slate-50/80 transition-colors group">
+                    <td class="px-6 py-4 font-bold text-slate-500 text-sm whitespace-nowrap">${exp.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-teal-800 flex items-center justify-center text-white border-2 border-white shadow-sm shrink-0">
+                                <span class="material-symbols-outlined text-[20px]">medical_mask</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm leading-tight">${exp.paciente}</p>
+                                <p class="text-[11px] text-slate-400 font-medium mt-0.5">Ingreso: ${fechaIngresoFormateada}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-medium text-slate-600 whitespace-nowrap">${exp.tutor}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-slate-500 whitespace-nowrap">${exp.escuela}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold flex items-center justify-center shrink-0 border border-blue-200">${iniciales_esp}</div>
+                            <span class="text-sm font-bold text-slate-700">${exp.especialista}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${badgeClass}">${exp.estatus}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                        <button onclick="abrirModalDetalle('${exp.id}', \`${exp.paciente}\`, \`${exp.escuela}\`, '${exp.estatus}', \`${exp.tutor}\`, '${fechaIngresoFormateada}', \`${exp.especialista}\`, '${genero}', '${edad}', \`${colonia}\`, \`${exp.telefono_tutor || ''}\`, \`${exp.correo_tutor || ''}\`, '${fechaNacRaw}', \`${escuelaRaw}\`)" class="text-slate-400 hover:text-secondary bg-white hover:bg-pink-50 p-2 rounded-full border border-transparent hover:border-pink-100 transition-all shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100">
+                            <span class="material-symbols-outlined text-[20px]">edit_document</span>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function aplicarFiltros() {
+        const texto = document.getElementById('buscador_principal').value.toLowerCase();
+        const fEsp = document.getElementById('filtro_especialista').value;
+        const fEst = document.getElementById('filtro_estatus').value;
+
+        const filtrados = window.expedientesDB.filter(exp => {
+            const matchesText = !texto || exp.paciente.toLowerCase().includes(texto) || exp.tutor.toLowerCase().includes(texto) || exp.id.toString().includes(texto);
+            const matchesEsp = fEsp === 'Todos' || exp.especialista === fEsp;
+            const matchesEst = fEst === 'Todos' || exp.estatus === fEst;
+            return matchesText && matchesEsp && matchesEst;
+        });
+        window.expedientesFiltradosActuales = filtrados;
+        paginaExpedientesActual = 1;
+        renderExpedientes(filtrados);
+    }
+
+    function limpiarFiltros() {
+        document.getElementById('buscador_principal').value = '';
+        document.getElementById('filtro_especialista').value = 'Todos';
+        document.getElementById('filtro_estatus').value = 'Todos';
+        window.expedientesFiltradosActuales = window.expedientesDB;
+        paginaExpedientesActual = 1;
+        renderExpedientes(window.expedientesDB);
+    }
+
+    // ================= NUEVO EXPEDIENTE =================
+    function toggleNuevaEscuela() {
+        const select = document.getElementById('sel_escuela');
+        const input = document.getElementById('input_nueva_escuela');
+        if (select.value === 'otra') {
+            input.classList.remove('hidden');
+            input.required = true;
+        } else {
+            input.classList.add('hidden');
+            input.required = false;
+            input.value = '';
+        }
+    }
+
+    function abrirModalNuevoExpediente() {
+        document.getElementById('formNuevoExpediente').reset();
+        toggleNuevaEscuela();
+        // El reset() del form borra cualquier selección previa, así que reaplicamos
+        // la preselección del psicólogo logueado (si aplica) después de resetear.
+        if (usuarioActual && usuarioActual.rol === 2 && (usuarioActual.especialidad || '').toLowerCase().includes('psic')) {
+            document.getElementById('sel_especialista').value = usuarioActual.id;
+        }
+        document.getElementById('modalNuevo').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalNuevo').classList.remove('opacity-0');
+            document.getElementById('modalNuevoContent').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function cerrarModalNuevo() {
+        document.getElementById('modalNuevo').classList.add('opacity-0');
+        document.getElementById('modalNuevoContent').classList.add('scale-95');
+        setTimeout(() => { document.getElementById('modalNuevo').classList.add('hidden'); }, 300);
+    }
+
+    async function guardarExpediente(e) {
+        e.preventDefault();
+        const valEscuela = document.getElementById('sel_escuela').value;
+
+        const payload = {
+            nombre: document.getElementById('nom_paciente').value,
+            fecha_nacimiento: document.getElementById('f_nacimiento').value,
+            genero: document.getElementById('sel_genero').value || null,
+            colonia_puebla: document.getElementById('input_colonia').value || null,
+            id_escuela: valEscuela,
+            escuela_nueva: valEscuela === 'otra' ? document.getElementById('input_nueva_escuela').value : null,
+            tutor: document.getElementById('nom_tutor').value,
+            telefono_tutor: document.getElementById('tel_tutor').value,
+            correo_tutor: document.getElementById('correo_tutor').value,
+            id_especialista: document.getElementById('sel_especialista').value
+        };
+
+        const btn = e.target.querySelector('button[type="submit"]');
+        const textoOriginal = btn.innerText;
+        btn.innerText = "Guardando..."; btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_URL}/expedientes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                cerrarModalNuevo();
+                cargarDatosIniciales(); // Recarga catálogos (por si hay escuela nueva) y expedientes
+            } else alert("Error al guardar.");
+        } catch (error) { console.error(error); alert("Error de conexión al guardar el expediente."); }
+        finally { btn.innerText = textoOriginal; btn.disabled = false; }
+    }
+
+    // ================= MODAL DETALLE, TABS Y NOTAS =================
+    function abrirModalDetalle(id, nombre, escuela, estatus, tutor, ingreso, especialista, genero, edad, colonia, telefono_tutor, correo_tutor, fecha_nac_raw, escuela_raw) {
+        expedienteActualId = id;
+        expedienteActualFechaNac = fecha_nac_raw || '';
+        expedienteActualEscuela = escuela_raw || '';
+        document.getElementById('det_id').innerText = 'ID: ' + id;
+        document.getElementById('det_nombre').innerText = nombre;
+        document.getElementById('det_escuela').innerText = escuela;
+
+        // Inyectar Datos Generales
+        document.getElementById('dg_ingreso').innerText = ingreso;
+        document.getElementById('dg_especialista').innerText = especialista;
+        document.getElementById('dg_tutor').innerText = tutor;
+        document.getElementById('dg_tel_tutor').innerText = telefono_tutor || 'No registrado';
+        document.getElementById('dg_correo_tutor').innerText = correo_tutor || 'No registrado';
+        document.getElementById('vista_tutor').classList.remove('hidden');
+        document.getElementById('edicion_tutor').classList.add('hidden');
+        document.getElementById('vista_beneficiario').classList.remove('hidden');
+        document.getElementById('edicion_beneficiario').classList.add('hidden');
+        document.getElementById('dg_genero').innerText = genero || '-';
+        document.getElementById('dg_edad').innerText = edad || '-';
+        document.getElementById('dg_colonia').innerText = colonia || '-';
+
+        // El select de estatus refleja el valor actual
+        document.getElementById('det_estatus').value = estatus;
+
+        // Reiniciar Interfaz
+        cambiarTab('notas');
+        document.getElementById('texto_nueva_nota').value = '';
+
+        const selectRiesgo = document.getElementById('nota_riesgo');
+        selectRiesgo.value = 'Bajo';
+        cambiarColorRiesgo(selectRiesgo);
+
+        cargarNotas(id);
+        cargarDocumentos(id);
+
+        document.getElementById('modalDetalle').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalDetalle').classList.remove('opacity-0');
+            document.getElementById('modalDetalleContent').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function cerrarModalDetalle() {
+        document.getElementById('modalDetalle').classList.add('opacity-0');
+        document.getElementById('modalDetalleContent').classList.add('scale-95');
+        setTimeout(() => { document.getElementById('modalDetalle').classList.add('hidden'); }, 300);
+    }
+
+    function cambiarTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => {
+            el.classList.add('hidden'); el.classList.remove('block');
+        });
+        document.querySelectorAll('[id^="tabBtn_"]').forEach(btn => {
+            btn.classList.replace('border-secondary', 'border-transparent');
+            btn.classList.replace('text-secondary', 'text-slate-400');
+        });
+
+        document.getElementById(`tab_${tabName}`).classList.remove('hidden');
+        document.getElementById(`tab_${tabName}`).classList.add('block');
+
+        const activeBtn = document.getElementById(`tabBtn_${tabName}`);
+        activeBtn.classList.replace('border-transparent', 'border-secondary');
+        activeBtn.classList.replace('text-slate-400', 'text-secondary');
+    }
+
+    // ================= NOTAS DE EVOLUCIÓN =================
+    async function cargarNotas(id) {
+        const contenedor = document.getElementById('contenedor_notas');
+        contenedor.innerHTML = '<p class="text-sm text-slate-400">Cargando...</p>';
+        try {
+            const res = await fetch(`${API_URL}/expedientes/${id}/notas`, { headers: authHeaders() });
+            const data = await res.json();
+            if (data.success) {
+                contenedor.innerHTML = '';
+                if (data.data.length === 0) {
+                    contenedor.innerHTML = '<p class="text-sm text-slate-400 italic">No hay notas registradas aún.</p>';
+                    return;
+                }
+                data.data.forEach((nota, index) => {
+                    const colorMarker = index === 0 ? "bg-secondary" : "bg-slate-300";
+                    const opacity = index === 0 ? "" : "opacity-80";
+                    const fechaFormat = new Date(nota.fecha_atencion).toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short' });
+
+                    let badgeRiesgo = '<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px]">Sin Clasificar</span>';
+                    if (nota.nivel_riesgo === 'Bajo') badgeRiesgo = '<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px]">Riesgo Bajo</span>';
+                    else if (nota.nivel_riesgo === 'Medio') badgeRiesgo = '<span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-[10px]">Riesgo Medio</span>';
+                    else if (nota.nivel_riesgo === 'Alto') badgeRiesgo = '<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-[10px]">Riesgo Alto</span>';
+
+                    contenedor.innerHTML += `
+                    <div class="relative">
+                      <span class="absolute -left-[31px] top-1 w-3 h-3 ${colorMarker} rounded-full ring-4 ring-white"></span>
+                      <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 ${opacity}">
+                          <div class="flex justify-between items-start mb-3 border-b border-slate-200 pb-2">
+                              <div>
+                                  <p class="text-xs font-bold text-slate-800 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">calendar_today</span> ${fechaFormat}
+                                  </p>
+                                  <p class="text-[10px] text-slate-500 mt-0.5 font-medium">Por: ${nota.especialista}</p>
+                              </div>
+                              <div class="flex flex-col items-end gap-1">
+                                  ${badgeRiesgo}
+                                  <span class="text-[10px] text-slate-500 font-bold">${nota.tipo_sesion || ''} • ${nota.modalidad || ''} • ${nota.asistencia || ''}</span>
+                              </div>
+                          </div>
+                          <p class="text-sm text-slate-700 whitespace-pre-line">${nota.contenido_nota}</p>
+                      </div>
+                    </div>`;
+                });
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function guardarNota() {
+        const texto = document.getElementById('texto_nueva_nota').value.trim();
+        if (!texto) return alert("La nota está vacía.");
+
+        const token = localStorage.getItem('token_sanctorum');
+        let id_esp = null;
+        if (token) { try { id_esp = decodeJWT(token).id; } catch (e) {} }
+
+        const payload = {
+            id_especialista: id_esp,
+            nota: texto,
+            tipo_sesion: document.getElementById('nota_tipo').value,
+            modalidad: document.getElementById('nota_modalidad').value,
+            asistencia: document.getElementById('nota_asistencia').value,
+            nivel_riesgo: document.getElementById('nota_riesgo').value
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/expedientes/${expedienteActualId}/notas`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('texto_nueva_nota').value = '';
+                cargarNotas(expedienteActualId);
+            } else alert("Error al guardar nota.");
+        } catch (e) { console.error(e); alert("Error de conexión al guardar la nota."); }
+    }
+
+    // ================= EDITAR DATOS DEL TUTOR =================
+    function toggleEditarTutor() {
+        const vista = document.getElementById('vista_tutor');
+        const edicion = document.getElementById('edicion_tutor');
+        const editando = edicion.classList.contains('hidden');
+        vista.classList.toggle('hidden', editando);
+        edicion.classList.toggle('hidden', !editando);
+        if (editando) {
+            document.getElementById('edit_tutor_nombre').value = document.getElementById('dg_tutor').innerText;
+            const tel = document.getElementById('dg_tel_tutor').innerText;
+            const correo = document.getElementById('dg_correo_tutor').innerText;
+            document.getElementById('edit_tutor_telefono').value = tel === 'No registrado' ? '' : tel;
+            document.getElementById('edit_tutor_correo').value = correo === 'No registrado' ? '' : correo;
+        }
+    }
+
+    // --- Edición de datos del Beneficiario (nombre, fecha de nacimiento, escuela, género, colonia) ---
+    function toggleEditarBeneficiario() {
+        const vista = document.getElementById('vista_beneficiario');
+        const edicion = document.getElementById('edicion_beneficiario');
+        const editando = edicion.classList.contains('hidden');
+        vista.classList.toggle('hidden', editando);
+        edicion.classList.toggle('hidden', !editando);
+        if (editando) {
+            document.getElementById('edit_ben_nombre').value = document.getElementById('det_nombre').innerText;
+            document.getElementById('edit_ben_fecha_nac').value = expedienteActualFechaNac || '';
+            document.getElementById('edit_ben_escuela').value = expedienteActualEscuela || '';
+            const generoActual = document.getElementById('dg_genero').innerText;
+            const coloniaActual = document.getElementById('dg_colonia').innerText;
+            document.getElementById('edit_ben_genero').value = ['Masculino', 'Femenino', 'Otro'].includes(generoActual) ? generoActual : '';
+            document.getElementById('edit_ben_colonia').value = (coloniaActual === 'No especificada' || coloniaActual === '-') ? '' : coloniaActual;
+        }
+    }
+
+    async function guardarBeneficiario() {
+        const payload = {
+            nombre: document.getElementById('edit_ben_nombre').value,
+            fecha_nacimiento: document.getElementById('edit_ben_fecha_nac').value || null,
+            escuela_texto: document.getElementById('edit_ben_escuela').value,
+            genero: document.getElementById('edit_ben_genero').value || null,
+            colonia_puebla: document.getElementById('edit_ben_colonia').value || null
+        };
+        try {
+            const res = await fetch(`${API_URL}/api/expedientes/${expedienteActualId}/datos`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('det_nombre').innerText = payload.nombre || document.getElementById('det_nombre').innerText;
+                if (payload.escuela_texto) { document.getElementById('det_escuela').innerText = payload.escuela_texto; expedienteActualEscuela = payload.escuela_texto; }
+                if (payload.fecha_nacimiento) {
+                    expedienteActualFechaNac = payload.fecha_nacimiento;
+                    document.getElementById('dg_edad').innerText = calcularEdad(payload.fecha_nacimiento);
+                }
+                if (payload.genero) document.getElementById('dg_genero').innerText = payload.genero;
+                if (payload.colonia_puebla) document.getElementById('dg_colonia').innerText = payload.colonia_puebla;
+                toggleEditarBeneficiario();
+                cargarDatosIniciales();
+            } else {
+                alert('Error al guardar los datos del beneficiario.');
+            }
+        } catch (e) { console.error(e); alert('Error de conexión.'); }
+    }
+
+    async function guardarTutor() {
+        const payload = {
+            tutor: document.getElementById('edit_tutor_nombre').value,
+            telefono_tutor: document.getElementById('edit_tutor_telefono').value,
+            correo_tutor: document.getElementById('edit_tutor_correo').value
+        };
+        try {
+            const res = await fetch(`${API_URL}/expedientes/${expedienteActualId}/tutor`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('dg_tutor').innerText = payload.tutor || '-';
+                document.getElementById('dg_tel_tutor').innerText = payload.telefono_tutor || 'No registrado';
+                document.getElementById('dg_correo_tutor').innerText = payload.correo_tutor || 'No registrado';
+                toggleEditarTutor();
+                cargarDatosIniciales();
+            } else {
+                alert('Error al guardar los datos del tutor.');
+            }
+        } catch (e) { console.error(e); alert('Error de conexión.'); }
+    }
+
+    function eliminarDocumento(idDoc) {
+        if (!confirm('¿Eliminar este documento? Esta acción no se puede deshacer.')) return;
+        fetch(`${API_URL}/expedientes/${expedienteActualId}/documentos/${idDoc}`, { method: 'DELETE', headers: authHeaders() })
+            .then(res => res.json())
+            .then(data => { if (data.success) cargarDocumentos(expedienteActualId); else alert('No se pudo eliminar.'); })
+            .catch(e => { console.error(e); alert('Error de conexión.'); });
+    }
+
+    // ================= DOCUMENTOS Y CLOUDINARY =================
+    async function cargarDocumentos(id) {
+        const contenedor = document.getElementById('contenedor_documentos');
+        contenedor.innerHTML = '<p class="text-sm text-slate-400">Cargando...</p>';
+        try {
+            const res = await fetch(`${API_URL}/expedientes/${id}/documentos`, { headers: authHeaders() });
+            const data = await res.json();
+            if (data.success) {
+                contenedor.innerHTML = '';
+                if (data.data.length === 0) {
+                    contenedor.innerHTML = '<p class="text-sm text-slate-400 italic">No hay documentos adjuntos.</p>';
+                    return;
+                }
+                data.data.forEach(doc => {
+                    const isPdf = doc.url_archivo.toLowerCase().endsWith('.pdf');
+                    const icon = isPdf ? 'picture_as_pdf' : 'image';
+                    const fechaFormat = new Date(doc.fecha_subida).toLocaleDateString('es-MX');
+
+                    contenedor.innerHTML += `
+                    <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined">${icon}</span>
+                            </div>
+                            <div class="truncate">
+                                <p class="text-sm font-bold text-slate-700 truncate">${doc.nombre_archivo}</p>
+                                <p class="text-[10px] text-slate-400">Subido el ${fechaFormat}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-1 shrink-0">
+                            <a href="${doc.url_archivo}" target="_blank" class="p-2 text-slate-400 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 rounded-full transition-colors">
+                                <span class="material-symbols-outlined">download</span>
+                            </a>
+                            <button onclick="eliminarDocumento(${doc.id_doc})" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors">
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+                        </div>
+                    </div>`;
+                });
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function subirDocumentoCloudinary(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const btnText = document.getElementById('btn_upload_text');
+        btnText.innerText = "Subiendo...";
+        btnText.disabled = true;
+
+        // Config leída del backend (que a su vez la lee de las variables de entorno
+        // CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET).
+        const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } = await obtenerConfigCloudinary();
+        if (!CLOUD_NAME || !UPLOAD_PRESET) {
+            alert('Falta configurar CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET en las variables de entorno del servidor.');
+            btnText.innerText = "Seleccionar Archivo"; btnText.disabled = false;
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', UPLOAD_PRESET);
+
+        try {
+            // Los PDF deben subirse como "raw": Cloudinary bloquea por seguridad la entrega
+            // de PDFs cuando se suben/sirven como "image" (que es lo que "auto" elige para
+            // archivos PDF), y esos documentos terminan con un enlace que nunca abre.
+            const esPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${esPdf ? 'raw' : 'auto'}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+            const uploadData = await uploadRes.json();
+
+            if (uploadData.secure_url) {
+                const dbRes = await fetch(`${API_URL}/expedientes/${expedienteActualId}/documentos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({
+                        nombre_archivo: file.name,
+                        url_archivo: uploadData.secure_url
+                    })
+                });
+                const dbData = await dbRes.json();
+                if (dbData.success) {
+                    cargarDocumentos(expedienteActualId);
+                } else alert("El archivo se subió, pero hubo un error en la base de datos.");
+            } else {
+                alert("No se pudo subir el archivo. Revisa la configuración de Cloudinary (CLOUD_NAME / UPLOAD_PRESET).");
+            }
+        } catch (error) {
+            console.error("Error al subir archivo:", error);
+            alert("Falló la subida del documento. Revisa tu configuración.");
+        } finally {
+            btnText.innerText = "Seleccionar Archivo";
+            btnText.disabled = false;
+            event.target.value = '';
+        }
+    }
+
+    // ================= ESTATUS CLÍNICO =================
+    async function cambiarEstatusExpediente(nuevoEstatus) {
+        try {
+            const res = await fetch(`${API_URL}/expedientes/${expedienteActualId}/estatus`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify({ estatus: nuevoEstatus })
+            });
+            const data = await res.json();
+            if (data.success) {
+                cargarExpedientes(); // Refresca la tabla principal por detrás
+            } else {
+                alert("Error al actualizar estatus");
+            }
+        } catch (e) { console.error(e); }
     }
   </script>
 </body>

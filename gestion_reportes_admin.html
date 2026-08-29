@@ -1,0 +1,648 @@
+<!doctype html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Reportes de Evento | Sanctorum A.C.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = { theme: { extend: { colors: { primary: "#8a5100", secondary: "#b50062", surface: "#f6fafe", "surface-container-low": "#f0f4f8" }, fontFamily: { sans: ["Quicksand", "sans-serif"], plus: ["Plus Jakarta Sans", "sans-serif"] } } } };
+  </script>
+  <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+</head>
+<body class="bg-surface text-slate-800 min-h-screen">
+
+  <!-- ================= SIDE NAV BAR UNIVERSAL ================= -->
+  <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
+    <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
+    <nav class="flex-1 px-4 space-y-2">
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda_admin.html"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_publicaciones_admin.html"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="gestion_reportes_admin.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">fact_check</span><span class="font-medium">Reportes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos_admin.html"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
+    </nav>
+    <div class="px-6 mt-auto space-y-4">
+      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
+      <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <main class="ml-72 min-h-screen flex flex-col">
+    <!-- ================= TOP NAV BAR UNIVERSAL ================= -->
+    <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
+      <div class="flex items-center flex-1">
+        <div class="relative w-full max-w-md">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+          <input id="buscador_principal" oninput="aplicarFiltroReportes()" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar por evento o autor..." type="text" />
+        </div>
+      </div>
+      <div class="flex items-center gap-4 ml-8">
+        <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
+        <div class="h-8 w-px bg-slate-200 mx-2"></div>
+        <a href="perfil_admin.html" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
+          <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
+          <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
+        </a>
+
+        <!-- Panel de Notificaciones -->
+        <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
+              <h3 class="font-bold text-sm">Notificaciones</h3>
+              <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
+            </div>
+            <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
+            </div>
+            <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="p-8 flex-1">
+      <div class="flex justify-between items-end mb-10">
+        <div>
+          <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Reportes de Evento</h2>
+          <p class="text-slate-500 max-w-xl">Registro de qué se hizo, qué se utilizó y cuántas personas asistieron a cada actividad realizada.</p>
+        </div>
+        <button onclick="abrirModalReporte()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-[#b50062] to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
+          <span class="material-symbols-outlined">add</span> Llenar Nuevo Reporte
+        </button>
+      </div>
+
+      <div id="lista_reportes" class="space-y-4">
+        <p class="text-slate-400 text-sm text-center py-10">Cargando reportes...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= MODAL: NUEVO / EDITAR REPORTE ================= -->
+  <div id="modalReporte" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10">
+    <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="modalReporteContent">
+      <div class="bg-gradient-to-r from-primary to-[#f39200] px-8 py-6 text-white flex justify-between items-center shrink-0">
+        <div><h3 id="modalReporteTitulo" class="text-2xl font-bold font-plus">Nuevo Reporte de Evento</h3></div>
+        <button type="button" onclick="cerrarModalReporte()" class="text-white/80 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
+      </div>
+      <div class="p-8 bg-white overflow-y-auto max-h-[75vh]">
+        <form id="formReporte" onsubmit="guardarReporte(event)" class="space-y-5">
+          <input type="hidden" id="rep_id" value="">
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Evento Reportado</label>
+            <select id="rep_evento" onchange="cargarMaterialesDelEvento()" required class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">Selecciona el evento...</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">¿Qué se hizo? (Actividades realizadas)</label>
+            <textarea id="rep_actividades" rows="4" required class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" placeholder="Describe brevemente cómo se desarrolló el evento..."></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Materiales utilizados</label>
+            <p class="text-xs text-slate-400 mb-2">Captura cuánto se usó realmente de cada material que ya estaba planeado para este evento. Lo que sobre se regresa automáticamente al inventario para futuros eventos.</p>
+            <div id="contenedor_materiales_reporte" class="space-y-2">
+              <p class="text-xs text-slate-400 italic">Selecciona primero un evento para ver sus materiales planeados.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Número de asistentes</label>
+              <input type="number" min="0" id="rep_asistentes" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30" placeholder="Ej. 35">
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Reportado por</label>
+              <input type="text" id="rep_autor_display" disabled class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl outline-none text-slate-500 font-bold">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Observaciones adicionales</label>
+            <textarea id="rep_observaciones" rows="3" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" placeholder="Incidencias, aprendizajes, recomendaciones para la próxima vez..."></textarea>
+          </div>
+
+          <div class="pt-4 flex gap-4">
+            <button type="button" onclick="cerrarModalReporte()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors">Cancelar</button>
+            <button type="submit" id="btnGuardarReporte" class="flex-1 py-3 bg-primary text-white font-bold rounded-full shadow-lg hover:bg-orange-800 transition-colors">Guardar Reporte</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: PARTICIPANTES DEL EVENTO ================= -->
+  <div id="modalParticipantesReporte" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0">
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalParticipantesReporteContent">
+      <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-6 text-white flex justify-between items-center">
+        <div><h3 class="text-xl font-bold font-plus">Voluntarios que participaron</h3></div>
+        <button type="button" onclick="cerrarModalParticipantes()" class="text-white/80 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
+      </div>
+      <div class="p-8">
+        <p class="text-xs text-slate-400 mb-3">Desmarca a quien al final no participó, o marca a quien se sumó y no estaba agendado.</p>
+        <input type="hidden" id="part_id_reporte" value="">
+        <div id="part_lista_voluntarios" class="max-h-72 overflow-y-auto space-y-1 border border-slate-200 rounded-xl p-3 text-sm">
+          <!-- Checkboxes inyectados por JS -->
+        </div>
+        <div class="pt-5 flex gap-4">
+          <button type="button" onclick="cerrarModalParticipantes()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="button" id="btnGuardarParticipantes" onclick="guardarParticipantesReporte()" class="flex-1 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition-colors">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function decodeJWT(token) {
+        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4 !== 0) base64 += '=';
+        const binario = atob(base64);
+        const jsonPayload = decodeURIComponent(
+            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(jsonPayload);
+    }
+
+    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
+    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
+    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
+    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
+    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
+
+    function obtenerNotifDescartadas() {
+        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
+    }
+    function guardarNotifDescartadas(lista) {
+        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
+    }
+
+    function toggleNotificaciones() {
+        const panel = document.getElementById('modalNotificaciones');
+        const estabaOculto = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        if (estabaOculto) cargarNotificaciones();
+    }
+
+    async function cargarNotificaciones() {
+        const cont = document.getElementById('lista_notificaciones');
+        try {
+            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
+            const json = await res.json();
+            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
+
+            const descartadas = obtenerNotifDescartadas();
+            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
+                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
+                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
+                titulo: a.titulo, detalle: a.detalle || ''
+            }));
+
+            if (json.data.solicitudes_pendientes > 0) {
+                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
+                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
+            }
+            if (json.data.insumos_bajo_stock > 0) {
+                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
+                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
+            }
+
+            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
+            actualizarPuntoNotificaciones(notificaciones.length);
+
+            if (notificaciones.length === 0) {
+                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
+                return;
+            }
+
+            cont.innerHTML = notificaciones.map(n => `
+                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
+                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
+                    </div>
+                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>`).join('');
+        } catch (e) {
+            console.error("Error al cargar notificaciones:", e);
+            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
+        }
+    }
+
+    function actualizarPuntoNotificaciones(cantidad) {
+        const punto = document.getElementById('punto_notificaciones');
+        if (!punto) return;
+        punto.classList.toggle('hidden', cantidad === 0);
+    }
+
+    function descartarNotificacion(id) {
+        const descartadas = obtenerNotifDescartadas();
+        if (!descartadas.includes(id)) descartadas.push(id);
+        guardarNotifDescartadas(descartadas);
+        cargarNotificaciones();
+    }
+
+    function limpiarTodasNotificaciones() {
+        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
+            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
+            if (match) {
+                const descartadas = obtenerNotifDescartadas();
+                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
+                guardarNotifDescartadas(descartadas);
+            }
+        });
+        cargarNotificaciones();
+    }
+
+    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
+    // entra directo por URL a una página no permitida para su rol, lo redirige.
+    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
+    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
+    function aplicarRestriccionesNav(rol, especialidad) {
+        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
+        const permisos = {
+            'dashboard_admin.html': [1, 3],
+            'gestion_expedientes_admin.html': esPsico ? [1, 2] : [1],
+            'gestion_voluntariado_admin.html': [1, 3],
+            'inventario_admin.html': [1, 3],
+            'agenda_admin.html': [1, 2, 3, 4],
+            'gestion_publicaciones_admin.html': [1, 2, 3, 4],
+            'gestion_reportes_admin.html': [1, 2, 3, 4],
+            'aliados_donativos_admin.html': [1, 3]
+        };
+
+        document.querySelectorAll('aside nav a[href]').forEach(a => {
+            const pagina = a.getAttribute('href');
+            const permitidos = permisos[pagina];
+            if (permitidos && !permitidos.includes(rol)) {
+                a.remove();
+            }
+        });
+
+        const paginaActual = window.location.pathname.split('/').pop();
+        const permitidosActual = permisos[paginaActual];
+        if (permitidosActual && !permitidosActual.includes(rol)) {
+            window.location.replace('agenda_admin.html');
+        }
+    }
+
+    const API_URL = "http://localhost:3000";
+
+    // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
+    function authHeaders() {
+        return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
+    }
+    let reportesGlobal = [];
+    let usuarioActual = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token_sanctorum');
+        if (!token) { window.location.replace("login.html"); return; }
+        try {
+            usuarioActual = decodeJWT(token);
+            aplicarRestriccionesNav(usuarioActual.rol, usuarioActual.especialidad);
+            document.getElementById('nav_user_name').innerText = usuarioActual.nombre.split(' ')[0];
+            cargarNotificaciones();
+            document.getElementById('rep_autor_display').value = usuarioActual.nombre;
+            verificarAccesoDocumento(usuarioActual);
+        } catch (e) { window.location.replace("login.html"); return; }
+
+        cargarEventosParaReporte();
+        cargarReportes();
+        manejarParametroEventoURL();
+    });
+
+    // Bloquea el acceso si el usuario (Especialista/Coordinador) todavía no tiene
+    // aprobado su documento profesional -- solo puede ver su Perfil.
+    function verificarAccesoDocumento(usuario) {
+        if (usuario.rol !== 2 && usuario.rol !== 3) return;
+        fetch(`${API_URL}/api/usuarios/${usuario.id}`)
+            .then(r => r.json())
+            .then(j => {
+                const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
+                if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
+                    window.location.replace('perfil_admin.html');
+                }
+            })
+            .catch(() => {});
+    }
+
+    // Si se llega desde el dashboard con ?id_evento=X (clic en "Eventos con más
+    // participación"), abre directamente el reporte de ese evento (o el formulario
+    // para crearlo si todavía no existe).
+    function manejarParametroEventoURL() {
+        const idEvento = new URLSearchParams(window.location.search).get('id_evento');
+        if (!idEvento) return;
+        setTimeout(() => {
+            const reporteExistente = reportesGlobal.find(r => String(r.id_evento) === String(idEvento));
+            if (reporteExistente) {
+                abrirModalEditarReporte(reporteExistente.id_reporte);
+            } else {
+                abrirModalReporte();
+                const selEvento = document.getElementById('rep_evento');
+                if (selEvento) {
+                    selEvento.value = idEvento;
+                    selEvento.dispatchEvent(new Event('change'));
+                }
+            }
+        }, 500);
+    }
+
+    function cerrarSesion() {
+        localStorage.removeItem('token_sanctorum');
+        window.location.replace("login.html");
+    }
+
+    // ================= CATÁLOGO DE EVENTOS =================
+    async function cargarEventosParaReporte() {
+        try {
+            const res = await fetch(`${API_URL}/api/eventos_para_reporte`);
+            const json = await res.json();
+            if (!json.success) return;
+            const sel = document.getElementById('rep_evento');
+            json.data.forEach(ev => {
+                const fecha = new Date(ev.fecha_realizacion).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+                sel.innerHTML += `<option value="${ev.id_evento}">${ev.titulo_evento} — ${fecha}</option>`;
+            });
+        } catch (e) { console.error("Error al cargar eventos para reporte:", e); }
+    }
+
+    // Trae los materiales que ya se planearon para este evento en Agenda, y arma
+    // una fila editable por cada uno con la cantidad realmente usada (prellenada con lo planeado).
+    async function cargarMaterialesDelEvento() {
+        const idEvento = document.getElementById('rep_evento').value;
+        const cont = document.getElementById('contenedor_materiales_reporte');
+        if (!idEvento) {
+            cont.innerHTML = '<p class="text-xs text-slate-400 italic">Selecciona primero un evento para ver sus materiales planeados.</p>';
+            return;
+        }
+        cont.innerHTML = '<p class="text-xs text-slate-400">Cargando materiales...</p>';
+        try {
+            const res = await fetch(`${API_URL}/api/eventos/${idEvento}/insumos_consumidos`);
+            const json = await res.json();
+            if (!json.success || json.data.length === 0) {
+                cont.innerHTML = '<p class="text-xs text-slate-400 italic">Este evento no tenía materiales planeados en Agenda.</p>';
+                return;
+            }
+            cont.innerHTML = json.data.map(m => `
+                <div class="flex items-center gap-3 bg-[#f0f4f8] p-3 rounded-xl" data-id-insumo="${m.id_insumo}">
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-slate-700">${m.nombre_insumo}</p>
+                        <p class="text-[11px] text-slate-400">Planeado: ${m.cantidad_planeada} ${m.unidad_medida}</p>
+                    </div>
+                    <input type="number" min="0" step="0.01" class="input_material_real w-28 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/30" value="${m.cantidad_planeada}">
+                    <span class="text-xs text-slate-400 w-16">${m.unidad_medida}</span>
+                </div>`).join('');
+        } catch (e) {
+            console.error("Error al cargar materiales del evento:", e);
+            cont.innerHTML = '<p class="text-xs text-red-400">No se pudieron cargar los materiales planeados.</p>';
+        }
+    }
+
+    // ================= LISTADO =================
+    async function cargarReportes() {
+        try {
+            const res = await fetch(`${API_URL}/api/reportes_evento`);
+            const json = await res.json();
+            if (json.success) {
+                reportesGlobal = json.data;
+                renderReportes(reportesGlobal);
+            }
+        } catch (e) {
+            console.error("Error al cargar reportes:", e);
+            document.getElementById('lista_reportes').innerHTML = '<p class="text-red-400 text-sm text-center py-10">No se pudo conectar con el servidor.</p>';
+        }
+    }
+
+    function aplicarFiltroReportes() {
+        const texto = document.getElementById('buscador_principal').value.toLowerCase();
+        const filtrados = reportesGlobal.filter(r =>
+            (r.titulo_evento || '').toLowerCase().includes(texto) || (r.autor || '').toLowerCase().includes(texto)
+        );
+        renderReportes(filtrados);
+    }
+
+    function renderReportes(lista) {
+        const cont = document.getElementById('lista_reportes');
+        if (lista.length === 0) {
+            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-10">Aún no hay reportes registrados. Cuando un voluntario llene el reporte de un evento, aparecerá aquí.</p>';
+            return;
+        }
+        cont.innerHTML = lista.map(r => {
+            const fechaEvento = new Date(r.fecha_realizacion).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+            const fechaReporte = new Date(r.fecha_reporte).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            return `
+              <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-orange-100 text-primary">${fechaEvento}</span>
+                      ${r.numero_asistentes ? `<span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-blue-100 text-blue-700"><span class="material-symbols-outlined text-[12px] align-middle mr-1">group</span>${r.numero_asistentes} asistentes</span>` : ''}
+                    </div>
+                    <h4 class="font-bold text-slate-800 text-lg mb-2">${r.titulo_evento}</h4>
+                    <p class="text-sm text-slate-600 mb-2"><b>Actividades:</b> ${r.actividades_realizadas}</p>
+                    ${r.materiales_utilizados ? `<p class="text-sm text-slate-500 mb-2"><b>Materiales:</b> ${r.materiales_utilizados}</p>` : ''}
+                    ${r.observaciones ? `<p class="text-sm text-slate-500 italic">"${r.observaciones}"</p>` : ''}
+                    <div class="mt-3">
+                      <p class="text-xs font-bold text-slate-500 mb-1.5">Voluntarios que participaron</p>
+                      <div class="flex flex-wrap gap-1.5">
+                        ${(r.participantes && r.participantes.length > 0)
+                            ? r.participantes.map(p => `<span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">${p.nombre_completo}</span>`).join('')
+                            : '<span class="text-[10px] text-slate-400">Nadie registrado todavía</span>'}
+                        <button onclick="abrirModalParticipantes(${r.id_reporte}, ${r.id_evento})" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Editar</button>
+                      </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">Reportado por <b>${r.autor || 'Voluntario'}</b> el ${fechaReporte}</p>
+                  </div>
+                  <div class="flex gap-2 shrink-0">
+                    <button onclick="abrirModalEditarReporte(${r.id_reporte})" class="p-2 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
+                      <span class="material-symbols-outlined text-[18px]">edit</span>
+                    </button>
+                    <button onclick="eliminarReporte(${r.id_reporte})" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
+                      <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>`;
+        }).join('');
+    }
+
+    // ================= MODAL =================
+    function abrirModalReporte() {
+        document.getElementById('formReporte').reset();
+        document.getElementById('rep_id').value = '';
+        document.getElementById('rep_autor_display').value = usuarioActual.nombre;
+        document.getElementById('contenedor_materiales_reporte').innerHTML = '<p class="text-xs text-slate-400 italic">Selecciona primero un evento para ver sus materiales planeados.</p>';
+        document.getElementById('modalReporteTitulo').innerText = 'Nuevo Reporte de Evento';
+        document.getElementById('btnGuardarReporte').innerText = 'Guardar Reporte';
+        document.getElementById('modalReporte').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalReporte').classList.remove('opacity-0');
+            document.getElementById('modalReporteContent').classList.remove('scale-95');
+        }, 10);
+    }
+
+    // Editar un reporte existente solo permite ajustar el texto narrativo (actividades,
+    // asistentes, observaciones) — NO vuelve a tocar el inventario, para evitar acreditar
+    // o descontar stock dos veces por el mismo reporte.
+    function abrirModalEditarReporte(id) {
+        const r = reportesGlobal.find(x => x.id_reporte === id);
+        if (!r) return;
+        document.getElementById('formReporte').reset();
+        document.getElementById('rep_id').value = r.id_reporte;
+        document.getElementById('rep_evento').value = r.id_evento;
+        document.getElementById('rep_evento').disabled = true; // No se cambia el evento al editar
+        document.getElementById('rep_actividades').value = r.actividades_realizadas || '';
+        document.getElementById('contenedor_materiales_reporte').innerHTML = `
+            <div class="bg-slate-100 p-3 rounded-xl text-xs text-slate-500">
+                <b>Materiales ya registrados (no editables aquí):</b><br>${r.materiales_utilizados || 'Sin materiales.'}
+                <p class="mt-1 text-slate-400">El inventario ya se ajustó cuando se creó este reporte. Si necesitas corregirlo, elimina el reporte y créalo de nuevo.</p>
+            </div>`;
+        document.getElementById('rep_asistentes').value = r.numero_asistentes || '';
+        document.getElementById('rep_observaciones').value = r.observaciones || '';
+        document.getElementById('rep_autor_display').value = r.autor || usuarioActual.nombre;
+        document.getElementById('modalReporteTitulo').innerText = 'Editar Reporte de Evento';
+        document.getElementById('btnGuardarReporte').innerText = 'Guardar Cambios';
+        document.getElementById('modalReporte').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalReporte').classList.remove('opacity-0');
+            document.getElementById('modalReporteContent').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function cerrarModalReporte() {
+        document.getElementById('modalReporte').classList.add('opacity-0');
+        document.getElementById('modalReporteContent').classList.add('scale-95');
+        setTimeout(() => {
+            document.getElementById('modalReporte').classList.add('hidden');
+            document.getElementById('rep_evento').disabled = false;
+        }, 300);
+    }
+
+    // ================= GUARDAR =================
+    async function guardarReporte(e) {
+        e.preventDefault();
+        const idExistente = document.getElementById('rep_id').value;
+
+        const payload = {
+            id_evento: document.getElementById('rep_evento').value,
+            id_usuario: usuarioActual.id,
+            actividades_realizadas: document.getElementById('rep_actividades').value,
+            numero_asistentes: document.getElementById('rep_asistentes').value || null,
+            observaciones: document.getElementById('rep_observaciones').value
+        };
+
+        // Solo en creación recolectamos las cantidades reales por material (edición no las toca).
+        if (!idExistente) {
+            const filas = document.querySelectorAll('#contenedor_materiales_reporte [data-id-insumo]');
+            payload.materiales_reales = Array.from(filas).map(fila => ({
+                id_insumo: parseInt(fila.dataset.idInsumo, 10),
+                cantidad_real: parseFloat(fila.querySelector('.input_material_real').value) || 0
+            }));
+        }
+
+        const btn = document.getElementById('btnGuardarReporte');
+        const textoOriginal = btn.innerText;
+        btn.innerText = 'Guardando...'; btn.disabled = true;
+
+        try {
+            const res = idExistente
+                ? await fetch(`${API_URL}/api/reportes_evento/${idExistente}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) })
+                : await fetch(`${API_URL}/api/reportes_evento`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                cerrarModalReporte();
+                cargarReportes();
+            } else {
+                alert('Error al guardar: ' + (data.message || 'inténtalo de nuevo.'));
+            }
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+        } finally {
+            btn.innerText = textoOriginal; btn.disabled = false;
+        }
+    }
+
+    // ================= ELIMINAR =================
+    let listaVoluntariosCatalogo = null;
+
+    async function obtenerListaVoluntariosCatalogo() {
+        if (listaVoluntariosCatalogo) return listaVoluntariosCatalogo;
+        try {
+            const res = await fetch(`${API_URL}/api/catalogos_agenda`, { headers: authHeaders() });
+            const json = await res.json();
+            listaVoluntariosCatalogo = json.success ? json.voluntarios : [];
+        } catch (e) { console.error(e); listaVoluntariosCatalogo = []; }
+        return listaVoluntariosCatalogo;
+    }
+
+    async function abrirModalParticipantes(idReporte, idEvento) {
+        const reporte = reportesGlobal.find(r => r.id_reporte === idReporte);
+        const yaParticipan = (reporte && reporte.participantes) ? reporte.participantes.map(p => p.id_usuario) : [];
+        document.getElementById('part_id_reporte').value = idReporte;
+        const voluntarios = await obtenerListaVoluntariosCatalogo();
+        const cont = document.getElementById('part_lista_voluntarios');
+        cont.innerHTML = voluntarios.map(v => `
+            <label class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                <input type="checkbox" class="part_check accent-blue-600" value="${v.id_usuario}" ${yaParticipan.includes(v.id_usuario) ? 'checked' : ''}>
+                <span>${v.nombre_completo} <span class="text-slate-400 text-xs">(${v.especialidad})</span></span>
+            </label>`).join('');
+        document.getElementById('modalParticipantesReporte').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalParticipantesReporte').classList.remove('opacity-0');
+            document.getElementById('modalParticipantesReporteContent').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function cerrarModalParticipantes() {
+        document.getElementById('modalParticipantesReporte').classList.add('opacity-0');
+        document.getElementById('modalParticipantesReporteContent').classList.add('scale-95');
+        setTimeout(() => document.getElementById('modalParticipantesReporte').classList.add('hidden'), 300);
+    }
+
+    async function guardarParticipantesReporte() {
+        const idReporte = document.getElementById('part_id_reporte').value;
+        const idsSeleccionados = [...document.querySelectorAll('.part_check:checked')].map(c => parseInt(c.value));
+        const btn = document.getElementById('btnGuardarParticipantes');
+        const textoOriginal = btn.innerText; btn.innerText = 'Guardando...'; btn.disabled = true;
+        try {
+            const res = await fetch(`${API_URL}/api/reportes_evento/${idReporte}/participantes`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify({ ids_usuarios: idsSeleccionados })
+            });
+            const data = await res.json();
+            if (data.success) {
+                cerrarModalParticipantes();
+                cargarReportes();
+            } else {
+                alert(data.message || 'No se pudieron actualizar los participantes.');
+            }
+        } catch (e) { console.error(e); alert('Error de conexión.'); }
+        finally { btn.innerText = textoOriginal; btn.disabled = false; }
+    }
+
+    async function eliminarReporte(id) {
+        if (!confirm('¿Eliminar este reporte de evento? Esta acción no se puede deshacer.')) return;
+        try {
+            const res = await fetch(`${API_URL}/api/reportes_evento/${id}`, { method: 'DELETE', headers: authHeaders() });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                cargarReportes();
+            } else {
+                alert(data.message || 'No se pudo eliminar el reporte.');
+            }
+        } catch (error) { alert('Error de conexión al eliminar.'); }
+    }
+  </script>
+</body>
+</html>

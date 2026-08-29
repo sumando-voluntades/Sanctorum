@@ -118,7 +118,7 @@
         <nav class="hidden md:flex gap-8 items-center">
           <a
             class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="inicio.html"
+            href="index.html"
             >Inicio</a
           >
           <a
@@ -445,6 +445,21 @@
           </div>
         </div>
       </section>
+      <!-- Próximos Eventos (dinámico) -->
+      <section id="seccion_eventos_comunidad" class="mt-40">
+        <div class="flex flex-col items-center mb-16 text-center">
+          <h2 class="text-4xl font-extrabold text-secondary mb-4">
+            Próximos Eventos
+          </h2>
+          <div class="w-24 h-1 bg-primary-container rounded-full mb-6"></div>
+          <p class="text-on-surface-variant max-w-2xl leading-relaxed">
+            Así se ve nuestra agenda comunitaria en las próximas semanas.
+          </p>
+        </div>
+        <div id="contenedor_eventos_comunidad" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <p class="text-on-surface-variant col-span-3 text-center py-8">Cargando eventos...</p>
+        </div>
+      </section>
       <!-- Call to Action -->
       <section
         class="mt-40 bg-primary-container/10 p-12 md:p-20 rounded-lg text-center tonal-shift-shadow relative overflow-hidden"
@@ -468,16 +483,18 @@
           suma.
         </p>
         <div class="flex flex-wrap justify-center gap-4 relative z-10">
-          <button
+          <a
+            href="como_ayudar.html#formVoluntariadoPublico"
             class="px-10 py-4 bg-secondary text-white rounded-full font-bold text-lg shadow-lg hover:shadow-secondary/20 hover:scale-105 transition-all"
           >
             Unirse como Voluntario
-          </button>
-          <button
+          </a>
+          <a
+            href="como_ayudar.html"
             class="px-10 py-4 bg-white text-secondary border-2 border-secondary rounded-full font-bold text-lg hover:bg-secondary/5 transition-all"
           >
-            Ver Próximos Eventos
-          </button>
+            ¿Quieres aportar algo a la causa?
+          </a>
         </div>
       </section>
     </main>
@@ -524,7 +541,7 @@
             <li>
               <a
                 class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="inicio.html"
+                href="index.html"
                 >Inicio</a
               >
             </li>
@@ -562,13 +579,16 @@
           <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
             Boletín de Esperanza
           </h4>
-          <form class="flex flex-col gap-4">
+          <form id="formNewsletterFooter" class="flex flex-col gap-4">
             <input
+              id="newsletter_footer_input"
               class="bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-pink-500 outline-none"
               placeholder="Tu correo electrónico"
               type="email"
+              required
             />
             <button
+              type="submit"
               class="bg-pink-700 text-white rounded-full py-3 font-bold hover:bg-pink-800 transition-all"
             >
               Suscribirme
@@ -583,5 +603,59 @@
         en sociedad.
       </div>
     </footer>
+
+    <script>
+      const API_URL = "http://localhost:3000";
+
+      document.addEventListener('DOMContentLoaded', cargarEventosComunidad);
+
+      // ---------- NEWSLETTER (RF-11) ----------
+      const formNewsletterSv = document.getElementById('formNewsletterFooter');
+      if (formNewsletterSv) {
+          formNewsletterSv.addEventListener('submit', (e) => {
+              e.preventDefault();
+              const input = document.getElementById('newsletter_footer_input');
+              alert('¡Gracias por tu interés, ' + input.value + '! La integración con nuestro boletín está en construcción — muy pronto podrás suscribirte aquí mismo.');
+              input.value = '';
+          });
+      }
+
+      async function cargarEventosComunidad() {
+          const cont = document.getElementById('contenedor_eventos_comunidad');
+          try {
+              const res = await fetch(`${API_URL}/api/eventos_publicos`);
+              const json = await res.json();
+              if (!json.success || json.data.length === 0) {
+                  cont.innerHTML = '<p class="text-on-surface-variant col-span-3 text-center py-8">No hay eventos programados por el momento. ¡Síguenos para enterarte de los próximos!</p>';
+                  return;
+              }
+              cont.innerHTML = json.data.slice(0, 6).map(ev => {
+                  const fecha = new Date(ev.fecha_realizacion);
+                  const dia = fecha.toLocaleDateString('es-MX', { day: '2-digit' });
+                  const mes = fecha.toLocaleDateString('es-MX', { month: 'short' }).replace('.', '');
+                  const hora = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                  const lugar = ev.nombre_escuela || 'Sede Sanctórum';
+                  return `
+                    <div class="bg-white p-8 rounded-lg shadow-sm border border-slate-100 hover:shadow-lg transition-all">
+                      <div class="flex justify-between items-start mb-6">
+                        <div class="text-center">
+                          <span class="block text-3xl font-extrabold text-secondary leading-none">${dia}</span>
+                          <span class="text-xs font-bold uppercase tracking-widest text-slate-400">${mes}</span>
+                        </div>
+                        <span class="bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold px-3 py-1 rounded-full uppercase">${ev.tipo_evento}</span>
+                      </div>
+                      <h4 class="text-xl font-bold mb-4">${ev.titulo_evento}</h4>
+                      <div class="space-y-2 text-slate-500 text-sm">
+                        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">schedule</span><span>${hora} hrs</span></div>
+                        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">location_on</span><span>${lugar}</span></div>
+                      </div>
+                    </div>`;
+              }).join('');
+          } catch (e) {
+              console.error("Error al cargar eventos de la comunidad:", e);
+              cont.innerHTML = '<p class="text-on-surface-variant col-span-3 text-center py-8">No se pudo cargar el calendario en este momento.</p>';
+          }
+      }
+    </script>
   </body>
 </html>

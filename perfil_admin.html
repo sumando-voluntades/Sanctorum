@@ -18,14 +18,17 @@
   <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
     <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
     <nav class="flex-1 px-4 space-y-2">
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda_admin.html"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda_admin.html"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_publicaciones_admin.html"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_reportes_admin.html"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos_admin.html"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
     </nav>
     <div class="px-6 mt-auto space-y-4">
-      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="inicio.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
+      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
       <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
     </div>
   </aside>
@@ -33,20 +36,24 @@
   <main class="ml-72 min-h-screen flex flex-col">
     <!-- ================= TOP NAV BAR UNIVERSAL ================= -->
     <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
-      <div class="flex items-center flex-1"></div> <!-- Sin buscador aquí -->
+      <div class="flex items-center flex-1"></div>
       <div class="flex items-center gap-4 ml-8 relative">
-        <button onclick="document.getElementById('modalNotificaciones').classList.toggle('hidden')" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span class="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
-        <button class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors"><span class="material-symbols-outlined">settings</span></button>
+        <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
         <div class="h-8 w-px bg-slate-200 mx-2"></div>
         <div class="flex items-center gap-3 cursor-pointer bg-slate-50 p-2 rounded-full transition-all border border-slate-200">
           <span id="nav_user_name" class="text-sm font-bold text-slate-700">Mi Perfil</span>
-          <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
+          <div id="nav_user_avatar_wrap" class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center text-slate-500 font-bold overflow-hidden"><span class="material-symbols-outlined">person</span></div>
         </div>
 
         <!-- Panel de Notificaciones -->
         <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center"><h3 class="font-bold text-sm">Notificaciones</h3></div>
-            <div class="p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-100 flex gap-3"><div class="w-8 h-8 rounded-full bg-pink-100 text-[#b50062] flex items-center justify-center"><span class="material-symbols-outlined text-sm">mail</span></div><div><p class="text-sm font-bold">Correo Enviado</p><p class="text-xs text-slate-500">Se enviaron credenciales.</p></div></div>
+            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
+              <h3 class="font-bold text-sm">Notificaciones</h3>
+              <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
+            </div>
+            <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
+            </div>
             <div class="p-2 text-center bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar</button></div>
         </div>
       </div>
@@ -57,16 +64,125 @@
       <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Configuración de Perfil</h2>
       <p class="text-slate-500 mb-10">Administra tu información personal y la seguridad de tu cuenta.</p>
 
-      <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+      <!-- TARJETA PRINCIPAL: DATOS + FOTO -->
+      <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8">
         <div class="flex items-center gap-6 mb-8 border-b border-slate-100 pb-8">
-            <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-slate-400"><span class="material-symbols-outlined" style="font-size: 40px;">person</span></div>
+            <div class="relative group">
+              <div id="perfil_avatar_wrap" class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 overflow-hidden border-2 border-white shadow-sm">
+                <span class="material-symbols-outlined" style="font-size: 40px;">person</span>
+              </div>
+              <button onclick="document.getElementById('input_foto_perfil').click()" class="absolute -bottom-1 -right-1 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-lg hover:bg-orange-700 transition-all" title="Cambiar foto">
+                <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+              </button>
+              <input type="file" id="input_foto_perfil" class="hidden" accept="image/png,image/jpeg,image/webp" onchange="subirFotoPerfil(event)">
+            </div>
             <div>
                 <h3 id="perfil_nombre" class="text-2xl font-bold text-slate-800">Cargando...</h3>
                 <p id="perfil_correo" class="text-slate-500 font-mono text-sm mt-1">Cargando...</p>
-                <span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase rounded-full tracking-wide">Cuenta Activa</span>
+                <div class="flex items-center gap-2 mt-2">
+                  <span id="perfil_rol_badge" class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase rounded-full tracking-wide">Rol</span>
+                  <span id="perfil_estatus_badge" class="inline-block px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase rounded-full tracking-wide">Cuenta Activa</span>
+                </div>
             </div>
         </div>
 
+        <div id="vista_datos_perfil" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div>
+              <p class="text-slate-400 font-bold text-xs uppercase mb-1">Teléfono</p>
+              <p id="perfil_telefono" class="font-medium text-slate-700">-</p>
+            </div>
+            <div>
+              <p class="text-slate-400 font-bold text-xs uppercase mb-1">Especialidad / Área</p>
+              <p id="perfil_especialidad" class="font-medium text-slate-700">-</p>
+            </div>
+            <div>
+              <p class="text-slate-400 font-bold text-xs uppercase mb-1">Edad</p>
+              <p id="perfil_edad" class="font-medium text-slate-700">-</p>
+            </div>
+            <div>
+              <p class="text-slate-400 font-bold text-xs uppercase mb-1">Género</p>
+              <p id="perfil_genero" class="font-medium text-slate-700">-</p>
+            </div>
+            <div>
+              <p class="text-slate-400 font-bold text-xs uppercase mb-1">Miembro desde</p>
+              <p id="perfil_fecha_registro" class="font-medium text-slate-700">-</p>
+            </div>
+            <div class="md:col-span-2 md:text-right">
+              <button type="button" onclick="toggleEditarDatosPerfil()" class="text-xs font-bold text-primary hover:underline"><span class="material-symbols-outlined text-[16px] align-middle mr-1">edit</span>Editar datos</button>
+            </div>
+        </div>
+        <form id="formDatosPerfil" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-2" onsubmit="guardarDatosPerfil(event)">
+            <div>
+              <label class="block text-slate-400 font-bold text-xs uppercase mb-1">Nombre Completo</label>
+              <input id="edit_perfil_nombre" type="text" class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold text-xs uppercase mb-1">Correo</label>
+              <input id="edit_perfil_correo" type="email" class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold text-xs uppercase mb-1">Teléfono</label>
+              <input id="edit_perfil_telefono" type="tel" class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold text-xs uppercase mb-1">Especialidad / Área</label>
+              <input id="edit_perfil_especialidad" type="text" class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold text-xs uppercase mb-1">Edad</label>
+              <input id="edit_perfil_edad" type="number" min="0" max="120" class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-bold text-xs uppercase mb-1">Género</label>
+              <select id="edit_perfil_genero" class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none">
+                  <option value="">No especificado</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Femenino">Femenino</option>
+                  <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div class="md:col-span-2 flex gap-3 justify-end">
+              <button type="button" onclick="toggleEditarDatosPerfil()" class="px-6 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-full text-xs hover:bg-slate-200 transition-colors">Cancelar</button>
+              <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-primary to-[#f39200] text-white font-bold rounded-full text-xs shadow-lg hover:scale-[1.02] transition-all">Guardar</button>
+            </div>
+        </form>
+      </div>
+
+      <!-- TARJETA: DOCUMENTO PROFESIONAL (solo visible para rol Especialista) -->
+      <div id="tarjeta_documento_profesional" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 hidden">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-primary">verified</span> Validación Profesional</h4>
+        <p class="text-sm text-slate-500 mb-4">Sube tu cédula profesional o certificado que valide tu ejercicio como Especialista. Este documento será revisado por el área administrativa.</p>
+        <div id="documento_profesional_estado" class="mb-4"></div>
+        <input type="file" id="input_documento_profesional" class="hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="subirDocumentoProfesional(event)">
+        <button onclick="document.getElementById('input_documento_profesional').click()" id="btn_subir_documento" class="px-6 py-3 bg-slate-800 text-white font-bold rounded-full text-sm hover:bg-slate-900 transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">upload_file</span> Subir Cédula / Certificado
+        </button>
+      </div>
+
+      <!-- TARJETA: DOCUMENTOS PENDIENTES DE REVISIÓN (solo Admin/Coordinador) -->
+      <div id="tarjeta_revision_documentos" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 hidden">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-primary">fact_check</span> Documentos por Revisar</h4>
+        <p class="text-sm text-slate-500 mb-4">Especialistas y Coordinadores que subieron su documento profesional y esperan aprobación.</p>
+        <div id="lista_documentos_pendientes" class="space-y-3">
+          <p class="text-sm text-slate-400">Cargando...</p>
+        </div>
+      </div>
+
+      <!-- TARJETA: BIOGRAFÍA PÚBLICA (solo Especialistas, Coordinadores y Admin — se muestra en la página "Nosotros") -->
+      <div id="tarjeta_biografia" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 hidden">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-primary">badge</span> Biografía Pública</h4>
+        <p class="text-sm text-slate-500 mb-4">Este texto aparecerá en la página pública "Nosotros" junto a tu foto y tu rol. Escribe una breve presentación profesional.</p>
+        <form id="formBiografia" class="space-y-4">
+          <textarea id="input_biografia" rows="4" maxlength="500" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" placeholder="Ej. Psicóloga clínica especializada en infancia, con 8 años de experiencia en atención comunitaria..."></textarea>
+          <div class="flex justify-between items-center">
+            <span id="contador_biografia" class="text-xs text-slate-400">0 / 500</span>
+            <button type="submit" class="px-8 py-3 bg-gradient-to-r from-primary to-[#f39200] text-white font-bold rounded-full shadow-lg hover:scale-[1.02] transition-all">Guardar Biografía</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TARJETA: SEGURIDAD -->
+      <div id="seccion_seguridad" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 scroll-mt-24">
         <h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-primary">security</span> Seguridad de la Cuenta</h4>
         <form id="formPassword" class="space-y-4">
             <div>
@@ -84,58 +200,505 @@
   </main>
 
   <script>
-    // 1. Proteger la ruta y cargar nombre del usuario
-    document.addEventListener('DOMContentLoaded', () => {
-      const token = localStorage.getItem('token_sanctorum');
-      
-      // Si no hay token (no ha iniciado sesión), lo pateamos al login
-      if(!token) {
-          window.location.href = "login.html";
-          return;
-      }
-
-      try {
-          // Si sí hay token, lo desencriptamos y sacamos su nombre
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          document.getElementById('nav_user_name').innerText = payload.nombre.split(' ')[0]; // Muestra "Enrique" en vez de nombre completo
-      } catch (e) { 
-          console.error("Error leyendo el token de seguridad"); 
-          window.location.href = "login.html";
-      }
-  });
-
-  // 2. Función del botón rojo del menú
-  function cerrarSesion() {
-      localStorage.removeItem('token_sanctorum');
-      window.location.href = "login.html";
-  }
-    const API_URL = "http://localhost:3000";
-
-    // 1. CARGAR DATOS UNIVERSALES Y PROTEGER LA RUTA
-    document.addEventListener('DOMContentLoaded', () => {
-        const token = localStorage.getItem('token_sanctorum');
-        if(!token) window.location.href = "login.html"; // Proteger la ruta
-
-        try {
-            // Leer la información del token que guardamos en el login
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            document.getElementById('perfil_nombre').innerText = payload.nombre;
-            document.getElementById('perfil_correo').innerText = payload.correo;
-            document.getElementById('nav_user_name').innerText = payload.nombre.split(' ')[0]; // Mostrar primer nombre arriba
-        } catch (e) { console.error("Error leyendo token"); }
-    });
-
-    // 2. FUNCIÓN UNIVERSAL DE CERRAR SESIÓN
-    function cerrarSesion() {
-        localStorage.removeItem('token_sanctorum');
-        window.location.href = "login.html";
+    // Decodifica el payload de un JWT de forma segura: los JWT usan base64url
+    // (con '-' y '_' en vez de '+' y '/', y sin padding '='), y pueden contener
+    // caracteres UTF-8 (acentos, ñ, etc.). atob() a secas falla o corrompe esos casos.
+    function decodeJWT(token) {
+        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4 !== 0) base64 += '=';
+        const binario = atob(base64);
+        const jsonPayload = decodeURIComponent(
+            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(jsonPayload);
     }
 
-    // 3. CAMBIAR CONTRASEÑA
+    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
+    // entra directo por URL a una página no permitida para su rol, lo redirige.
+    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
+    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
+    function aplicarRestriccionesNav(rol, especialidad) {
+        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
+        const permisos = {
+            'dashboard_admin.html': [1, 3],
+            'gestion_expedientes_admin.html': esPsico ? [1, 2] : [1],
+            'gestion_voluntariado_admin.html': [1, 3],
+            'inventario_admin.html': [1, 3],
+            'agenda_admin.html': [1, 2, 3, 4],
+            'gestion_publicaciones_admin.html': [1, 2, 3, 4],
+            'gestion_reportes_admin.html': [1, 2, 3, 4],
+            'aliados_donativos_admin.html': [1, 3]
+        };
+
+        document.querySelectorAll('aside nav a[href]').forEach(a => {
+            const pagina = a.getAttribute('href');
+            const permitidos = permisos[pagina];
+            if (permitidos && !permitidos.includes(rol)) {
+                a.remove();
+            }
+        });
+
+        const paginaActual = window.location.pathname.split('/').pop();
+        const permitidosActual = permisos[paginaActual];
+        if (permitidosActual && !permitidosActual.includes(rol)) {
+            window.location.replace('agenda_admin.html');
+        }
+    }
+
+    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
+    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
+    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
+    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
+    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
+
+    function obtenerNotifDescartadas() {
+        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
+    }
+    function guardarNotifDescartadas(lista) {
+        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
+    }
+
+    function toggleNotificaciones() {
+        const panel = document.getElementById('modalNotificaciones');
+        const estabaOculto = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        if (estabaOculto) cargarNotificaciones();
+    }
+
+    async function cargarNotificaciones() {
+        const cont = document.getElementById('lista_notificaciones');
+        try {
+            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
+            const json = await res.json();
+            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
+
+            const descartadas = obtenerNotifDescartadas();
+            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
+                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
+                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
+                titulo: a.titulo, detalle: a.detalle || ''
+            }));
+
+            if (json.data.solicitudes_pendientes > 0) {
+                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
+                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
+            }
+            if (json.data.insumos_bajo_stock > 0) {
+                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
+                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
+            }
+
+            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
+            actualizarPuntoNotificaciones(notificaciones.length);
+
+            if (notificaciones.length === 0) {
+                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
+                return;
+            }
+
+            cont.innerHTML = notificaciones.map(n => `
+                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
+                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
+                    </div>
+                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>`).join('');
+        } catch (e) {
+            console.error("Error al cargar notificaciones:", e);
+            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
+        }
+    }
+
+    function actualizarPuntoNotificaciones(cantidad) {
+        const punto = document.getElementById('punto_notificaciones');
+        if (!punto) return;
+        punto.classList.toggle('hidden', cantidad === 0);
+    }
+
+    function descartarNotificacion(id) {
+        const descartadas = obtenerNotifDescartadas();
+        if (!descartadas.includes(id)) descartadas.push(id);
+        guardarNotifDescartadas(descartadas);
+        cargarNotificaciones();
+    }
+
+    function limpiarTodasNotificaciones() {
+        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
+            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
+            if (match) {
+                const descartadas = obtenerNotifDescartadas();
+                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
+                guardarNotifDescartadas(descartadas);
+            }
+        });
+        cargarNotificaciones();
+    }
+
+    const API_URL = "http://localhost:3000";
+
+    // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
+    function authHeaders() {
+        return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
+    }
+
+    // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
+    // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
+    // pedirla de nuevo en cada subida.
+    let _cloudinaryConfigCache = null;
+    async function obtenerConfigCloudinary() {
+        if (_cloudinaryConfigCache) return _cloudinaryConfigCache;
+        const res = await fetch(`${API_URL}/api/config/cloudinary`);
+        const json = await res.json();
+        _cloudinaryConfigCache = { cloudName: json.cloud_name, uploadPreset: json.upload_preset };
+        return _cloudinaryConfigCache;
+    }
+    let usuarioActual = null; // payload decodificado del token (id, nombre, correo, rol)
+    let perfilActual = null;  // datos reales cargados desde la BD
+
+    // ---------- MAPEO DE ROLES (para mostrar el nombre en vez del id) ----------
+    const NOMBRES_ROL = { 1: 'Admin', 2: 'Especialista', 3: 'Coordinador', 4: 'Voluntario', 5: 'Donador' };
+
+    // Distingue "Psicólogo/a" de un Especialista genérico (maestro, trabajador social, etc.)
+    // usando el mismo criterio que el backend (rol=2 + especialidad contiene "psic").
+    function calcularNombreRolMostrado(p) {
+        if (p.id_rol === 2 && (p.especialidad || '').toLowerCase().includes('psic')) return 'Psicólogo/a';
+        return p.nombre_rol || NOMBRES_ROL[p.id_rol] || 'Usuario';
+    }
+
+    // 1. PROTEGER LA RUTA Y CARGAR DATOS REALES DE LA BD
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token_sanctorum');
+        if (!token) { window.location.replace("login.html"); return; }
+
+        try {
+            usuarioActual = decodeJWT(token);
+            document.getElementById('nav_user_name').innerText = usuarioActual.nombre.split(' ')[0];
+            aplicarRestriccionesNav(usuarioActual.rol, usuarioActual.especialidad);
+        } catch (e) {
+            localStorage.removeItem('token_sanctorum');
+            window.location.replace("login.html");
+            return;
+        }
+
+        cargarPerfil();
+        cargarNotificaciones();
+    });
+
+    function cerrarSesion() {
+        localStorage.removeItem('token_sanctorum');
+        window.location.replace("login.html");
+    }
+
+    // 2. CARGAR PERFIL REAL DESDE LA BASE DE DATOS (no solo lo que trae el token)
+    async function cargarPerfil() {
+        try {
+            const res = await fetch(`${API_URL}/api/usuarios/${usuarioActual.id}`);
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || !json.success) {
+                console.error("Respuesta del servidor al cargar perfil:", res.status, json);
+                alert("No se pudo cargar tu perfil: " + (json.message || `el servidor respondió con estado ${res.status}`));
+                // Mostramos al menos lo que sabemos por el token para que la página no quede vacía
+                document.getElementById('perfil_nombre').innerText = usuarioActual.nombre || 'Sin nombre';
+                document.getElementById('perfil_correo').innerText = usuarioActual.correo || '';
+                return;
+            }
+            perfilActual = json.data;
+            pintarPerfil(perfilActual);
+        } catch (e) {
+            // Este catch solo se dispara si fetch() en sí falla (servidor apagado, CORS, red caída) —
+            // no si el backend respondió con un error controlado (ese caso ya se maneja arriba).
+            console.error("Fetch falló al cargar el perfil (revisa que server.js esté corriendo en el puerto correcto):", e);
+            alert("Error de conexión al cargar tu perfil: " + e.message + "\n\nVerifica que tu backend (server.js) esté corriendo en " + API_URL);
+            document.getElementById('perfil_nombre').innerText = usuarioActual.nombre || 'Sin nombre';
+            document.getElementById('perfil_correo').innerText = usuarioActual.correo || '';
+        }
+    }
+
+    function pintarPerfil(p) {
+        document.getElementById('perfil_nombre').innerText = p.nombre_completo;
+        document.getElementById('perfil_correo').innerText = p.correo;
+        document.getElementById('perfil_telefono').innerText = p.telefono || 'No registrado';
+        document.getElementById('perfil_especialidad').innerText = p.especialidad || 'General';
+        document.getElementById('perfil_edad').innerText = p.edad || 'No registrada';
+        document.getElementById('perfil_genero').innerText = p.genero || 'No especificado';
+        document.getElementById('perfil_rol_badge').innerText = calcularNombreRolMostrado(p);
+
+        const badgeEstatus = document.getElementById('perfil_estatus_badge');
+        const esActivo = (p.estatus || 'Activo') === 'Activo';
+        badgeEstatus.innerText = esActivo ? 'Cuenta Activa' : p.estatus;
+        badgeEstatus.className = `inline-block px-3 py-1 text-[10px] font-bold uppercase rounded-full tracking-wide ${esActivo ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-600'}`;
+
+        if (p.fecha_registro) {
+            document.getElementById('perfil_fecha_registro').innerText = new Date(p.fecha_registro).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        // Foto de perfil (nav + tarjeta principal)
+        if (p.foto_perfil_url) {
+            document.getElementById('perfil_avatar_wrap').innerHTML = `<img src="${p.foto_perfil_url}" class="w-full h-full object-cover" alt="Foto de perfil">`;
+            document.getElementById('nav_user_avatar_wrap').innerHTML = `<img src="${p.foto_perfil_url}" class="w-full h-full object-cover" alt="Foto de perfil">`;
+        }
+
+        // Documento profesional: visible para Especialistas y Coordinadores (id_rol 2 o 3)
+        if (p.id_rol === 2 || p.id_rol === 3) {
+            document.getElementById('tarjeta_documento_profesional').classList.remove('hidden');
+            const estadoDiv = document.getElementById('documento_profesional_estado');
+            const btn = document.getElementById('btn_subir_documento');
+            const estatusDoc = p.documento_profesional_estatus || 'Pendiente';
+            if (p.documento_profesional_url && estatusDoc === 'Aprobado') {
+                estadoDiv.innerHTML = `
+                    <div class="flex items-center justify-between p-3 bg-green-50 border border-green-100 rounded-xl">
+                        <div class="flex items-center gap-2 text-green-700">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            <span class="text-sm font-bold">Documento aprobado</span>
+                        </div>
+                        <a href="${p.documento_profesional_url}" target="_blank" class="text-sm font-bold text-green-700 hover:underline">Ver documento</a>
+                    </div>`;
+                btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">upload_file</span> Reemplazar documento';
+            } else if (p.documento_profesional_url && estatusDoc === 'Rechazado') {
+                estadoDiv.innerHTML = `
+                    <div class="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-xl">
+                        <div class="flex items-center gap-2 text-red-700">
+                            <span class="material-symbols-outlined">cancel</span>
+                            <span class="text-sm font-bold">Tu documento fue rechazado. Sube uno nuevo.</span>
+                        </div>
+                        <a href="${p.documento_profesional_url}" target="_blank" class="text-sm font-bold text-red-700 hover:underline">Ver anterior</a>
+                    </div>`;
+                btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">upload_file</span> Subir nuevo documento';
+            } else if (p.documento_profesional_url) {
+                estadoDiv.innerHTML = `
+                    <div class="flex items-center justify-between p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                        <div class="flex items-center gap-2 text-amber-700">
+                            <span class="material-symbols-outlined">hourglass_top</span>
+                            <span class="text-sm font-bold">Documento en revisión</span>
+                        </div>
+                        <a href="${p.documento_profesional_url}" target="_blank" class="text-sm font-bold text-amber-700 hover:underline">Ver documento</a>
+                    </div>`;
+                btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">upload_file</span> Reemplazar documento';
+            } else {
+                estadoDiv.innerHTML = `
+                    <div class="flex items-center gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-700">
+                        <span class="material-symbols-outlined">warning</span>
+                        <span class="text-sm font-bold">Aún no has subido tu documento de validación profesional. Mientras no lo aprueben, solo podrás ver esta página.</span>
+                    </div>`;
+            }
+        }
+
+        // Revisión de documentos pendientes: solo Admin (1) y Coordinador (3)
+        if (p.id_rol === 1 || p.id_rol === 3) {
+            document.getElementById('tarjeta_revision_documentos').classList.remove('hidden');
+            cargarDocumentosPendientes();
+        }
+
+        // Biografía pública: visible para Especialista (2), Coordinador (3) y Admin (1) —
+        // el mismo criterio de roles que usa /api/equipo para la página "Nosotros".
+        if (p.id_rol === 1 || p.id_rol === 2 || p.id_rol === 3) {
+            document.getElementById('tarjeta_biografia').classList.remove('hidden');
+            const textarea = document.getElementById('input_biografia');
+            textarea.value = p.biografia || '';
+            actualizarContadorBiografia();
+        }
+    }
+
+    function toggleEditarDatosPerfil() {
+        const vista = document.getElementById('vista_datos_perfil');
+        const form = document.getElementById('formDatosPerfil');
+        const editando = form.classList.contains('hidden');
+        vista.classList.toggle('hidden', editando);
+        form.classList.toggle('hidden', !editando);
+        if (editando && perfilActual) {
+            document.getElementById('edit_perfil_nombre').value = perfilActual.nombre_completo || '';
+            document.getElementById('edit_perfil_correo').value = perfilActual.correo || '';
+            document.getElementById('edit_perfil_telefono').value = perfilActual.telefono || '';
+            document.getElementById('edit_perfil_edad').value = perfilActual.edad || '';
+            document.getElementById('edit_perfil_genero').value = perfilActual.genero || '';
+            document.getElementById('edit_perfil_especialidad').value = perfilActual.especialidad || '';
+        }
+    }
+
+    async function guardarDatosPerfil(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const textoOriginal = btn.innerText;
+        btn.innerText = 'Guardando...'; btn.disabled = true;
+        try {
+            const res = await fetch(`${API_URL}/api/usuarios/${usuarioActual.id}/perfil`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nombre_completo: document.getElementById('edit_perfil_nombre').value,
+                    correo: document.getElementById('edit_perfil_correo').value,
+                    telefono: document.getElementById('edit_perfil_telefono').value,
+                    edad: document.getElementById('edit_perfil_edad').value || null,
+                    genero: document.getElementById('edit_perfil_genero').value || null,
+                    especialidad: document.getElementById('edit_perfil_especialidad').value
+                })
+            });
+            const json = await res.json();
+            if (res.ok && json.success) {
+                toggleEditarDatosPerfil();
+                cargarPerfil();
+                if (json.correo_cambiado) {
+                    alert('Tu correo fue actualizado. La próxima vez inicia sesión con el nuevo correo.');
+                }
+            } else {
+                alert('No se pudieron guardar los cambios: ' + (json.message || ''));
+            }
+        } catch (error) {
+            alert('Error de conexión al guardar tus datos.');
+        } finally {
+            btn.innerText = textoOriginal; btn.disabled = false;
+        }
+    }
+
+    async function cargarDocumentosPendientes() {
+        const cont = document.getElementById('lista_documentos_pendientes');
+        try {
+            const res = await fetch(`${API_URL}/api/usuarios/pendientes_revision`, { headers: authHeaders() });
+            const json = await res.json();
+            if (!json.success || json.data.length === 0) {
+                cont.innerHTML = '<p class="text-sm text-slate-400 italic">No hay documentos pendientes por ahora.</p>';
+                return;
+            }
+            cont.innerHTML = json.data.map(u => `
+                <div class="flex items-center justify-between p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">${u.nombre_completo} <span class="text-[10px] font-normal text-slate-400">(${u.nombre_rol || ''})</span></p>
+                        <a href="${u.documento_profesional_url}" target="_blank" class="text-xs font-bold text-blue-600 hover:underline">Ver documento</a>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="revisarDocumento(${u.id_usuario}, 'Rechazado')" class="px-4 py-2 bg-red-100 text-red-700 font-bold rounded-full text-xs hover:bg-red-200 transition-colors">Rechazar</button>
+                        <button onclick="revisarDocumento(${u.id_usuario}, 'Aprobado')" class="px-4 py-2 bg-green-100 text-green-700 font-bold rounded-full text-xs hover:bg-green-200 transition-colors">Aprobar</button>
+                    </div>
+                </div>`).join('');
+        } catch (e) {
+            console.error('Error al cargar documentos pendientes:', e);
+            cont.innerHTML = '<p class="text-sm text-red-400">No se pudo cargar la lista.</p>';
+        }
+    }
+
+    async function revisarDocumento(idUsuario, estatus) {
+        try {
+            const res = await fetch(`${API_URL}/api/usuarios/${idUsuario}/documento_profesional/revisar`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify({ estatus })
+            });
+            const json = await res.json();
+            if (json.success) cargarDocumentosPendientes();
+            else alert('No se pudo actualizar la revisión.');
+        } catch (e) { alert('Error de conexión.'); }
+    }
+
+    function actualizarContadorBiografia() {
+        const len = document.getElementById('input_biografia').value.length;
+        document.getElementById('contador_biografia').innerText = `${len} / 500`;
+    }
+    document.getElementById('input_biografia').addEventListener('input', actualizarContadorBiografia);
+
+    document.getElementById('formBiografia').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const textoOriginal = btn.innerText;
+        btn.innerText = 'Guardando...'; btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_URL}/api/usuarios/${usuarioActual.id}/perfil`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ biografia: document.getElementById('input_biografia').value })
+            });
+            const json = await res.json();
+            if (res.ok && json.success) {
+                btn.innerText = '¡Guardado! ✓';
+                setTimeout(() => { btn.innerText = textoOriginal; }, 1500);
+            } else {
+                alert('No se pudo guardar la biografía: ' + (json.message || ''));
+                btn.innerText = textoOriginal;
+            }
+        } catch (error) {
+            alert('Error de conexión al guardar la biografía.');
+            btn.innerText = textoOriginal;
+        } finally {
+            btn.disabled = false;
+        }
+    });
+
+    // 3. SUBIR FOTO DE PERFIL (Cloudinary → guardar URL en BD)
+    async function subirFotoPerfil(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        await subirArchivoYGuardar(file, `${API_URL}/api/usuarios/${usuarioActual.id}/foto`, 'foto_perfil_url', () => {
+            cargarPerfil();
+        });
+        event.target.value = '';
+    }
+
+    // 4. SUBIR DOCUMENTO PROFESIONAL (Cloudinary → guardar URL en BD)
+    async function subirDocumentoProfesional(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        await subirArchivoYGuardar(file, `${API_URL}/api/usuarios/${usuarioActual.id}/documento_profesional`, 'documento_profesional_url', () => {
+            cargarPerfil();
+        });
+        event.target.value = '';
+    }
+
+    // Función compartida: sube a Cloudinary y guarda la URL resultante en el endpoint indicado.
+    async function subirArchivoYGuardar(file, endpoint, campoUrl, onSuccess) {
+        const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } = await obtenerConfigCloudinary();
+        if (!CLOUD_NAME || !UPLOAD_PRESET) {
+            alert('Falta configurar CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET en las variables de entorno del servidor.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', UPLOAD_PRESET);
+
+        try {
+            // Los PDF (documento profesional) se suben como "raw", no "auto"/"image":
+            // Cloudinary bloquea por seguridad la entrega de PDFs servidos como imagen y el
+            // enlace de "Ver documento" nunca abre. Las fotos de perfil siguen usando "auto".
+            const esPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${esPdf ? 'raw' : 'auto'}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+            const uploadData = await uploadRes.json();
+
+            if (!uploadData.secure_url) {
+                alert("No se pudo subir el archivo. Revisa la configuración de Cloudinary (CLOUD_NAME / UPLOAD_PRESET).");
+                return;
+            }
+
+            const payload = {}; payload[campoUrl] = uploadData.secure_url;
+            const dbRes = await fetch(endpoint, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const dbData = await dbRes.json();
+            if (dbData.success) {
+                onSuccess();
+            } else {
+                alert(dbData.message || "El archivo se subió, pero no se pudo guardar en tu perfil.");
+            }
+        } catch (error) {
+            console.error("Error al subir archivo:", error);
+            alert("Falló la subida del archivo.");
+        }
+    }
+
+    // 5. CAMBIAR CONTRASEÑA
     document.getElementById('formPassword').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const btn = e.target.querySelector('button'); btn.innerText = "Actualizando..."; btn.disabled = true;
-        
+        const btn = e.target.querySelector('button'); const textoOriginal = btn.innerText;
+        btn.innerText = "Actualizando..."; btn.disabled = true;
+
         const data = {
             correo: document.getElementById('perfil_correo').innerText,
             password_actual: document.getElementById('pass_actual').value,
@@ -145,12 +708,12 @@
         try {
             const res = await fetch(`${API_URL}/api/auth/cambiar-password`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
             const json = await res.json();
-            if(res.ok) {
+            if (res.ok && json.success) {
                 alert("¡Contraseña actualizada con éxito!");
                 document.getElementById('formPassword').reset();
-            } else { alert("Error: " + json.message); }
-        } catch(e) { alert("Error de conexión"); }
-        btn.innerText = "Actualizar Contraseña"; btn.disabled = false;
+            } else { alert("Error: " + (json.message || 'No se pudo actualizar la contraseña.')); }
+        } catch (e) { alert("Error de conexión"); }
+        btn.innerText = textoOriginal; btn.disabled = false;
     });
   </script>
 </body>

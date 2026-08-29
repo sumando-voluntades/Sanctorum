@@ -1,0 +1,250 @@
+<!doctype html>
+<html class="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Calendario de Eventos | Sumando Voluntades Sanctórum</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#8a5100",
+              "primary-container": "#f39200",
+              secondary: "#b50062",
+              "secondary-container": "#e2007c",
+              surface: "#f6fafe",
+              "surface-container-low": "#f0f4f8",
+              "surface-container-lowest": "#ffffff",
+              "on-surface": "#171c1f",
+              "on-surface-variant": "#544434",
+            },
+            borderRadius: { DEFAULT: "1rem", lg: "2rem", xl: "3rem", full: "9999px" },
+            fontFamily: { headline: ["Quicksand", "sans-serif"], body: ["Quicksand", "sans-serif"] },
+          },
+        },
+      };
+    </script>
+    <style>
+      body { font-family: "Quicksand", sans-serif; }
+      .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+    </style>
+  </head>
+  <body class="bg-surface text-on-surface">
+    <!-- TopNavBar -->
+    <header class="fixed top-0 w-full z-50 rounded-b-xl bg-white/70 backdrop-blur-md shadow-[0_20px_50px_rgba(23,28,31,0.06)]">
+      <div class="flex justify-between items-center max-w-7xl mx-auto px-8 py-4">
+        <div class="flex items-center gap-3">
+          <img alt="Logo Sumando Voluntades Sanctórum" class="h-12 w-auto object-contain" src="Logo.png" />
+        </div>
+        <nav class="hidden md:flex gap-8 items-center">
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="index.html">Inicio</a>
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="comunidad_blog.html">Comunidad</a>
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="solicitud_apoyo_oficial.html">Solicitud de Apoyo</a>
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="como_ayudar.html">Cómo Ayudar</a>
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="nosotros.html">Nosotros</a>
+        </nav>
+        <div class="flex items-center gap-4">
+          <a
+            href="gestion_expedientes_admin.html"
+            title="Panel de Administración"
+            class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
+          >
+            admin_panel_settings
+          </a>
+          <a
+            href="como_ayudar.html#formVoluntariadoPublico"
+            class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
+          >
+            Voluntariado
+          </a>
+          <a href="index.html#donacion-monetaria" class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all">
+            Donar
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="pt-32 pb-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <a href="comunidad_blog.html" class="inline-flex items-center gap-2 text-secondary font-bold text-sm mb-8 hover:underline">
+          <span class="material-symbols-outlined text-lg">arrow_back</span> Volver a Comunidad
+        </a>
+
+        <div class="text-center mb-14">
+          <h1 class="text-4xl md:text-5xl font-bold text-primary mb-4">Calendario de Eventos</h1>
+          <p class="text-on-surface-variant max-w-2xl mx-auto">
+            Todos nuestros talleres, jornadas y pláticas comunitarias en un solo lugar.
+            Selecciona un día para ver el detalle de sus actividades.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Calendario -->
+          <div class="lg:col-span-2 bg-white rounded-3xl shadow-[0_10px_30px_rgba(23,28,31,0.06)] p-8">
+            <div class="flex items-center justify-between mb-6">
+              <button onclick="cambiarMesCalendario(-1)" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center transition-colors">
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+              <h2 id="titulo_mes_calendario" class="text-2xl font-bold text-on-surface">-</h2>
+              <button onclick="cambiarMesCalendario(1)" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center transition-colors">
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 uppercase mb-3">
+              <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
+            </div>
+            <div id="grid_calendario" class="grid grid-cols-7 gap-2"></div>
+          </div>
+
+          <!-- Detalle del día seleccionado -->
+          <div class="bg-white rounded-3xl shadow-[0_10px_30px_rgba(23,28,31,0.06)] p-8">
+            <h3 id="titulo_dia_seleccionado" class="text-lg font-bold text-on-surface mb-1">Selecciona un día</h3>
+            <p class="text-xs text-slate-400 mb-6">Los días con un punto rosa tienen eventos programados.</p>
+            <div id="lista_eventos_dia" class="space-y-4">
+              <p class="text-slate-400 text-sm text-center py-8">Elige un día del calendario para ver sus eventos.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full rounded-t-xl mt-16 bg-slate-50 font-['Quicksand'] leading-relaxed text-sm">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-12 py-16">
+        <div class="flex flex-col gap-6">
+          <img alt="Logo Sumando Voluntades Sanctórum" class="h-16 w-auto object-contain mb-2" src="Logo.png" />
+          <p class="text-slate-500">
+            La salud mental es responsabilidad en sociedad. Construyendo puentes
+            de bienestar para todos.
+          </p>
+        </div>
+        <div>
+          <h4 class="text-pink-700 font-bold mb-6">Redes Sociales</h4>
+          <ul class="space-y-3">
+            <li><a class="text-slate-500 hover:underline hover:text-orange-600 transition-all" href="#">Facebook</a></li>
+            <li><a class="text-slate-500 hover:underline hover:text-orange-600 transition-all" href="#">Instagram</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-pink-700 font-bold mb-6">Contacto</h4>
+          <ul class="space-y-3 text-slate-500">
+            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">mail</span> ayuda@sanctorum.org</li>
+            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">call</span> 800-SANCTORUM</li>
+            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">location_on</span> Ciudad de México, MX</li>
+          </ul>
+        </div>
+      </div>
+      <div class="max-w-7xl mx-auto px-12 py-8 border-t border-slate-200/50 text-center text-slate-500">
+        © 2024 Sumando Voluntades Sanctórum. La salud mental es responsabilidad en sociedad.
+      </div>
+    </footer>
+
+    <script>
+      const API_URL = "http://localhost:3000";
+      let mesCalendarioActual = new Date();
+      let eventosPorFecha = {};
+      let diaSeleccionado = null;
+
+      document.addEventListener('DOMContentLoaded', cargarEventosCalendario);
+
+      async function cargarEventosCalendario() {
+          try {
+              const res = await fetch(`${API_URL}/api/eventos_calendario_publico`);
+              const json = await res.json();
+              if (!json.success) return;
+
+              eventosPorFecha = {};
+              json.data.forEach(ev => {
+                  const clave = new Date(ev.fecha_realizacion).toISOString().split('T')[0];
+                  if (!eventosPorFecha[clave]) eventosPorFecha[clave] = [];
+                  eventosPorFecha[clave].push(ev);
+              });
+              renderCalendario();
+
+              // Si hay eventos futuros, selecciona automáticamente el más próximo al día de hoy.
+              const hoyStr = new Date().toISOString().split('T')[0];
+              const fechasFuturas = Object.keys(eventosPorFecha).filter(f => f >= hoyStr).sort();
+              if (fechasFuturas.length > 0) verDiaCalendario(fechasFuturas[0]);
+          } catch (e) {
+              console.error("Error al cargar eventos del calendario:", e);
+              document.getElementById('lista_eventos_dia').innerHTML = '<p class="text-red-400 text-sm text-center py-8">No se pudo cargar el calendario en este momento.</p>';
+          }
+      }
+
+      function cambiarMesCalendario(direccion) {
+          mesCalendarioActual.setMonth(mesCalendarioActual.getMonth() + direccion);
+          renderCalendario();
+      }
+
+      function renderCalendario() {
+          const anio = mesCalendarioActual.getFullYear();
+          const mes = mesCalendarioActual.getMonth();
+          const nombresMes = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+          document.getElementById('titulo_mes_calendario').innerText = `${nombresMes[mes]} ${anio}`;
+
+          const primerDiaSemana = new Date(anio, mes, 1).getDay();
+          const diasEnMes = new Date(anio, mes + 1, 0).getDate();
+          const hoy = new Date();
+          const hoyStr = hoy.toISOString().split('T')[0];
+
+          const grid = document.getElementById('grid_calendario');
+          let celdas = '';
+          for (let i = 0; i < primerDiaSemana; i++) celdas += '<div></div>';
+
+          for (let dia = 1; dia <= diasEnMes; dia++) {
+              const fechaObj = new Date(anio, mes, dia);
+              const claveFecha = fechaObj.toISOString().split('T')[0];
+              const tieneEventos = !!eventosPorFecha[claveFecha];
+              const esHoy = claveFecha === hoyStr;
+              const esSeleccionado = claveFecha === diaSeleccionado;
+
+              let clases = 'relative w-full aspect-square rounded-xl flex flex-col items-center justify-center text-sm font-bold transition-all cursor-pointer ';
+              if (esSeleccionado) clases += 'bg-secondary text-white shadow-lg';
+              else if (tieneEventos) clases += 'bg-pink-50 text-secondary hover:bg-pink-100';
+              else clases += 'text-slate-500 hover:bg-slate-50';
+              if (esHoy && !esSeleccionado) clases += ' ring-2 ring-primary/40';
+
+              celdas += `
+                <button onclick="verDiaCalendario('${claveFecha}')" class="${clases}">
+                  <span>${dia}</span>
+                  ${tieneEventos ? `<span class="absolute bottom-1.5 w-1.5 h-1.5 rounded-full ${esSeleccionado ? 'bg-white' : 'bg-secondary'}"></span>` : ''}
+                </button>`;
+          }
+          grid.innerHTML = celdas;
+      }
+
+      function verDiaCalendario(claveFecha) {
+          diaSeleccionado = claveFecha;
+          renderCalendario();
+
+          const fechaLegible = new Date(claveFecha + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          document.getElementById('titulo_dia_seleccionado').innerText = fechaLegible.charAt(0).toUpperCase() + fechaLegible.slice(1);
+
+          const eventosDia = eventosPorFecha[claveFecha] || [];
+          const cont = document.getElementById('lista_eventos_dia');
+          if (eventosDia.length === 0) {
+              cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">No hay eventos programados este día.</p>';
+              return;
+          }
+          cont.innerHTML = eventosDia.map(ev => {
+              const hora = new Date(ev.fecha_realizacion).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+              const lugar = ev.nombre_escuela || 'Sede Sanctórum';
+              return `
+                <a href="evento_detalle.html?tipo=evento&id=${ev.id_evento}" class="block p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-colors">
+                  <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-pink-100 text-secondary">${ev.tipo_evento}</span>
+                  <h4 class="font-bold text-slate-800 mt-2">${ev.titulo_evento}</h4>
+                  <div class="flex items-center gap-1 text-xs text-slate-500 mt-1"><span class="material-symbols-outlined text-sm">schedule</span>${hora} hrs</div>
+                  <div class="flex items-center gap-1 text-xs text-slate-500 mt-0.5"><span class="material-symbols-outlined text-sm">location_on</span>${lugar}</div>
+                </a>`;
+          }).join('');
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1010 @@
+<!doctype html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Publicaciones | Sanctorum A.C.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = { theme: { extend: { colors: { primary: "#8a5100", secondary: "#b50062", surface: "#f6fafe", "surface-container-low": "#f0f4f8" }, fontFamily: { sans: ["Quicksand", "sans-serif"], plus: ["Plus Jakarta Sans", "sans-serif"] } } } };
+  </script>
+  <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+</head>
+<body class="bg-surface text-slate-800 min-h-screen">
+
+  <!-- ================= SIDE NAV BAR UNIVERSAL ================= -->
+  <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
+    <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
+    <nav class="flex-1 px-4 space-y-2">
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda_admin.html"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="gestion_publicaciones_admin.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">campaign</span><span class="font-medium">Publicaciones</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_reportes_admin.html"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos_admin.html"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
+    </nav>
+    <div class="px-6 mt-auto space-y-4">
+      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
+      <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <main class="ml-72 min-h-screen flex flex-col">
+    <!-- ================= TOP NAV BAR UNIVERSAL ================= -->
+    <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
+      <div class="flex items-center flex-1">
+        <div class="relative w-full max-w-md">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+          <input id="buscador_principal" oninput="aplicarFiltrosPublicaciones()" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar publicaciones..." type="text" />
+        </div>
+      </div>
+      <div class="flex items-center gap-4 ml-8 relative">
+        <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
+        <div class="h-8 w-px bg-slate-200 mx-2"></div>
+        <a href="perfil_admin.html" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
+          <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
+          <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
+        </a>
+
+        <!-- Panel de Notificaciones -->
+        <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
+              <h3 class="font-bold text-sm">Notificaciones</h3>
+              <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
+            </div>
+            <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
+            </div>
+            <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="p-8 flex-1">
+      <div class="flex justify-between items-end mb-10">
+        <div>
+          <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Publicaciones</h2>
+          <p class="text-slate-500 max-w-xl">Noticias, avisos y eventos que alimentan la página pública (Inicio y Comunidad).</p>
+        </div>
+        <button onclick="abrirModalPublicacion()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-secondary to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
+          <span class="material-symbols-outlined">add</span> Nueva Publicación
+        </button>
+      </div>
+
+      <!-- FILTROS -->
+      <div class="flex flex-wrap gap-4 mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 items-center">
+        <span class="text-sm font-bold text-slate-400 px-2 uppercase tracking-widest text-[10px]">Filtrar por:</span>
+        <select id="filtro_tipo" onchange="aplicarFiltrosPublicaciones()" class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer">
+          <option value="Todos">Cualquier Tipo</option>
+          <option value="Aviso">Avisos</option>
+          <option value="Evento">Eventos</option>
+        </select>
+        <select id="filtro_categoria" onchange="aplicarFiltrosPublicaciones()" class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer">
+          <option value="Todas">Cualquier Categoría</option>
+          <option value="Infancia">Infancia</option>
+          <option value="Adolescencia">Adolescencia</option>
+          <option value="Consejos para padres">Consejos para padres</option>
+          <option value="Cultura de Paz">Cultura de Paz</option>
+          <option value="Muralismo">Muralismo</option>
+        </select>
+        <button onclick="limpiarFiltrosPublicaciones()" class="ml-auto p-2.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"><span class="material-symbols-outlined text-slate-600">refresh</span></button>
+      </div>
+
+      <!-- GRID DE PUBLICACIONES -->
+      <div id="grid_publicaciones" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <p class="text-slate-400 col-span-3 text-center py-10">Cargando publicaciones...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= MODAL: NUEVA / EDITAR PUBLICACIÓN ================= -->
+  <div id="modalPublicacion" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10">
+    <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="modalPublicacionContent">
+      <div class="bg-gradient-to-r from-[#b50062] to-[#e2007c] px-8 py-6 text-white flex justify-between items-center shrink-0">
+        <div><h3 id="modalPublicacionTitulo" class="text-2xl font-bold font-plus">Nueva Publicación</h3></div>
+        <button type="button" onclick="cerrarModalPublicacion()" class="text-white/80 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
+      </div>
+      <div class="p-8 bg-white overflow-y-auto max-h-[75vh]">
+        <form id="formPublicacion" onsubmit="guardarPublicacion(event)" class="space-y-5">
+          <input type="hidden" id="pub_id" value="">
+          <input type="hidden" id="pub_origen" value="publicacion">
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Título</label>
+            <input id="pub_titulo" type="text" required class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30" placeholder="Ej. Taller de Comunicación No Violenta">
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Tipo</label>
+            <select id="pub_tipo" required onchange="cambiarTipoPublicacion()" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30">
+              <option value="Aviso">Aviso</option>
+              <option value="Evento">Evento</option>
+              <option value="Historia de Éxito">Historia de Éxito</option>
+              <option value="Otro">Otro: escribir...</option>
+            </select>
+            <input type="text" id="pub_tipo_otro" placeholder="Escribe el tipo de publicación" class="hidden mt-2 w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none">
+          </div>
+
+          <div id="bloque_consentimiento_historia" class="hidden bg-rose-50 border border-rose-100 rounded-2xl p-6">
+            <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-rose-600">verified_user</span> Documento de Consentimiento</h4>
+            <p class="text-xs text-slate-500 mb-4">Obligatorio para publicar una Historia de Éxito: sube el documento firmado que acredita el permiso para compartir esta historia.</p>
+            <div class="flex items-center gap-4">
+              <span id="consentimiento_nombre_archivo" class="text-xs text-slate-500 flex-1 truncate"></span>
+              <input type="file" id="input_consentimiento_historia" class="hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="subirConsentimientoHistoria(event)">
+              <button type="button" onclick="document.getElementById('input_consentimiento_historia').click()" id="btn_subir_consentimiento" class="px-5 py-2 bg-slate-800 text-white font-bold rounded-full text-sm hover:bg-slate-900 transition-all shrink-0">Subir Documento</button>
+              <input type="hidden" id="pub_url_consentimiento" value="">
+            </div>
+          </div>
+
+          <div id="bloque_historia_campos" class="hidden bg-blue-50 border border-blue-100 rounded-2xl p-6 space-y-4">
+            <h4 class="font-bold text-slate-800 flex items-center gap-2"><span class="material-symbols-outlined text-blue-600">favorite</span> Datos de la Historia de Éxito</h4>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Beneficiario</label>
+              <select id="pub_id_beneficiario" class="w-full px-4 py-3 bg-white border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30">
+                <option value="">Selecciona un beneficiario...</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Contenido: Antes</label>
+              <textarea id="pub_contenido_preayuda" rows="3" class="w-full px-4 py-3 bg-white border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30 resize-none" placeholder="Situación del beneficiario antes de la intervención..."></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Contenido: Después</label>
+              <textarea id="pub_contenido_postayuda" rows="3" class="w-full px-4 py-3 bg-white border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30 resize-none" placeholder="Resultado después de la intervención..."></textarea>
+            </div>
+          </div>
+
+          <div id="bloque_campos_normales" class="space-y-5">
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Categoría <span class="font-normal text-slate-400 normal-case">(puedes elegir varias)</span></label>
+            <div id="pub_categorias_checks" class="flex flex-wrap gap-2">
+              <label class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"><input type="checkbox" class="pub_categoria_check accent-secondary" value="Infancia"> Infancia</label>
+              <label class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"><input type="checkbox" class="pub_categoria_check accent-secondary" value="Adolescencia"> Adolescencia</label>
+              <label class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"><input type="checkbox" class="pub_categoria_check accent-secondary" value="Consejos para padres"> Consejos para padres</label>
+              <label class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"><input type="checkbox" class="pub_categoria_check accent-secondary" value="Cultura de Paz"> Cultura de Paz</label>
+              <label class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"><input type="checkbox" class="pub_categoria_check accent-secondary" value="Muralismo"> Muralismo (Impacto Visual)</label>
+              <label class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"><input type="checkbox" id="pub_categoria_otro_check" class="accent-secondary" onchange="toggleCategoriaOtraPub()"> Otro: escribir...</label>
+            </div>
+            <input type="text" id="pub_categoria_otro" placeholder="Escribe la(s) categoría(s) — sepáralas con coma si son varias" class="hidden mt-2 w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Relacionar con un evento (opcional)</label>
+            <select id="pub_evento_relacionado" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30">
+              <option value="">Ninguno</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Contenido</label>
+            <textarea id="pub_contenido" rows="6" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30 resize-none" placeholder="Redacta el cuerpo completo de la publicación..."></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Fotografía (portada)</label>
+            <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center bg-slate-50 hover:bg-slate-100 transition-colors">
+              <div id="pub_imagen_preview_wrap" class="hidden mb-4">
+                <img id="pub_imagen_preview" class="max-h-40 mx-auto rounded-xl object-cover" alt="Vista previa">
+              </div>
+              <input type="file" id="input_imagen_publicacion" class="hidden" accept="image/png,image/jpeg,image/webp" onchange="subirImagenPublicacion(event)">
+              <button type="button" onclick="document.getElementById('input_imagen_publicacion').click()" id="btn_subir_imagen_pub" class="px-6 py-2 bg-slate-800 text-white font-bold rounded-full text-sm hover:bg-slate-900 transition-all">Seleccionar Imagen</button>
+              <input type="hidden" id="pub_url_imagen" value="">
+            </div>
+          </div>
+
+          <!-- ================= GALERÍA ADICIONAL (varias fotos → historia en el detalle público) ================= -->
+          <div id="bloque_galeria_adicional" class="hidden">
+            <label class="block text-sm font-bold text-slate-700 mb-1">Fotos adicionales</label>
+            <p class="text-xs text-slate-400 mb-3">Si agregas más de una foto (portada + estas), la página pública las mostrará como un carrusel deslizable tipo "historia".</p>
+            <div id="galeria_adicional_preview" class="flex flex-wrap gap-3 mb-3"></div>
+            <input type="file" id="input_galeria_adicional" class="hidden" accept="image/png,image/jpeg,image/webp" multiple onchange="subirImagenesGaleria(event)">
+            <button type="button" onclick="document.getElementById('input_galeria_adicional').click()" id="btn_subir_galeria" class="px-6 py-2 bg-white border-2 border-slate-800 text-slate-800 font-bold rounded-full text-sm hover:bg-slate-50 transition-all">
+              <span class="material-symbols-outlined align-middle text-[16px] mr-1">add_photo_alternate</span> Agregar más fotos
+            </button>
+          </div>
+
+          <!-- ================= GENERADOR DE IMAGEN PARA REDES SOCIALES ================= -->
+          <div id="bloque_generador_redes" class="hidden bg-gradient-to-br from-orange-50 to-pink-50 border border-orange-100 rounded-2xl p-6">
+            <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-secondary">photo_camera</span> Imagen para Instagram / Facebook</h4>
+            <p class="text-xs text-slate-500 mb-4">Genera una tarjeta cuadrada (1080×1080) con la fotografía, el marco institucional y el logo — lista para compartir en redes.</p>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <canvas id="canvas_redes" width="1080" height="1080" class="w-48 h-48 rounded-xl shadow-lg border border-white bg-white"></canvas>
+              <div class="flex-1 space-y-3 w-full">
+                <button type="button" onclick="generarImagenRedes()" class="w-full px-6 py-3 bg-gradient-to-r from-primary to-primary-container text-white font-bold rounded-full text-sm hover:scale-[1.02] transition-all">
+                  <span class="material-symbols-outlined align-middle text-[18px] mr-1">auto_awesome</span> Generar Imagen
+                </button>
+                <a id="btn_descargar_redes" href="#" download="publicacion_sanctorum.png" class="hidden w-full px-6 py-3 bg-slate-800 text-white font-bold rounded-full text-sm hover:bg-slate-900 transition-all text-center block">
+                  <span class="material-symbols-outlined align-middle text-[18px] mr-1">download</span> Descargar Imagen
+                </a>
+              </div>
+            </div>
+          </div>
+          </div>
+
+          <div class="pt-4 flex gap-4">
+            <button type="button" onclick="cerrarModalPublicacion()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors">Cancelar</button>
+            <button type="submit" id="btnGuardarPublicacion" class="flex-1 py-3 bg-[#b50062] text-white font-bold rounded-full shadow-lg hover:bg-[#e2007c] transition-colors">Publicar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CONFIRMAR ELIMINACIÓN ================= -->
+  <div id="modalEliminarPub" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform scale-95 transition-all" id="modalEliminarPubContent">
+      <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="material-symbols-outlined text-3xl">delete</span>
+      </div>
+      <h3 class="text-xl font-bold text-slate-800 mb-2">¿Eliminar esta publicación?</h3>
+      <p class="text-sm text-slate-500 mb-6">Dejará de mostrarse en el sitio público de inmediato.</p>
+      <div class="flex gap-3">
+        <button onclick="cerrarModalEliminarPub()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors">Cancelar</button>
+        <button onclick="confirmarEliminarPub()" class="flex-1 py-3 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition-colors shadow-lg">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function decodeJWT(token) {
+        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4 !== 0) base64 += '=';
+        const binario = atob(base64);
+        const jsonPayload = decodeURIComponent(
+            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(jsonPayload);
+    }
+
+    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
+    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
+    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
+    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
+    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
+
+    function obtenerNotifDescartadas() {
+        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
+    }
+    function guardarNotifDescartadas(lista) {
+        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
+    }
+
+    function toggleNotificaciones() {
+        const panel = document.getElementById('modalNotificaciones');
+        const estabaOculto = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        if (estabaOculto) cargarNotificaciones();
+    }
+
+    async function cargarNotificaciones() {
+        const cont = document.getElementById('lista_notificaciones');
+        try {
+            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
+            const json = await res.json();
+            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
+
+            const descartadas = obtenerNotifDescartadas();
+            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
+                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
+                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
+                titulo: a.titulo, detalle: a.detalle || ''
+            }));
+
+            if (json.data.solicitudes_pendientes > 0) {
+                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
+                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
+            }
+            if (json.data.insumos_bajo_stock > 0) {
+                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
+                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
+            }
+
+            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
+            actualizarPuntoNotificaciones(notificaciones.length);
+
+            if (notificaciones.length === 0) {
+                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
+                return;
+            }
+
+            cont.innerHTML = notificaciones.map(n => `
+                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
+                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
+                    </div>
+                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>`).join('');
+        } catch (e) {
+            console.error("Error al cargar notificaciones:", e);
+            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
+        }
+    }
+
+    function actualizarPuntoNotificaciones(cantidad) {
+        const punto = document.getElementById('punto_notificaciones');
+        if (!punto) return;
+        punto.classList.toggle('hidden', cantidad === 0);
+    }
+
+    function descartarNotificacion(id) {
+        const descartadas = obtenerNotifDescartadas();
+        if (!descartadas.includes(id)) descartadas.push(id);
+        guardarNotifDescartadas(descartadas);
+        cargarNotificaciones();
+    }
+
+    function limpiarTodasNotificaciones() {
+        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
+            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
+            if (match) {
+                const descartadas = obtenerNotifDescartadas();
+                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
+                guardarNotifDescartadas(descartadas);
+            }
+        });
+        cargarNotificaciones();
+    }
+
+    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
+    // entra directo por URL a una página no permitida para su rol, lo redirige.
+    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
+    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
+    function aplicarRestriccionesNav(rol, especialidad) {
+        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
+        const permisos = {
+            'dashboard_admin.html': [1, 3],
+            'gestion_expedientes_admin.html': esPsico ? [1, 2] : [1],
+            'gestion_voluntariado_admin.html': [1, 3],
+            'inventario_admin.html': [1, 3],
+            'agenda_admin.html': [1, 2, 3, 4],
+            'gestion_publicaciones_admin.html': [1, 2, 3, 4],
+            'gestion_reportes_admin.html': [1, 2, 3, 4],
+            'aliados_donativos_admin.html': [1, 3]
+        };
+
+        document.querySelectorAll('aside nav a[href]').forEach(a => {
+            const pagina = a.getAttribute('href');
+            const permitidos = permisos[pagina];
+            if (permitidos && !permitidos.includes(rol)) {
+                a.remove();
+            }
+        });
+
+        const paginaActual = window.location.pathname.split('/').pop();
+        const permitidosActual = permisos[paginaActual];
+        if (permitidosActual && !permitidosActual.includes(rol)) {
+            window.location.replace('agenda_admin.html');
+        }
+    }
+
+    const API_URL = "http://localhost:3000";
+
+    // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
+    function authHeaders() {
+        return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
+    }
+
+    // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
+    // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
+    // pedirla de nuevo en cada subida.
+    let _cloudinaryConfigCache = null;
+    async function obtenerConfigCloudinary() {
+        if (_cloudinaryConfigCache) return _cloudinaryConfigCache;
+        const res = await fetch(`${API_URL}/api/config/cloudinary`);
+        const json = await res.json();
+        _cloudinaryConfigCache = { cloudName: json.cloud_name, uploadPreset: json.upload_preset };
+        return _cloudinaryConfigCache;
+    }
+
+    let publicacionesGlobal = [];
+    let idPubAEliminar = null;
+    let origenPubAEliminar = 'publicacion';
+    let esRolVoluntario = false;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token_sanctorum');
+        if (!token) { window.location.replace("login.html"); return; }
+        try {
+            const payload = decodeJWT(token);
+            aplicarRestriccionesNav(payload.rol, payload.especialidad);
+            document.getElementById('nav_user_name').innerText = payload.nombre.split(' ')[0];
+            cargarNotificaciones();
+            esRolVoluntario = payload.rol === 4; // Voluntario no puede eliminar publicaciones
+            verificarAccesoDocumento(payload);
+        } catch (e) { window.location.replace("login.html"); return; }
+        cargarPublicaciones();
+        cargarEventosParaRelacionar();
+        cargarBeneficiariosParaHistoria();
+    });
+
+    // Bloquea el acceso si el usuario (Especialista/Coordinador) todavía no tiene
+    // aprobado su documento profesional -- solo puede ver su Perfil.
+    function verificarAccesoDocumento(payload) {
+        if (payload.rol !== 2 && payload.rol !== 3) return;
+        fetch(`${API_URL}/api/usuarios/${payload.id}`)
+            .then(r => r.json())
+            .then(j => {
+                const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
+                if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
+                    window.location.replace('perfil_admin.html');
+                }
+            })
+            .catch(() => {});
+    }
+
+    async function cargarEventosParaRelacionar() {
+        try {
+            const res = await fetch(`${API_URL}/api/proyectos`, { headers: authHeaders() });
+            const json = await res.json();
+            const sel = document.getElementById('pub_evento_relacionado');
+            if (json.success && sel) {
+                sel.innerHTML = '<option value="">Ninguno</option>' + json.data.map(e => `<option value="${e.id_evento}">${e.titulo_evento}</option>`).join('');
+            }
+        } catch (e) { console.error('Error al cargar eventos para relacionar:', e); }
+    }
+
+    async function cargarBeneficiariosParaHistoria() {
+        try {
+            const res = await fetch(`${API_URL}/api/beneficiarios`, { headers: authHeaders() });
+            const json = await res.json();
+            const sel = document.getElementById('pub_id_beneficiario');
+            if (json.success && sel) {
+                sel.innerHTML = '<option value="">Selecciona un beneficiario...</option>' + json.data.map(b => `<option value="${b.id_beneficiario}">${b.nombre_completo}</option>`).join('');
+            }
+        } catch (e) { console.error('Error al cargar beneficiarios:', e); }
+    }
+
+    function cambiarTipoPublicacion() {
+        const esHistoria = document.getElementById('pub_tipo').value === 'Historia de Éxito';
+        document.getElementById('bloque_consentimiento_historia').classList.toggle('hidden', !esHistoria);
+        document.getElementById('bloque_historia_campos').classList.toggle('hidden', !esHistoria);
+        document.getElementById('bloque_campos_normales').classList.toggle('hidden', esHistoria);
+        document.getElementById('pub_contenido').required = !esHistoria;
+        toggleTipoOtraPub();
+    }
+
+    function toggleTipoOtraPub() {
+        const esOtro = document.getElementById('pub_tipo').value === 'Otro';
+        document.getElementById('pub_tipo_otro').classList.toggle('hidden', !esOtro);
+        document.getElementById('pub_tipo_otro').required = esOtro;
+    }
+
+    function toggleCategoriaOtraPub() {
+        const esOtra = document.getElementById('pub_categoria_otro_check').checked;
+        document.getElementById('pub_categoria_otro').classList.toggle('hidden', !esOtra);
+    }
+
+    // Junta las categorías marcadas (checkboxes) + las escritas a mano en "Otro", como una
+    // sola lista separada por comas — así una publicación puede pertenecer a varias categorías.
+    function obtenerCategoriasSeleccionadas() {
+        const marcadas = [...document.querySelectorAll('.pub_categoria_check:checked')].map(c => c.value);
+        if (document.getElementById('pub_categoria_otro_check').checked) {
+            const libres = document.getElementById('pub_categoria_otro').value.split(',').map(s => s.trim()).filter(Boolean);
+            marcadas.push(...libres);
+        }
+        return marcadas;
+    }
+
+    // Inversa: recibe "Infancia, Muralismo" (como viene guardado) y marca los checkboxes que
+    // correspondan; lo que no coincide con ninguna categoría conocida cae en "Otro: escribir...".
+    function marcarCategoriasSeleccionadas(categoriaStr) {
+        const conocidas = ['Infancia', 'Adolescencia', 'Consejos para padres', 'Cultura de Paz', 'Muralismo'];
+        const partes = (categoriaStr || '').split(',').map(s => s.trim()).filter(Boolean);
+        document.querySelectorAll('.pub_categoria_check').forEach(c => { c.checked = partes.includes(c.value); });
+        const libres = partes.filter(p => !conocidas.includes(p));
+        document.getElementById('pub_categoria_otro_check').checked = libres.length > 0;
+        document.getElementById('pub_categoria_otro').value = libres.join(', ');
+        document.getElementById('pub_categoria_otro').classList.toggle('hidden', libres.length === 0);
+    }
+
+    async function subirConsentimientoHistoria(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const btn = document.getElementById('btn_subir_consentimiento');
+        const textoOriginal = btn.innerText;
+        btn.innerText = 'Subiendo...'; btn.disabled = true;
+        const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } = await obtenerConfigCloudinary();
+        if (!CLOUD_NAME || !UPLOAD_PRESET) {
+            alert('Falta configurar CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET en las variables de entorno del servidor.');
+            btn.innerText = textoOriginal; btn.disabled = false;
+            return;
+        }
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', UPLOAD_PRESET);
+        try {
+            // Los PDF se suben como "raw" (no "auto"/"image"): Cloudinary bloquea por
+            // seguridad la entrega de PDFs servidos como imagen, y el enlace nunca abre.
+            const esPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${esPdf ? 'raw' : 'auto'}/upload`, { method: 'POST', body: formData });
+            const uploadData = await uploadRes.json();
+            if (uploadData.secure_url) {
+                document.getElementById('pub_url_consentimiento').value = uploadData.secure_url;
+                document.getElementById('consentimiento_nombre_archivo').innerText = file.name;
+            } else {
+                alert('No se pudo subir el documento.');
+            }
+        } catch (error) {
+            console.error('Error al subir documento de consentimiento:', error);
+            alert('Falló la subida del documento.');
+        } finally {
+            btn.innerText = textoOriginal; btn.disabled = false;
+        }
+    }
+
+    function cerrarSesion() {
+        localStorage.removeItem('token_sanctorum');
+        window.location.replace("login.html");
+    }
+
+    // ================= CARGA Y RENDER =================
+    async function cargarPublicaciones() {
+        try {
+            const res = await fetch(`${API_URL}/api/publicaciones?incluir_historias=1`);
+            const json = await res.json();
+            if (json.success) {
+                publicacionesGlobal = json.data;
+                aplicarFiltrosPublicaciones();
+            }
+        } catch (e) {
+            console.error("Error al cargar publicaciones:", e);
+            document.getElementById('grid_publicaciones').innerHTML = '<p class="text-red-400 col-span-3 text-center py-10">No se pudo conectar con el servidor.</p>';
+        }
+    }
+
+    function aplicarFiltrosPublicaciones() {
+        const texto = document.getElementById('buscador_principal').value.toLowerCase();
+        const fTipo = document.getElementById('filtro_tipo').value;
+        const fCat = document.getElementById('filtro_categoria').value;
+
+        const filtradas = publicacionesGlobal.filter(p => {
+            if (texto && !p.titulo.toLowerCase().includes(texto)) return false;
+            if (fTipo !== 'Todos' && p.tipo !== fTipo) return false;
+            if (fCat !== 'Todas' && !(p.categoria || '').split(',').map(c => c.trim()).includes(fCat)) return false;
+            return true;
+        });
+        renderPublicaciones(filtradas);
+    }
+
+    function limpiarFiltrosPublicaciones() {
+        document.getElementById('buscador_principal').value = '';
+        document.getElementById('filtro_tipo').value = 'Todos';
+        document.getElementById('filtro_categoria').value = 'Todas';
+        aplicarFiltrosPublicaciones();
+    }
+
+    function renderPublicaciones(lista) {
+        const grid = document.getElementById('grid_publicaciones');
+        if (lista.length === 0) {
+            grid.innerHTML = '<p class="text-slate-400 col-span-3 text-center py-10">No hay publicaciones con estos filtros.</p>';
+            return;
+        }
+        grid.innerHTML = lista.map(p => {
+            const fecha = new Date(p.fecha_post).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+            const img = p.url_imagen || '';
+            const esHistoriaCard = p.origen === 'historia';
+            const badgeTipo = p.tipo === 'Evento' ? 'bg-blue-100 text-blue-700' : (esHistoriaCard ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700');
+            const verPublicaBtn = esHistoriaCard
+                ? `<span class="flex-1 text-center text-xs font-bold text-slate-400 bg-slate-50 py-2 rounded-full">En Comunidad</span>`
+                : `<a href="evento_detalle.html?id=${p.id_publicacion}" target="_blank" class="flex-1 text-center text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 py-2 rounded-full transition-colors">Ver pública</a>`;
+            return `
+              <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden group">
+                <div class="h-40 bg-slate-100 relative">
+                  ${img ? `<img src="${img}" class="w-full h-full object-cover" alt="${p.titulo}">` : `<div class="w-full h-full flex items-center justify-center text-slate-300"><span class="material-symbols-outlined text-4xl">image</span></div>`}
+                  <div class="absolute top-3 left-3 flex gap-2">
+                    <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full ${badgeTipo}">${p.tipo}</span>
+                    ${(p.categoria || '').split(',').map(c => c.trim()).filter(Boolean).map(c => `<span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-white/90 text-slate-600">${c}</span>`).join('')}
+                  </div>
+                </div>
+                <div class="p-5">
+                  <h4 class="font-bold text-slate-800 mb-1 line-clamp-2">${p.titulo}</h4>
+                  <p class="text-xs text-slate-400 mb-4">${fecha}</p>
+                  <div class="flex items-center gap-2">
+                    ${verPublicaBtn}
+                    <button onclick="abrirModalEditarPub(${p.id_publicacion}, '${p.origen}')" class="p-2 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
+                      <span class="material-symbols-outlined text-[18px]">edit</span>
+                    </button>
+                    ${esRolVoluntario ? '' : `<button onclick="abrirModalEliminarPub(${p.id_publicacion}, '${p.origen}')" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
+                      <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>`}
+                  </div>
+                </div>
+              </div>`;
+        }).join('');
+    }
+
+    // ================= MODAL CREAR/EDITAR =================
+    function abrirModalPublicacion() {
+        document.getElementById('formPublicacion').reset();
+        document.getElementById('pub_id').value = '';
+        document.getElementById('pub_origen').value = 'publicacion';
+        document.getElementById('pub_tipo').disabled = false;
+        document.getElementById('pub_url_imagen').value = '';
+        document.getElementById('pub_imagen_preview_wrap').classList.add('hidden');
+        document.getElementById('bloque_generador_redes').classList.add('hidden');
+        document.getElementById('bloque_galeria_adicional').classList.add('hidden');
+        document.getElementById('btn_descargar_redes').classList.add('hidden');
+        document.querySelectorAll('.pub_categoria_check').forEach(c => c.checked = false);
+        document.getElementById('pub_categoria_otro_check').checked = false;
+        document.getElementById('pub_categoria_otro').value = '';
+        document.getElementById('pub_categoria_otro').classList.add('hidden');
+        document.getElementById('pub_tipo_otro').value = '';
+        document.getElementById('pub_tipo_otro').classList.add('hidden');
+        document.getElementById('bloque_consentimiento_historia').classList.add('hidden');
+        document.getElementById('pub_url_consentimiento').value = '';
+        document.getElementById('consentimiento_nombre_archivo').innerText = '';
+        document.getElementById('pub_evento_relacionado').value = '';
+        document.getElementById('pub_id_beneficiario').value = '';
+        document.getElementById('pub_contenido_preayuda').value = '';
+        document.getElementById('pub_contenido_postayuda').value = '';
+        cambiarTipoPublicacion();
+        document.getElementById('modalPublicacionTitulo').innerText = 'Nueva Publicación';
+        document.getElementById('btnGuardarPublicacion').innerText = 'Publicar';
+        document.getElementById('modalPublicacion').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalPublicacion').classList.remove('opacity-0');
+            document.getElementById('modalPublicacionContent').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function abrirModalEditarPub(id, origen) {
+        const pub = publicacionesGlobal.find(p => p.id_publicacion === id && p.origen === origen);
+        if (!pub) return;
+        document.getElementById('formPublicacion').reset();
+        document.getElementById('pub_id').value = pub.id_publicacion;
+        document.getElementById('pub_origen').value = pub.origen;
+        document.getElementById('pub_titulo').value = pub.titulo;
+        const tiposConocidos = ['Aviso', 'Evento', 'Historia de Éxito'];
+        if (tiposConocidos.includes(pub.tipo)) {
+            document.getElementById('pub_tipo').value = pub.tipo;
+        } else {
+            document.getElementById('pub_tipo').value = 'Otro';
+            document.getElementById('pub_tipo_otro').value = pub.tipo || '';
+        }
+        // El tipo no se puede cambiar al editar: cruzar de "Publicación normal" a "Historia de
+        // Éxito" (o viceversa) implicaría mover el registro entre tablas distintas.
+        document.getElementById('pub_tipo').disabled = true;
+        cambiarTipoPublicacion();
+
+        if (pub.origen === 'historia') {
+            document.getElementById('pub_id_beneficiario').value = pub.id_beneficiario || '';
+            document.getElementById('pub_contenido_preayuda').value = pub.contenido_preayuda || '';
+            document.getElementById('pub_contenido_postayuda').value = pub.contenido_postayuda || '';
+            document.getElementById('pub_url_consentimiento').value = pub.url_documento_consentimiento || '';
+            document.getElementById('consentimiento_nombre_archivo').innerText = pub.url_documento_consentimiento ? 'Documento ya cargado' : '';
+            document.getElementById('bloque_galeria_adicional').classList.add('hidden');
+            document.getElementById('bloque_generador_redes').classList.add('hidden');
+            document.getElementById('pub_imagen_preview_wrap').classList.add('hidden');
+        } else {
+            marcarCategoriasSeleccionadas(pub.categoria);
+            document.getElementById('pub_evento_relacionado').value = pub.id_evento_relacionado || '';
+            document.getElementById('pub_contenido').value = pub.contenido || '';
+            document.getElementById('pub_url_imagen').value = pub.url_imagen || '';
+            document.getElementById('btn_descargar_redes').classList.add('hidden');
+            if (pub.url_imagen) {
+                document.getElementById('pub_imagen_preview').src = pub.url_imagen;
+                document.getElementById('pub_imagen_preview_wrap').classList.remove('hidden');
+                document.getElementById('bloque_generador_redes').classList.remove('hidden');
+            } else {
+                document.getElementById('pub_imagen_preview_wrap').classList.add('hidden');
+                document.getElementById('bloque_generador_redes').classList.add('hidden');
+            }
+            // La galería de fotos adicionales solo aplica a publicaciones ya guardadas (necesitan un ID).
+            document.getElementById('bloque_galeria_adicional').classList.remove('hidden');
+            cargarGaleriaAdicional(pub.id_publicacion);
+        }
+
+        document.getElementById('modalPublicacionTitulo').innerText = 'Editar Publicación';
+        document.getElementById('btnGuardarPublicacion').innerText = 'Guardar Cambios';
+        document.getElementById('modalPublicacion').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalPublicacion').classList.remove('opacity-0');
+            document.getElementById('modalPublicacionContent').classList.remove('scale-95');
+        }, 10);
+    }
+
+    // ================= GALERÍA DE FOTOS ADICIONALES (historia con varias imágenes) =================
+    async function cargarGaleriaAdicional(idPub) {
+        const cont = document.getElementById('galeria_adicional_preview');
+        cont.innerHTML = '<p class="text-xs text-slate-400">Cargando...</p>';
+        try {
+            const res = await fetch(`${API_URL}/api/galeria/noticia/${idPub}`);
+            const json = await res.json();
+            if (!json.success || json.data.length === 0) {
+                cont.innerHTML = '<p class="text-xs text-slate-400">Aún no hay fotos adicionales.</p>';
+                return;
+            }
+            cont.innerHTML = json.data.map(img => `
+                <div class="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 group">
+                    <img src="${img.url_imagen}" class="w-full h-full object-cover" alt="Foto adicional">
+                    <button type="button" onclick="eliminarImagenGaleria(${img.id_imagen}, ${idPub})" class="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                </div>`).join('');
+        } catch (e) {
+            console.error('Error al cargar galería adicional:', e);
+            cont.innerHTML = '<p class="text-xs text-red-400">No se pudo cargar la galería.</p>';
+        }
+    }
+
+    async function subirImagenesGaleria(event) {
+        const files = Array.from(event.target.files || []);
+        if (files.length === 0) return;
+        const idPub = document.getElementById('pub_id').value;
+        if (!idPub) { alert('Primero guarda la publicación antes de agregar fotos adicionales.'); return; }
+
+        const btn = document.getElementById('btn_subir_galeria');
+        const textoOriginal = btn.innerText;
+        btn.innerText = 'Subiendo...'; btn.disabled = true;
+
+        try {
+            const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } = await obtenerConfigCloudinary();
+            if (!CLOUD_NAME || !UPLOAD_PRESET) {
+                alert('Falta configurar CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET en las variables de entorno del servidor.');
+                return;
+            }
+
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', UPLOAD_PRESET);
+                const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
+                const uploadData = await uploadRes.json();
+                if (uploadData.secure_url) {
+                    await fetch(`${API_URL}/api/galeria`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({ tipo_entidad: 'noticia', id_entidad: idPub, url_imagen: uploadData.secure_url })
+                    });
+                }
+            }
+            cargarGaleriaAdicional(idPub);
+        } catch (e) {
+            console.error('Error al subir fotos adicionales:', e);
+            alert('Falló la subida de una o más fotos.');
+        } finally {
+            btn.innerText = textoOriginal; btn.disabled = false;
+            event.target.value = '';
+        }
+    }
+
+    async function eliminarImagenGaleria(idImagen, idPub) {
+        if (!confirm('¿Eliminar esta foto de la galería?')) return;
+        try {
+            await fetch(`${API_URL}/api/galeria/${idImagen}`, { method: 'DELETE', headers: authHeaders() });
+            cargarGaleriaAdicional(idPub);
+        } catch (e) { alert('No se pudo eliminar la foto.'); }
+    }
+
+    function cerrarModalPublicacion() {
+        document.getElementById('modalPublicacion').classList.add('opacity-0');
+        document.getElementById('modalPublicacionContent').classList.add('scale-95');
+        setTimeout(() => { document.getElementById('modalPublicacion').classList.add('hidden'); }, 300);
+    }
+
+    // ================= SUBIDA DE IMAGEN (Cloudinary) =================
+    async function subirImagenPublicacion(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const btn = document.getElementById('btn_subir_imagen_pub');
+        const textoOriginal = btn.innerText;
+        btn.innerText = 'Subiendo...'; btn.disabled = true;
+
+        const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } = await obtenerConfigCloudinary();
+        if (!CLOUD_NAME || !UPLOAD_PRESET) {
+            alert('Falta configurar CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET en las variables de entorno del servidor.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', UPLOAD_PRESET);
+
+        try {
+            const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
+            const uploadData = await uploadRes.json();
+            if (uploadData.secure_url) {
+                document.getElementById('pub_url_imagen').value = uploadData.secure_url;
+                document.getElementById('pub_imagen_preview').src = uploadData.secure_url;
+                document.getElementById('pub_imagen_preview_wrap').classList.remove('hidden');
+                document.getElementById('bloque_generador_redes').classList.remove('hidden');
+                document.getElementById('btn_descargar_redes').classList.add('hidden');
+            } else {
+                alert('No se pudo subir la imagen. Revisa la configuración de Cloudinary (CLOUD_NAME / UPLOAD_PRESET).');
+            }
+        } catch (error) {
+            console.error('Error al subir imagen:', error);
+            alert('Falló la subida de la imagen.');
+        } finally {
+            btn.innerText = textoOriginal; btn.disabled = false;
+            event.target.value = '';
+        }
+    }
+
+    // ================= GUARDAR (crear/editar) =================
+    async function guardarPublicacion(e) {
+        e.preventDefault();
+        const idExistente = document.getElementById('pub_id').value;
+        const origenExistente = document.getElementById('pub_origen').value;
+        const tipoRaw = document.getElementById('pub_tipo').value;
+        const esHistoria = tipoRaw === 'Historia de Éxito';
+        const tipoSeleccionado = tipoRaw === 'Otro' ? (document.getElementById('pub_tipo_otro').value.trim() || 'Otro') : tipoRaw;
+
+        if (esHistoria && !document.getElementById('pub_url_consentimiento').value) {
+            alert('Para publicar una Historia de Éxito debes subir el documento de consentimiento.');
+            return;
+        }
+
+        let payload;
+        if (esHistoria) {
+            if (!document.getElementById('pub_id_beneficiario').value) {
+                alert('Selecciona a qué beneficiario pertenece esta historia.');
+                return;
+            }
+            payload = {
+                titulo: document.getElementById('pub_titulo').value,
+                tipo: tipoSeleccionado,
+                origen: 'historia',
+                id_beneficiario: document.getElementById('pub_id_beneficiario').value,
+                contenido_preayuda: document.getElementById('pub_contenido_preayuda').value,
+                contenido_postayuda: document.getElementById('pub_contenido_postayuda').value,
+                url_documento_consentimiento: document.getElementById('pub_url_consentimiento').value || null
+            };
+        } else {
+            const categoriasSeleccionadas = obtenerCategoriasSeleccionadas();
+            if (categoriasSeleccionadas.length === 0) {
+                alert('Selecciona al menos una categoría.');
+                return;
+            }
+            const categoriaFinal = categoriasSeleccionadas.join(', ');
+            payload = {
+                titulo: document.getElementById('pub_titulo').value,
+                contenido: document.getElementById('pub_contenido').value,
+                url_imagen: document.getElementById('pub_url_imagen').value || null,
+                tipo: tipoSeleccionado,
+                origen: 'publicacion',
+                categoria: categoriaFinal,
+                url_documento_consentimiento: document.getElementById('pub_url_consentimiento').value || null,
+                id_evento_relacionado: document.getElementById('pub_evento_relacionado').value || null
+            };
+        }
+
+        const btn = document.getElementById('btnGuardarPublicacion');
+        const textoOriginal = btn.innerText;
+        btn.innerText = 'Guardando...'; btn.disabled = true;
+
+        try {
+            const res = idExistente
+                ? await fetch(`${API_URL}/api/publicaciones/${idExistente}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) })
+                : await fetch(`${API_URL}/api/publicaciones`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                cerrarModalPublicacion();
+                cargarPublicaciones();
+            } else {
+                alert('Error al guardar: ' + (data.message || 'revisa que la migración ronda 6 se haya ejecutado en Supabase.'));
+            }
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+        } finally {
+            btn.innerText = textoOriginal; btn.disabled = false;
+        }
+    }
+
+    // ================= ELIMINAR =================
+    function abrirModalEliminarPub(id, origen) {
+        idPubAEliminar = id;
+        origenPubAEliminar = origen || 'publicacion';
+        document.getElementById('modalEliminarPub').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalEliminarPub').classList.remove('opacity-0');
+            document.getElementById('modalEliminarPubContent').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function cerrarModalEliminarPub() {
+        document.getElementById('modalEliminarPub').classList.add('opacity-0');
+        document.getElementById('modalEliminarPubContent').classList.add('scale-95');
+        setTimeout(() => { document.getElementById('modalEliminarPub').classList.add('hidden'); idPubAEliminar = null; }, 300);
+    }
+
+    async function confirmarEliminarPub() {
+        if (!idPubAEliminar) return;
+        try {
+            const res = await fetch(`${API_URL}/api/publicaciones/${idPubAEliminar}?origen=${origenPubAEliminar}`, { method: 'DELETE', headers: authHeaders() });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                cerrarModalEliminarPub();
+                cargarPublicaciones();
+            } else {
+                alert(data.message || 'No se pudo eliminar la publicación.');
+            }
+        } catch (error) { alert('Error de conexión al eliminar.'); }
+    }
+
+    // ================= GENERADOR DE IMAGEN PARA REDES SOCIALES =================
+    // Réplica en Canvas (navegador) del formato definido en generar_foto.py:
+    // degradado naranja→rosa, marco blanco central, foto proporcional centrada,
+    // frase institucional en blanco abajo, y logo en la esquina inferior derecha del marco.
+    async function generarImagenRedes() {
+        const urlFoto = document.getElementById('pub_url_imagen').value;
+        if (!urlFoto) { alert('Primero sube una fotografía.'); return; }
+
+        const canvas = document.getElementById('canvas_redes');
+        const ctx = canvas.getContext('2d');
+        const ANCHO = 1080, ALTO = 1080;
+
+        try {
+            // 1. Degradado vertical de fondo (mismos coeficientes que el script de Python)
+            for (let y = 0; y < ALTO; y++) {
+                const r = Math.round(255 - (y / ALTO) * 40);
+                const g = Math.round(140 - (y / ALTO) * 120);
+                const b = Math.round(0 + (y / ALTO) * 120);
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                ctx.fillRect(0, y, ANCHO, 1);
+            }
+
+            // 2. Recuadro blanco central
+            const left = 90, top = 80, right = 990, bottom = 770;
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(left, top, right - left, bottom - top);
+
+            // 3. Cargar y dibujar la foto, centrada y proporcional (equivalente a thumbnail + paste centrado)
+            const foto = await cargarImagenParaCanvas(urlFoto);
+            const anchoFotoMax = (right - left) - 20;
+            const altoFotoMax = (bottom - top) - 20;
+            const escala = Math.min(anchoFotoMax / foto.width, altoFotoMax / foto.height, 1);
+            const anchoFinal = foto.width * escala;
+            const altoFinal = foto.height * escala;
+            const posXFoto = left + 10 + (anchoFotoMax - anchoFinal) / 2;
+            const posYFoto = top + 10 + (altoFotoMax - altoFinal) / 2;
+            ctx.drawImage(foto, posXFoto, posYFoto, anchoFinal, altoFinal);
+
+            // 4. Frase institucional en la parte inferior
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 28px Quicksand, sans-serif';
+            ctx.fillText('"LA SALUD MENTAL ES RESPONSABILIDAD EN SOCIEDAD"', 90, 950);
+
+            // 5. Logo en la esquina inferior derecha del marco
+            try {
+                const logo = await cargarImagenParaCanvas('Logo.png');
+                const altoLogo = 130;
+                const anchoLogo = altoLogo * (logo.width / logo.height);
+                ctx.drawImage(logo, right - anchoLogo - 10, bottom - altoLogo - 10, anchoLogo, altoLogo);
+            } catch (e) {
+                console.warn('No se pudo cargar el logo para la tarjeta de redes:', e);
+            }
+
+            // 6. Habilitar descarga
+            const enlace = document.getElementById('btn_descargar_redes');
+            enlace.href = canvas.toDataURL('image/png');
+            const tituloArchivo = (document.getElementById('pub_titulo').value || 'publicacion').toLowerCase().replace(/[^a-z0-9]+/g, '_');
+            enlace.download = `sanctorum_${tituloArchivo}.png`;
+            enlace.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error al generar imagen para redes:', error);
+            alert('No se pudo generar la imagen. Si la foto viene de Cloudinary, revisa que tu cuenta permita CORS para descargas (comportamiento por defecto en la mayoría de los planes).');
+        }
+    }
+
+    function cargarImagenParaCanvas(src) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = src;
+        });
+    }
+  </script>
+</body>
+</html>

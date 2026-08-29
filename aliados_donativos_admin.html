@@ -1,0 +1,754 @@
+<!doctype html>
+<html class="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Aliados y Donativos | Sanctorum A.C.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#8a5100", "primary-container": "#f39200", secondary: "#b50062", "secondary-container": "#e2007c", surface: "#f6fafe", "surface-container-low": "#f0f4f8", "surface-container-lowest": "#ffffff", "on-surface": "#171c1f", "on-surface-variant": "#544434" }, fontFamily: { sans: ["Quicksand", "sans-serif"], plus: ["Plus Jakarta Sans", "sans-serif"] } } } };
+    </script>
+    <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+  </head>
+  <body class="bg-surface text-slate-800 min-h-screen">
+    
+    <!-- ================= SIDE NAV BAR UNIVERSAL ================= -->
+    <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
+      <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
+      <nav class="flex-1 px-4 space-y-2">
+        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda_admin.html"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_publicaciones_admin.html"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_reportes_admin.html"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
+      <!-- PESTAÑA ACTIVA -->
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="aliados_donativos_admin.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
+      </nav>
+      <div class="px-6 mt-auto space-y-4">
+        <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
+        <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
+      </div>
+    </aside><main class="ml-72 min-h-screen flex flex-col">
+      <!-- ================= TOP NAV BAR UNIVERSAL ================= -->
+      <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
+        <div class="flex items-center flex-1">
+          <div class="relative w-full max-w-md">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <input id="buscador_principal" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar aliados..." type="text" />
+          </div>
+        </div>
+        <div class="flex items-center gap-4 ml-8 relative">
+          <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
+          <div class="h-8 w-px bg-slate-200 mx-2"></div>
+          <a href="perfil_admin.html" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
+            <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
+            <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
+          </a>
+  
+          <!-- PANEL DE NOTIFICACIONES -->
+          <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+              <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm">Notificaciones</h3>
+                <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
+              </div>
+              <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                  <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
+              </div>
+              <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
+          </div>
+        </div>
+      </header>
+  
+      <div class="p-8 flex-1">
+
+        <!-- TÍTULO Y BOTÓN SUPERIOR -->
+        <div class="flex justify-between items-end mb-6">
+            <div>
+              <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Aliados y Donativos</h2>
+              <p class="text-slate-500 max-w-xl">Directorio de aliados externos y registro de donativos recibidos.</p>
+            </div>
+            <button id="btn_nuevo_aliado" onclick="abrirModalAliado()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-secondary to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
+              <span class="material-symbols-outlined">add</span> Nuevo Aliado
+            </button>
+            <button id="btn_nuevo_donativo" onclick="abrirModalDonativo()" class="hidden flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-secondary to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
+              <span class="material-symbols-outlined">add</span> Nuevo Donativo
+            </button>
+        </div>
+
+        <!-- PESTAÑAS: ALIADOS / DONATIVOS -->
+        <div class="flex gap-6 border-b border-slate-200 mb-8">
+            <button id="tabBtn_aliados" onclick="cambiarTabAliados('aliados')" class="pb-3 border-b-2 border-secondary text-secondary font-bold text-sm transition-all">Aliados</button>
+            <button id="tabBtn_donativos" onclick="cambiarTabAliados('donativos')" class="pb-3 border-b-2 border-transparent text-slate-400 font-bold text-sm hover:text-slate-600 transition-all">Donativos</button>
+        </div>
+
+        <div id="panel_aliados">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="px-8 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest">Aliado</th>
+                <th class="px-6 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest">Tipo</th>
+                <th class="px-6 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest">Especialidad</th>
+                <th class="px-6 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest">Enlace Interno</th>
+                <th class="px-6 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla_aliados" class="divide-y divide-slate-100">
+              <tr><td colspan="5" class="px-8 py-10 text-center text-slate-400">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        </div>
+
+        <div id="panel_donativos" class="hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="px-8 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest">Fecha</th>
+                <th class="px-6 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest">Aliado</th>
+                <th class="px-6 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest">Monto</th>
+                <th class="px-6 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest">Método</th>
+                <th class="px-6 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest">Categoría</th>
+                <th class="px-6 py-5 text-sm font-bold text-slate-400 uppercase tracking-widest text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla_donativos" class="divide-y divide-slate-100">
+              <tr><td colspan="6" class="px-8 py-10 text-center text-slate-400">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ================= MODAL: NUEVO / EDITAR ALIADO ================= -->
+    <div id="modalAliado" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalAliadoContent">
+          <div class="bg-gradient-to-r from-[#8a5100] to-[#f39200] px-8 py-6 text-white flex justify-between items-center">
+            <div><h3 id="modalAliadoTitulo" class="text-2xl font-bold font-plus">Nuevo Aliado</h3></div>
+            <button onclick="cerrarModalAliado()" class="text-white/80 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
+          </div>
+          <form id="formAliado" class="p-8 space-y-4">
+            <input type="hidden" id="ali_id" value="">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Nombre del Aliado</label>
+                <input type="text" id="ali_nombre" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none" placeholder="Ej. Fundación Ejemplo A.C.">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Tipo de Aliado</label>
+                  <select id="ali_tipo" onchange="toggleAliTipoOtro()" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
+                      <option value="Voluntario">Voluntario</option>
+                      <option value="Donante Individual">Donante Individual</option>
+                      <option value="Empresa Aliada">Empresa Aliada</option>
+                      <option value="Otro">Otro: escribir...</option>
+                  </select>
+                  <input type="text" id="ali_tipo_otro" placeholder="Escribe el tipo de aliado" class="hidden mt-2 w-full px-4 py-2 bg-white border border-slate-200 rounded-full outline-none">
+              </div>
+              <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Especialidad / Giro</label>
+                  <input type="text" id="ali_especialidad" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none" placeholder="Ej. Psicología, Logística...">
+              </div>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Enlace Interno (usuario responsable)</label>
+                <select id="ali_usuario_enlace" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
+                    <option value="">Sin asignar</option>
+                </select>
+            </div>
+            <div class="pt-4 flex gap-4">
+                <button type="button" onclick="cerrarModalAliado()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors">Cancelar</button>
+                <button type="submit" id="btnGuardarAliado" class="flex-1 py-3 bg-[#b50062] text-white font-bold rounded-full shadow-lg hover:bg-[#e2007c] transition-colors">Guardar Aliado</button>
+            </div>
+          </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: NUEVO DONATIVO ================= -->
+    <div id="modalDonativo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalDonativoContent">
+          <div class="bg-gradient-to-r from-[#8a5100] to-[#f39200] px-8 py-6 text-white flex justify-between items-center">
+            <div><h3 class="text-2xl font-bold font-plus">Nuevo Donativo</h3></div>
+            <button onclick="cerrarModalDonativo()" class="text-white/80 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
+          </div>
+          <form id="formDonativo" class="p-8 space-y-4">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Aliado / Donante</label>
+                <select id="don_id_contacto" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
+                    <option value="">Selecciona un aliado...</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Monto ($)</label>
+                  <input type="number" step="0.01" min="0" id="don_monto" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none" value="0">
+              </div>
+              <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Fecha</label>
+                  <input type="date" id="don_fecha" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Método de Pago</label>
+                  <p class="text-[11px] text-slate-400 mb-1 ml-1">¿Cómo se recibió este donativo?</p>
+                  <select id="don_metodo" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
+                      <option value="Transferencia">Transferencia</option>
+                      <option value="Efectivo">Efectivo</option>
+                      <option value="Plataforma Digital">Plataforma Digital</option>
+                      <option value="En especie">En especie</option>
+                  </select>
+              </div>
+              <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Categoría de Gasto</label>
+                  <select id="don_categoria" onchange="toggleDonCategoriaOtro()" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
+                      <option value="Especialistas">Especialistas</option>
+                      <option value="Insumos">Insumos</option>
+                      <option value="Operación">Operación</option>
+                      <option value="Otro">Otro: escribir...</option>
+                  </select>
+                  <input type="text" id="don_categoria_otro" placeholder="Escribe la categoría de gasto" class="hidden mt-2 w-full px-4 py-2 bg-white border border-slate-200 rounded-full outline-none">
+              </div>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Insumo relacionado (si el donativo es en especie)</label>
+                <select id="don_id_insumo" onchange="toggleDonInsumoOtro()" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
+                    <option value="">Ninguno</option>
+                    <option value="__otro__">Otro: escribir... (se agregará al inventario)</option>
+                </select>
+                <input type="text" id="don_insumo_otro" placeholder="Nombre del insumo nuevo" class="hidden mt-2 w-full px-4 py-2 bg-white border border-slate-200 rounded-full outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Comprobante</label>
+                <div class="border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center bg-slate-50">
+                    <span id="don_comprobante_nombre" class="text-xs text-slate-500 block mb-2"></span>
+                    <input type="file" id="input_comprobante_donativo" class="hidden" accept="image/png,image/jpeg,image/webp,.pdf" onchange="subirComprobanteDonativo(event)">
+                    <button type="button" onclick="document.getElementById('input_comprobante_donativo').click()" id="btn_subir_comprobante" class="px-5 py-2 bg-slate-800 text-white font-bold rounded-full text-sm hover:bg-slate-900 transition-all">Subir Comprobante</button>
+                    <input type="hidden" id="don_comprobante_url" value="">
+                </div>
+            </div>
+            <div class="pt-4 flex gap-4">
+                <button type="button" onclick="cerrarModalDonativo()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors">Cancelar</button>
+                <button type="submit" id="btnGuardarDonativo" class="flex-1 py-3 bg-[#b50062] text-white font-bold rounded-full shadow-lg hover:bg-[#e2007c] transition-colors">Registrar Donativo</button>
+            </div>
+          </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: CONFIRMAR ELIMINACIÓN ================= -->
+    <div id="modalEliminarGenerico" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+      <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform scale-95 transition-all" id="modalEliminarGenericoContent">
+        <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-3xl">delete</span>
+        </div>
+        <h3 id="elim_generico_titulo" class="text-xl font-bold text-slate-800 mb-2">¿Eliminar este registro?</h3>
+        <p id="elim_generico_texto" class="text-sm text-slate-500 mb-6">Esta acción no se puede deshacer.</p>
+        <div class="flex gap-3">
+          <button onclick="cerrarModalEliminarGenerico()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button onclick="confirmarEliminarGenerico()" class="flex-1 py-3 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition-colors shadow-lg">Eliminar</button>
+        </div>
+      </div>
+    </div>
+<script>
+    // Decodifica el payload de un JWT de forma segura: los JWT usan base64url
+    // (con '-' y '_' en vez de '+' y '/', y sin padding '='), y pueden contener
+    // caracteres UTF-8 (acentos, ñ, etc.). atob() a secas falla o corrompe esos casos.
+    function decodeJWT(token) {
+        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4 !== 0) base64 += '=';
+        const binario = atob(base64);
+        const jsonPayload = decodeURIComponent(
+            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(jsonPayload);
+    }
+
+    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
+    // entra directo por URL a una página no permitida para su rol, lo redirige.
+    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
+    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
+    function aplicarRestriccionesNav(rol, especialidad) {
+        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
+        const permisos = {
+            'dashboard_admin.html': [1, 3],
+            'gestion_expedientes_admin.html': esPsico ? [1, 2] : [1],
+            'gestion_voluntariado_admin.html': [1, 3],
+            'inventario_admin.html': [1, 3],
+            'agenda_admin.html': [1, 2, 3, 4],
+            'gestion_publicaciones_admin.html': [1, 2, 3, 4],
+            'gestion_reportes_admin.html': [1, 2, 3, 4],
+            'aliados_donativos_admin.html': [1, 3]
+        };
+
+        document.querySelectorAll('aside nav a[href]').forEach(a => {
+            const pagina = a.getAttribute('href');
+            const permitidos = permisos[pagina];
+            if (permitidos && !permitidos.includes(rol)) {
+                a.remove();
+            }
+        });
+
+        const paginaActual = window.location.pathname.split('/').pop();
+        const permitidosActual = permisos[paginaActual];
+        if (permitidosActual && !permitidosActual.includes(rol)) {
+            window.location.replace('agenda_admin.html');
+        }
+    }
+
+    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
+    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
+    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
+    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
+    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
+
+    function obtenerNotifDescartadas() {
+        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
+    }
+    function guardarNotifDescartadas(lista) {
+        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
+    }
+
+    function toggleNotificaciones() {
+        const panel = document.getElementById('modalNotificaciones');
+        const estabaOculto = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        if (estabaOculto) cargarNotificaciones();
+    }
+
+    async function cargarNotificaciones() {
+        const cont = document.getElementById('lista_notificaciones');
+        try {
+            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
+            const json = await res.json();
+            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
+
+            const descartadas = obtenerNotifDescartadas();
+            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
+                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
+                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
+                titulo: a.titulo, detalle: a.detalle || ''
+            }));
+
+            if (json.data.solicitudes_pendientes > 0) {
+                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
+                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
+            }
+            if (json.data.insumos_bajo_stock > 0) {
+                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
+                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
+            }
+
+            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
+            actualizarPuntoNotificaciones(notificaciones.length);
+
+            if (notificaciones.length === 0) {
+                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
+                return;
+            }
+
+            cont.innerHTML = notificaciones.map(n => `
+                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
+                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
+                    </div>
+                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>`).join('');
+        } catch (e) {
+            console.error("Error al cargar notificaciones:", e);
+            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
+        }
+    }
+
+    function actualizarPuntoNotificaciones(cantidad) {
+        const punto = document.getElementById('punto_notificaciones');
+        if (!punto) return;
+        punto.classList.toggle('hidden', cantidad === 0);
+    }
+
+    function descartarNotificacion(id) {
+        const descartadas = obtenerNotifDescartadas();
+        if (!descartadas.includes(id)) descartadas.push(id);
+        guardarNotifDescartadas(descartadas);
+        cargarNotificaciones();
+    }
+
+    function limpiarTodasNotificaciones() {
+        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
+            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
+            if (match) {
+                const descartadas = obtenerNotifDescartadas();
+                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
+                guardarNotifDescartadas(descartadas);
+            }
+        });
+        cargarNotificaciones();
+    }
+
+      // Bloquea el acceso si el usuario (Especialista/Coordinador) todavía no tiene
+      // aprobado su documento profesional -- solo puede ver su Perfil.
+      function verificarAccesoDocumento(payload) {
+          if (payload.rol !== 2 && payload.rol !== 3) return;
+          fetch(`${API_URL}/api/usuarios/${payload.id}`)
+              .then(r => r.json())
+              .then(j => {
+                  const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
+                  if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
+                      window.location.replace('perfil_admin.html');
+                  }
+              })
+              .catch(() => {});
+      }
+  
+      function cerrarSesion() { localStorage.removeItem('token_sanctorum'); window.location.replace("login.html"); }
+      let _cloudinaryConfigCache = null;
+      async function obtenerConfigCloudinary() {
+          if (_cloudinaryConfigCache) return _cloudinaryConfigCache;
+          const res = await fetch(`${API_URL}/api/config/cloudinary`);
+          const json = await res.json();
+          _cloudinaryConfigCache = { cloudName: json.cloud_name, uploadPreset: json.upload_preset };
+          return _cloudinaryConfigCache;
+      }
+
+      const API_URL = "http://localhost:3000";
+
+      function authHeaders() {
+          return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
+      }
+
+      let aliadosGlobal = [];
+      let donativosGlobal = [];
+
+      document.addEventListener('DOMContentLoaded', () => {
+          const token = localStorage.getItem('token_sanctorum');
+          if (!token) { window.location.replace("login.html"); return; }
+          try {
+              const payload = decodeJWT(token);
+              aplicarRestriccionesNav(payload.rol, payload.especialidad);
+              document.getElementById('nav_user_name').innerText = payload.nombre.split(' ')[0];
+              verificarAccesoDocumento(payload);
+          } catch (e) { window.location.replace("login.html"); return; }
+
+          cargarAliados();
+          cargarCatalogosDonativos();
+          cargarNotificaciones();
+
+          const inputBuscador = document.getElementById('buscador_principal');
+          if (inputBuscador) { inputBuscador.addEventListener('input', () => { filtrarTablaActual(); }); }
+      });
+
+      function filtrarTablaActual() {
+          const enDonativos = !document.getElementById('panel_donativos').classList.contains('hidden');
+          if (enDonativos) renderDonativos(); else renderAliados();
+      }
+
+      // ================= PESTAÑAS =================
+      function cambiarTabAliados(tab) {
+          const esDonativos = tab === 'donativos';
+          document.getElementById('panel_aliados').classList.toggle('hidden', esDonativos);
+          document.getElementById('panel_donativos').classList.toggle('hidden', !esDonativos);
+          document.getElementById('btn_nuevo_aliado').classList.toggle('hidden', esDonativos);
+          document.getElementById('btn_nuevo_donativo').classList.toggle('hidden', !esDonativos);
+          document.getElementById('tabBtn_aliados').classList.toggle('border-secondary', !esDonativos);
+          document.getElementById('tabBtn_aliados').classList.toggle('text-secondary', !esDonativos);
+          document.getElementById('tabBtn_aliados').classList.toggle('border-transparent', esDonativos);
+          document.getElementById('tabBtn_aliados').classList.toggle('text-slate-400', esDonativos);
+          document.getElementById('tabBtn_donativos').classList.toggle('border-secondary', esDonativos);
+          document.getElementById('tabBtn_donativos').classList.toggle('text-secondary', esDonativos);
+          document.getElementById('tabBtn_donativos').classList.toggle('border-transparent', !esDonativos);
+          document.getElementById('tabBtn_donativos').classList.toggle('text-slate-400', !esDonativos);
+          if (esDonativos) cargarDonativos();
+      }
+
+      // ================= ALIADOS =================
+      async function cargarAliados() {
+          try {
+              const res = await fetch(`${API_URL}/api/aliados`, { headers: authHeaders() });
+              const json = await res.json();
+              if (json.success) { aliadosGlobal = json.data; renderAliados(); }
+              else document.getElementById('tabla_aliados').innerHTML = `<tr><td colspan="5" class="px-8 py-10 text-center text-slate-400">No se pudieron cargar los aliados.</td></tr>`;
+          } catch (e) {
+              console.error('Error al cargar aliados:', e);
+              document.getElementById('tabla_aliados').innerHTML = `<tr><td colspan="5" class="px-8 py-10 text-center text-red-400">No se pudo conectar con el servidor.</td></tr>`;
+          }
+      }
+
+      function renderAliados() {
+          const texto = (document.getElementById('buscador_principal').value || '').toLowerCase();
+          const filtrados = aliadosGlobal.filter(a => !texto || a.nombre_aliado.toLowerCase().includes(texto));
+          const tbody = document.getElementById('tabla_aliados');
+          if (filtrados.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="5" class="px-8 py-10 text-center text-slate-400">No hay aliados registrados todavía.</td></tr>`;
+              return;
+          }
+          tbody.innerHTML = filtrados.map(a => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-8 py-5 font-bold text-slate-700">${a.nombre_aliado}</td>
+                  <td class="px-6 py-5 text-slate-500 font-medium">${a.tipo_aliado || 'Sin especificar'}</td>
+                  <td class="px-6 py-5 text-slate-500 font-medium">${a.especialidad || '-'}</td>
+                  <td class="px-6 py-5 text-slate-500 font-medium">${a.usuario_enlace || 'Sin asignar'}</td>
+                  <td class="px-6 py-5 text-center">
+                    <div class="flex items-center justify-center gap-2">
+                      <button onclick="abrirModalEditarAliado(${a.id_contacto})" class="p-2 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button onclick="prepararEliminar('aliado', ${a.id_contacto}, '${(a.nombre_aliado || '').replace(/'/g, "\\'")}')" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>`).join('');
+      }
+
+      async function cargarCatalogosDonativos() {
+          try {
+              const res = await fetch(`${API_URL}/api/catalogos_agenda`, { headers: authHeaders() });
+              const json = await res.json();
+              if (json.success) {
+                  document.getElementById('ali_usuario_enlace').innerHTML = '<option value="">Sin asignar</option>' + json.voluntarios.map(u => `<option value="${u.id_usuario}">${u.nombre_completo}</option>`).join('');
+                  document.getElementById('don_id_insumo').innerHTML = '<option value="">Ninguno</option>' + json.insumos.map(i => `<option value="${i.id_insumo}">${i.nombre_insumo}</option>`).join('') + '<option value="__otro__">Otro: escribir... (se agregará al inventario)</option>';
+              }
+          } catch (e) { console.error('Error al cargar catálogos:', e); }
+      }
+
+      function toggleAliTipoOtro() {
+          const esOtro = document.getElementById('ali_tipo').value === 'Otro';
+          document.getElementById('ali_tipo_otro').classList.toggle('hidden', !esOtro);
+      }
+
+      function toggleDonCategoriaOtro() {
+          const esOtro = document.getElementById('don_categoria').value === 'Otro';
+          document.getElementById('don_categoria_otro').classList.toggle('hidden', !esOtro);
+      }
+
+      function toggleDonInsumoOtro() {
+          const esOtro = document.getElementById('don_id_insumo').value === '__otro__';
+          document.getElementById('don_insumo_otro').classList.toggle('hidden', !esOtro);
+      }
+
+      function abrirModalAliado() {
+          document.getElementById('formAliado').reset();
+          document.getElementById('ali_id').value = '';
+          document.getElementById('ali_tipo_otro').value = '';
+          document.getElementById('ali_tipo_otro').classList.add('hidden');
+          document.getElementById('modalAliadoTitulo').innerText = 'Nuevo Aliado';
+          document.getElementById('btnGuardarAliado').innerText = 'Guardar Aliado';
+          document.getElementById('modalAliado').classList.remove('hidden');
+          setTimeout(() => { document.getElementById('modalAliado').classList.remove('opacity-0'); document.getElementById('modalAliadoContent').classList.remove('scale-95'); }, 10);
+      }
+
+      function abrirModalEditarAliado(id) {
+          const item = aliadosGlobal.find(a => a.id_contacto == id);
+          if (!item) return;
+          document.getElementById('formAliado').reset();
+          document.getElementById('ali_id').value = item.id_contacto;
+          document.getElementById('ali_nombre').value = item.nombre_aliado;
+          const tiposAliadoConocidos = ['Voluntario', 'Donante Individual', 'Empresa Aliada'];
+          if (tiposAliadoConocidos.includes(item.tipo_aliado)) {
+              document.getElementById('ali_tipo').value = item.tipo_aliado || 'Voluntario';
+              document.getElementById('ali_tipo_otro').value = '';
+              document.getElementById('ali_tipo_otro').classList.add('hidden');
+          } else {
+              document.getElementById('ali_tipo').value = 'Otro';
+              document.getElementById('ali_tipo_otro').value = item.tipo_aliado || '';
+              document.getElementById('ali_tipo_otro').classList.remove('hidden');
+          }
+          document.getElementById('ali_especialidad').value = item.especialidad || '';
+          document.getElementById('ali_usuario_enlace').value = item.id_usuario_enlace || '';
+          document.getElementById('modalAliadoTitulo').innerText = 'Editar Aliado';
+          document.getElementById('btnGuardarAliado').innerText = 'Guardar Cambios';
+          document.getElementById('modalAliado').classList.remove('hidden');
+          setTimeout(() => { document.getElementById('modalAliado').classList.remove('opacity-0'); document.getElementById('modalAliadoContent').classList.remove('scale-95'); }, 10);
+      }
+
+      function cerrarModalAliado() {
+          document.getElementById('modalAliado').classList.add('opacity-0');
+          document.getElementById('modalAliadoContent').classList.add('scale-95');
+          setTimeout(() => { document.getElementById('modalAliado').classList.add('hidden'); document.getElementById('formAliado').reset(); }, 300);
+      }
+
+      document.getElementById('formAliado').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = e.target.querySelector('button[type="submit"]'); const textoOriginal = btn.innerText; btn.innerText = "Guardando..."; btn.disabled = true;
+          const idExistente = document.getElementById('ali_id').value;
+          const tipoAliadoRaw = document.getElementById('ali_tipo').value;
+          const data = {
+              nombre_aliado: document.getElementById('ali_nombre').value,
+              tipo_aliado: tipoAliadoRaw === 'Otro' ? (document.getElementById('ali_tipo_otro').value.trim() || 'Otro') : tipoAliadoRaw,
+              especialidad: document.getElementById('ali_especialidad').value || null,
+              id_usuario_enlace: document.getElementById('ali_usuario_enlace').value || null
+          };
+          try {
+              const response = idExistente
+                  ? await fetch(`${API_URL}/api/aliados/${idExistente}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(data) })
+                  : await fetch(`${API_URL}/api/aliados`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(data) });
+              const json = await response.json();
+              if (response.ok && json.success) { cerrarModalAliado(); cargarAliados(); }
+              else alert(json.message || "Error al guardar el aliado.");
+          } catch (error) { alert("Error de conexión"); }
+          finally { btn.innerText = textoOriginal; btn.disabled = false; }
+      });
+
+      // ================= DONATIVOS =================
+      async function cargarDonativos() {
+          try {
+              const res = await fetch(`${API_URL}/api/donativos`, { headers: authHeaders() });
+              const json = await res.json();
+              if (json.success) { donativosGlobal = json.data; renderDonativos(); }
+              else document.getElementById('tabla_donativos').innerHTML = `<tr><td colspan="6" class="px-8 py-10 text-center text-slate-400">No se pudieron cargar los donativos.</td></tr>`;
+          } catch (e) {
+              console.error('Error al cargar donativos:', e);
+              document.getElementById('tabla_donativos').innerHTML = `<tr><td colspan="6" class="px-8 py-10 text-center text-red-400">No se pudo conectar con el servidor.</td></tr>`;
+          }
+      }
+
+      function renderDonativos() {
+          const texto = (document.getElementById('buscador_principal').value || '').toLowerCase();
+          const filtrados = donativosGlobal.filter(d => !texto || (d.nombre_aliado || '').toLowerCase().includes(texto));
+          const tbody = document.getElementById('tabla_donativos');
+          if (filtrados.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="6" class="px-8 py-10 text-center text-slate-400">No hay donativos registrados todavía.</td></tr>`;
+              return;
+          }
+          tbody.innerHTML = filtrados.map(d => {
+              const fecha = d.fecha_donacion ? new Date(d.fecha_donacion).toLocaleDateString('es-MX') : '-';
+              const comprobanteValido = d.comprobante_url && /^https?:\/\/res\.cloudinary\.com\//i.test(d.comprobante_url);
+              const comprobante = comprobanteValido
+                  ? `<a href="${d.comprobante_url}" target="_blank" class="text-secondary font-bold hover:underline">Ver</a>`
+                  : (d.comprobante_url ? '<span class="text-slate-300" title="El enlace guardado no es un comprobante válido">Comprobante inválido</span>' : '<span class="text-slate-300">Sin comprobante</span>');
+              return `
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-8 py-5 text-slate-500 font-medium">${fecha}</td>
+                  <td class="px-6 py-5 font-bold text-slate-700">${d.nombre_aliado}</td>
+                  <td class="px-6 py-5 font-bold text-slate-700">$${parseFloat(d.monto).toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
+                  <td class="px-6 py-5 text-slate-500 font-medium">${d.metodo_pago || '-'}</td>
+                  <td class="px-6 py-5 text-slate-500 font-medium">${d.categoria_gasto || '-'} ${comprobante}</td>
+                  <td class="px-6 py-5 text-center">
+                    <button onclick="prepararEliminar('donativo', ${d.id_donacion}, 'este donativo')" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
+                      <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                  </td>
+                </tr>`;
+          }).join('');
+      }
+
+      async function cargarSelectorAliadosDonativo() {
+          const sel = document.getElementById('don_id_contacto');
+          sel.innerHTML = '<option value="">Selecciona un aliado...</option>' + aliadosGlobal.map(a => `<option value="${a.id_contacto}">${a.nombre_aliado}</option>`).join('');
+      }
+
+      function abrirModalDonativo() {
+          if (aliadosGlobal.length === 0) { alert('Registra primero al menos un aliado antes de capturar un donativo.'); return; }
+          document.getElementById('formDonativo').reset();
+          document.getElementById('don_comprobante_url').value = '';
+          document.getElementById('don_comprobante_nombre').innerText = '';
+          document.getElementById('don_categoria_otro').value = '';
+          document.getElementById('don_categoria_otro').classList.add('hidden');
+          document.getElementById('don_insumo_otro').value = '';
+          document.getElementById('don_insumo_otro').classList.add('hidden');
+          document.getElementById('don_fecha').value = new Date().toISOString().split('T')[0];
+          cargarSelectorAliadosDonativo();
+          document.getElementById('modalDonativo').classList.remove('hidden');
+          setTimeout(() => { document.getElementById('modalDonativo').classList.remove('opacity-0'); document.getElementById('modalDonativoContent').classList.remove('scale-95'); }, 10);
+      }
+
+      function cerrarModalDonativo() {
+          document.getElementById('modalDonativo').classList.add('opacity-0');
+          document.getElementById('modalDonativoContent').classList.add('scale-95');
+          setTimeout(() => { document.getElementById('modalDonativo').classList.add('hidden'); document.getElementById('formDonativo').reset(); }, 300);
+      }
+
+      async function subirComprobanteDonativo(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          const btn = document.getElementById('btn_subir_comprobante');
+          const textoOriginal = btn.innerText;
+          btn.innerText = 'Subiendo...'; btn.disabled = true;
+          const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } = await obtenerConfigCloudinary();
+          if (!CLOUD_NAME || !UPLOAD_PRESET) {
+              alert('Falta configurar CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET en el servidor.');
+              btn.innerText = textoOriginal; btn.disabled = false;
+              return;
+          }
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', UPLOAD_PRESET);
+          try {
+              // Los PDF se suben como "raw" (no "auto"/"image"): Cloudinary bloquea por
+              // seguridad la entrega de PDFs servidos como imagen, y el enlace nunca abre.
+              const esPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+              const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${esPdf ? 'raw' : 'auto'}/upload`, { method: 'POST', body: formData });
+              const uploadData = await uploadRes.json();
+              if (uploadData.secure_url) {
+                  document.getElementById('don_comprobante_url').value = uploadData.secure_url;
+                  document.getElementById('don_comprobante_nombre').innerText = file.name;
+              } else { alert('No se pudo subir el comprobante.'); }
+          } catch (error) {
+              console.error('Error al subir comprobante:', error);
+              alert('Falló la subida del comprobante.');
+          } finally { btn.innerText = textoOriginal; btn.disabled = false; }
+      }
+
+      document.getElementById('formDonativo').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = e.target.querySelector('button[type="submit"]'); const textoOriginal = btn.innerText; btn.innerText = "Guardando..."; btn.disabled = true;
+          const idInsumoRaw = document.getElementById('don_id_insumo').value;
+          const categoriaGastoRaw = document.getElementById('don_categoria').value;
+          const data = {
+              id_contacto: document.getElementById('don_id_contacto').value,
+              id_insumo: (idInsumoRaw && idInsumoRaw !== '__otro__') ? idInsumoRaw : null,
+              insumo_nuevo: idInsumoRaw === '__otro__' ? document.getElementById('don_insumo_otro').value.trim() : null,
+              monto: parseFloat(document.getElementById('don_monto').value),
+              metodo_pago: document.getElementById('don_metodo').value,
+              categoria_gasto: categoriaGastoRaw === 'Otro' ? (document.getElementById('don_categoria_otro').value.trim() || 'Otro') : categoriaGastoRaw,
+              comprobante_url: document.getElementById('don_comprobante_url').value || null,
+              fecha_donacion: document.getElementById('don_fecha').value || null
+          };
+          try {
+              const response = await fetch(`${API_URL}/api/donativos`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(data) });
+              const json = await response.json();
+              if (response.ok && json.success) { cerrarModalDonativo(); cargarDonativos(); }
+              else alert(json.message || "Error al registrar el donativo.");
+          } catch (error) { alert("Error de conexión"); }
+          finally { btn.innerText = textoOriginal; btn.disabled = false; }
+      });
+
+      // ================= ELIMINAR (genérico para aliados y donativos) =================
+      let elimPendiente = { tipo: null, id: null };
+      function prepararEliminar(tipo, id, nombre) {
+          elimPendiente = { tipo, id };
+          document.getElementById('elim_generico_titulo').innerText = tipo === 'aliado' ? '¿Eliminar este aliado?' : '¿Eliminar este donativo?';
+          document.getElementById('elim_generico_texto').innerText = tipo === 'aliado' ? `Se eliminará "${nombre}" permanentemente.` : `Se eliminará ${nombre} permanentemente.`;
+          document.getElementById('modalEliminarGenerico').classList.remove('hidden');
+          setTimeout(() => { document.getElementById('modalEliminarGenerico').classList.remove('opacity-0'); document.getElementById('modalEliminarGenericoContent').classList.remove('scale-95'); }, 10);
+      }
+      function cerrarModalEliminarGenerico() {
+          document.getElementById('modalEliminarGenerico').classList.add('opacity-0');
+          document.getElementById('modalEliminarGenericoContent').classList.add('scale-95');
+          setTimeout(() => { document.getElementById('modalEliminarGenerico').classList.add('hidden'); elimPendiente = { tipo: null, id: null }; }, 300);
+      }
+      async function confirmarEliminarGenerico() {
+          if (!elimPendiente.id) return;
+          const endpoint = elimPendiente.tipo === 'aliado' ? `${API_URL}/api/aliados/${elimPendiente.id}` : `${API_URL}/api/donativos/${elimPendiente.id}`;
+          try {
+              const res = await fetch(endpoint, { method: 'DELETE', headers: authHeaders() });
+              const data = await res.json();
+              if (res.ok && data.success) {
+                  cerrarModalEliminarGenerico();
+                  if (elimPendiente.tipo === 'aliado') cargarAliados(); else cargarDonativos();
+              } else alert(data.message || "No se pudo eliminar.");
+          } catch (error) { alert("Error de conexión al eliminar."); }
+      }
+
+    </script>
+  </body>
+</html>

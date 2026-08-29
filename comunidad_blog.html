@@ -125,7 +125,7 @@
         <nav class="hidden md:flex gap-8 items-center">
           <a
             class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="inicio.html"
+            href="index.html"
             >Inicio</a
           >
           <a
@@ -143,13 +143,13 @@
             href="como_ayudar.html"
             >Cómo Ayudar</a
           >
+          <a
+            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
+            href="nosotros.html"
+            >Nosotros</a
+          >
         </nav>
         <div class="flex items-center gap-4">
-          <button
-            class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
-          >
-            help
-          </button>
           <a
             href="login.html"
             title="Panel de Administración"
@@ -157,16 +157,18 @@
           >
             admin_panel_settings
           </a>
-          <button
+          <a
+            href="como_ayudar.html#formVoluntariadoPublico"
             class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
           >
             Voluntariado
-          </button>
-          <button
+          </a>
+          <a
+            href="index.html#donacion-monetaria"
             class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
           >
             Donar
-          </button>
+          </a>
         </div>
       </div>
     </header>
@@ -196,230 +198,133 @@
           </p>
         </div>
       </section>
-      <!-- Featured Post -->
+      <!-- Comunidad: filtro lateral + artículos -->
       <section class="max-w-7xl mx-auto px-8 mb-24">
-        <div
-          class="grid md:grid-cols-2 gap-0 bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(23,28,31,0.06)] group cursor-pointer transition-transform duration-500 hover:scale-[1.01]"
-        >
-          <div class="relative h-[400px] md:h-full overflow-hidden">
-            <img
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              data-alt="A diverse multi-generational family sitting together in a warm living room, laughing and engaging in positive conversation with soft natural lighting"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKTfcgq5ylrTDoBmKGMN5IFJ3TsGB-6irBnP_IYZey_MplnFD-akKWe4_PSE6Nf1rISxwHiZThkMhJ2lNZADev4K4wFNw8urmt_qS57o-4hwrPmO_hB14ba6SSj2uU-HO6hqfJ0qgggZIGlyPjp4Q37nm5SVKTov4ay3_mgh9VBHOPkg1NTmxfw1Xb2DLwWqzYXKJQw6YpISPpOOdhLEa4AMRQJuqBDvfmeNgaNYXzlDUze_b6kvvmSYam6eeg0GkYGbz_sOCq5nA"
-            />
-            <div class="absolute top-6 left-6">
-              <span
-                class="px-4 py-1.5 bg-secondary text-white rounded-full text-sm font-semibold tracking-wide"
-                >Destacado</span
-              >
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <!-- ============ SIDEBAR: FILTRAR CONTENIDO ============ -->
+          <aside class="lg:col-span-1">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 lg:sticky lg:top-28">
+              <div class="flex items-center justify-between mb-5">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-secondary text-lg">filter_list</span> Filtrar Contenido
+                </h3>
+                <button onclick="limpiarFiltrosNoticias()" class="text-xs font-bold text-secondary hover:underline">Limpiar</button>
+              </div>
+
+              <div class="relative mb-6">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                <input id="buscador_noticias" oninput="aplicarFiltrosNoticias()" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border-none rounded-full text-sm outline-none focus:ring-2 focus:ring-secondary/20" placeholder="Buscar artículos..." type="text" />
+              </div>
+
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Categorías</p>
+              <div id="contenedor_filtros" class="space-y-1 mb-2">
+                <p class="text-xs text-slate-400">Cargando categorías...</p>
+              </div>
             </div>
-          </div>
-          <div class="p-8 md:p-16 flex flex-col justify-center bg-white">
-            <span
-              class="text-secondary font-bold text-sm tracking-widest uppercase mb-4"
-              >Cultura de Paz</span
-            >
-            <h2
-              class="text-3xl md:text-4xl font-bold text-on-surface mb-6 leading-tight"
-            >
-              Cómo fomentar la comunicación no violenta en casa
-            </h2>
-            <p class="text-on-surface/70 text-lg leading-relaxed mb-8">
-              Aprende técnicas sencillas para transformar los conflictos en
-              oportunidades de conexión y entendimiento mutuo entre los miembros
-              de tu familia.
-            </p>
-            <div class="flex items-center gap-4">
-              <button
-                class="px-8 py-3 bg-secondary text-white rounded-full font-bold shadow-lg hover:shadow-secondary/20 transition-all flex items-center gap-2"
-              >
-                Leer artículo completo
-                <span class="material-symbols-outlined">arrow_forward</span>
-              </button>
+          </aside>
+
+          <!-- ============ CONTENIDO: ARTÍCULOS ============ -->
+          <div class="lg:col-span-3">
+            <div class="flex justify-between items-center mb-8">
+              <h2 id="titulo_articulos" class="text-2xl font-bold text-on-surface">Artículos Recientes</h2>
+              <span id="contador_articulos" class="text-sm text-slate-400"></span>
+            </div>
+            <div id="grid_noticias" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <p class="text-on-surface/50 py-10 col-span-2">Cargando publicaciones...</p>
             </div>
           </div>
         </div>
       </section>
-      <!-- Categories Filter -->
-      <section class="max-w-7xl mx-auto px-8 mb-12">
-        <div class="flex flex-wrap items-center justify-center gap-4">
-          <button
-            class="px-6 py-2.5 bg-primary text-white rounded-full font-semibold shadow-md transition-all"
-          >
-            Todos
-          </button>
-          <button
-            class="px-6 py-2.5 bg-surface-container-low text-on-surface hover:bg-secondary/10 hover:text-secondary rounded-full font-semibold transition-all"
-          >
-            Salud Mental
-          </button>
-          <button
-            class="px-6 py-2.5 bg-surface-container-low text-on-surface hover:bg-secondary/10 hover:text-secondary rounded-full font-semibold transition-all"
-          >
-            Cultura de Paz
-          </button>
-          <button
-            class="px-6 py-2.5 bg-surface-container-low text-on-surface hover:bg-secondary/10 hover:text-secondary rounded-full font-semibold transition-all"
-          >
-            Actividades de Campo
-          </button>
-          <button
-            class="px-6 py-2.5 bg-surface-container-low text-on-surface hover:bg-secondary/10 hover:text-secondary rounded-full font-semibold transition-all"
-          >
-            Historias de Éxito
-          </button>
-        </div>
-      </section>
-      <!-- Blog Grid -->
+
+      <!-- Carrusel: Impacto Visual (Murales) -->
       <section class="max-w-7xl mx-auto px-8 mb-24">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          <!-- Card 1 -->
-          <div
-            class="bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(23,28,31,0.06)] hover:translate-y-[-8px] transition-all duration-300"
-          >
-            <div class="relative h-64">
-              <img
-                class="w-full h-full object-cover"
-                data-alt="A calm serene person practicing mindfulness outdoors in a lush green park with soft morning sunlight filtering through trees"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnegNE53o1QknLomEAXCAsibRyUfTvd3FpTDfA1Hld5pwnVI8FOjbtTt43xNzCPid61zlkHOJ5b3cxwOdnT73S4iz1lHArs65RwRszWFj4TaQXjFDwS9Q2gAr3_hBZeUpaKYJjwLdWPFwL9w0mwEa56LoXVjJUPPe-GgEraF1pK4E2fmVngR1vIE_0jJHy3c76-U9FJxwVjG6lT8L1BbvvRIyg_BUxrUESXDY-xgJOgpAN8IyjYKQCKDP-DW8zIJfgdlzkaX6fTSg"
-              />
-              <div class="absolute bottom-4 left-4">
-                <span
-                  class="px-3 py-1 bg-white/90 backdrop-blur text-primary text-xs font-bold rounded-full"
-                  >Salud Mental</span
-                >
-              </div>
-            </div>
-            <div class="p-8">
-              <h3 class="text-xl font-bold mb-3 leading-snug">
-                5 Minutos de calma: Guía básica de mindfulness
-              </h3>
-              <p class="text-on-surface/60 text-sm leading-relaxed mb-6">
-                Pequeños pasos para encontrar equilibrio emocional en medio del
-                ajetreo diario de la ciudad.
-              </p>
-              <button
-                class="text-secondary font-bold text-sm flex items-center gap-2 group"
-              >
-                Leer más
-                <span
-                  class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform"
-                  >chevron_right</span
-                >
-              </button>
-            </div>
+        <div class="flex justify-between items-center mb-8">
+          <div>
+            <h2 class="text-2xl font-bold text-on-surface">Impacto Visual: Nuestro Muralismo</h2>
+            <p class="text-on-surface-variant text-sm mt-1">Murales completados por nuestros equipos de voluntarios.</p>
           </div>
-          <!-- Card 2 -->
-          <div
-            class="bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(23,28,31,0.06)] hover:translate-y-[-8px] transition-all duration-300"
-          >
-            <div class="relative h-64">
-              <img
-                class="w-full h-full object-cover"
-                data-alt="Volunteers and local residents working together to paint a colorful community mural on a sunlit wall in a neighborhood"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjaWGovPY7vF-bl98jJfTcrWp6YskrDUpMImfo-OtysroJyJTiWopeoLeCtSIiOHBI81rTTIZIYvY_Qu9PNxlBzMeuSfQLrT6BXqxkEp6GMdbUQ3A2TyWSUQe7oxrbHgyh9-QkTA1AHpjfP1NLM5wTOGY-VJQegNSLvW4GuGdB6I_V4th8Rg7N4wsiTlW5-9QvJS3vfykeCM7U6Zw-kPQmwj_Vy0GUZRmWcJWLbQZz16eURORPYVvbbb9xgmSCcESt_u16S8ro1Ao"
-              />
-              <div class="absolute bottom-4 left-4">
-                <span
-                  class="px-3 py-1 bg-white/90 backdrop-blur text-primary text-xs font-bold rounded-full"
-                  >Actividades de Campo</span
-                >
-              </div>
-            </div>
-            <div class="p-8">
-              <h3 class="text-xl font-bold mb-3 leading-snug">
-                Resumen: Nuestra última jornada en Sanctórum
-              </h3>
-              <p class="text-on-surface/60 text-sm leading-relaxed mb-6">
-                Revive los momentos más emotivos de nuestro encuentro
-                comunitario para la recuperación de espacios.
-              </p>
-              <button
-                class="text-secondary font-bold text-sm flex items-center gap-2 group"
-              >
-                Leer más
-                <span
-                  class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform"
-                  >chevron_right</span
-                >
-              </button>
-            </div>
-          </div>
-          <!-- Card 3 -->
-          <div
-            class="bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(23,28,31,0.06)] hover:translate-y-[-8px] transition-all duration-300"
-          >
-            <div class="relative h-64">
-              <img
-                class="w-full h-full object-cover"
-                data-alt="A young smiling woman working confidently in her own small creative business studio surrounded by colorful materials and sunlight"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-bo957Et0c0_9-vAT2URiQL-LJ0SaiW8mUNey_dK_S5KEr3xGgpz9JGX_r2j5m8UX5vBil74SPhZCZz72H9JhubEV2dIe5MZobn8V4TIRwFzko8pg9OztkMI6jmUtIPnAS-eETJjBgdvhgdoOC2pngn3yv1n-MNaKkkW0f_j1CXLZn4GujtjRRu78EaY2QgvOHmjFh6vb04UJbYOaR0pZzu9Xh86iYHsJWfgwID3TyKHxnaTUkn1O4nmkMcUO9cWQHAQtcti4wEc"
-              />
-              <div class="absolute bottom-4 left-4">
-                <span
-                  class="px-3 py-1 bg-white/90 backdrop-blur text-primary text-xs font-bold rounded-full"
-                  >Historias de Éxito</span
-                >
-              </div>
-            </div>
-            <div class="p-8">
-              <h3 class="text-xl font-bold mb-3 leading-snug">
-                El camino de María: Emprendimiento y sanación
-              </h3>
-              <p class="text-on-surface/60 text-sm leading-relaxed mb-6">
-                Cómo el apoyo comunitario ayudó a María a reconstruir su vida y
-                su confianza personal.
-              </p>
-              <button
-                class="text-secondary font-bold text-sm flex items-center gap-2 group"
-              >
-                Leer más
-                <span
-                  class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform"
-                  >chevron_right</span
-                >
-              </button>
-            </div>
+          <div class="hidden md:flex gap-2">
+            <button onclick="moverCarrusel('carrusel_murales', -1)" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
+              <span class="material-symbols-outlined text-lg">chevron_left</span>
+            </button>
+            <button onclick="moverCarrusel('carrusel_murales', 1)" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
+              <span class="material-symbols-outlined text-lg">chevron_right</span>
+            </button>
           </div>
         </div>
+        <div id="carrusel_murales" class="flex gap-6 overflow-x-auto pb-6 scroll-smooth snap-x snap-mandatory">
+          <p class="text-on-surface/50 py-10">Cargando murales...</p>
+        </div>
       </section>
-      <!-- Newsletter Section -->
-      <section class="max-w-7xl mx-auto px-8 mb-32">
-        <div
-          class="bg-gradient-to-br from-secondary to-secondary-container rounded-xl p-12 md:p-16 text-white text-center relative overflow-hidden"
-        >
-          <div
-            class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"
-          ></div>
-          <div class="relative z-10">
-            <span class="material-symbols-outlined text-5xl mb-6">mail</span>
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">
-              Boletín de Esperanza
-            </h2>
-            <p class="max-w-xl mx-auto mb-10 opacity-90 text-lg">
-              Recibe mensualmente reflexiones, consejos de especialistas y
-              noticias sobre nuestras próximas actividades directamente en tu
-              correo.
-            </p>
-            <form class="flex flex-col md:flex-row gap-4 max-w-lg mx-auto">
-              <input
-                class="flex-grow px-8 py-4 rounded-full text-on-surface bg-white border-none focus:ring-2 focus:ring-primary outline-none transition-all"
-                placeholder="Tu correo electrónico"
-                required=""
-                type="email"
-              />
-              <button
-                class="px-10 py-4 bg-primary text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all"
-                type="submit"
-              >
-                Suscribirme
-              </button>
-            </form>
-            <p class="mt-6 text-xs opacity-75">
-              Respetamos tu privacidad. Puedes darte de baja en cualquier
-              momento.
-            </p>
+
+      <!-- Carrusel: Eventos Anteriores -->
+      <section class="max-w-7xl mx-auto px-8 mb-24">
+        <div class="flex justify-between items-center mb-8">
+          <h2 class="text-2xl font-bold text-on-surface">Eventos Anteriores</h2>
+          <div class="hidden md:flex gap-2">
+            <button onclick="moverCarrusel('carrusel_eventos_anteriores', -1)" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
+              <span class="material-symbols-outlined text-lg">chevron_left</span>
+            </button>
+            <button onclick="moverCarrusel('carrusel_eventos_anteriores', 1)" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
+              <span class="material-symbols-outlined text-lg">chevron_right</span>
+            </button>
           </div>
+        </div>
+        <div id="carrusel_eventos_anteriores" class="flex gap-6 overflow-x-auto pb-6 scroll-smooth snap-x snap-mandatory">
+          <p class="text-on-surface/50 py-10">Cargando eventos anteriores...</p>
+        </div>
+      </section>
+
+      <!-- Calendario de Comunidad -->
+      <section class="max-w-7xl mx-auto px-8 mb-24">
+        <div class="flex justify-between items-end mb-8">
+          <div>
+            <h2 class="text-2xl font-bold text-on-surface">Calendario de Comunidad</h2>
+            <p class="text-on-surface-variant text-sm mt-1">Únete a nuestros próximos talleres y pláticas. El conocimiento es el primer paso hacia el bienestar compartido.</p>
+          </div>
+          <a href="calendario_eventos.html" class="hidden md:block shrink-0 bg-surface-container-low text-primary font-bold px-8 py-3 rounded-full hover:bg-surface-container transition-colors">
+            Ver Calendario Completo
+          </a>
+        </div>
+        <div id="contenedor_calendario_comunidad" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <p class="text-on-surface/50 col-span-3 text-center py-10">Cargando próximos eventos...</p>
+        </div>
+      </section>
+
+      <!-- Historias de Éxito -->
+      <section class="max-w-7xl mx-auto px-8 mb-24">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-on-surface mb-3">Historias de Éxito</h2>
+          <p class="text-on-surface-variant max-w-2xl mx-auto">
+            Experiencias reales de quienes han encontrado apoyo con nosotros.
+            Compartidas con su consentimiento expreso, para inspirar a otros.
+          </p>
+        </div>
+        <div id="contenedor_historias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <p class="text-on-surface/50 col-span-3 text-center py-10">Cargando historias...</p>
+        </div>
+        <div id="controles_historias" class="hidden justify-center items-center gap-4 mt-10">
+          <button onclick="moverHistorias(-1)" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
+            <span class="material-symbols-outlined text-lg">chevron_left</span>
+          </button>
+          <span id="indicador_historias" class="text-xs font-bold text-slate-400">1 / 1</span>
+          <button onclick="moverHistorias(1)" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
+            <span class="material-symbols-outlined text-lg">chevron_right</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Compartir tu historia -->
+      <section class="max-w-7xl mx-auto px-8 mb-16">
+        <div class="bg-gradient-to-br from-teal-800 to-teal-900 rounded-3xl p-10 md:p-14 text-center text-white">
+          <h2 class="text-2xl md:text-3xl font-bold mb-3">¿Quieres compartir tu historia?</h2>
+          <p class="max-w-xl mx-auto text-white/80 mb-8">
+            Tu experiencia puede inspirar a otros jóvenes. Comparte tu testimonio de
+            manera segura y anónima si lo prefieres.
+          </p>
+          <a href="mailto:sumandovoluntadesensanctorum@gmail.com?subject=Quiero%20compartir%20mi%20historia" class="inline-flex items-center gap-2 bg-white text-teal-900 font-bold px-8 py-3 rounded-full hover:scale-105 transition-all">
+            <span class="material-symbols-outlined text-lg">share</span> Compartir Mi Historia
+          </a>
         </div>
       </section>
     </main>
@@ -440,43 +345,12 @@
             La salud mental es responsabilidad en sociedad. Construyendo puentes
             de bienestar para todos.
           </p>
-          <div class="flex gap-4">
-            <a
-              class="text-slate-500 hover:text-orange-600 transition-all material-symbols-outlined"
-              href="#"
-              >facebook</a
-            >
-            <a
-              class="text-slate-500 hover:text-orange-600 transition-all material-symbols-outlined"
-              href="#"
-              >photo_camera</a
-            >
-            <a
-              class="text-slate-500 hover:text-orange-600 transition-all material-symbols-outlined"
-              href="#"
-              >play_circle</a
-            >
-          </div>
         </div>
         <div>
           <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Enlaces Rápidos
+            Redes Sociales
           </h4>
           <ul class="space-y-3">
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="inicio.html"
-                >Inicio</a
-              >
-            </li>
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >Newsletter</a
-              >
-            </li>
             <li>
               <a
                 class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
@@ -491,31 +365,17 @@
                 >Instagram</a
               >
             </li>
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >YouTube</a
-              >
-            </li>
           </ul>
         </div>
         <div>
           <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Boletín de Esperanza
+            Contacto
           </h4>
-          <form class="flex flex-col gap-4">
-            <input
-              class="bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-pink-500 outline-none"
-              placeholder="Tu correo electrónico"
-              type="email"
-            />
-            <button
-              class="bg-pink-700 text-white rounded-full py-3 font-bold hover:bg-pink-800 transition-all"
-            >
-              Suscribirme
-            </button>
-          </form>
+          <ul class="space-y-3 text-slate-500 dark:text-slate-400">
+            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">mail</span> ayuda@sanctorum.org</li>
+            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">call</span> 800-SANCTORUM</li>
+            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">location_on</span> Ciudad de México, MX</li>
+          </ul>
         </div>
       </div>
       <div
@@ -525,5 +385,308 @@
         en sociedad.
       </div>
     </footer>
+
+    <script>
+      const API_URL = "http://localhost:3000";
+      const IMG_PLACEHOLDER_NOTICIA = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCnegNE53o1QknLomEAXCAsibRyUfTvd3FpTDfA1Hld5pwnVI8FOjbtTt43xNzCPid61zlkHOJ5b3cxwOdnT73S4iz1lHArs65RwRszWFj4TaQXjFDwS9Q2gAr3_hBZeUpaKYJjwLdWPFwL9w0mwEa56LoXVjJUPPe-GgEraF1pK4E2fmVngR1vIE_0jJHy3c76-U9FJxwVjG6lT8L1BbvvRIyg_BUxrUESXDY-xgJOgpAN8IyjYKQCKDP-DW8zIJfgdlzkaX6fTSg';
+
+      let noticiasGlobal = [];
+
+      document.addEventListener('DOMContentLoaded', () => {
+          cargarNoticias();
+          cargarMurales();
+          cargarEventosAnteriores();
+          cargarHistoriasExito();
+          cargarCalendarioComunidad();
+      });
+
+      // ---------- CALENDARIO DE COMUNIDAD (próximos eventos) ----------
+      async function cargarCalendarioComunidad() {
+          const cont = document.getElementById('contenedor_calendario_comunidad');
+          try {
+              const res = await fetch(`${API_URL}/api/eventos_publicos`);
+              const json = await res.json();
+              if (!json.success || json.data.length === 0) {
+                  cont.innerHTML = '<p class="text-on-surface/50 col-span-3 text-center py-8">No hay eventos próximos programados por el momento.</p>';
+                  return;
+              }
+              const colores = [
+                  { badge: 'bg-secondary-fixed text-on-secondary-fixed', num: 'text-secondary', btn: 'border-secondary-fixed text-secondary hover:bg-secondary hover:text-white' },
+                  { badge: 'bg-primary-fixed text-on-primary-fixed', num: 'text-primary', btn: 'border-primary-fixed text-primary hover:bg-primary-container hover:text-on-primary' }
+              ];
+              cont.innerHTML = json.data.slice(0, 3).map((ev, i) => {
+                  const fecha = new Date(ev.fecha_realizacion);
+                  const dia = fecha.toLocaleDateString('es-MX', { day: '2-digit' });
+                  const mes = fecha.toLocaleDateString('es-MX', { month: 'short' }).replace('.', '');
+                  const hora = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                  const c = colores[i % colores.length];
+                  const lugar = ev.nombre_escuela || 'Sede Sanctórum';
+                  return `
+                    <div class="group relative bg-white p-8 rounded-3xl shadow-[0_10px_30px_rgba(23,28,31,0.05)] transition-all hover:scale-[1.02] hover:shadow-xl">
+                      <div class="mb-6 flex justify-between items-start">
+                        <div class="text-center">
+                          <span class="block text-3xl font-extrabold ${c.num} leading-none">${dia}</span>
+                          <span class="text-xs font-bold uppercase tracking-widest text-slate-400">${mes}</span>
+                        </div>
+                        <span class="${c.badge} text-[10px] font-bold px-3 py-1 rounded-full uppercase">${ev.tipo_evento}</span>
+                      </div>
+                      <h4 class="text-xl font-bold mb-4 group-hover:text-secondary transition-colors">${ev.titulo_evento}</h4>
+                      <div class="space-y-2 text-slate-500 text-sm mb-6">
+                        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">schedule</span><span>${hora} hrs</span></div>
+                        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">location_on</span><span>${lugar}</span></div>
+                      </div>
+                      <a href="evento_detalle.html?tipo=evento&id=${ev.id_evento}" class="block text-center w-full border-2 ${c.btn} font-bold py-2 rounded-full transition-all">Más información</a>
+                    </div>`;
+              }).join('');
+          } catch (e) {
+              console.error("Error al cargar el calendario de comunidad:", e);
+              cont.innerHTML = '<p class="text-on-surface/50 col-span-3 text-center py-8">No se pudo cargar el calendario en este momento.</p>';
+          }
+      }
+
+      // ---------- CARRUSEL: NOTICIAS (con filtro de categoría) ----------
+      async function cargarNoticias() {
+          const cont = document.getElementById('grid_noticias');
+          try {
+              const res = await fetch(`${API_URL}/api/publicaciones`);
+              const json = await res.json();
+              if (!json.success || json.data.length === 0) {
+                  noticiasGlobal = [];
+                  cont.innerHTML = '<p class="text-on-surface/50 py-10 col-span-2">Aún no hay noticias publicadas. ¡Vuelve pronto!</p>';
+                  document.getElementById('contenedor_filtros').innerHTML = '<p class="text-xs text-slate-400">Sin categorías todavía.</p>';
+                  return;
+              }
+              noticiasGlobal = json.data;
+              renderFiltrosCategoria();
+              renderNoticias(noticiasGlobal);
+          } catch (e) {
+              console.error("Error al cargar noticias:", e);
+              cont.innerHTML = '<p class="text-on-surface/50 py-10 col-span-2">No se pudieron cargar las noticias en este momento.</p>';
+          }
+      }
+
+      // Construye la lista de categorías del sidebar dinámicamente (con conteo real),
+      // en vez de una lista fija hardcodeada — así si mañana agregan una categoría nueva
+      // desde Publicaciones, aparece aquí automáticamente sin tocar el HTML.
+      let categoriaActivaNoticias = 'Todos';
+      function renderFiltrosCategoria() {
+          const cont = document.getElementById('contenedor_filtros');
+          const conteos = {};
+          noticiasGlobal.forEach(n => {
+              const cat = n.categoria || n.tipo || 'Comunidad';
+              conteos[cat] = (conteos[cat] || 0) + 1;
+          });
+          const categorias = Object.keys(conteos).sort();
+
+          const filaTodos = `
+            <button data-categoria="Todos" onclick="aplicarFiltroCategoria('Todos')" class="filtro-categoria w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold transition-all ${categoriaActivaNoticias === 'Todos' ? 'bg-secondary/10 text-secondary' : 'text-slate-600 hover:bg-slate-50'}">
+              <span>Todas</span>
+              <span class="text-xs font-bold ${categoriaActivaNoticias === 'Todos' ? 'text-secondary' : 'text-slate-400'}">${noticiasGlobal.length}</span>
+            </button>`;
+
+          const filasCategorias = categorias.map(cat => `
+            <button data-categoria="${cat}" onclick="aplicarFiltroCategoria('${cat}')" class="filtro-categoria w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold transition-all ${categoriaActivaNoticias === cat ? 'bg-secondary/10 text-secondary' : 'text-slate-600 hover:bg-slate-50'}">
+              <span>${cat}</span>
+              <span class="text-xs font-bold ${categoriaActivaNoticias === cat ? 'text-secondary' : 'text-slate-400'}">${conteos[cat]}</span>
+            </button>`).join('');
+
+          cont.innerHTML = filaTodos + filasCategorias;
+      }
+
+      function renderNoticias(lista) {
+          const cont = document.getElementById('grid_noticias');
+          document.getElementById('contador_articulos').innerText = lista.length > 0 ? `Mostrando ${lista.length} artículo(s)` : '';
+          if (lista.length === 0) {
+              cont.innerHTML = '<p class="text-on-surface/50 py-10 col-span-2">No hay artículos con estos filtros.</p>';
+              return;
+          }
+          cont.innerHTML = lista.map(n => {
+              const fecha = new Date(n.fecha_post).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+              const img = n.url_imagen || IMG_PLACEHOLDER_NOTICIA;
+              const categoria = n.categoria || n.tipo || 'Comunidad';
+              return `
+                <a href="evento_detalle.html?id=${n.id_publicacion}"
+                   class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(23,28,31,0.05)] hover:translate-y-[-4px] hover:shadow-lg transition-all duration-300 block">
+                  <div class="relative h-48">
+                    <img class="w-full h-full object-cover" src="${img}" alt="${n.titulo}" />
+                    <div class="absolute bottom-3 left-3">
+                      <span class="px-3 py-1 bg-white/90 backdrop-blur text-primary text-xs font-bold rounded-full">${categoria}</span>
+                    </div>
+                  </div>
+                  <div class="p-5">
+                    <h3 class="text-base font-bold mb-2 leading-snug line-clamp-2">${n.titulo}</h3>
+                    <p class="text-on-surface/60 text-xs mb-3">${fecha} · ${n.autor || 'Equipo Sanctórum'}</p>
+                    <span class="text-secondary font-bold text-sm flex items-center gap-1">
+                      Leer más
+                      <span class="material-symbols-outlined text-lg">chevron_right</span>
+                    </span>
+                  </div>
+                </a>`;
+          }).join('');
+      }
+
+      function aplicarFiltroCategoria(categoria) {
+          categoriaActivaNoticias = categoria;
+          renderFiltrosCategoria();
+          aplicarFiltrosNoticias();
+      }
+
+      function aplicarFiltrosNoticias() {
+          const texto = document.getElementById('buscador_noticias').value.toLowerCase();
+          let filtradas = categoriaActivaNoticias === 'Todos'
+              ? noticiasGlobal
+              : noticiasGlobal.filter(n => (n.categoria || n.tipo || 'Comunidad') === categoriaActivaNoticias);
+          if (texto) {
+              filtradas = filtradas.filter(n => n.titulo.toLowerCase().includes(texto) || (n.contenido || '').toLowerCase().includes(texto));
+          }
+          renderNoticias(filtradas);
+      }
+
+      function limpiarFiltrosNoticias() {
+          document.getElementById('buscador_noticias').value = '';
+          categoriaActivaNoticias = 'Todos';
+          renderFiltrosCategoria();
+          renderNoticias(noticiasGlobal);
+      }
+
+      // ---------- CARRUSEL: IMPACTO VISUAL (Murales) ----------
+      async function cargarMurales() {
+          const cont = document.getElementById('carrusel_murales');
+          try {
+              const res = await fetch(`${API_URL}/api/publicaciones?categoria=Muralismo`);
+              const json = await res.json();
+              const murales = (json.success ? json.data : []).filter(n => n.url_imagen);
+              if (murales.length === 0) {
+                  cont.innerHTML = '<p class="text-on-surface/50 py-10">Aún no hay murales publicados. En cuanto el equipo suba fotografías de un mural terminado (categoría "Muralismo"), aparecerán aquí.</p>';
+                  return;
+              }
+              cont.innerHTML = murales.map(m => `
+                <a href="evento_detalle.html?id=${m.id_publicacion}" class="snap-start shrink-0 w-72 group relative rounded-lg overflow-hidden shadow-md block">
+                  <img src="${m.url_imagen}" alt="${m.titulo}" class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                    <p class="text-white font-bold text-lg">${m.titulo}</p>
+                  </div>
+                </a>`).join('');
+          } catch (e) {
+              console.error("Error al cargar murales:", e);
+              cont.innerHTML = '<p class="text-on-surface/50 py-10">No se pudieron cargar los murales en este momento.</p>';
+          }
+      }
+
+      // ---------- CARRUSEL: EVENTOS ANTERIORES ----------
+      // NOTA: estos son eventos operativos reales (tabla Eventos), no publicaciones del CMS
+      // (Noticias_Eventos). Por eso usan su propio endpoint y su propio enlace de detalle.
+      async function cargarEventosAnteriores() {
+          const cont = document.getElementById('carrusel_eventos_anteriores');
+          try {
+              const res = await fetch(`${API_URL}/api/eventos_anteriores`);
+              if (!res.ok) {
+                  const texto = await res.text().catch(() => '');
+                  throw new Error(`El servidor respondió ${res.status}. ${texto}`.trim());
+              }
+              const json = await res.json();
+              const pasados = json.success ? json.data : [];
+              if (pasados.length === 0) {
+                  cont.innerHTML = '<p class="text-on-surface/50 py-10">Aún no hay eventos anteriores registrados.</p>';
+                  return;
+              }
+              cont.innerHTML = pasados.map(ev => {
+                  const fecha = new Date(ev.fecha_realizacion).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+                  const img = ev.url_imagen || IMG_PLACEHOLDER_NOTICIA;
+                  const lugar = ev.nombre_escuela || 'Sede Sanctórum';
+                  return `
+                    <a href="evento_detalle.html?tipo=evento&id=${ev.id_evento}" class="snap-start shrink-0 w-72 bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all block">
+                      <img src="${img}" alt="${ev.titulo_evento}" class="w-full h-40 object-cover" />
+                      <div class="p-5">
+                        <h4 class="font-bold text-sm mb-1 line-clamp-2">${ev.titulo_evento}</h4>
+                        <p class="text-xs text-slate-400">${fecha} · ${lugar}</p>
+                      </div>
+                    </a>`;
+              }).join('');
+          } catch (e) {
+              // Si esto sigue fallando, revisa la consola del navegador (F12): el mensaje real
+              // del error aparece ahí. La causa más común es que el servidor Node no se haya
+              // reiniciado después de agregar el endpoint /api/eventos_anteriores.
+              console.error("Error al cargar eventos anteriores:", e);
+              cont.innerHTML = `<p class="text-on-surface/50 py-10">No se pudieron cargar los eventos anteriores en este momento. (${e.message})</p>`;
+          }
+      }
+
+      // ---------- HISTORIAS DE ÉXITO (paginado de 6 en 6) ----------
+      let historiasGlobal = [];
+      let paginaHistorias = 0;
+      const HISTORIAS_POR_PAGINA = 6;
+
+      async function cargarHistoriasExito() {
+          const cont = document.getElementById('contenedor_historias');
+          try {
+              const res = await fetch(`${API_URL}/api/historias_exito`);
+              const json = await res.json();
+              if (!json.success || json.data.length === 0) {
+                  cont.innerHTML = '<p class="text-on-surface/50 col-span-3 text-center py-10">Aún no hay historias publicadas con consentimiento. Cuando el equipo clínico registre una y su familia firme el consentimiento, aparecerá aquí.</p>';
+                  return;
+              }
+              historiasGlobal = json.data;
+              paginaHistorias = 0;
+              renderPaginaHistorias();
+          } catch (e) {
+              console.error("Error al cargar historias de éxito:", e);
+              cont.innerHTML = '<p class="text-on-surface/50 col-span-3 text-center py-10">No se pudieron cargar las historias en este momento.</p>';
+          }
+      }
+
+      function renderPaginaHistorias() {
+          const cont = document.getElementById('contenedor_historias');
+          const controles = document.getElementById('controles_historias');
+          const totalPaginas = Math.ceil(historiasGlobal.length / HISTORIAS_POR_PAGINA);
+          const inicio = paginaHistorias * HISTORIAS_POR_PAGINA;
+          const grupo = historiasGlobal.slice(inicio, inicio + HISTORIAS_POR_PAGINA);
+
+          cont.innerHTML = grupo.map(h => {
+              const nombreEdad = h.edad ? `${h.protagonista}, ${h.edad} años` : h.protagonista;
+              return `
+            <div class="bg-white rounded-3xl p-8 shadow-[0_10px_30px_rgba(23,28,31,0.05)] border border-slate-100">
+              <div class="flex items-center gap-3 mb-5">
+                <div class="w-12 h-12 bg-secondary/10 text-secondary rounded-full flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined">favorite</span>
+                </div>
+                <div>
+                  <p class="font-bold text-slate-800 text-sm">${nombreEdad}</p>
+                  ${h.titulo ? `<p class="text-xs text-secondary font-bold">${h.titulo}</p>` : ''}
+                </div>
+              </div>
+              <div class="bg-red-50 rounded-xl p-4 mb-3">
+                <p class="text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Antes</p>
+                <p class="text-on-surface-variant text-sm leading-relaxed">"${h.contenido_preayuda}"</p>
+              </div>
+              <div class="bg-green-50 rounded-xl p-4">
+                <p class="text-[10px] font-bold text-green-600 uppercase tracking-wide mb-1">Después</p>
+                <p class="text-on-surface-variant text-sm leading-relaxed">"${h.contenido_postayuda}"</p>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-4">✓ Consentimiento ético obtenido</p>
+            </div>`;
+          }).join('');
+
+          if (totalPaginas > 1) {
+              controles.classList.remove('hidden');
+              controles.classList.add('flex');
+              document.getElementById('indicador_historias').innerText = `${paginaHistorias + 1} / ${totalPaginas}`;
+          } else {
+              controles.classList.add('hidden');
+          }
+      }
+
+      function moverHistorias(direccion) {
+          const totalPaginas = Math.ceil(historiasGlobal.length / HISTORIAS_POR_PAGINA);
+          paginaHistorias = (paginaHistorias + direccion + totalPaginas) % totalPaginas;
+          renderPaginaHistorias();
+      }
+
+      // ---------- UTILIDAD DE SCROLL PARA CARRUSELES ----------
+      function moverCarrusel(idContenedor, direccion) {
+          const cont = document.getElementById(idContenedor);
+          cont.scrollBy({ left: direccion * 340, behavior: 'smooth' });
+      }
+    </script>
   </body>
 </html>

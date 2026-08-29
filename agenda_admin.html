@@ -1,1176 +1,1189 @@
 <!doctype html>
 <html class="light" lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Agenda Operativa | Sanctorum A.C.</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: "#8a5100",
-              secondary: "#b50062",
-              surface: "#f6fafe",
-            },
-            fontFamily: {
-              sans: ["Quicksand", "sans-serif"],
-              plus: ["Plus Jakarta Sans", "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      .material-symbols-outlined {
-        font-variation-settings:
-          "FILL" 0,
-          "wght" 400,
-          "GRAD" 0,
-          "opsz" 24;
-      }
-      .fill-1 {
-        font-variation-settings: "FILL" 1;
-      }
-    </style>
-  </head>
-  <body class="bg-surface text-slate-800 min-h-screen">
-    <!-- ================= SIDE NAV BAR ================= -->
-    <aside
-      class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50"
-    >
-      <div class="flex justify-center mb-10 px-8">
-        <img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" />
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Agenda Operativa | Sanctorum A.C.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = { theme: { extend: { colors: { primary: "#8a5100", secondary: "#b50062", surface: "#f6fafe" }, fontFamily: { sans: ["Quicksand", "sans-serif"], plus: ["Plus Jakarta Sans", "sans-serif"] } } } };
+  </script>
+  <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+</head>
+<body class="bg-surface text-slate-800 min-h-screen">
+  
+  <!-- ================= SIDE NAV BAR ================= -->
+  <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
+    <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
+    <nav class="flex-1 px-4 space-y-2">
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="agenda_admin.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_publicaciones_admin.html"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_reportes_admin.html"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos_admin.html"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
+    </nav>
+    <div class="px-6 mt-auto space-y-4">
+      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
+      <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <main class="ml-72 min-h-screen flex flex-col">
+    <!-- ================= TOP NAV BAR ================= -->
+    <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
+      <div class="flex items-center flex-1">
+        <div class="relative w-full max-w-md">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+          <input id="buscador_principal" oninput="buscarGlobalAgenda(this.value)" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar escuela, paciente o actividad..." type="text" />
+        </div>
       </div>
-      <nav class="flex-1 px-4 space-y-2">
-        <a
-          class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all"
-          href="dashboard_admin.html"
-          ><span class="material-symbols-outlined">dashboard</span
-          ><span class="font-medium">Resumen</span></a
-        >
-        <a
-          class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all"
-          href="gestion_expedientes_admin.html"
-          ><span class="material-symbols-outlined">folder_shared</span
-          ><span class="font-medium">Expedientes</span></a
-        >
-        <a
-          class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all"
-          href="gestion_voluntariado_admin.html"
-          ><span class="material-symbols-outlined">group</span
-          ><span class="font-medium">Voluntariado</span></a
-        >
-        <a
-          class="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all"
-          href="inventario_admin.html"
-          ><span class="material-symbols-outlined">inventory_2</span
-          ><span class="font-medium">Inventario</span></a
-        >
-        <a
-          class="flex items-center gap-4 px-4 py-3 rounded-xl text-orange-600 font-bold border-r-4 border-orange-500 bg-orange-50 transition-all"
-          href="agenda_admin.html"
-          ><span class="material-symbols-outlined fill-1">school</span
-          ><span class="font-medium">Agenda</span></a
-        >
-      </nav>
-      <div class="px-6 mt-auto space-y-4">
-        <a
-          class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200"
-          href="inicio.html"
-          ><span class="material-symbols-outlined">home</span>Volver al
-          Inicio</a
-        >
-        <button
-          onclick="cerrarSesion()"
-          class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"
-        >
-          <span class="material-symbols-outlined">logout</span>Cerrar Sesión
+      <div class="flex items-center gap-4 ml-8">
+        <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
+        <div class="h-8 w-px bg-slate-200 mx-2"></div>
+        <a href="perfil_admin.html" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
+          <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
+          <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
+        </a>
+
+        <!-- Panel de Notificaciones -->
+        <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
+              <h3 class="font-bold text-sm">Notificaciones</h3>
+              <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
+            </div>
+            <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
+            </div>
+            <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="p-8 flex-1 w-full overflow-hidden">
+      <div class="flex justify-between items-end mb-8">
+        <div>
+          <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Agenda</h2>
+          <p class="text-slate-500 max-w-xl">Eventos, reuniones escolares y citas clínicas — todo en un solo lugar.</p>
+        </div>
+        <button id="btn_agendar_actividad" onclick="abrirModalAgenda()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-[#b50062] to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
+          <span class="material-symbols-outlined">add</span> Agendar Actividad
         </button>
       </div>
-    </aside>
 
-    <main class="ml-72 min-h-screen flex flex-col">
-      <!-- ================= TOP NAV BAR ================= -->
-      <header
-        class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus"
-      >
-        <div class="flex items-center flex-1">
-          <div class="relative w-full max-w-md">
-            <span
-              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              >search</span
-            >
-            <input
-              id="buscador_principal"
-              oninput="aplicarFiltros()"
-              class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm"
-              placeholder="Buscar título o sede..."
-              type="text"
-            />
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- ============ PANEL IZQUIERDO: DIRECTORIOS (toda la altura) ============ -->
+        <div class="lg:col-span-1 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col" style="max-height: 900px;">
+          <div class="flex border-b border-slate-100 shrink-0">
+            <button id="tabDirEscuelas" onclick="cambiarTabDirectorio('escuelas')" class="flex-1 py-4 text-sm font-bold text-primary border-b-2 border-primary transition-all">
+              <span class="material-symbols-outlined align-middle text-[18px] mr-1">school</span> Escuelas
+            </button>
+            <button id="tabDirPacientes" onclick="cambiarTabDirectorio('pacientes')" class="flex-1 py-4 text-sm font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition-all">
+              <span class="material-symbols-outlined align-middle text-[18px] mr-1">groups</span> Pacientes
+            </button>
           </div>
-        </div>
-        <div class="flex items-center gap-4 ml-8">
-          <a
-            href="perfil_admin.html"
-            class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all"
-          >
-            <span id="nav_user_name" class="text-sm font-bold text-slate-700"
-              >Cargando...</span
-            >
-            <div
-              class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"
-            >
-              <span class="material-symbols-outlined">person</span>
+          <div class="p-4 shrink-0 space-y-2">
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+              <input id="buscador_directorio" oninput="filtrarDirectorio()" class="w-full pl-9 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full text-sm outline-none focus:ring-2 focus:ring-pink-500/20" placeholder="Buscar..." type="text" />
             </div>
-          </a>
-        </div>
-      </header>
-
-      <div class="p-8 flex-1 w-full overflow-hidden">
-        <div class="flex justify-between items-end mb-10">
-          <div>
-            <h2
-              class="text-4xl font-bold text-primary font-plus tracking-tight mb-2"
-            >
-              Agenda Operativa
-            </h2>
-            <p class="text-slate-500 max-w-xl">
-              Cronograma de visitas a escuelas, citas y eventos.
-            </p>
+            <button onclick="cargarVistaGeneral()" class="w-full text-xs font-bold text-slate-500 hover:text-secondary py-2 rounded-full hover:bg-pink-50 transition-all flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">calendar_view_day</span> Ver todas las actividades
+            </button>
           </div>
-          <button
-            onclick="abrirModalAgenda()"
-            class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-[#b50062] to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all"
-          >
-            <span class="material-symbols-outlined">add</span> Agendar Actividad
-          </button>
+          <div id="lista_directorio" class="flex-1 overflow-y-auto px-4 pb-4 space-y-2">
+            <p class="text-slate-400 text-sm text-center py-8">Cargando...</p>
+          </div>
         </div>
 
-        <!-- BARRA DE FILTROS SUPERIOR -->
-        <div
-          class="flex flex-wrap gap-4 mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 items-center w-full"
-        >
-          <span
-            class="text-sm font-bold text-slate-400 px-2 uppercase tracking-widest text-[10px]"
-            >Filtros:</span
-          >
+        <!-- ============ COLUMNA DERECHA: CALENDARIO (arriba) + DETALLE (abajo) ============ -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+          <!-- Calendario Visual -->
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <button onclick="cambiarMesCalendario(-1)" class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-lg">chevron_left</span></button>
+                <h3 id="titulo_mes_calendario" class="text-lg font-bold text-slate-800 w-40 text-center">-</h3>
+                <button onclick="cambiarMesCalendario(1)" class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-lg">chevron_right</span></button>
+              </div>
+              <button onclick="cargarVistaGeneral()" class="text-xs font-bold text-secondary hover:underline">Quitar filtro de día</button>
+            </div>
+            <div class="grid grid-cols-7 gap-2 text-center text-[10px] font-bold text-slate-400 uppercase mb-2">
+              <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
+            </div>
+            <div id="grid_calendario" class="grid grid-cols-7 gap-2"></div>
+          </div>
 
-          <select
-            id="filtro_categoria"
-            title="Filtrar por tipo de actividad"
-            aria-label="Filtrar por tipo de actividad"
-            onchange="aplicarFiltros()"
-            class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2 text-sm font-medium text-slate-600 focus:ring-2 focus:ring-pink-500 cursor-pointer"
-          >
-            <option value="Todos">Tipo de Actividad</option>
-            <option value="visita">Prospección Escolar</option>
-            <option value="evento">Evento Comunitario</option>
-          </select>
-
-          <select
-            id="filtro_escuela"
-            title="Filtrar por sede"
-            aria-label="Filtrar por sede"
-            onchange="aplicarFiltros()"
-            class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2 text-sm font-medium text-slate-600 focus:ring-2 focus:ring-pink-500 cursor-pointer"
-          >
-            <option value="Todas">Cualquier Sede</option>
-            <!-- Llenado con JS -->
-          </select>
-
-          <input
-            type="date"
-            id="filtro_fecha"
-            title="Filtrar por fecha"
-            aria-label="Filtrar por fecha"
-            onchange="aplicarFiltros()"
-            class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2 text-sm font-medium text-slate-600 focus:ring-2 focus:ring-pink-500 cursor-pointer"
-          />
-
-          <button
-            onclick="limpiarFiltros()"
-            class="ml-auto p-2.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
-          >
-            <span class="material-symbols-outlined text-slate-600"
-              >refresh</span
-            >
-          </button>
-        </div>
-
-        <!-- TABLERO DE EVENTOS -->
-        <!-- AQUÍ ESTÁ LA MAGIA: Cambiamos max-w-5xl por w-full -->
-        <div
-          class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 w-full"
-        >
-          <h3 class="text-lg font-bold mb-6 text-slate-800">
-            Próximas Actividades
-          </h3>
-          <div id="lista_eventos" class="space-y-4">
-            <!-- Inyectado por JS -->
+          <!-- Detalle / Actividades Generales -->
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 overflow-y-auto flex-1" style="max-height: 500px;">
+            <div id="cabecera_detalle_agenda" class="mb-6 pb-6 border-b border-slate-100">
+              <h3 class="text-2xl font-bold text-slate-800">Actividades Generales</h3>
+              <p class="text-slate-400 text-sm mt-1">Selecciona una escuela o un paciente a la izquierda para ver su información específica, o revisa aquí todas las actividades agendadas.</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 mb-6">
+              <div class="relative flex-1">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                <input id="buscador_actividades" oninput="filtrarActividadesGenerales()" class="w-full pl-9 pr-4 py-2.5 bg-[#f0f4f8] border-none rounded-full text-sm outline-none focus:ring-2 focus:ring-pink-500/20" placeholder="Buscar actividad por título o lugar..." type="text" />
+              </div>
+              <select id="filtro_tipo_actividades" onchange="filtrarActividadesGenerales()" class="px-4 py-2.5 bg-[#f0f4f8] border-none rounded-full text-sm outline-none cursor-pointer font-bold text-slate-600">
+                <option value="">Todos los tipos</option>
+                <option value="visita">Visita de Prospección</option>
+                <option value="Taller">Taller</option>
+                <option value="Jornada Muralista">Jornada Muralista</option>
+                <option value="Conferencia">Conferencia</option>
+                <option value="Plática">Plática</option>
+                <option value="Cita Clínica">Cita Clínica</option>
+              </select>
+            </div>
+            <div id="lista_eventos" class="space-y-4">
+              <p class="text-slate-400 text-sm text-center py-8">Cargando actividades...</p>
+            </div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
+  </main>
 
-    <!-- ================= EL GRAN MODAL MULTI-PROPÓSITO ================= -->
-    <div
-      id="modalAgenda"
-      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10"
-    >
-      <div
-        class="bg-white rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-full flex flex-col"
-        id="modalAgendaContent"
-      >
-        <div
-          class="bg-gradient-to-r from-blue-700 to-indigo-600 px-8 py-6 text-white flex justify-between items-center shrink-0"
-        >
-          <div>
-            <h3 id="titulo_modal" class="text-2xl font-bold font-plus">
-              Agendar Nueva Actividad
-            </h3>
-          </div>
-          <button
-            onclick="cerrarModalAgenda()"
-            class="text-white/80 hover:text-white"
-          >
-            <span class="material-symbols-outlined text-3xl">close</span>
-          </button>
-        </div>
-
-        <div class="overflow-y-auto p-8 bg-white">
+  <!-- ================= EL GRAN MODAL MULTI-PROPÓSITO ================= -->
+  <div id="modalAgenda" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10">
+    <div class="bg-white rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-full flex flex-col" id="modalAgendaContent">
+      
+      <div class="bg-gradient-to-r from-blue-700 to-indigo-600 px-8 py-6 text-white flex justify-between items-center shrink-0">
+        <div><h3 id="titulo_modal" class="text-2xl font-bold font-plus">Agendar Nueva Actividad</h3></div>
+        <button onclick="cerrarModalAgenda()" class="text-white/80 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
+      </div>
+      
+      <div class="overflow-y-auto p-8 bg-white">
           <form id="formAgenda" class="space-y-6">
-            <input type="hidden" id="edit_id" />
-            <input type="hidden" id="edit_categoria" />
+            <input type="hidden" id="edit_id">
+            <input type="hidden" id="edit_categoria">
 
             <!-- 1. DECISIÓN DEL TIPO DE FLUJO -->
-            <div
-              class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm"
-            >
-              <label
-                for="tipo_agendamiento"
-                class="block text-sm font-bold text-slate-800 mb-2"
-                >Selecciona el tipo de registro:</label
-              >
-              <select
-                id="tipo_agendamiento"
-                title="Selecciona el tipo de registro"
-                aria-label="Selecciona el tipo de registro"
-                onchange="cambiarVistaFormulario()"
-                class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl outline-none font-bold text-blue-700 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-              >
-                <option value="visita">
-                  1. Visita de Prospección (Reunión con Escuela Nueva)
-                </option>
-                <option value="evento" selected>
-                  2. Evento Operativo (Taller, Plática, Jornada Muralista)
-                </option>
-                <option value="clinica">
-                  3. Cita Clínica (Atención Psicológica a Beneficiario)
-                </option>
-              </select>
+            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <label class="block text-sm font-bold text-slate-800 mb-2">Selecciona el tipo de registro:</label>
+                <select id="tipo_agendamiento" onchange="cambiarVistaFormulario()" class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl outline-none font-bold text-blue-700 focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                    <option value="visita">Visita de Prospección (Reunión con Escuela Nueva)</option>
+                    <option value="evento" selected>Evento Operativo (Taller, Plática, Jornada Muralista)</option>
+                    <option value="clinica">Cita Clínica (Atención Psicológica a Beneficiario)</option>
+                </select>
             </div>
 
-            <hr class="border-slate-100" />
+            <hr class="border-slate-100">
 
             <!-- ================= VISTA A: VISITA PROSPECCIÓN ================= -->
             <div id="vista_visita" class="hidden space-y-5">
-              <div
-                class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4"
-              >
-                <p class="text-xs text-blue-700 font-bold">
-                  <span class="material-symbols-outlined text-sm align-middle"
-                    >info</span
-                  >
-                  Este formulario registrará una nueva escuela en la base de
-                  datos y programará la visita.
-                </p>
-              </div>
-              <div>
-                <label
-                  for="vis_escuela"
-                  class="block text-sm font-bold text-slate-700 mb-1"
-                  >Nombre de la Escuela / Institución</label
-                ><input
-                  type="text"
-                  id="vis_escuela"
-                  title="Nombre de la escuela o institución"
-                  placeholder="Ej. Escuela Benito Juárez"
-                  class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"
-                />
-              </div>
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4">
+                    <p class="text-xs text-blue-700 font-bold"><span class="material-symbols-outlined text-sm align-middle">info</span> Este formulario registrará una nueva escuela en la base de datos y programará la visita.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1">Nombre de la Escuela / Institución</label><input type="text" id="vis_escuela" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1">Asistentes esperados</label><input type="number" min="0" id="vis_asistentes_plan" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none" placeholder="Ej. 15"></div>
+                </div>
 
-              <h4 class="font-bold text-slate-800 border-b pb-2 mt-4">
-                Datos del Contacto
-              </h4>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    for="vis_contacto"
-                    class="block text-sm font-bold text-slate-700 mb-1"
-                    >Nombre</label
-                  ><input
-                    type="text"
-                    id="vis_contacto"
-                    title="Nombre del contacto"
-                    placeholder="Ej. María López"
-                    class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"
-                  />
+                <h4 class="font-bold text-slate-800 border-b pb-2 mt-4">Datos del Contacto</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1">Nombre</label><input type="text" id="vis_contacto" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"></div>
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1">Puesto (Ej. Director)</label><input type="text" id="vis_puesto" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"></div>
                 </div>
-                <div>
-                  <label
-                    for="vis_puesto"
-                    class="block text-sm font-bold text-slate-700 mb-1"
-                    >Puesto (Ej. Director)</label
-                  ><input
-                    type="text"
-                    id="vis_puesto"
-                    title="Puesto del contacto"
-                    placeholder="Ej. Director"
-                    class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"
-                  />
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    for="vis_telefono"
-                    class="block text-sm font-bold text-slate-700 mb-1"
-                    >Teléfono</label
-                  ><input
-                    type="tel"
-                    id="vis_telefono"
-                    title="Teléfono del contacto"
-                    placeholder="Ej. 2223456789"
-                    class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"
-                  />
-                </div>
-                <div>
-                  <label
-                    for="vis_ubicacion"
-                    class="block text-sm font-bold text-slate-700 mb-1"
-                    >Ubicación (Link de Google Maps o Dirección física)</label
-                  >
-                  <input
-                    type="text"
-                    id="vis_ubicacion"
-                    title="Ubicación de la escuela"
-                    placeholder="Ej. Calle 5 Sur #1204 o https://maps.app.goo.gl/..."
-                    class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"
-                  />
-                </div>
-              </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-bold text-slate-700 mb-1">Teléfono</label><input type="tel" id="vis_telefono" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"></div>
+                    <div>
+                      <label class="block text-sm font-bold text-slate-700 mb-1">Ubicación (Link de Google Maps o Dirección física)</label>
+                      <input type="text" id="vis_ubicacion" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none" placeholder="Ej. Calle 5 Sur #1204 o https://maps.app.goo.gl/...">
+                  </div>
+                  </div>
             </div>
 
             <!-- ================= VISTA B: EVENTO OPERATIVO (MATERIAL Y EQUIPO) ================= -->
             <div id="vista_evento" class="space-y-6">
-              <div>
-                <label
-                  for="ev_titulo"
-                  class="block text-sm font-bold text-slate-700 mb-1"
-                  >Título del Evento</label
-                >
-                <input
-                  type="text"
-                  id="ev_titulo"
-                  title="Título del evento"
-                  placeholder="Ej. Taller de Prevención"
-                  class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"
-                />
-              </div>
-              <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label
-                    for="ev_escuela"
-                    class="block text-sm font-bold text-slate-700 mb-1"
-                    >Sede / Escuela</label
-                  >
-                  <select
-                    id="ev_escuela"
-                    title="Selecciona sede o escuela"
-                    aria-label="Selecciona sede o escuela"
-                    class="cat_escuelas w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none cursor-pointer"
-                  >
-                    <option value="0">Evento Interno / Oficina S.A.C.</option>
-                  </select>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Título del Evento</label>
+                    <input type="text" id="ev_titulo" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none">
                 </div>
-                <div>
-                  <label
-                    for="ev_tipo"
-                    class="block text-sm font-bold text-slate-700 mb-1"
-                    >Tipo de Actividad</label
-                  >
-                  <select
-                    id="ev_tipo"
-                    title="Selecciona tipo de actividad"
-                    aria-label="Selecciona tipo de actividad"
-                    class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none cursor-pointer"
-                  >
-                    <option value="Taller">Taller</option>
-                    <option value="Jornada Muralista">Jornada Muralista</option>
-                    <option value="Conferencia">Conferencia</option>
-                    <option value="Plática">Plática</option>
-                  </select>
-                </div>
-              </div>
-
-              <div
-                class="grid grid-cols-2 gap-6 pt-4 border-t border-slate-100"
-              >
-                <!-- SECCIÓN MATERIALES (BARRA DESPLAZADORA) -->
-                <div
-                  class="bg-amber-50 p-5 rounded-2xl border border-amber-100"
-                >
-                  <h4
-                    class="font-bold text-slate-800 flex items-center gap-2 mb-3"
-                  >
-                    <span class="material-symbols-outlined text-amber-600"
-                      >inventory_2</span
-                    >
-                    Material a utilizar
-                  </h4>
-
-                  <!-- Barra desplazadora activada aquí -->
-                  <div
-                    id="contenedor_insumos"
-                    class="space-y-3 max-h-40 overflow-y-auto pr-2 pb-2"
-                  >
-                    <!-- Fila inyectada por JS -->
-                  </div>
-                  <button
-                    type="button"
-                    onclick="agregarFilaInsumo()"
-                    class="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full mt-3 hover:bg-amber-200 transition-colors"
-                  >
-                    + Añadir material
-                  </button>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Sede / Escuela</label>
+                        <select id="ev_escuela" class="cat_escuelas w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none cursor-pointer">
+                            <option value="0">Evento Interno / Oficina S.A.C.</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Tipo de Actividad</label>
+                        <select id="ev_tipo" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none cursor-pointer">
+                            <option value="Taller">Taller</option>
+                            <option value="Jornada Muralista">Jornada Muralista</option>
+                            <option value="Conferencia">Conferencia</option>
+                            <option value="Plática">Plática</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- SECCIÓN RESPONSABLE Y VOLUNTARIOS -->
+                <div class="grid grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+                    <!-- SECCIÓN MATERIALES (BARRA DESPLAZADORA) -->
+                    <div class="bg-amber-50 p-5 rounded-2xl border border-amber-100">
+                        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-amber-600">inventory_2</span> Material a utilizar</h4>
+                        
+                        <!-- Barra desplazadora activada aquí -->
+                        <div id="contenedor_insumos" class="space-y-3 max-h-40 overflow-y-auto pr-2 pb-2">
+                            <!-- Fila inyectada por JS -->
+                        </div>
+                        <button type="button" onclick="agregarFilaInsumo()" class="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full mt-3 hover:bg-amber-200 transition-colors">+ Añadir material</button>
+                    </div>
+
+                    <!-- SECCIÓN RESPONSABLE Y VOLUNTARIOS -->
+                    <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-blue-600">group</span> Equipo de Campo</h4>
+                        
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-blue-800 mb-1">Responsable del Evento (Y material)</label>
+                            <select id="ev_responsable" class="w-full px-3 py-2 bg-white border border-blue-200 rounded-xl text-sm font-bold text-blue-700 outline-none shadow-sm cursor-pointer"></select>
+                        </div>
+                        
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Resto del equipo que asistirá:</label>
+                        <input type="text" id="ev_buscar_equipo" oninput="filtrarEquipoCampo()" placeholder="Buscar por nombre..." class="w-full px-3 py-2 mb-2 bg-white border border-blue-200 rounded-xl text-xs outline-none">
+                        <div id="ev_voluntarios_list" class="max-h-32 overflow-y-auto bg-white border border-slate-200 rounded-xl p-2 space-y-1 text-sm shadow-inner">
+                            <!-- Checkboxes inyectados -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN FOTOGRAFÍA DEL EVENTO -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-slate-600">photo_camera</span> Fotografía del Evento (opcional)</h4>
+                    <p class="text-xs text-slate-400 mb-3">Se usará como imagen destacada si luego decides publicar este evento en la web o generar una tarjeta para redes sociales.</p>
+                    <div class="flex items-center gap-4">
+                        <div id="ev_imagen_preview_wrap" class="hidden w-24 h-24 rounded-xl overflow-hidden shrink-0 border border-slate-200">
+                            <img id="ev_imagen_preview" class="w-full h-full object-cover" alt="Vista previa">
+                        </div>
+                        <input type="file" id="input_imagen_evento" class="hidden" accept="image/png,image/jpeg,image/webp" onchange="subirImagenEvento(event)">
+                        <button type="button" onclick="document.getElementById('input_imagen_evento').click()" id="btn_subir_imagen_evento" class="px-5 py-2.5 bg-slate-800 text-white font-bold rounded-full text-sm hover:bg-slate-900 transition-all">Seleccionar Imagen</button>
+                        <input type="hidden" id="ev_url_imagen" value="">
+                    </div>
+                </div>
+
+                <!-- SECCIÓN UBICACIÓN Y ENLACE DE REUNIÓN -->
                 <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-                  <h4
-                    class="font-bold text-slate-800 flex items-center gap-2 mb-3"
-                  >
-                    <span class="material-symbols-outlined text-blue-600"
-                      >group</span
-                    >
-                    Equipo de Campo
-                  </h4>
-
-                  <div class="mb-4">
-                    <label
-                      for="ev_responsable"
-                      class="block text-xs font-bold text-blue-800 mb-1"
-                      >Responsable del Evento (Y material)</label
-                    >
-                    <select
-                      id="ev_responsable"
-                      title="Selecciona al responsable del evento"
-                      aria-label="Selecciona al responsable del evento"
-                      class="w-full px-3 py-2 bg-white border border-blue-200 rounded-xl text-sm font-bold text-blue-700 outline-none shadow-sm cursor-pointer"
-                    ></select>
-                  </div>
-
-                  <label class="block text-xs font-bold text-slate-500 mb-1"
-                    >Resto del equipo que asistirá:</label
-                  >
-                  <div
-                    id="ev_voluntarios_list"
-                    class="max-h-32 overflow-y-auto bg-white border border-slate-200 rounded-xl p-2 space-y-1 text-sm shadow-inner"
-                  >
-                    <!-- Checkboxes inyectados -->
-                  </div>
+                    <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-blue-600">location_on</span> Ubicación y Enlace de Reunión (opcional)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Dirección o lugar (para el mapa)</label>
+                            <input type="text" id="ev_direccion_mapa" placeholder="Ej. Av. Reforma 123, Puebla, Pue." class="w-full px-3 py-2.5 bg-white border border-blue-200 rounded-xl text-sm outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Link de reunión (Meet, Zoom, etc.)</label>
+                            <input type="url" id="ev_link_reunion" placeholder="https://meet.google.com/xxx-xxxx-xxx" class="w-full px-3 py-2.5 bg-white border border-blue-200 rounded-xl text-sm outline-none">
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2">Si llenas la dirección, se mostrará un mapa en la página pública del evento. Si llenas el link, aparecerá un botón "Unirse a la reunión".</p>
                 </div>
-              </div>
             </div>
 
             <!-- ================= VISTA C: AGENDA CLÍNICA ================= -->
             <div id="vista_clinica" class="hidden space-y-6">
-              <div
-                class="bg-rose-50 border border-rose-100 rounded-xl p-4 mb-4 flex gap-3"
-              >
-                <span class="material-symbols-outlined text-rose-500"
-                  >lock</span
-                >
-                <p class="text-xs text-rose-800 font-bold">
-                  Datos clínicos confidenciales. Se asignará la sesión al
-                  expediente del beneficiario seleccionado.
-                </p>
-              </div>
-              <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1 ml-1"
-                  >Título de la Sesión</label
-                >
-                <input
-                  type="text"
-                  id="cli_titulo"
-                  class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"
-                  placeholder="Ej. Sesión Diagnóstica - 1ra vez"
-                />
-              </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    for="cli_beneficiario"
-                    class="block text-sm font-bold text-slate-700 mb-1 ml-1"
-                    >Beneficiario (Paciente)</label
-                  >
-                  <select
-                    id="cli_beneficiario"
-                    title="Selecciona beneficiario"
-                    aria-label="Selecciona beneficiario"
-                    class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none cursor-pointer"
-                  >
-                    <option value="">Selecciona al beneficiario...</option>
-                  </select>
+                <div class="bg-rose-50 border border-rose-100 rounded-xl p-4 mb-4 flex gap-3">
+                    <span class="material-symbols-outlined text-rose-500">lock</span>
+                    <p class="text-xs text-rose-800 font-bold">Datos clínicos confidenciales. Se asignará la sesión al expediente del beneficiario seleccionado.</p>
                 </div>
                 <div>
-                  <label
-                    for="cli_especialista"
-                    class="block text-sm font-bold text-slate-700 mb-1 ml-1"
-                    >Especialista (Psicólogo) a cargo</label
-                  >
-                  <select
-                    id="cli_especialista"
-                    title="Selecciona especialista"
-                    aria-label="Selecciona especialista"
-                    class="w-full px-4 py-3 bg-rose-50 border border-rose-200 text-rose-700 font-bold rounded-xl outline-none cursor-pointer"
-                  ></select>
+                    <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Título de la Sesión</label>
+                    <input type="text" id="cli_titulo" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none" placeholder="Ej. Sesión Diagnóstica - 1ra vez">
                 </div>
-              </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Beneficiario (Paciente)</label>
+                        <select id="cli_beneficiario" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none cursor-pointer">
+                            <option value="">Selecciona al beneficiario...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Especialista (Psicólogo) a cargo</label>
+                        <select id="cli_especialista" class="w-full px-4 py-3 bg-rose-50 border border-rose-200 text-rose-700 font-bold rounded-xl outline-none cursor-pointer"></select>
+                    </div>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-xl p-4">
+                    <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Modalidad de la cita</label>
+                    <div class="flex gap-6 mb-3">
+                        <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer">
+                            <input type="radio" name="cli_modalidad" id="cli_modalidad_presencial" value="Presencial" checked onchange="cambiarModalidadClinica()"> Presencial
+                        </label>
+                        <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer">
+                            <input type="radio" name="cli_modalidad" id="cli_modalidad_online" value="En línea" onchange="cambiarModalidadClinica()"> En línea
+                        </label>
+                    </div>
+                    <div id="cli_campo_ubicacion">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Ubicación de la cita</label>
+                        <input type="text" id="cli_ubicacion" placeholder="Ej. Sede S.A.C., consultorio 2" class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl text-sm outline-none">
+                    </div>
+                    <div id="cli_campo_link" class="hidden">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Link de Google Meet</label>
+                        <input type="url" id="cli_link_reunion" placeholder="https://meet.google.com/xxx-xxxx-xxx" class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl text-sm outline-none">
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2">El tutor recibirá un correo con la fecha, hora y estos datos de la cita.</p>
+                </div>
             </div>
 
             <!-- FECHA Y HORA UNIVERSAL -->
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-              <div>
-                <label
-                  for="gral_fecha"
-                  class="block text-sm font-bold text-slate-700 mb-1 ml-1"
-                  >Fecha de Actividad</label
-                ><input
-                  type="date"
-                  id="gral_fecha"
-                  title="Fecha de la actividad"
-                  required
-                  class="w-full px-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label
-                  for="gral_hora"
-                  class="block text-sm font-bold text-slate-700 mb-1 ml-1"
-                  >Hora</label
-                ><input
-                  type="time"
-                  id="gral_hora"
-                  title="Hora de la actividad"
-                  required
-                  class="w-full px-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Fecha de Actividad</label><input type="date" id="gral_fecha" required class="w-full px-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Hora</label><input type="time" id="gral_hora" required class="w-full px-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></div>
             </div>
-
+            
             <div class="pt-6 flex gap-4">
-              <button
-                type="button"
-                onclick="cerrarModalAgenda()"
-                class="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                id="btn_submit_agenda"
-                class="flex-1 py-4 bg-blue-600 text-white font-bold rounded-full shadow-xl shadow-blue-200 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all"
-              >
-                Guardar Actividad
-              </button>
+                <button type="button" onclick="cerrarModalAgenda()" class="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors">Cancelar</button>
+                <button type="submit" id="btn_submit_agenda" class="flex-1 py-4 bg-blue-600 text-white font-bold rounded-full shadow-xl shadow-blue-200 hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all">Guardar Actividad</button>
             </div>
           </form>
-        </div>
       </div>
     </div>
+  </div>
 
-    <!-- INSUMOS TEMPLATE (OCULTO, SOLO PARA COPIAR JS) -->
-    <select
-      id="insumos_template"
-      class="hidden"
-      title="Plantilla de insumos"
-      aria-label="Plantilla de insumos"
-    >
-      <option value="0">No requiere material...</option>
-    </select>
+  <!-- INSUMOS TEMPLATE (OCULTO, SOLO PARA COPIAR JS) -->
+  <select id="insumos_template" class="hidden"><option value="0">No requiere material...</option><option value="otro">Otro: escribir... (no está en inventario)</option></select>
 
-    <script>
-      const LOCAL_API_URL = "http://localhost:3000";
-      const REMOTE_API_URL = "https://sanctorum-backend.onrender.com";
-      let API_URL = LOCAL_API_URL;
-      let apiUrlChecked = false;
-      let agendaGlobal = [];
-      let userIdActual = null;
+  <script>
+    // Decodifica el payload de un JWT de forma segura: los JWT usan base64url
+    // (con '-' y '_' en vez de '+' y '/', y sin padding '='), y pueden contener
+    // caracteres UTF-8 (acentos, ñ, etc.). atob() a secas falla o corrompe esos casos.
+    function decodeJWT(token) {
+        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4 !== 0) base64 += '=';
+        const binario = atob(base64);
+        const jsonPayload = decodeURIComponent(
+            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(jsonPayload);
+    }
 
-      async function obtenerApiUrl() {
-        if (apiUrlChecked) return API_URL;
-        apiUrlChecked = true;
-        const candidates = [LOCAL_API_URL, REMOTE_API_URL];
-        for (const candidate of candidates) {
-          try {
-            const res = await fetch(`${candidate}/api/agenda`, {
-              method: "GET",
-              cache: "no-cache",
-            });
-            if (res.ok || res.status === 404 || res.status === 401) {
-              API_URL = candidate;
-              break;
-            }
-          } catch (_) {}
-        }
-        return API_URL;
-      }
+    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
+    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
+    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
+    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
+    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
 
-      function obtenerValorEvento(ev, keys) {
-        for (const key of keys) {
-          if (ev[key] != null && ev[key] !== "") return ev[key];
-        }
-        return "";
-      }
+    function obtenerNotifDescartadas() {
+        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
+    }
+    function guardarNotifDescartadas(lista) {
+        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
+    }
 
-      document.addEventListener("DOMContentLoaded", async () => {
-        const token = localStorage.getItem("token_sanctorum");
-        if (!token) {
-          window.location.replace("login.html");
-          return;
-        }
+    function toggleNotificaciones() {
+        const panel = document.getElementById('modalNotificaciones');
+        const estabaOculto = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        if (estabaOculto) cargarNotificaciones();
+    }
+
+    async function cargarNotificaciones() {
+        const cont = document.getElementById('lista_notificaciones');
         try {
-          const payload = JSON.parse(atob(token.split(".")[1]));
-          document.getElementById("nav_user_name").innerText =
-            payload.nombre.split(" ")[0];
-          userIdActual = payload.id;
+            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
+            const json = await res.json();
+            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
+
+            const descartadas = obtenerNotifDescartadas();
+            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
+                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
+                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
+                titulo: a.titulo, detalle: a.detalle || ''
+            }));
+
+            if (json.data.solicitudes_pendientes > 0) {
+                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
+                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
+            }
+            if (json.data.insumos_bajo_stock > 0) {
+                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
+                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
+            }
+
+            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
+            actualizarPuntoNotificaciones(notificaciones.length);
+
+            if (notificaciones.length === 0) {
+                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
+                return;
+            }
+
+            cont.innerHTML = notificaciones.map(n => `
+                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
+                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
+                    </div>
+                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>`).join('');
         } catch (e) {
-          window.location.replace("login.html");
+            console.error("Error al cargar notificaciones:", e);
+            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
+        }
+    }
+
+    function actualizarPuntoNotificaciones(cantidad) {
+        const punto = document.getElementById('punto_notificaciones');
+        if (!punto) return;
+        punto.classList.toggle('hidden', cantidad === 0);
+    }
+
+    function descartarNotificacion(id) {
+        const descartadas = obtenerNotifDescartadas();
+        if (!descartadas.includes(id)) descartadas.push(id);
+        guardarNotifDescartadas(descartadas);
+        cargarNotificaciones();
+    }
+
+    function limpiarTodasNotificaciones() {
+        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
+            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
+            if (match) {
+                const descartadas = obtenerNotifDescartadas();
+                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
+                guardarNotifDescartadas(descartadas);
+            }
+        });
+        cargarNotificaciones();
+    }
+
+    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
+    // entra directo por URL a una página no permitida para su rol, lo redirige.
+    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
+    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
+    function aplicarRestriccionesNav(rol, especialidad) {
+        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
+        esUsuarioPsicologo = esPsico;
+        const permisos = {
+            'dashboard_admin.html': [1, 3],
+            'gestion_expedientes_admin.html': esPsico ? [1, 2] : [1],
+            'gestion_voluntariado_admin.html': [1, 3],
+            'inventario_admin.html': [1, 3],
+            'agenda_admin.html': [1, 2, 3, 4],
+            'gestion_publicaciones_admin.html': [1, 2, 3, 4],
+            'gestion_reportes_admin.html': [1, 2, 3, 4],
+            'aliados_donativos_admin.html': [1, 3]
+        };
+
+        document.querySelectorAll('aside nav a[href]').forEach(a => {
+            const pagina = a.getAttribute('href');
+            const permitidos = permisos[pagina];
+            if (permitidos && !permitidos.includes(rol)) {
+                a.remove();
+            }
+        });
+
+        const paginaActual = window.location.pathname.split('/').pop();
+        const permitidosActual = permisos[paginaActual];
+        if (permitidosActual && !permitidosActual.includes(rol)) {
+            window.location.replace('agenda_admin.html');
         }
 
-        await obtenerApiUrl();
-        cargarAgenda(true);
+        // Solo Admin, Coordinador y Psicólogo pueden agendar actividades.
+        const puedeAgendar = rol === 1 || rol === 3 || esPsico;
+        const btnAgendar = document.getElementById('btn_agendar_actividad');
+        if (btnAgendar) btnAgendar.classList.toggle('hidden', !puedeAgendar);
+    }
+
+    const API_URL = "http://localhost:3000";
+
+    // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
+    function authHeaders() {
+        return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
+    }
+
+    // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
+    // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
+    // pedirla de nuevo en cada subida.
+    let _cloudinaryConfigCache = null;
+    async function obtenerConfigCloudinary() {
+        if (_cloudinaryConfigCache) return _cloudinaryConfigCache;
+        const res = await fetch(`${API_URL}/api/config/cloudinary`);
+        const json = await res.json();
+        _cloudinaryConfigCache = { cloudName: json.cloud_name, uploadPreset: json.upload_preset };
+        return _cloudinaryConfigCache;
+    }
+
+    let userIdActual = null;
+    let esUsuarioPsicologo = false;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token_sanctorum');
+        if(!token) { window.location.replace("login.html"); return; }
+        try {
+            const payload = decodeJWT(token);
+            aplicarRestriccionesNav(payload.rol, payload.especialidad);
+            document.getElementById('nav_user_name').innerText = payload.nombre.split(' ')[0];
+            cargarNotificaciones();
+            userIdActual = payload.id;
+            restringirPestanaPacientes(payload.rol, payload.especialidad);
+            verificarAccesoDocumento(payload);
+        } catch (e) { window.location.replace("login.html"); }
+
+        cargarVistaGeneral();
+        cargarDirectorios();
+        cargarCalendario();
         cargarCatalogosModal();
         cambiarVistaFormulario();
-      });
+    });
 
-      function cerrarSesion() {
-        localStorage.removeItem("token_sanctorum");
-        window.location.replace("login.html");
-      }
+    // Bloquea el acceso a esta página si el usuario (Especialista o Coordinador) todavía
+    // no tiene aprobado su documento profesional — solo puede ver su Perfil.
+    function verificarAccesoDocumento(payload) {
+        if (payload.rol !== 2 && payload.rol !== 3) return;
+        fetch(`${API_URL}/api/usuarios/${payload.id}`)
+            .then(r => r.json())
+            .then(j => {
+                const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
+                if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
+                    window.location.replace('perfil_admin.html');
+                }
+            })
+            .catch(() => {});
+    }
 
-      // ================= MODAL LÓGICA =================
-      function abrirModalAgenda() {
-        document.getElementById("edit_id").value = "";
-        document.getElementById("formAgenda").reset();
-        document.getElementById("titulo_modal").innerText =
-          "Agendar Nueva Actividad";
-        document.getElementById("btn_submit_agenda").innerText =
-          "Guardar Actividad";
-        document.getElementById("tipo_agendamiento").disabled = false;
+    function cerrarSesion() { localStorage.removeItem('token_sanctorum'); window.location.replace("login.html"); }
 
-        document.getElementById("contenedor_insumos").innerHTML = "";
-        agregarFilaInsumo();
+    // ================= MODAL LÓGICA =================
+    function abrirModalAgenda() { 
+        document.getElementById('edit_id').value = '';
+        document.getElementById('formAgenda').reset();
+        document.getElementById('titulo_modal').innerText = "Agendar Nueva Actividad";
+        document.getElementById('btn_submit_agenda').innerText = "Guardar Actividad";
+        document.getElementById('tipo_agendamiento').disabled = esUsuarioPsicologo;
+        if (esUsuarioPsicologo) { document.getElementById('tipo_agendamiento').value = 'clinica'; }
+        cambiarVistaFormulario();
+        cambiarModalidadClinica();
+        
+        document.getElementById('contenedor_insumos').innerHTML = '';
+        agregarFilaInsumo(); 
 
-        document.getElementById("modalAgenda").classList.remove("hidden");
-        setTimeout(() => {
-          document.getElementById("modalAgenda").classList.remove("opacity-0");
-          document
-            .getElementById("modalAgendaContent")
-            .classList.remove("scale-95");
-        }, 10);
-      }
+        document.getElementById('ev_url_imagen').value = '';
+        document.getElementById('ev_imagen_preview_wrap').classList.add('hidden');
+        
+        document.getElementById('modalAgenda').classList.remove('hidden'); 
+        setTimeout(() => { document.getElementById('modalAgenda').classList.remove('opacity-0'); document.getElementById('modalAgendaContent').classList.remove('scale-95'); }, 10); 
+    }
 
-      function cerrarModalAgenda() {
-        document.getElementById("modalAgenda").classList.add("opacity-0");
-        document.getElementById("modalAgendaContent").classList.add("scale-95");
-        setTimeout(() => {
-          document.getElementById("modalAgenda").classList.add("hidden");
-          document.getElementById("formAgenda").reset();
-          cambiarVistaFormulario();
-        }, 300);
-      }
+    function cerrarModalAgenda() { document.getElementById('modalAgenda').classList.add('opacity-0'); document.getElementById('modalAgendaContent').classList.add('scale-95'); setTimeout(() => { document.getElementById('modalAgenda').classList.add('hidden'); document.getElementById('formAgenda').reset(); cambiarVistaFormulario(); }, 300); }
 
-      function cambiarVistaFormulario() {
-        const tipo = document.getElementById("tipo_agendamiento").value;
-        document
-          .getElementById("vista_visita")
-          .classList.toggle("hidden", tipo !== "visita");
-        document
-          .getElementById("vista_evento")
-          .classList.toggle("hidden", tipo !== "evento");
-        document
-          .getElementById("vista_clinica")
-          .classList.toggle("hidden", tipo !== "clinica");
+    function cambiarVistaFormulario() {
+        const tipo = document.getElementById('tipo_agendamiento').value;
+        document.getElementById('vista_visita').classList.toggle('hidden', tipo !== 'visita');
+        document.getElementById('vista_evento').classList.toggle('hidden', tipo !== 'evento');
+        document.getElementById('vista_clinica').classList.toggle('hidden', tipo !== 'clinica');
 
-        document.getElementById("vis_escuela").required = tipo === "visita";
-        document.getElementById("ev_titulo").required = tipo === "evento";
-        document.getElementById("cli_titulo").required = tipo === "clinica";
-        document.getElementById("cli_beneficiario").required =
-          tipo === "clinica";
-      }
+        document.getElementById('vis_escuela').required = (tipo === 'visita');
+        document.getElementById('ev_titulo').required = (tipo === 'evento');
+        document.getElementById('cli_titulo').required = (tipo === 'clinica');
+        document.getElementById('cli_beneficiario').required = (tipo === 'clinica');
+    }
 
-      // ================= LÓGICA DE INVENTARIO =================
-      function agregarFilaInsumo() {
-        const div = document.createElement("div");
-        div.className =
-          "flex gap-2 items-center bg-white p-2 rounded-xl shadow-sm mt-2";
-        const opciones = document.getElementById("insumos_template").innerHTML;
+    function cambiarModalidadClinica() {
+        const campoOnline = document.getElementById('cli_modalidad_online');
+        const online = campoOnline ? campoOnline.checked : false;
+        document.getElementById('cli_campo_link').classList.toggle('hidden', !online);
+        document.getElementById('cli_campo_ubicacion').classList.toggle('hidden', online);
+    }
+
+    function filtrarEquipoCampo() {
+        const campo = document.getElementById('ev_buscar_equipo');
+        const texto = (campo ? campo.value : '').trim().toLowerCase();
+        document.querySelectorAll('#ev_voluntarios_list label').forEach(lbl => {
+            const nombre = lbl.textContent.toLowerCase();
+            lbl.classList.toggle('hidden', !!texto && !nombre.includes(texto));
+        });
+    }
+
+    // ================= LÓGICA DE INVENTARIO =================
+    // ================= FOTOGRAFÍA DEL EVENTO (Cloudinary) =================
+    async function subirImagenEvento(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const btn = document.getElementById('btn_subir_imagen_evento');
+        const textoOriginal = btn.innerText;
+        btn.innerText = 'Subiendo...'; btn.disabled = true;
+
+        const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } = await obtenerConfigCloudinary();
+        if (!CLOUD_NAME || !UPLOAD_PRESET) {
+            alert('Falta configurar CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET en las variables de entorno del servidor.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', UPLOAD_PRESET);
+
+        try {
+            const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, { method: 'POST', body: formData });
+            const uploadData = await uploadRes.json();
+            if (uploadData.secure_url) {
+                document.getElementById('ev_url_imagen').value = uploadData.secure_url;
+                document.getElementById('ev_imagen_preview').src = uploadData.secure_url;
+                document.getElementById('ev_imagen_preview_wrap').classList.remove('hidden');
+            } else {
+                alert('No se pudo subir la imagen. Revisa la configuración de Cloudinary (CLOUD_NAME / UPLOAD_PRESET).');
+            }
+        } catch (error) {
+            console.error('Error al subir imagen del evento:', error);
+            alert('Falló la subida de la imagen.');
+        } finally {
+            btn.innerText = textoOriginal; btn.disabled = false;
+            event.target.value = '';
+        }
+    }
+
+    function agregarFilaInsumo() {
+        const div = document.createElement('div');
+        div.className = 'flex flex-col gap-1 bg-white p-2 rounded-xl shadow-sm mt-2';
+        const opciones = document.getElementById('insumos_template').innerHTML;
         div.innerHTML = `
-            <select class="insumo_select w-full p-2 bg-transparent text-sm font-medium border-none outline-none cursor-pointer">${opciones}</select>
-            <input type="number" min="0.01" step="0.01" onchange="validarStock(this)" class="insumo_cant w-24 p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none" placeholder="Cant.">
-            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 font-bold px-2 hover:scale-110">X</button>
+            <div class="flex gap-2 items-center">
+                <div class="w-full">
+                    <input type="text" oninput="filtrarOpcionesInsumo(this)" placeholder="Escribe para buscar material..." class="insumo_buscar w-full px-2 py-1 mb-1 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
+                    <select class="insumo_select w-full p-2 bg-transparent text-sm font-medium border border-slate-100 rounded-lg outline-none cursor-pointer" onchange="toggleInsumoOtro(this)">${opciones}</select>
+                </div>
+                <input type="number" min="0.01" step="0.01" onchange="validarStock(this)" class="insumo_cant w-24 p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none" placeholder="Cant.">
+                <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 font-bold px-2 hover:scale-110">X</button>
+            </div>
+            <input type="text" placeholder="Nombre del material (se agregará al inventario)" class="insumo_otro hidden w-full px-2 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs outline-none">
         `;
-        document.getElementById("contenedor_insumos").appendChild(div);
-      }
+        document.getElementById('contenedor_insumos').appendChild(div);
+    }
 
-      function validarStock(inputField) {
-        const select = inputField.previousElementSibling;
+    function toggleInsumoOtro(selectEl) {
+        const contenedorFila = selectEl.closest('div.flex.flex-col');
+        const inputOtro = contenedorFila ? contenedorFila.querySelector('.insumo_otro') : null;
+        if (inputOtro) inputOtro.classList.toggle('hidden', selectEl.value !== 'otro');
+    }
+
+    // Filtra visualmente las opciones del <select> de materiales según lo que se escriba,
+    // para poder buscar rápido en catálogos largos sin perder el <select> nativo.
+    function filtrarOpcionesInsumo(inputEl) {
+        const texto = inputEl.value.trim().toLowerCase();
+        const select = inputEl.parentElement.querySelector('.insumo_select');
+        if (!select) return;
+        Array.from(select.options).forEach(op => {
+            if (op.value === 'otro') { op.hidden = false; return; }
+            op.hidden = !!texto && !op.textContent.toLowerCase().includes(texto);
+        });
+        if (select.selectedOptions[0] && select.selectedOptions[0].hidden) {
+            const primeraVisible = Array.from(select.options).find(op => !op.hidden);
+            if (primeraVisible) select.value = primeraVisible.value;
+        }
+    }
+
+    function validarStock(inputField) {
+        const select = inputField.parentElement.querySelector('.insumo_select');
+        if (!select) return;
         const opcionSeleccionada = select.options[select.selectedIndex];
         if (opcionSeleccionada.value !== "0") {
-          const stockMax = parseFloat(opcionSeleccionada.dataset.stock);
-          const pedido = parseFloat(inputField.value);
-          if (pedido > stockMax) {
-            alert(
-              `¡Alerta! Solo existen ${stockMax} unidades en inventario. Se ajustará la cantidad al máximo disponible.`,
-            );
-            inputField.value = stockMax;
-          }
+            const stockMax = parseFloat(opcionSeleccionada.dataset.stock);
+            const pedido = parseFloat(inputField.value);
+            if (pedido > stockMax) {
+                alert(`¡Alerta! Solo existen ${stockMax} unidades en inventario. Se ajustará la cantidad al máximo disponible.`);
+                inputField.value = stockMax;
+            }
         }
-      }
+    }
 
-      // ================= CARGA DE DATOS (CATÁLOGOS) =================
-      async function cargarCatalogosModal() {
+    // ================= CARGA DE DATOS (CATÁLOGOS) =================
+    async function cargarCatalogosModal() {
         try {
-          await obtenerApiUrl();
-          const res = await fetch(`${API_URL}/api/catalogos_agenda`);
-          const json = await res.json();
-          if (json.success) {
-            // Escuelas
-            const selEscuelas = document.querySelectorAll(
-              ".cat_escuelas, #filtro_escuela",
-            );
-            json.escuelas.forEach((e) => {
-              selEscuelas.forEach(
-                (select) =>
-                  (select.innerHTML += `<option value="${e.id_escuela}">${e.nombre_escuela}</option>`),
-              );
-            });
+            const res = await fetch(`${API_URL}/api/catalogos_agenda`);
+            const json = await res.json();
+            if(json.success) {
+                // Escuelas
+                const selEscuelas = document.querySelectorAll('.cat_escuelas');
+                json.escuelas.forEach(e => {
+                    selEscuelas.forEach(select => select.innerHTML += `<option value="${e.id_escuela}">${e.nombre_escuela}</option>`);
+                });
+                
+                // Insumos
+                const template = document.getElementById('insumos_template');
+                json.insumos.forEach(i => {
+                    template.innerHTML += `<option value="${i.id_insumo}" data-stock="${i.stock_actual}">${i.nombre_insumo} (Disp: ${i.stock_actual} ${i.unidad_medida})</option>`;
+                });
+                agregarFilaInsumo(); // Pre-llena la primera fila
+                
+                // Voluntarios
+                const divVols = document.getElementById('ev_voluntarios_list');
+                const selResp = document.getElementById('ev_responsable');
+                const selPsi = document.getElementById('cli_especialista');
 
-            // Insumos
-            const template = document.getElementById("insumos_template");
-            json.insumos.forEach((i) => {
-              template.innerHTML += `<option value="${i.id_insumo}" data-stock="${i.stock_actual}">${i.nombre_insumo} (Disp: ${i.stock_actual} ${i.unidad_medida})</option>`;
-            });
-            agregarFilaInsumo(); // Pre-llena la primera fila
-
-            // Voluntarios
-            const divVols = document.getElementById("ev_voluntarios_list");
-            const selResp = document.getElementById("ev_responsable");
-            const selPsi = document.getElementById("cli_especialista");
-
-            json.voluntarios.forEach((v) => {
-              const selectedStr =
-                v.id_usuario === userIdActual ? "selected" : "";
-              selResp.innerHTML += `<option value="${v.id_usuario}" ${selectedStr}>${v.nombre_completo} (${v.especialidad})</option>`;
-              if (
-                v.id_rol === 2 ||
-                v.id_rol === 1 ||
-                v.especialidad === "Psicología"
-              ) {
-                selPsi.innerHTML += `<option value="${v.id_usuario}" ${selectedStr}>${v.nombre_completo}</option>`;
-              }
-              divVols.innerHTML += `
+                json.voluntarios.forEach(v => {
+                    const selectedStr = (v.id_usuario === userIdActual) ? "selected" : "";
+                    selResp.innerHTML += `<option value="${v.id_usuario}" ${selectedStr}>${v.nombre_completo} (${v.especialidad})</option>`;
+                    if (v.id_rol === 2 || v.id_rol === 1 || v.especialidad === 'Psicología') {
+                        selPsi.innerHTML += `<option value="${v.id_usuario}" ${selectedStr}>${v.nombre_completo}</option>`;
+                    }
+                    divVols.innerHTML += `
                         <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-2 rounded-lg border border-transparent hover:border-slate-100 transition-colors">
                             <input type="checkbox" name="asistentes" value="${v.id_usuario}" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4">
                             <span class="font-medium text-slate-700">${v.nombre_completo} <span class="text-[10px] text-slate-400 font-bold ml-1">${v.especialidad}</span></span>
                         </label>`;
-            });
-
-            // Beneficiarios
-            const selBen = document.getElementById("cli_beneficiario");
-            json.beneficiarios.forEach((b) => {
-              selBen.innerHTML += `<option value="${b.id_beneficiario}">${b.nombre_completo}</option>`;
-            });
-          }
-        } catch (e) {
-          console.error("Error catálogos", e);
-        }
-      }
-
-      // ================= MODIFICAR: PRELLENAR DATOS =================
-      async function editarActividad(id, categoria) {
-        try {
-          const res = await fetch(`${API_URL}/api/agenda/${categoria}/${id}`);
-          const json = await res.json();
-          if (json.success) {
-            const data = json.data;
-            document.getElementById("edit_id").value = id;
-            document.getElementById("edit_categoria").value = categoria;
-            document.getElementById("titulo_modal").innerText =
-              "Modificar Actividad";
-            document.getElementById("btn_submit_agenda").innerText =
-              "Actualizar Cambios";
-
-            document.getElementById("tipo_agendamiento").value =
-              data.tipo_registro;
-            document.getElementById("tipo_agendamiento").disabled = true; // Bloqueado al editar
-            cambiarVistaFormulario();
-
-            // Formatear Fecha y Hora para los inputs
-            const fechaCita = new Date(
-              data.fecha_cita || data.fecha_realizacion,
-            );
-            document.getElementById("gral_fecha").value = fechaCita
-              .toISOString()
-              .split("T")[0];
-            document.getElementById("gral_hora").value = fechaCita
-              .toTimeString()
-              .slice(0, 5);
-
-            if (data.tipo_registro === "visita") {
-              document.getElementById("vis_escuela").value =
-                data.nombre_escuela || "";
-              document.getElementById("vis_ubicacion").value =
-                data.ubicacion || "";
-              document.getElementById("vis_contacto").value =
-                data.contacto_nombre || "";
-              document.getElementById("vis_puesto").value =
-                data.puesto_contacto || "";
-              document.getElementById("vis_telefono").value =
-                data.telefono_escuela || "";
-            } else if (data.tipo_registro === "clinica") {
-              document.getElementById("cli_titulo").value =
-                data.titulo_evento || "";
-              document.getElementById("cli_beneficiario").value =
-                data.id_beneficiario || "";
-              document.getElementById("cli_especialista").value =
-                data.id_especialista || "";
-            } else {
-              // Evento Operativo
-              document.getElementById("ev_titulo").value =
-                data.titulo_evento || "";
-              document.getElementById("ev_tipo").value = data.tipo_evento || "";
-              document.getElementById("ev_escuela").value =
-                data.id_escuela || 0;
-
-              // Limpiar y Llenar Voluntarios
-              document
-                .querySelectorAll('input[name="asistentes"]')
-                .forEach((cb) => (cb.checked = false));
-              if (data.voluntarios && data.voluntarios.length > 0) {
-                document.getElementById("ev_responsable").value =
-                  data.voluntarios[0]; // El 1ro es el responsable
-                data.voluntarios.forEach((vid) => {
-                  const cb = document.querySelector(
-                    `input[name="asistentes"][value="${vid}"]`,
-                  );
-                  if (cb && vid !== data.voluntarios[0]) cb.checked = true;
                 });
-              }
 
-              // Limpiar y Llenar Insumos
-              document.getElementById("contenedor_insumos").innerHTML = "";
-              if (!data.insumos || data.insumos.length === 0) {
-                agregarFilaInsumo();
-              } else {
-                data.insumos.forEach((ins) => {
-                  agregarFilaInsumo();
-                  const div =
-                    document.getElementById(
-                      "contenedor_insumos",
-                    ).lastElementChild;
-                  div.querySelector(".insumo_select").value = ins.id_insumo;
-                  div.querySelector(".insumo_cant").value = ins.cantidad_usada;
-                });
-              }
+                // Beneficiarios
+                const selBen = document.getElementById('cli_beneficiario');
+                json.beneficiarios.forEach(b => { selBen.innerHTML += `<option value="${b.id_beneficiario}">${b.nombre_completo}</option>`; });
             }
+        } catch (e) { console.error("Error catálogos", e); }
+    }
 
-            // Abrir modal suavemente
-            document.getElementById("modalAgenda").classList.remove("hidden");
-            setTimeout(() => {
-              document
-                .getElementById("modalAgenda")
-                .classList.remove("opacity-0");
-              document
-                .getElementById("modalAgendaContent")
-                .classList.remove("scale-95");
-            }, 10);
-          } else {
-            alert("Error al obtener los datos de la base de datos.");
-          }
-        } catch (e) {
-          alert("Error al conectar con el servidor.");
-        }
-      }
-
-      // ================= GUARDAR AGENDA (POST / PUT) =================
-      document
-        .getElementById("formAgenda")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const btn = e.target.querySelector('button[type="submit"]');
-          btn.innerText = "Procesando...";
-          btn.disabled = true;
-
-          const editId = document.getElementById("edit_id").value;
-          const editCategoria = document.getElementById("edit_categoria").value;
-          const tipoRegistro =
-            document.getElementById("tipo_agendamiento").value;
-
-          let payload = {
-            tipo_registro: tipoRegistro,
-            datos: {
-              fecha: document.getElementById("gral_fecha").value,
-              hora: document.getElementById("gral_hora").value,
-            },
-          };
-
-          if (tipoRegistro === "visita") {
-            payload.datos.escuela =
-              document.getElementById("vis_escuela").value;
-            payload.datos.ubicacion =
-              document.getElementById("vis_ubicacion").value;
-            payload.datos.contacto =
-              document.getElementById("vis_contacto").value;
-            payload.datos.puesto = document.getElementById("vis_puesto").value;
-            payload.datos.telefono =
-              document.getElementById("vis_telefono").value;
-          } else if (tipoRegistro === "clinica") {
-            payload.datos.titulo = document.getElementById("cli_titulo").value;
-            payload.datos.id_beneficiario =
-              document.getElementById("cli_beneficiario").value;
-            payload.datos.id_especialista =
-              document.getElementById("cli_especialista").value;
-          } else {
-            // Evento Operativo
-            const checkboxes = document.querySelectorAll(
-              'input[name="asistentes"]:checked',
-            );
-            const insumosRecoleccion = [];
-            document
-              .querySelectorAll("#contenedor_insumos .flex")
-              .forEach((fila) => {
-                const id = fila.querySelector(".insumo_select").value;
-                const cant = parseFloat(
-                  fila.querySelector(".insumo_cant").value,
-                );
-                if (id != "0" && cant > 0)
-                  insumosRecoleccion.push({ id: parseInt(id), cant });
-              });
-
-            payload.datos.titulo = document.getElementById("ev_titulo").value;
-            payload.datos.tipo = document.getElementById("ev_tipo").value;
-            payload.datos.id_escuela =
-              document.getElementById("ev_escuela").value;
-            payload.datos.responsable = parseInt(
-              document.getElementById("ev_responsable").value,
-            );
-            payload.datos.voluntarios = Array.from(checkboxes).map((cb) =>
-              parseInt(cb.value),
-            );
-            payload.datos.insumos = insumosRecoleccion;
-          }
-
-          try {
-            let url = `${API_URL}/api/agenda`;
-            let method = "POST";
-
-            if (editId) {
-              url = `${API_URL}/api/agenda/${editCategoria}/${editId}`;
-              method = "PUT";
-            }
-
-            const response = await fetch(url, {
-              method: method,
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            if (response.ok) {
-              cerrarModalAgenda();
-              cargarAgenda(true);
-            } else {
-              alert("Hubo un error al guardar los datos.");
-            }
-          } catch (error) {
-            alert("Error de conexión");
-          } finally {
-            btn.innerText = "Guardar Actividad";
-            btn.disabled = false;
-          }
-        });
-
-      // ================= LISTADO, FILTROS Y ELIMINAR =================
-      async function eliminarActividad(id, categoria) {
-        if (
-          !confirm(
-            "¿Estás súper seguro de eliminar este registro? Esta acción no se puede deshacer y regresará el material al inventario.",
-          )
-        )
-          return;
+    // ================= MODIFICAR: PRELLENAR DATOS =================
+    async function editarActividad(id, categoria) {
         try {
-          await fetch(`${API_URL}/api/agenda/${categoria}/${id}`, {
-            method: "DELETE",
-          });
-          cargarAgenda(true);
-        } catch (e) {
-          alert("Error al eliminar");
-        }
-      }
-
-      async function cargarAgenda(forzar = false) {
-        try {
-          await obtenerApiUrl();
-          if (agendaGlobal.length === 0 || forzar) {
-            const res = await fetch(`${API_URL}/api/agenda`);
+            const res = await fetch(`${API_URL}/api/agenda/${categoria}/${id}`);
             const json = await res.json();
-            if (json.success) agendaGlobal = json.data;
-          }
-          aplicarFiltros();
-        } catch (error) {
-          console.error("Error cargar agenda", error);
-          document.getElementById("lista_eventos").innerHTML =
-            `<div class="p-10 text-center text-red-500 font-medium">No se pudo cargar la agenda. Verifica la conexión con el servidor.</div>`;
-        }
-      }
+            if(json.success) {
+                const data = json.data;
+                document.getElementById('edit_id').value = id;
+                document.getElementById('edit_categoria').value = categoria;
+                document.getElementById('titulo_modal').innerText = "Modificar Actividad";
+                document.getElementById('btn_submit_agenda').innerText = "Actualizar Cambios";
+                
+                document.getElementById('tipo_agendamiento').value = data.tipo_registro;
+                document.getElementById('tipo_agendamiento').disabled = true; // Bloqueado al editar
+                cambiarVistaFormulario();
 
-      function aplicarFiltros() {
-        const texto = document
-          .getElementById("buscador_principal")
-          .value.toLowerCase();
-        const fCat = document.getElementById("filtro_categoria").value;
-        const filtroEscuela = document.getElementById("filtro_escuela");
-        const fEscuelaId = filtroEscuela.value;
-        const fEscuelaTexto =
-          filtroEscuela.options[
-            filtroEscuela.selectedIndex
-          ]?.text.toLowerCase() || "";
-        const fFecha = document.getElementById("filtro_fecha").value;
+                // Formatear Fecha y Hora para los inputs
+                const fechaCita = new Date(data.fecha_cita || data.fecha_realizacion);
+                document.getElementById('gral_fecha').value = fechaCita.toISOString().split('T')[0];
+                document.getElementById('gral_hora').value = fechaCita.toTimeString().slice(0,5);
 
-        const divLista = document.getElementById("lista_eventos");
-        divLista.innerHTML = "";
+                if(data.tipo_registro === 'visita') {
+                    document.getElementById('vis_escuela').value = data.nombre_escuela || '';
+                    document.getElementById('vis_ubicacion').value = data.ubicacion || '';
+                    document.getElementById('vis_contacto').value = data.contacto_nombre || '';
+                    document.getElementById('vis_puesto').value = data.puesto_contacto || '';
+                    document.getElementById('vis_telefono').value = data.telefono_escuela || '';
+                    document.getElementById('vis_asistentes_plan').value = data.asistentes_plan || '';
+                } 
+                else if(data.tipo_registro === 'clinica') {
+                    document.getElementById('cli_titulo').value = data.titulo_evento || '';
+                    document.getElementById('cli_beneficiario').value = data.id_beneficiario || '';
+                    document.getElementById('cli_especialista').value = data.id_especialista || '';
+                    document.getElementById('cli_modalidad_online').checked = (data.modalidad === 'En línea');
+                    document.getElementById('cli_modalidad_presencial').checked = (data.modalidad !== 'En línea');
+                    document.getElementById('cli_ubicacion').value = data.direccion_mapa || '';
+                    document.getElementById('cli_link_reunion').value = data.link_reunion || '';
+                    cambiarModalidadClinica();
+                }
+                else { // Evento Operativo
+                    document.getElementById('ev_titulo').value = data.titulo_evento || '';
+                    if (data.url_imagen) {
+                        document.getElementById('ev_url_imagen').value = data.url_imagen;
+                        document.getElementById('ev_imagen_preview').src = data.url_imagen;
+                        document.getElementById('ev_imagen_preview_wrap').classList.remove('hidden');
+                    } else {
+                        document.getElementById('ev_url_imagen').value = '';
+                        document.getElementById('ev_imagen_preview_wrap').classList.add('hidden');
+                    }
+                    document.getElementById('ev_tipo').value = data.tipo_evento || '';
+                    document.getElementById('ev_escuela').value = data.id_escuela || 0;
+                    document.getElementById('ev_direccion_mapa').value = data.direccion_mapa || '';
+                    document.getElementById('ev_link_reunion').value = data.link_reunion || '';
+                    
+                    // Limpiar y Llenar Voluntarios
+                    document.querySelectorAll('input[name="asistentes"]').forEach(cb => cb.checked = false);
+                    if(data.voluntarios && data.voluntarios.length > 0) {
+                        document.getElementById('ev_responsable').value = data.voluntarios[0]; // El 1ro es el responsable
+                        data.voluntarios.forEach(vid => {
+                            const cb = document.querySelector(`input[name="asistentes"][value="${vid}"]`);
+                            if(cb && vid !== data.voluntarios[0]) cb.checked = true;
+                        });
+                    }
 
-        const filtrados = agendaGlobal.filter((ev) => {
-          const titulo = obtenerValorEvento(ev, [
-            "titulo",
-            "titulo_evento",
-            "nombre_escuela",
-          ])
-            .toString()
-            .toLowerCase();
-          const lugar = obtenerValorEvento(ev, [
-            "lugar",
-            "ubicacion",
-            "nombre_escuela",
-          ])
-            .toString()
-            .toLowerCase();
-          const categoria = obtenerValorEvento(ev, [
-            "categoria",
-            "tipo_registro",
-            "tipo",
-          ]).toString();
-          const fechaRaw = obtenerValorEvento(ev, [
-            "fecha",
-            "fecha_cita",
-            "fecha_realizacion",
-          ]).toString();
+                    // Limpiar y Llenar Insumos
+                    document.getElementById('contenedor_insumos').innerHTML = '';
+                    if(!data.insumos || data.insumos.length === 0) {
+                        agregarFilaInsumo();
+                    } else {
+                        data.insumos.forEach(ins => {
+                            agregarFilaInsumo();
+                            const div = document.getElementById('contenedor_insumos').lastElementChild;
+                            div.querySelector('.insumo_select').value = ins.id_insumo;
+                            div.querySelector('.insumo_cant').value = ins.cantidad_usada;
+                        });
+                    }
+                }
 
-          if (texto && !titulo.includes(texto) && !lugar.includes(texto))
-            return false;
-          if (fCat !== "Todos" && categoria !== fCat) return false;
-          if (fEscuelaId !== "Todas") {
-            if (ev.id_escuela != null) {
-              if (ev.id_escuela.toString() !== fEscuelaId) return false;
-            } else if (lugar !== fEscuelaTexto) {
-              return false;
+                // Abrir modal suavemente
+                document.getElementById('modalAgenda').classList.remove('hidden'); 
+                setTimeout(() => { document.getElementById('modalAgenda').classList.remove('opacity-0'); document.getElementById('modalAgendaContent').classList.remove('scale-95'); }, 10); 
+            } else {
+                alert("Error al obtener los datos de la base de datos.");
             }
-          }
-          if (fFecha && fechaRaw.split("T")[0] !== fFecha) return false;
-          return true;
-        });
+        } catch (e) { alert("Error al conectar con el servidor."); }
+    }
 
-        if (filtrados.length === 0) {
-          divLista.innerHTML = `<div class="p-10 text-center text-slate-400 font-medium">No se encontraron actividades.</div>`;
-          return;
+    // ================= GUARDAR AGENDA (POST / PUT) =================
+    document.getElementById('formAgenda').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]'); btn.innerText = "Procesando..."; btn.disabled = true;
+
+        const editId = document.getElementById('edit_id').value;
+        const editCategoria = document.getElementById('edit_categoria').value;
+        const tipoRegistro = document.getElementById('tipo_agendamiento').value;
+        
+        let payload = { 
+            tipo_registro: tipoRegistro,
+            datos: { fecha: document.getElementById('gral_fecha').value, hora: document.getElementById('gral_hora').value }
+        };
+
+        if (tipoRegistro === 'visita') {
+            payload.datos.escuela = document.getElementById('vis_escuela').value;
+            payload.datos.ubicacion = document.getElementById('vis_ubicacion').value;
+            payload.datos.contacto = document.getElementById('vis_contacto').value;
+            payload.datos.puesto = document.getElementById('vis_puesto').value;
+            payload.datos.telefono = document.getElementById('vis_telefono').value;
+            payload.datos.asistentes_plan = document.getElementById('vis_asistentes_plan').value || null;
+        } 
+        else if (tipoRegistro === 'clinica') {
+            payload.datos.titulo = document.getElementById('cli_titulo').value;
+            payload.datos.id_beneficiario = document.getElementById('cli_beneficiario').value;
+            payload.datos.id_especialista = document.getElementById('cli_especialista').value;
+            const modalidadSeleccionada = document.getElementById('cli_modalidad_online').checked ? 'En línea' : 'Presencial';
+            payload.datos.modalidad = modalidadSeleccionada;
+            payload.datos.ubicacion = document.getElementById('cli_ubicacion').value || null;
+            payload.datos.link_reunion = document.getElementById('cli_link_reunion').value || null;
+        }
+        else { // Evento Operativo
+            const checkboxes = document.querySelectorAll('input[name="asistentes"]:checked');
+            const insumosRecoleccion = [];
+            document.querySelectorAll('#contenedor_insumos > div').forEach(fila => {
+                const id = fila.querySelector('.insumo_select').value;
+                const cant = parseFloat(fila.querySelector('.insumo_cant').value);
+                if (id === 'otro' && cant > 0) {
+                    const nombreOtro = (fila.querySelector('.insumo_otro').value || '').trim();
+                    if (nombreOtro) insumosRecoleccion.push({ id: 'otro', nombre_otro: nombreOtro, cant });
+                } else if (id != "0" && cant > 0) {
+                    insumosRecoleccion.push({ id: parseInt(id), cant });
+                }
+            });
+
+            payload.datos.titulo = document.getElementById('ev_titulo').value;
+            payload.datos.url_imagen = document.getElementById('ev_url_imagen').value || null;
+            payload.datos.direccion_mapa = document.getElementById('ev_direccion_mapa').value || null;
+            payload.datos.link_reunion = document.getElementById('ev_link_reunion').value || null;
+            payload.datos.tipo = document.getElementById('ev_tipo').value;
+            payload.datos.id_escuela = document.getElementById('ev_escuela').value;
+            payload.datos.responsable = parseInt(document.getElementById('ev_responsable').value);
+            payload.datos.voluntarios = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            payload.datos.insumos = insumosRecoleccion;
         }
 
-        filtrados.forEach((ev) => {
-          const titulo =
-            obtenerValorEvento(ev, [
-              "titulo",
-              "titulo_evento",
-              "nombre_escuela",
-            ]) || "Actividad";
-          const lugar =
-            obtenerValorEvento(ev, ["lugar", "ubicacion", "nombre_escuela"]) ||
-            "Sin ubicación";
-          const categoria = obtenerValorEvento(ev, [
-            "categoria",
-            "tipo_registro",
-            "tipo",
-          ]);
-          const fechaRaw = obtenerValorEvento(ev, [
-            "fecha",
-            "fecha_cita",
-            "fecha_realizacion",
-          ]);
-          const f = fechaRaw ? new Date(fechaRaw) : null;
-          const fechaTxt =
-            f instanceof Date && !isNaN(f)
-              ? f.toLocaleDateString("es-ES", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                })
-              : "Fecha no disponible";
-          const horaTxt =
-            f instanceof Date && !isNaN(f)
-              ? f.toLocaleTimeString("es-ES", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "--:--";
-          const numAsistentes =
-            ev.num_asistentes ?? ev.voluntarios?.length ?? 0;
-          const numInsumos = ev.num_insumos ?? ev.insumos?.length ?? 0;
-          const iconType = ev.tipo || ev.tipo_evento || categoria;
-          const eventoId = ev.id ?? ev.id_evento ?? ev.id_agenda ?? 0;
+        try {
+            let url = `${API_URL}/api/agenda`;
+            let method = 'POST';
+            
+            if(editId) {
+                url = `${API_URL}/api/agenda/${editCategoria}/${editId}`;
+                method = 'PUT';
+            }
 
-          let iconColor = "bg-blue-100 text-blue-600";
-          let icon = "event";
-          if (iconType === "Jornada Muralista") {
-            iconColor = "bg-purple-100 text-purple-600";
-            icon = "format_paint";
-          } else if (iconType === "Reunión Escolar") {
-            iconColor = "bg-teal-100 text-teal-600";
-            icon = "handshake";
-          } else if (iconType === "Cita Clínica" || iconType === "clinica") {
-            iconColor = "bg-rose-100 text-rose-600";
-            icon = "medical_services";
-          }
+            const response = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
+            const resultado = await response.json().catch(() => ({}));
+            if (response.ok && resultado.success) {
+                cerrarModalAgenda();
+                recargarVistaActual();
+            } else {
+                alert("Hubo un error al guardar los datos" + (resultado.message ? (": " + resultado.message) : "."));
+            }
+        } catch (error) { alert("Error de conexión: " + error.message); }
+        finally { btn.innerText = "Guardar Actividad"; btn.disabled = false; }
+    });
 
-          divLista.innerHTML += `
+    // ================= LISTADO, FILTROS Y ELIMINAR =================
+    async function completarVisita(id) {
+        const asistentesReales = prompt('¿Cuántas personas asistieron realmente a esta visita?');
+        if (asistentesReales === null) return;
+        try {
+            const res = await fetch(`${API_URL}/api/agenda/visita/${id}/completar`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify({ asistentes_reales: asistentesReales === '' ? null : parseInt(asistentesReales, 10) })
+            });
+            const data = await res.json();
+            if (data.success) { recargarVistaActual(); }
+            else alert(data.message || 'No se pudo marcar la visita como realizada.');
+        } catch (e) { console.error(e); alert('Error de conexión.'); }
+    }
+
+    async function eliminarActividad(id, categoria) {
+        if(!confirm("¿Estás súper seguro de eliminar este registro? Esta acción no se puede deshacer y regresará el material al inventario.")) return;
+        try {
+            await fetch(`${API_URL}/api/agenda/${categoria}/${id}`, { method: 'DELETE' });
+            recargarVistaActual();
+        } catch(e) { alert("Error al eliminar"); }
+    }
+
+    // ================= DIRECTORIOS (Escuelas / Pacientes) =================
+    let directorioEscuelas = [];
+    let directorioPacientes = [];
+    let tabDirectorioActivo = 'escuelas';
+    let seleccionActual = null; // { tipo: 'escuela'|'paciente', id: N } o null (vista general)
+
+    async function cargarDirectorios() {
+        try {
+            const [resEsc, resPac] = await Promise.all([
+                fetch(`${API_URL}/api/agenda/directorio_escuelas`, { headers: authHeaders() }),
+                fetch(`${API_URL}/api/agenda/directorio_pacientes`, { headers: authHeaders() })
+            ]);
+            const jsonEsc = await resEsc.json();
+            const jsonPac = await resPac.json();
+            if (jsonEsc.success) directorioEscuelas = jsonEsc.data;
+            if (jsonPac.success) directorioPacientes = jsonPac.data;
+            renderDirectorio();
+        } catch (e) {
+            console.error("Error al cargar directorios:", e);
+            document.getElementById('lista_directorio').innerHTML = '<p class="text-red-400 text-sm text-center py-8">No se pudo conectar con el servidor.</p>';
+        }
+    }
+
+    // Solo Admin, Coordinador y Psicólogo (Especialista con especialidad "Psicología")
+    // pueden ver el directorio de Pacientes. El resto (otros especialistas, voluntarios)
+    // solo debe ver Escuelas — se oculta la pestaña por completo y se fuerza esa vista.
+    function restringirPestanaPacientes(rol, especialidad) {
+        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
+        const puedeVerPacientes = rol === 1 || rol === 3 || esPsico;
+        if (!puedeVerPacientes) {
+            cambiarTabDirectorio('escuelas'); // primero forzamos la vista, luego quitamos el botón
+            document.getElementById('tabDirPacientes').remove();
+        }
+    }
+
+    function cambiarTabDirectorio(tab) {
+        tabDirectorioActivo = tab;
+        const btnEsc = document.getElementById('tabDirEscuelas');
+        const btnPac = document.getElementById('tabDirPacientes');
+        btnEsc.classList.toggle('text-primary', tab === 'escuelas');
+        btnEsc.classList.toggle('border-primary', tab === 'escuelas');
+        btnEsc.classList.toggle('text-slate-400', tab !== 'escuelas');
+        btnEsc.classList.toggle('border-transparent', tab !== 'escuelas');
+        btnPac.classList.toggle('text-primary', tab === 'pacientes');
+        btnPac.classList.toggle('border-primary', tab === 'pacientes');
+        btnPac.classList.toggle('text-slate-400', tab !== 'pacientes');
+        btnPac.classList.toggle('border-transparent', tab !== 'pacientes');
+        document.getElementById('buscador_directorio').value = '';
+        renderDirectorio();
+    }
+
+    function filtrarDirectorio() { renderDirectorio(); }
+
+    function renderDirectorio() {
+        const texto = document.getElementById('buscador_directorio').value.toLowerCase();
+        const cont = document.getElementById('lista_directorio');
+
+        if (tabDirectorioActivo === 'escuelas') {
+            const filtradas = directorioEscuelas.filter(e => e.nombre_escuela.toLowerCase().includes(texto));
+            if (filtradas.length === 0) {
+                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">No se encontraron escuelas.</p>';
+                return;
+            }
+            cont.innerHTML = filtradas.map(e => {
+                const activo = seleccionActual && seleccionActual.tipo === 'escuela' && seleccionActual.id === e.id_escuela;
+                const ultima = e.ultima_visita ? new Date(e.ultima_visita).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Sin visitas registradas';
+                return `
+                  <button onclick="seleccionarEscuela(${e.id_escuela})" class="w-full text-left p-4 rounded-2xl border transition-all ${activo ? 'bg-pink-50 border-secondary shadow-sm' : 'bg-white border-slate-100 hover:bg-slate-50'}">
+                    ${activo ? '<span class="text-[10px] font-bold uppercase text-secondary tracking-wide">Seleccionada</span>' : ''}
+                    <p class="font-bold text-slate-800 text-sm mt-0.5">${e.nombre_escuela}</p>
+                    <p class="text-xs text-slate-400 mt-1">${e.contacto_nombre || 'Sin contacto'} ${e.puesto_contacto ? '(' + e.puesto_contacto + ')' : ''}</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Última visita: ${ultima}</p>
+                  </button>`;
+            }).join('');
+        } else {
+            const filtrados = directorioPacientes.filter(p => p.nombre_completo.toLowerCase().includes(texto));
+            if (filtrados.length === 0) {
+                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">No se encontraron pacientes.</p>';
+                return;
+            }
+            const badgeEstatus = { 'ACTIVO': 'bg-green-100 text-green-700', 'EN PAUSA': 'bg-orange-100 text-orange-700', 'ALTA': 'bg-slate-200 text-slate-600' };
+            cont.innerHTML = filtrados.map(p => {
+                const activo = seleccionActual && seleccionActual.tipo === 'paciente' && seleccionActual.id === p.id_beneficiario;
+                const badge = badgeEstatus[p.estatus] || 'bg-slate-100 text-slate-600';
+                return `
+                  <button onclick="seleccionarPaciente(${p.id_beneficiario})" class="w-full text-left p-4 rounded-2xl border transition-all ${activo ? 'bg-pink-50 border-secondary shadow-sm' : 'bg-white border-slate-100 hover:bg-slate-50'}">
+                    ${activo ? '<span class="text-[10px] font-bold uppercase text-secondary tracking-wide">Seleccionado</span>' : ''}
+                    <div class="flex items-center justify-between mt-0.5">
+                      <p class="font-bold text-slate-800 text-sm">${p.nombre_completo}</p>
+                      <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${badge}">${p.estatus}</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">Especialista: ${p.especialista || 'Sin asignar'}</p>
+                  </button>`;
+            }).join('');
+        }
+    }
+
+    // ================= SELECCIÓN: ESCUELA =================
+    async function seleccionarEscuela(id) {
+        seleccionActual = { tipo: 'escuela', id };
+        renderDirectorio();
+        const cabecera = document.getElementById('cabecera_detalle_agenda');
+        const lista = document.getElementById('lista_eventos');
+        cabecera.innerHTML = '<p class="text-slate-400 text-sm">Cargando...</p>';
+        lista.innerHTML = '';
+        try {
+            const res = await fetch(`${API_URL}/api/agenda/escuela/${id}/eventos`);
+            const json = await res.json();
+            if (!json.success) { cabecera.innerHTML = '<p class="text-red-400 text-sm">No se pudo cargar la escuela.</p>'; return; }
+
+            const esc = json.escuela;
+            cabecera.innerHTML = `
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-2xl">school</span></div>
+                <div>
+                  <h3 class="text-2xl font-bold text-slate-800">${esc.nombre_escuela}</h3>
+                  <p class="text-slate-400 text-sm">${esc.contacto_nombre || 'Sin contacto'} ${esc.puesto_contacto ? '· ' + esc.puesto_contacto : ''} ${esc.telefono_escuela ? '· ' + esc.telefono_escuela : ''}</p>
+                </div>
+              </div>`;
+
+            renderActividadesGenerico(json.actividades, 'escuela');
+        } catch (e) {
+            console.error("Error al cargar escuela:", e);
+            cabecera.innerHTML = '<p class="text-red-400 text-sm">Error de conexión.</p>';
+        }
+    }
+
+    // ================= SELECCIÓN: PACIENTE =================
+    async function seleccionarPaciente(id) {
+        seleccionActual = { tipo: 'paciente', id };
+        renderDirectorio();
+        const cabecera = document.getElementById('cabecera_detalle_agenda');
+        const lista = document.getElementById('lista_eventos');
+        cabecera.innerHTML = '<p class="text-slate-400 text-sm">Cargando...</p>';
+        lista.innerHTML = '';
+        try {
+            const res = await fetch(`${API_URL}/api/agenda/paciente/${id}/citas`);
+            const json = await res.json();
+            if (!json.success) { cabecera.innerHTML = '<p class="text-red-400 text-sm">No se pudo cargar el paciente.</p>'; return; }
+
+            const p = json.paciente;
+            cabecera.innerHTML = `
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-2xl">medical_mask</span></div>
+                <div>
+                  <h3 class="text-2xl font-bold text-slate-800">${p.nombre_completo}</h3>
+                  <p class="text-slate-400 text-sm">Especialista: ${p.especialista || 'Sin asignar'} · Estatus: ${p.estatus || 'ACTIVO'}</p>
+                </div>
+              </div>`;
+
+            if (json.citas.length === 0) {
+                lista.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">Este paciente no tiene citas clínicas agendadas todavía.</p>';
+                return;
+            }
+            lista.innerHTML = json.citas.map(c => {
+                const f = new Date(c.fecha);
+                return `
+                  <div class="p-6 border border-slate-100 rounded-2xl flex items-center justify-between hover:bg-slate-50 transition-all bg-white">
+                    <div class="flex items-center gap-4">
+                      <div class="p-3 bg-rose-100 text-rose-600 rounded-2xl"><span class="material-symbols-outlined">medical_services</span></div>
+                      <div>
+                        <h4 class="font-bold text-slate-800">${c.titulo}</h4>
+                        <p class="text-sm text-slate-500">${f.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })} · ${f.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })} hrs</p>
+                      </div>
+                    </div>
+                    <button onclick="editarActividad(${c.id}, 'evento')" class="text-xs font-bold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Modificar</button>
+                  </div>`;
+            }).join('');
+        } catch (e) {
+            console.error("Error al cargar paciente:", e);
+            cabecera.innerHTML = '<p class="text-red-400 text-sm">Error de conexión.</p>';
+        }
+    }
+
+    // ================= VISTA GENERAL (todas las actividades) =================
+    async function cargarVistaGeneral() {
+        seleccionActual = null;
+        renderDirectorio();
+        document.getElementById('cabecera_detalle_agenda').innerHTML = `
+          <h3 class="text-2xl font-bold text-slate-800">Actividades Generales</h3>
+          <p class="text-slate-400 text-sm mt-1">Selecciona una escuela o un paciente a la izquierda para ver su información específica, o revisa aquí todas las actividades agendadas.</p>`;
+        try {
+            const res = await fetch(`${API_URL}/api/agenda`, { headers: authHeaders() });
+            const json = await res.json();
+            if (json.success) renderActividadesGenerico(json.data, 'general');
+        } catch (e) {
+            console.error("Error al cargar vista general:", e);
+        }
+    }
+
+    function recargarVistaActual() {
+        if (!seleccionActual) cargarVistaGeneral();
+        else if (seleccionActual.tipo === 'escuela') seleccionarEscuela(seleccionActual.id);
+        else seleccionarPaciente(seleccionActual.id);
+        cargarDirectorios(); // refresca "última visita" y listas por si cambiaron
+        cargarCalendario(); // refresca los días resaltados
+    }
+
+    // Render reutilizable para actividades tipo 'evento'/'visita' (vista general y por escuela)
+    let ultimaListaActividades = [];
+    let contextoActividadesActual = 'general';
+
+    function actividadCoincideFiltro(ev) {
+        const campoTexto = document.getElementById('buscador_actividades');
+        const texto = (campoTexto ? campoTexto.value : '').trim().toLowerCase();
+        const campoTipo = document.getElementById('filtro_tipo_actividades');
+        const tipoFiltro = campoTipo ? campoTipo.value : '';
+        const coincideTexto = !texto || (ev.titulo || '').toLowerCase().includes(texto) || (ev.lugar || '').toLowerCase().includes(texto);
+        const coincideTipo = !tipoFiltro || ev.tipo === tipoFiltro || (tipoFiltro === 'visita' && ev.categoria === 'visita');
+        return coincideTexto && coincideTipo;
+    }
+
+    function filtrarActividadesGenerales() {
+        renderActividadesGenerico(ultimaListaActividades, contextoActividadesActual, true);
+    }
+
+    function buscarGlobalAgenda(valor) {
+        const campoDirectorio = document.getElementById('buscador_directorio');
+        const campoActividades = document.getElementById('buscador_actividades');
+        if (campoDirectorio) { campoDirectorio.value = valor; filtrarDirectorio(); }
+        if (campoActividades) { campoActividades.value = valor; filtrarActividadesGenerales(); }
+    }
+
+    function renderActividadesGenerico(lista, contexto, yaFiltrada) {
+        if (!yaFiltrada) { ultimaListaActividades = lista || []; contextoActividadesActual = contexto; }
+        const listaCompleta = lista || [];
+        const listaFiltrada = listaCompleta.filter(actividadCoincideFiltro);
+        const divLista = document.getElementById('lista_eventos');
+        if (listaFiltrada.length === 0) {
+            const mensaje = listaCompleta.length > 0
+                ? 'Ningún resultado coincide con tu búsqueda.'
+                : `No hay actividades ${contexto === 'escuela' ? 'registradas para esta escuela' : 'agendadas'} todavía.`;
+            divLista.innerHTML = `<p class="text-slate-400 text-sm text-center py-8">${mensaje}</p>`;
+            return;
+        }
+
+        divLista.innerHTML = listaFiltrada.map(ev => {
+            const f = new Date(ev.fecha);
+            const fechaTxt = f.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+            const horaTxt = f.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+            const tipoTexto = ev.tipo || ev.estatus || (ev.categoria === 'visita' ? 'Visita de Prospección' : 'Evento');
+            let iconColor = "bg-blue-100 text-blue-600"; let icon = "event";
+            if (tipoTexto === 'Jornada Muralista') { iconColor = "bg-purple-100 text-purple-600"; icon = "format_paint"; }
+            else if (ev.categoria === 'visita') { iconColor = "bg-teal-100 text-teal-600"; icon = "handshake"; }
+            else if (tipoTexto === 'Cita Clínica') { iconColor = "bg-rose-100 text-rose-600"; icon = "medical_services"; }
+
+            const lugar = ev.lugar || '';
+            const numAsistentes = (ev.num_asistentes !== undefined) ? `<span class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-md"><span class="material-symbols-outlined text-[12px] align-middle mr-1">group</span>${ev.num_asistentes} Asistentes</span>` : '';
+            const requiereMaterial = (ev.num_insumos > 0) ? `<span class="text-xs font-bold bg-amber-50 text-amber-700 px-3 py-1 rounded-md border border-amber-200"><span class="material-symbols-outlined text-[12px] align-middle mr-1">inventory_2</span>Requiere Material</span>` : '';
+            const badgeVisita = (ev.categoria === 'visita') ? `<span class="text-xs font-bold bg-teal-50 text-teal-700 px-3 py-1 rounded-md border border-teal-100">${ev.estatus || 'Pendiente'}${ev.asistentes_plan ? ' · ' + ev.asistentes_plan + ' esperados' : ''}${ev.asistentes_reales != null ? ' · ' + ev.asistentes_reales + ' reales' : ''}</span>` : '';
+
+            return `
               <div class="p-6 border border-slate-100 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-slate-50 transition-all hover:shadow-md bg-white">
                 <div class="flex items-start gap-5 w-full md:w-2/3">
                   <div class="p-4 ${iconColor} rounded-2xl shadow-sm"><span class="material-symbols-outlined text-2xl">${icon}</span></div>
                   <div>
-                    <h4 class="font-bold text-slate-800 text-lg">${titulo}</h4>
-                    <p class="text-sm text-slate-500 font-medium flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[16px]">location_on</span> ${lugar}</p>
+                    <h4 class="font-bold text-slate-800 text-lg">${ev.titulo}</h4>
+                    ${lugar ? `<p class="text-sm text-slate-500 font-medium flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[16px]">location_on</span> ${lugar}</p>` : ''}
                     <div class="flex flex-wrap gap-2 mt-3">
-                        ${categoria === "evento" ? `<span class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-md"><span class="material-symbols-outlined text-[12px] align-middle mr-1">group</span>${numAsistentes} Asistentes</span>` : `<span class="text-xs font-bold bg-teal-50 text-teal-700 px-3 py-1 rounded-md border border-teal-100">Prospección</span>`}
-                        ${numInsumos > 0 ? `<span class="text-xs font-bold bg-amber-50 text-amber-700 px-3 py-1 rounded-md border border-amber-200"><span class="material-symbols-outlined text-[12px] align-middle mr-1">inventory_2</span>Requiere Material</span>` : ""}
+                        ${numAsistentes}${badgeVisita}${requiereMaterial}
                     </div>
                   </div>
                 </div>
@@ -1181,23 +1194,115 @@
                       <p class="text-sm text-slate-500 font-bold">${horaTxt} hrs</p>
                   </div>
                   
-                  <div class="flex gap-2 w-full md:w-auto mt-auto">
-                      <button onclick="editarActividad(${eventoId}, '${categoria}')" class="flex-1 md:flex-none text-xs font-bold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Modificar</button>
-                      <button onclick="eliminarActividad(${eventoId}, '${categoria}')" class="flex-1 md:flex-none text-xs font-bold text-red-600 hover:text-white bg-red-50 hover:bg-red-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+                  <div class="flex flex-wrap gap-2 w-full md:w-auto mt-auto justify-end">
+                      ${(ev.categoria === 'evento') ? (ev.ya_asignado
+                          ? `<span class="flex-1 md:flex-none text-xs font-bold text-green-700 bg-green-50 px-4 py-2.5 rounded-lg text-center border border-green-100">Ya estás en el equipo</span>`
+                          : `<button onclick="unirseAEvento(${ev.id})" class="flex-1 md:flex-none text-xs font-bold text-purple-700 hover:text-white bg-purple-50 hover:bg-purple-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Unirse</button>`) : ''}
+                      ${(ev.categoria === 'visita' && ev.estatus !== 'Realizado') ? `<button onclick="completarVisita(${ev.id})" class="flex-1 md:flex-none text-xs font-bold text-teal-700 hover:text-white bg-teal-50 hover:bg-teal-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Marcar Realizada</button>` : ''}
+                      <button onclick="editarActividad(${ev.id}, '${ev.categoria}')" class="flex-1 md:flex-none text-xs font-bold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Modificar</button>
+                      <button onclick="eliminarActividad(${ev.id}, '${ev.categoria}')" class="flex-1 md:flex-none text-xs font-bold text-red-600 hover:text-white bg-red-50 hover:bg-red-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center"><span class="material-symbols-outlined text-[16px]">delete</span></button>
                   </div>
                 </div>
               </div>
             `;
-        });
-      }
+        }).join('');
+    }
 
-      function limpiarFiltros() {
-        document.getElementById("buscador_principal").value = "";
-        document.getElementById("filtro_categoria").value = "Todos";
-        document.getElementById("filtro_escuela").value = "Todas";
-        document.getElementById("filtro_fecha").value = "";
-        aplicarFiltros();
-      }
-    </script>
-  </body>
+    async function unirseAEvento(idEvento) {
+        try {
+            const res = await fetch(`${API_URL}/api/agenda/evento/${idEvento}/unirse`, { method: 'POST', headers: authHeaders() });
+            const data = await res.json();
+            if (data.success) {
+                recargarVistaActual();
+            } else {
+                alert(data.message || 'No se pudo registrar tu participación.');
+            }
+        } catch (e) { console.error(e); alert('Error de conexión.'); }
+    }
+
+    // ================= CALENDARIO VISUAL =================
+    let mesCalendarioActual = new Date();
+    let actividadesPorFecha = {}; // { 'YYYY-MM-DD': [ {titulo, categoria, id}, ... ] }
+    let diaSeleccionadoCalendario = null;
+
+    async function cargarCalendario() {
+        try {
+            const res = await fetch(`${API_URL}/api/agenda`, { headers: authHeaders() });
+            const json = await res.json();
+            if (!json.success) return;
+
+            actividadesPorFecha = {};
+            json.data.forEach(ev => {
+                const clave = new Date(ev.fecha).toISOString().split('T')[0];
+                if (!actividadesPorFecha[clave]) actividadesPorFecha[clave] = [];
+                actividadesPorFecha[clave].push(ev);
+            });
+            renderCalendario();
+        } catch (e) {
+            console.error("Error al cargar calendario:", e);
+        }
+    }
+
+    function cambiarMesCalendario(direccion) {
+        mesCalendarioActual.setMonth(mesCalendarioActual.getMonth() + direccion);
+        renderCalendario();
+    }
+
+    function renderCalendario() {
+        const anio = mesCalendarioActual.getFullYear();
+        const mes = mesCalendarioActual.getMonth();
+        const nombresMes = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        document.getElementById('titulo_mes_calendario').innerText = `${nombresMes[mes]} ${anio}`;
+
+        const primerDiaSemana = new Date(anio, mes, 1).getDay(); // 0=Dom
+        const diasEnMes = new Date(anio, mes + 1, 0).getDate();
+        const hoy = new Date();
+        const hoyStr = hoy.toISOString().split('T')[0];
+
+        const grid = document.getElementById('grid_calendario');
+        let celdas = '';
+
+        for (let i = 0; i < primerDiaSemana; i++) celdas += '<div></div>';
+
+        for (let dia = 1; dia <= diasEnMes; dia++) {
+            const fechaObj = new Date(anio, mes, dia);
+            const claveFecha = fechaObj.toISOString().split('T')[0];
+            const actividadesDia = actividadesPorFecha[claveFecha] || [];
+            const tieneEventos = actividadesDia.length > 0;
+            const esHoy = claveFecha === hoyStr;
+            const esSeleccionado = claveFecha === diaSeleccionadoCalendario;
+
+            let clases = 'relative w-full aspect-square rounded-xl flex flex-col items-center justify-center text-sm font-bold transition-all cursor-pointer ';
+            if (esSeleccionado) clases += 'bg-secondary text-white shadow-lg';
+            else if (tieneEventos) clases += 'bg-pink-50 text-secondary hover:bg-pink-100';
+            else clases += 'text-slate-500 hover:bg-slate-50';
+            if (esHoy && !esSeleccionado) clases += ' ring-2 ring-primary/40';
+
+            celdas += `
+              <button onclick="verDiaCalendario('${claveFecha}')" class="${clases}">
+                <span>${dia}</span>
+                ${tieneEventos ? `<span class="absolute bottom-1.5 w-1.5 h-1.5 rounded-full ${esSeleccionado ? 'bg-white' : 'bg-secondary'}"></span>` : ''}
+              </button>`;
+        }
+
+        grid.innerHTML = celdas;
+    }
+
+    function verDiaCalendario(claveFecha) {
+        diaSeleccionadoCalendario = claveFecha;
+        seleccionActual = null;
+        renderDirectorio();
+        renderCalendario();
+
+        const actividadesDia = actividadesPorFecha[claveFecha] || [];
+        const fechaLegible = new Date(claveFecha + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+        document.getElementById('cabecera_detalle_agenda').innerHTML = `
+          <h3 class="text-2xl font-bold text-slate-800 capitalize">${fechaLegible}</h3>
+          <p class="text-slate-400 text-sm mt-1">${actividadesDia.length} actividad(es) programada(s) este día.</p>`;
+
+        renderActividadesGenerico(actividadesDia, 'dia');
+    }
+  </script>
+</body>
 </html>

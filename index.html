@@ -123,12 +123,12 @@
         <nav class="hidden md:flex gap-8 items-center">
           <a
             class="text-orange-700 font-bold border-b-2 border-orange-500 hover:text-pink-600 transition-colors duration-300 py-1"
-            href="inicio.html"
+            href="index.html"
             >Inicio</a
           >
           <a
             class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="comunidad_sv.html"
+            href="comunidad_blog.html"
             >Comunidad</a
           >
           <a
@@ -141,13 +141,13 @@
             href="como_ayudar.html"
             >Cómo Ayudar</a
           >
+          <a
+            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
+            href="nosotros.html"
+            >Nosotros</a
+          >
         </nav>
         <div class="flex items-center gap-4">
-          <button
-            class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
-          >
-            help
-          </button>
           <a
             href="gestion_expedientes_admin.html"
             title="Panel de Administración"
@@ -155,16 +155,18 @@
           >
             admin_panel_settings
           </a>
-          <button
+          <a
+            href="como_ayudar.html#formVoluntariadoPublico"
             class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
           >
             Voluntariado
-          </button>
-          <button
+          </a>
+          <a
+            href="#donacion-monetaria"
             class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
           >
             Donar
-          </button>
+          </a>
         </div>
       </div>
     </header>
@@ -196,12 +198,14 @@
               refugio de esperanza.
             </p>
             <div class="flex flex-wrap gap-4">
-              <button
+              <a
+                href="como_ayudar.html#formVoluntariadoPublico"
                 class="px-10 py-4 bg-gradient-to-r from-primary to-primary-container text-white rounded-full font-bold text-lg shadow-xl hover:shadow-primary/20 transition-all"
               >
                 Únete hoy
-              </button>
+              </a>
               <button
+                onclick="document.getElementById('seccion_esencia').scrollIntoView({behavior:'smooth'})"
                 class="px-10 py-4 bg-white text-secondary border border-secondary/20 rounded-full font-bold text-lg shadow-sm hover:bg-surface-container-low transition-all"
               >
                 Conoce más
@@ -228,7 +232,7 @@
         </div>
       </section>
       <!-- Quiénes Somos -->
-      <section class="bg-surface-container-low py-24 rounded-xl mx-4 lg:mx-8">
+      <section id="seccion_esencia" class="bg-surface-container-low py-24 rounded-xl mx-4 lg:mx-8">
         <div class="max-w-7xl mx-auto px-8">
           <div class="text-center mb-16">
             <h2 class="text-4xl font-bold text-on-surface mb-4">
@@ -291,114 +295,62 @@
           </div>
         </div>
       </section>
-      <!-- Nuestros Proyectos (Bento Grid) -->
-      <section class="max-w-7xl mx-auto px-8 py-24">
-        <h2 class="text-4xl font-bold text-on-surface mb-12">
-          Nuestros Proyectos
-        </h2>
-        <div
-          class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-auto md:h-[800px]"
-        >
-          <div
-            class="md:col-span-2 md:row-span-1 bg-white rounded-xl p-8 relative overflow-hidden group"
-          >
-            <div class="relative z-10">
-              <span
-                class="bg-primary px-3 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider"
-                >Eco-Social</span
-              >
-              <h3 class="text-2xl font-bold mt-4 mb-2">Reciclaje</h3>
-              <p class="text-on-surface-variant text-sm">
-                Transformamos residuos en recursos para la comunidad.
-              </p>
-            </div>
-            <img
-              class="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity"
-              data-alt="Close up of various colorful glass bottles and recycled materials in a sunlight basket"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT5vdApGnMD-IeoRT4e3NMVb1xk7JJenXpAG6aqk3StUisXgILjTC7Atb6DXG1a828Tt4zqF3h7wDgcN0_3ku7JvgUHhw9mj3Z3mWQVk115LFqzPuLG4XYHyU6OEoK3licwLWrYey6DU1YBLBRWcmP3rQpUDa9JxWTV9BXm16WTm7WeKtAN3nrymRcODBwM2_cyauiDoRHEB9HwxvrTjkyF-xd6a9FJhjD5XIGQYG5t7hLhd3SnwmEM_b15NSziuuA8VYCra4aVkI"
-            />
+      <!-- Nuestros Proyectos (Carrusel dinámico) -->
+      <section class="max-w-7xl mx-auto px-8 py-24 overflow-hidden">
+        <div class="flex justify-between items-end mb-12">
+          <h2 class="text-4xl font-bold text-on-surface">Nuestros Proyectos</h2>
+          <div class="hidden md:flex gap-2">
+            <button onclick="moverCarrusel(-1)" class="w-11 h-11 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button onclick="moverCarrusel(1)" class="w-11 h-11 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
           </div>
-          <div
-            class="md:col-span-1 bg-gradient-to-br from-secondary to-secondary-container rounded-xl p-8 text-white flex flex-col justify-end"
-          >
-            <span class="material-symbols-outlined text-4xl mb-4">palette</span>
-            <h3 class="text-xl font-bold">Muralismo</h3>
-            <p class="text-white/80 text-sm">Color que sana nuestras calles.</p>
-          </div>
-          <div
-            class="md:col-span-1 bg-white rounded-xl p-8 shadow-sm flex flex-col justify-between"
-          >
-            <div>
-              <span class="material-symbols-outlined text-orange-500 text-4xl"
-                >mood</span
-              >
-              <h3 class="text-xl font-bold mt-4">Tribu Risoterapia</h3>
-            </div>
-            <p class="text-on-surface-variant text-sm">
-              La alegría como medicina social.
-            </p>
-          </div>
-          <div class="md:col-span-1 bg-white rounded-xl p-8 shadow-sm">
-            <h3 class="text-xl font-bold mb-4">Asistencia Jurídica</h3>
-            <p class="text-on-surface-variant text-sm mb-6">
-              Protegiendo los derechos de quienes más lo necesitan.
-            </p>
-            <div
-              class="w-full h-1 bg-surface-container-low rounded-full overflow-hidden"
-            >
-              <div class="bg-primary h-full w-2/3"></div>
-            </div>
-          </div>
-          <div
-            class="md:col-span-2 bg-surface-container-highest rounded-xl p-8 flex flex-col justify-center relative overflow-hidden"
-          >
-            <div class="z-10">
-              <h3 class="text-3xl font-bold mb-4 text-on-surface">
-                Asistencia Psicológica
-              </h3>
-              <p class="text-on-surface-variant max-w-sm">
-                Atención profesional para sanar el tejido emocional de las
-                familias.
-              </p>
-              <button
-                class="mt-6 text-primary font-bold flex items-center gap-2"
-              >
-                Agendar cita
-                <span class="material-symbols-outlined">arrow_forward</span>
-              </button>
-            </div>
-            <div
-              class="absolute right-0 bottom-0 w-48 h-48 bg-secondary/5 rounded-full blur-2xl"
-            ></div>
-          </div>
-          <div
-            class="md:col-span-1 bg-primary-container rounded-xl p-8 text-white"
-          >
-            <h3 class="text-xl font-bold mb-2">Talleres</h3>
-            <p class="text-white/90 text-sm">
-              Capacitación constante para el empoderamiento social.
-            </p>
-            <div class="mt-4 flex -space-x-3">
-              <div
-                class="w-10 h-10 rounded-full border-2 border-primary-container bg-slate-200"
-              ></div>
-              <div
-                class="w-10 h-10 rounded-full border-2 border-primary-container bg-slate-300"
-              ></div>
-              <div
-                class="w-10 h-10 rounded-full border-2 border-primary-container bg-slate-400"
-              ></div>
-              <div
-                class="w-10 h-10 rounded-full border-2 border-primary-container bg-primary flex items-center justify-center text-[10px] font-bold"
-              >
-                +50
-              </div>
-            </div>
+        </div>
+        <div class="relative">
+          <div id="carrusel_proyectos" class="flex gap-6 overflow-x-auto pb-6 scroll-smooth snap-x snap-mandatory" style="scrollbar-width: thin;">
+            <p class="text-slate-400 py-10">Cargando proyectos...</p>
           </div>
         </div>
       </section>
+      <!-- Asistencia Psicológica (estadísticas reales) -->
+      <section class="max-w-7xl mx-auto px-8 pb-12">
+        <div class="bg-surface-container-highest rounded-xl p-10 md:p-14 relative overflow-hidden">
+          <div class="grid md:grid-cols-2 gap-10 items-center relative z-10">
+            <div>
+              <span class="inline-block px-4 py-1 rounded-full bg-secondary-container/10 text-secondary font-bold text-sm mb-4">Salud Mental</span>
+              <h3 class="text-3xl md:text-4xl font-bold mb-4 text-on-surface">
+                Asistencia Psicológica
+              </h3>
+              <p class="text-on-surface-variant max-w-sm mb-6">
+                Atención profesional para sanar el tejido emocional de las
+                familias.
+              </p>
+              <a
+                href="solicitud_apoyo_oficial.html"
+                class="text-primary font-bold flex items-center gap-2 w-fit"
+              >
+                Agendar cita
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </a>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+              <div class="bg-white rounded-2xl p-6 text-center shadow-sm">
+                <p id="stat_pacientes_activos" class="text-4xl font-extrabold text-secondary mb-1">--</p>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Pacientes en atención actualmente</p>
+              </div>
+              <div class="bg-white rounded-2xl p-6 text-center shadow-sm">
+                <p id="stat_pacientes_exitosos" class="text-4xl font-extrabold text-primary mb-1">--</p>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Pacientes ayudados con éxito</p>
+              </div>
+            </div>
+          </div>
+          <div class="absolute right-0 bottom-0 w-64 h-64 bg-secondary/5 rounded-full blur-2xl"></div>
+        </div>
+      </section>
       <!-- Next Events Banner -->
-      <section class="max-w-7xl mx-auto px-8 py-12">
+      <section id="seccion_proximo_evento" class="max-w-7xl mx-auto px-8 py-12 hidden">
         <div
           class="bg-white rounded-xl p-1 shadow-[0_20px_50px_rgba(23,28,31,0.06)] overflow-hidden"
         >
@@ -410,38 +362,35 @@
                 class="text-sm font-bold uppercase tracking-widest mb-2 opacity-80"
                 >Próximo Evento</span
               >
-              <div class="text-6xl font-extrabold mb-1">29</div>
-              <div class="text-xl font-bold uppercase">Abril</div>
+              <div id="ev_dia" class="text-6xl font-extrabold mb-1">--</div>
+              <div id="ev_mes" class="text-xl font-bold uppercase">---</div>
               <div
                 class="mt-6 inline-block bg-white/20 rounded-full px-4 py-1 text-sm"
               >
-                10:00 AM
+                <span id="ev_hora">--:--</span>
               </div>
             </div>
             <div class="flex-1 p-12 bg-white flex flex-col justify-center">
               <div
                 class="flex items-center gap-2 text-secondary font-bold mb-4"
               >
-                <span class="material-symbols-outlined text-sm">videocam</span>
-                Modalidad Virtual
+                <span class="material-symbols-outlined text-sm">event</span>
+                <span id="ev_tipo">Evento</span>
               </div>
               <h3
+                id="ev_titulo"
                 class="text-3xl lg:text-4xl font-bold text-on-surface mb-6 leading-tight"
               >
-                Taller: Comunicación no violenta y manejo emocional
+                Cargando próximo evento...
               </h3>
               <div class="flex flex-wrap gap-6">
-                <button
+                <a
+                  id="ev_btn_registro"
+                  href="solicitud_apoyo_oficial.html"
                   class="bg-secondary text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-secondary-container transition-all"
                 >
-                  Registrarme gratis
-                </button>
-                <button
-                  class="text-on-surface-variant font-semibold flex items-center gap-2"
-                >
-                  Ver programa
-                  <span class="material-symbols-outlined">download</span>
-                </button>
+                  Ver información
+                </a>
               </div>
             </div>
           </div>
@@ -454,45 +403,23 @@
             <h2 class="text-4xl font-bold text-on-surface mb-6">
               Transparencia Financiera
             </h2>
-            <p class="text-on-surface-variant mb-10 leading-relaxed">
+            <p class="text-on-surface-variant mb-6 leading-relaxed">
               En Sumando Voluntades, cada centavo cuenta. Nos comprometemos a
               que tu apoyo llegue directamente a quienes más lo necesitan,
               manteniendo procesos claros y auditables.
             </p>
-            <div class="space-y-6">
-              <div class="flex items-center gap-4">
-                <div class="w-3 h-3 rounded-full bg-secondary"></div>
-                <div class="flex-1 text-on-surface font-medium">
-                  Atención Psicológica y Terapeutas
-                </div>
-                <div class="font-bold text-secondary">40%</div>
-              </div>
-              <div class="flex items-center gap-4">
-                <div class="w-3 h-3 rounded-full bg-primary"></div>
-                <div class="flex-1 text-on-surface font-medium">
-                  Materiales para Muralismo
-                </div>
-                <div class="font-bold text-primary">30%</div>
-              </div>
-              <div class="flex items-center gap-4">
-                <div class="w-3 h-3 rounded-full bg-tertiary"></div>
-                <div class="flex-1 text-on-surface font-medium">
-                  Programa Alimentario
-                </div>
-                <div class="font-bold text-tertiary">20%</div>
-              </div>
-              <div class="flex items-center gap-4">
-                <div class="w-3 h-3 rounded-full bg-slate-300"></div>
-                <div class="flex-1 text-on-surface font-medium">
-                  Gastos Administrativos
-                </div>
-                <div class="font-bold text-slate-400">10%</div>
-              </div>
+            <p class="text-xs text-slate-400 mb-6 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">verified</span>
+              Datos en tiempo real, calculados a partir de las donaciones registradas por categoría de gasto en nuestro sistema administrativo.
+            </p>
+            <div id="lista_transparencia" class="space-y-6">
+              <p class="text-on-surface-variant text-sm">Cargando datos de transparencia...</p>
             </div>
           </div>
           <div class="flex justify-center">
             <div class="relative w-80 h-80">
               <svg
+                id="donut_transparencia"
                 class="w-full h-full transform -rotate-90"
                 viewbox="0 0 36 36"
               >
@@ -504,46 +431,16 @@
                   r="16"
                   stroke-width="3"
                 ></circle>
-                <circle
-                  class="stroke-secondary"
-                  cx="18"
-                  cy="18"
-                  fill="none"
-                  r="16"
-                  stroke-dasharray="40 100"
-                  stroke-dashoffset="0"
-                  stroke-width="3"
-                ></circle>
-                <circle
-                  class="stroke-primary"
-                  cx="18"
-                  cy="18"
-                  fill="none"
-                  r="16"
-                  stroke-dasharray="30 100"
-                  stroke-dashoffset="-40"
-                  stroke-width="3"
-                ></circle>
-                <circle
-                  class="stroke-tertiary"
-                  cx="18"
-                  cy="18"
-                  fill="none"
-                  r="16"
-                  stroke-dasharray="20 100"
-                  stroke-dashoffset="-70"
-                  stroke-width="3"
-                ></circle>
               </svg>
               <div
                 class="absolute inset-0 flex flex-col items-center justify-center text-center"
               >
-                <span class="text-4xl font-extrabold text-on-surface"
-                  >100%</span
+                <span id="donut_centro_valor" class="text-3xl font-extrabold text-on-surface"
+                  >--</span
                 >
                 <span
                   class="text-xs font-bold text-on-surface-variant uppercase tracking-widest"
-                  >Impacto</span
+                  >Total Donado</span
                 >
               </div>
             </div>
@@ -586,14 +483,16 @@
                 Útiles Escolares y Didácticos
               </li>
             </ul>
-            <button
-              class="w-full py-4 rounded-full border-2 border-secondary text-secondary font-bold hover:bg-secondary hover:text-white transition-all"
+            <a
+              href="como_ayudar.html#donaciones-especie"
+              class="w-full py-4 rounded-full border-2 border-secondary text-secondary font-bold hover:bg-secondary hover:text-white transition-all block text-center"
             >
               Agendar Entrega
-            </button>
+            </a>
           </div>
           <div
-            class="bg-gradient-to-br from-slate-900 to-slate-800 p-12 rounded-xl text-white"
+            id="donacion-monetaria"
+            class="bg-gradient-to-br from-slate-900 to-slate-800 p-12 rounded-xl text-white scroll-mt-24"
           >
             <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
               <span class="material-symbols-outlined text-primary-container"
@@ -605,25 +504,16 @@
               <p class="text-white/60 text-sm mb-2">
                 Cuenta CLABE para Transferencia:
               </p>
-              <p class="text-xl font-mono font-bold tracking-wider">
+              <p id="texto_clabe" class="text-xl font-mono font-bold tracking-wider">
                 012 180 00123456789 5
               </p>
             </div>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 gap-4">
               <button
+                onclick="copiarClabe()"
                 class="bg-primary text-white py-3 rounded-full font-bold text-sm hover:scale-105 transition-all"
               >
                 Dona
-              </button>
-              <button
-                class="bg-white/10 text-white py-3 rounded-full font-bold text-sm hover:bg-white/20 transition-all"
-              >
-                Comparte
-              </button>
-              <button
-                class="bg-white/10 text-white py-3 rounded-full font-bold text-sm hover:bg-white/20 transition-all"
-              >
-                Firma
               </button>
             </div>
           </div>
@@ -704,43 +594,12 @@
             La salud mental es responsabilidad en sociedad. Construyendo puentes
             de bienestar para todos.
           </p>
-          <div class="flex gap-4">
-            <a
-              class="text-slate-500 hover:text-orange-600 transition-all material-symbols-outlined"
-              href="#"
-              >facebook</a
-            >
-            <a
-              class="text-slate-500 hover:text-orange-600 transition-all material-symbols-outlined"
-              href="#"
-              >photo_camera</a
-            >
-            <a
-              class="text-slate-500 hover:text-orange-600 transition-all material-symbols-outlined"
-              href="#"
-              >play_circle</a
-            >
-          </div>
         </div>
         <div>
           <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Enlaces Rápidos
+            Redes Sociales
           </h4>
           <ul class="space-y-3">
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="inicio.html"
-                >Inicio</a
-              >
-            </li>
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >Newsletter</a
-              >
-            </li>
             <li>
               <a
                 class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
@@ -755,31 +614,17 @@
                 >Instagram</a
               >
             </li>
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >YouTube</a
-              >
-            </li>
           </ul>
         </div>
         <div>
           <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Boletín de Esperanza
+            Contacto
           </h4>
-          <form class="flex flex-col gap-4">
-            <input
-              class="bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-pink-500 outline-none"
-              placeholder="Tu correo electrónico"
-              type="email"
-            />
-            <button
-              class="bg-pink-700 text-white rounded-full py-3 font-bold hover:bg-pink-800 transition-all"
-            >
-              Suscribirme
-            </button>
-          </form>
+          <ul class="space-y-3 text-slate-500 dark:text-slate-400">
+            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">mail</span> ayuda@sanctorum.org</li>
+            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">call</span> 800-SANCTORUM</li>
+            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">location_on</span> Ciudad de México, MX</li>
+          </ul>
         </div>
       </div>
       <div
@@ -789,5 +634,206 @@
         en sociedad.
       </div>
     </footer>
+
+    <script>
+      const API_URL = "http://localhost:3000";
+
+      document.addEventListener('DOMContentLoaded', () => {
+          cargarTransparencia();
+          cargarProximoEvento();
+          cargarCarruselProyectos();
+          cargarEstadisticasPsicologia();
+      });
+
+      // ---------- CARRUSEL DE PROYECTOS (Noticias_Eventos) ----------
+      const IMG_PLACEHOLDER_PROYECTO = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAT5vdApGnMD-IeoRT4e3NMVb1xk7JJenXpAG6aqk3StUisXgILjTC7Atb6DXG1a828Tt4zqF3h7wDgcN0_3ku7JvgUHhw9mj3Z3mWQVk115LFqzPuLG4XYHyU6OEoK3licwLWrYey6DU1YBLBRWcmP3rQpUDa9JxWTV9BXm16WTm7WeKtAN3nrymRcODBwM2_cyauiDoRHEB9HwxvrTjkyF-xd6a9FJhjD5XIGQYG5t7hLhd3SnwmEM_b15NSziuuA8VYCra4aVkI';
+
+      async function cargarCarruselProyectos() {
+          const cont = document.getElementById('carrusel_proyectos');
+          try {
+              const res = await fetch(`${API_URL}/api/publicaciones?limite=12`);
+              const json = await res.json();
+              if (!json.success || json.data.length === 0) {
+                  cont.innerHTML = '<p class="text-slate-400 py-10">Aún no hay proyectos publicados. ¡Vuelve pronto!</p>';
+                  return;
+              }
+              const hoy = new Date();
+              cont.innerHTML = json.data.map(n => {
+                  const fecha = new Date(n.fecha_post);
+                  const esProximo = n.tipo === 'Evento' && fecha >= hoy;
+                  const badge = esProximo
+                      ? '<span class="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">Próximamente</span>'
+                      : '<span class="bg-slate-800 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">Realizado</span>';
+                  const resumen = (n.contenido || '').substring(0, 90) + ((n.contenido || '').length > 90 ? '…' : '');
+                  const img = n.url_imagen || IMG_PLACEHOLDER_PROYECTO;
+                  return `
+                    <a href="evento_detalle.html?id=${n.id_publicacion}"
+                       class="group snap-start shrink-0 w-72 md:w-80 bg-white rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(23,28,31,0.06)] transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
+                      <div class="relative h-44 overflow-hidden">
+                        <img src="${img}" alt="${n.titulo}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                        <div class="absolute top-3 left-3">${badge}</div>
+                      </div>
+                      <div class="p-6">
+                        <h3 class="text-lg font-bold mb-2 leading-snug line-clamp-2">${n.titulo}</h3>
+                        <p class="text-on-surface-variant text-sm leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-20 transition-all duration-300 overflow-hidden">${resumen || 'Toca para ver el detalle completo.'}</p>
+                        <span class="text-xs text-slate-400 font-bold mt-2 block">${fecha.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      </div>
+                    </a>`;
+              }).join('');
+          } catch (e) {
+              console.error("Error al cargar el carrusel de proyectos:", e);
+              cont.innerHTML = '<p class="text-slate-400 py-10">No se pudieron cargar los proyectos en este momento.</p>';
+          }
+      }
+
+      function moverCarrusel(direccion) {
+          const cont = document.getElementById('carrusel_proyectos');
+          cont.scrollBy({ left: direccion * 340, behavior: 'smooth' });
+      }
+
+      // ---------- ESTADÍSTICAS DE ASISTENCIA PSICOLÓGICA ----------
+      async function cargarEstadisticasPsicologia() {
+          try {
+              const res = await fetch(`${API_URL}/api/estadisticas_psicologia`);
+              const json = await res.json();
+              if (!json.success) return;
+              document.getElementById('stat_pacientes_activos').innerText = json.data.pacientes_activos;
+              document.getElementById('stat_pacientes_exitosos').innerText = json.data.pacientes_exitosos;
+          } catch (e) {
+              console.error("Error al cargar estadísticas de psicología:", e);
+          }
+      }
+
+      // ---------- BOTONES DE DONACIÓN MONETARIA ----------
+      // Utilidad compartida: copia texto al portapapeles con fallback manual si la
+      // Clipboard API no está disponible (contextos no seguros, navegadores viejos, etc.)
+      // Blindada por completo: ninguna rama puede lanzar una excepción sin atrapar.
+      function copiarTextoConFallback(texto, mensajeExito) {
+          try {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(texto)
+                      .then(() => { try { alert(mensajeExito); } catch (e2) {} })
+                      .catch(() => { try { window.prompt('Copia manualmente (Ctrl+C / Cmd+C):', texto); } catch (e3) {} });
+              } else {
+                  window.prompt('Copia manualmente (Ctrl+C / Cmd+C):', texto);
+              }
+          } catch (errorCopiar) {
+              console.error('copiarTextoConFallback falló, mostrando alerta simple:', errorCopiar);
+              try { alert('Enlace: ' + texto); } catch (e4) {}
+          }
+      }
+
+      function copiarClabe() {
+          const clabe = document.getElementById('texto_clabe').innerText.replace(/\s/g, '');
+          copiarTextoConFallback(clabe, 'CLABE copiada al portapapeles: ' + clabe);
+      }
+
+      function compartirPagina() {
+          const datosCompartir = {
+              title: 'Sumando Voluntades Sanctórum',
+              text: 'Conoce y apoya a Sumando Voluntades Sanctórum A.C.',
+              url: window.location.href
+          };
+          try {
+              if (navigator.share) {
+                  navigator.share(datosCompartir).catch(() => { /* el usuario canceló el share */ });
+              } else {
+                  copiarTextoConFallback(window.location.href, 'Enlace copiado al portapapeles. ¡Compártelo con quien quieras!');
+              }
+          } catch (errorSincrono) {
+              // Algunos navegadores lanzan el error de forma síncrona (no como promesa rechazada),
+              // por ejemplo si la página no corre en un contexto seguro (https o localhost).
+              console.error('navigator.share falló de forma síncrona, usando respaldo:', errorSincrono);
+              copiarTextoConFallback(window.location.href, 'Enlace copiado al portapapeles. ¡Compártelo con quien quieras!');
+          }
+      }
+
+      // ---------- TRANSPARENCIA FINANCIERA (RF-09) ----------
+      const ESTILOS_CATEGORIA = {
+          'Especialistas': { color: '#b50062', clase: 'bg-secondary', label: 'Atención Psicológica y Terapeutas' },
+          'Insumos': { color: '#8a5100', clase: 'bg-primary', label: 'Materiales e Insumos de Campo' },
+          'Operación': { color: '#006491', clase: 'bg-tertiary', label: 'Gastos Operativos y Administrativos' }
+      };
+
+      async function cargarTransparencia() {
+          const lista = document.getElementById('lista_transparencia');
+          try {
+              const res = await fetch(`${API_URL}/api/transparencia`);
+              const json = await res.json();
+              if (!json.success || json.data.length === 0) {
+                  lista.innerHTML = `
+                    <div class="bg-white/60 border border-slate-100 rounded-2xl p-5 text-sm text-on-surface-variant">
+                      Aún no hay donaciones registradas en la tabla <b>Donaciones</b> de la base de datos.
+                      En cuanto el equipo administrativo registre ingresos con su <b>categoría de gasto</b>
+                      (Especialistas, Insumos u Operación), esta gráfica se llenará automáticamente.
+                    </div>`;
+                  document.getElementById('donut_centro_valor').innerText = '$0';
+                  return;
+              }
+
+              // Leyenda
+              lista.innerHTML = json.data.map(item => {
+                  const estilo = ESTILOS_CATEGORIA[item.categoria] || { clase: 'bg-slate-300', label: item.categoria };
+                  return `
+                    <div class="flex items-center gap-4">
+                      <div class="w-3 h-3 rounded-full ${estilo.clase}"></div>
+                      <div class="flex-1 text-on-surface font-medium">${estilo.label}</div>
+                      <div class="font-bold" style="color:${(ESTILOS_CATEGORIA[item.categoria] || {}).color || '#94a3b8'}">${item.porcentaje}%</div>
+                    </div>`;
+              }).join('');
+
+              // Donut dinámico (SVG stroke-dasharray acumulado)
+              const svg = document.getElementById('donut_transparencia');
+              // Quitamos círculos previos de datos (dejamos solo el de fondo, primer <circle>)
+              const circles = svg.querySelectorAll('circle');
+              circles.forEach((c, i) => { if (i > 0) c.remove(); });
+
+              let acumulado = 0;
+              json.data.forEach(item => {
+                  const estilo = ESTILOS_CATEGORIA[item.categoria] || { color: '#94a3b8' };
+                  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                  circle.setAttribute('cx', '18');
+                  circle.setAttribute('cy', '18');
+                  circle.setAttribute('r', '16');
+                  circle.setAttribute('fill', 'none');
+                  circle.setAttribute('stroke', estilo.color);
+                  circle.setAttribute('stroke-width', '3');
+                  circle.setAttribute('stroke-dasharray', `${item.porcentaje} 100`);
+                  circle.setAttribute('stroke-dashoffset', `${-acumulado}`);
+                  svg.appendChild(circle);
+                  acumulado += item.porcentaje;
+              });
+
+              document.getElementById('donut_centro_valor').innerText =
+                  '$' + Number(json.gran_total || 0).toLocaleString('es-MX', { maximumFractionDigits: 0 });
+          } catch (e) {
+              console.error("Error al cargar transparencia financiera:", e);
+              lista.innerHTML = '<p class="text-on-surface-variant text-sm">No se pudo cargar la información en este momento.</p>';
+          }
+      }
+
+      // ---------- PRÓXIMO EVENTO (RF-02 / RF-07) ----------
+      async function cargarProximoEvento() {
+          const seccion = document.getElementById('seccion_proximo_evento');
+          try {
+              const res = await fetch(`${API_URL}/api/eventos_publicos`);
+              const json = await res.json();
+              if (!json.success || json.data.length === 0) return; // La sección permanece oculta si no hay eventos
+
+              const ev = json.data[0];
+              const fecha = new Date(ev.fecha_realizacion);
+              document.getElementById('ev_dia').innerText = fecha.toLocaleDateString('es-MX', { day: '2-digit' });
+              document.getElementById('ev_mes').innerText = fecha.toLocaleDateString('es-MX', { month: 'long' });
+              document.getElementById('ev_hora').innerText = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+              document.getElementById('ev_tipo').innerText = ev.nombre_escuela ? `${ev.tipo_evento} · ${ev.nombre_escuela}` : ev.tipo_evento;
+              document.getElementById('ev_titulo').innerText = ev.titulo_evento;
+              document.getElementById('ev_btn_registro').href = `evento_detalle.html?tipo=evento&id=${ev.id_evento}`;
+
+              seccion.classList.remove('hidden');
+          } catch (e) {
+              console.error("Error al cargar el próximo evento:", e);
+          }
+      }
+    </script>
   </body>
 </html>
