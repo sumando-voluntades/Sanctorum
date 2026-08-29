@@ -126,46 +126,46 @@
         <nav class="hidden md:flex gap-8 items-center">
           <a
             class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="index.html"
+            href="index"
             >Inicio</a
           >
           <a
             class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="comunidad_blog.html"
+            href="comunidad_blog"
             >Comunidad</a
           >
           <a
             class="text-orange-700 font-bold border-b-2 border-orange-500 hover:text-pink-600 transition-colors duration-300 py-1"
-            href="solicitud_apoyo_oficial.html"
+            href="solicitud_apoyo_oficial"
             >Solicitud de Apoyo</a
           >
           <a
             class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="como_ayudar.html"
+            href="como_ayudar"
             >Cómo Ayudar</a
           >
           <a
             class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="nosotros.html"
+            href="nosotros"
             >Nosotros</a
           >
         </nav>
         <div class="flex items-center gap-4">
           <a
-            href="login.html"
+            href="login"
             title="Panel de Administración"
             class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
           >
             admin_panel_settings
           </a>
           <a
-            href="como_ayudar.html#formVoluntariadoPublico"
+            href="como_ayudar#formVoluntariadoPublico"
             class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
           >
             Voluntariado
           </a>
           <a
-            href="index.html#donacion-monetaria"
+            href="index#donacion-monetaria"
             class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
           >
             Donar
@@ -397,7 +397,7 @@
               </p>
             </div>
             <a
-              href="calendario_eventos.html"
+              href="calendario_eventos"
               class="bg-surface-container-low text-primary font-bold px-8 py-3 rounded-full hover:bg-surface-container transition-colors inline-block"
               style=""
             >
@@ -576,7 +576,7 @@
                         <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">schedule</span><span>${hora} hrs</span></div>
                         <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">location_on</span><span>${lugar}</span></div>
                       </div>
-                      <a href="evento_detalle.html?tipo=evento&id=${ev.id_evento}" class="block text-center w-full border-2 ${c.btn} font-bold py-2 rounded-full transition-all">Más información</a>
+                      <a href="evento_detalle?tipo=evento&id=${ev.id_evento}" class="block text-center w-full border-2 ${c.btn} font-bold py-2 rounded-full transition-all">Más información</a>
                     </div>`;
               }).join('');
           } catch (e) {

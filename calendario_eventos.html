@@ -46,27 +46,27 @@
           <img alt="Logo Sumando Voluntades Sanctórum" class="h-12 w-auto object-contain" src="Logo.png" />
         </div>
         <nav class="hidden md:flex gap-8 items-center">
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="index.html">Inicio</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="comunidad_blog.html">Comunidad</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="solicitud_apoyo_oficial.html">Solicitud de Apoyo</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="como_ayudar.html">Cómo Ayudar</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="nosotros.html">Nosotros</a>
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="index">Inicio</a>
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="comunidad_blog">Comunidad</a>
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="solicitud_apoyo_oficial">Solicitud de Apoyo</a>
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="como_ayudar">Cómo Ayudar</a>
+          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="nosotros">Nosotros</a>
         </nav>
         <div class="flex items-center gap-4">
           <a
-            href="gestion_expedientes_admin.html"
+            href="expedientes"
             title="Panel de Administración"
             class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
           >
             admin_panel_settings
           </a>
           <a
-            href="como_ayudar.html#formVoluntariadoPublico"
+            href="como_ayudar#formVoluntariadoPublico"
             class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
           >
             Voluntariado
           </a>
-          <a href="index.html#donacion-monetaria" class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all">
+          <a href="index#donacion-monetaria" class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all">
             Donar
           </a>
         </div>
@@ -75,7 +75,7 @@
 
     <main class="pt-32 pb-24 px-6">
       <div class="max-w-6xl mx-auto">
-        <a href="comunidad_blog.html" class="inline-flex items-center gap-2 text-secondary font-bold text-sm mb-8 hover:underline">
+        <a href="comunidad_blog" class="inline-flex items-center gap-2 text-secondary font-bold text-sm mb-8 hover:underline">
           <span class="material-symbols-outlined text-lg">arrow_back</span> Volver a Comunidad
         </a>
 
@@ -239,7 +239,7 @@
               const hora = new Date(ev.fecha_realizacion).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
               const lugar = ev.nombre_escuela || 'Sede Sanctórum';
               return `
-                <a href="evento_detalle.html?tipo=evento&id=${ev.id_evento}" class="block p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-colors">
+                <a href="evento_detalle?tipo=evento&id=${ev.id_evento}" class="block p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-colors">
                   <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-pink-100 text-secondary">${ev.tipo_evento}</span>
                   <h4 class="font-bold text-slate-800 mt-2">${ev.titulo_evento}</h4>
                   <div class="flex items-center gap-1 text-xs text-slate-500 mt-1"><span class="material-symbols-outlined text-sm">schedule</span>${hora} hrs</div>
