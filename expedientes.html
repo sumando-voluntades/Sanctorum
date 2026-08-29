@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Gestión de Expedientes | Sanctorum A.C.</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -32,17 +34,17 @@
   <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
     <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
     <nav class="flex-1 px-4 space-y-2">
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">folder_shared</span><span class="font-medium">Expedientes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda_admin.html"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_publicaciones_admin.html"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_reportes_admin.html"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos_admin.html"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="expedientes"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">folder_shared</span><span class="font-medium">Expedientes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="voluntariado"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="publicaciones"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="reportes"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
     </nav>
     <div class="px-6 mt-auto space-y-4">
-      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
+      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
       <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
     </div>
   </aside>
@@ -59,7 +61,7 @@
       <div class="flex items-center gap-4 ml-8 relative">
         <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
         <div class="h-8 w-px bg-slate-200 mx-2"></div>
-        <a href="perfil_admin.html" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
+        <a href="perfil" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
           <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
           <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
         </a>
@@ -312,6 +314,12 @@
                         </select>
                     </div>
                     <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Colonia</label><input id="edit_ben_colonia" type="text" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
+                    <div id="wrap_edit_ben_especialista" class="col-span-2 hidden">
+                        <label class="block text-slate-400 font-bold text-xs uppercase mb-1">Especialista asignado <span class="normal-case font-normal text-[10px]">(solo Admin)</span></label>
+                        <select id="edit_ben_especialista" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none">
+                            <option value="">Sin asignar</option>
+                        </select>
+                    </div>
                     <div class="col-span-2 flex gap-2 justify-end">
                         <button type="button" onclick="toggleEditarBeneficiario()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-full">Cancelar</button>
                         <button type="button" onclick="guardarBeneficiario()" class="px-4 py-2 text-xs font-bold text-white bg-secondary hover:bg-pink-700 rounded-full">Guardar</button>
@@ -473,14 +481,14 @@
     function aplicarRestriccionesNav(rol, especialidad) {
         const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
         const permisos = {
-            'dashboard_admin.html': [1, 3],
-            'gestion_expedientes_admin.html': esPsico ? [1, 2] : [1],
-            'gestion_voluntariado_admin.html': [1, 3],
-            'inventario_admin.html': [1, 3],
-            'agenda_admin.html': [1, 2, 3, 4],
-            'gestion_publicaciones_admin.html': [1, 2, 3, 4],
-            'gestion_reportes_admin.html': [1, 2, 3, 4],
-            'aliados_donativos_admin.html': [1, 3]
+            'dashboard': [1, 3],
+            'expedientes': esPsico ? [1, 2] : [1],
+            'voluntariado': [1, 3],
+            'inventario': [1, 3],
+            'agenda': [1, 2, 3, 4],
+            'publicaciones': [1, 2, 3, 4],
+            'reportes': [1, 2, 3, 4],
+            'aliados_donativos': [1, 3]
         };
 
         document.querySelectorAll('aside nav a[href]').forEach(a => {
@@ -491,10 +499,13 @@
             }
         });
 
-        const paginaActual = window.location.pathname.split('/').pop();
+        // .replace() de mas: por si alguien entra con la extension .html todavia (ej. un
+        // marcador viejo, o pruebas locales sin el rewrite de Vercel), para que la
+        // comparacion contra el mapa de permisos (sin extension) siga funcionando.
+        const paginaActual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
         const permitidosActual = permisos[paginaActual];
         if (permitidosActual && !permitidosActual.includes(rol)) {
-            window.location.replace('agenda_admin.html');
+            window.location.replace('agenda');
         }
     }
 
@@ -519,6 +530,7 @@
     }
 
     let expedienteActualId = null;
+    let expedienteActualIdEspecialista = null;
     let expedienteActualFechaNac = '';
     let expedienteActualEscuela = '';
     let usuarioActual = null;
@@ -528,7 +540,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         // Carga de credenciales visuales
         const token = localStorage.getItem('token_sanctorum');
-        if (!token) { window.location.replace("login.html"); return; }
+        if (!token) { window.location.replace("login"); return; }
         try {
             usuarioActual = decodeJWT(token);
             aplicarRestriccionesNav(usuarioActual.rol, usuarioActual.especialidad);
@@ -536,7 +548,7 @@
             cargarNotificaciones();
             verificarAccesoDocumento(usuarioActual);
         } catch (e) {
-            window.location.replace("login.html");
+            window.location.replace("login");
             return;
         }
 
@@ -552,7 +564,7 @@
             .then(j => {
                 const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
                 if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
-                    window.location.replace('perfil_admin.html');
+                    window.location.replace('perfil');
                 }
             })
             .catch(() => {});
@@ -560,7 +572,7 @@
 
     function cerrarSesion() {
         localStorage.removeItem('token_sanctorum');
-        window.location.replace("login.html");
+        window.location.replace("login");
     }
 
     // ================= CARGA DE DATOS PRINCIPALES =================
@@ -728,7 +740,7 @@
                         <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${badgeClass}">${exp.estatus}</span>
                     </td>
                     <td class="px-6 py-4 text-center whitespace-nowrap">
-                        <button onclick="abrirModalDetalle('${exp.id}', \`${exp.paciente}\`, \`${exp.escuela}\`, '${exp.estatus}', \`${exp.tutor}\`, '${fechaIngresoFormateada}', \`${exp.especialista}\`, '${genero}', '${edad}', \`${colonia}\`, \`${exp.telefono_tutor || ''}\`, \`${exp.correo_tutor || ''}\`, '${fechaNacRaw}', \`${escuelaRaw}\`)" class="text-slate-400 hover:text-secondary bg-white hover:bg-pink-50 p-2 rounded-full border border-transparent hover:border-pink-100 transition-all shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100">
+                        <button onclick="abrirModalDetalle('${exp.id}', \`${exp.paciente}\`, \`${exp.escuela}\`, '${exp.estatus}', \`${exp.tutor}\`, '${fechaIngresoFormateada}', \`${exp.especialista}\`, '${genero}', '${edad}', \`${colonia}\`, \`${exp.telefono_tutor || ''}\`, \`${exp.correo_tutor || ''}\`, '${fechaNacRaw}', \`${escuelaRaw}\`, ${exp.id_especialista || 'null'})" class="text-slate-400 hover:text-secondary bg-white hover:bg-pink-50 p-2 rounded-full border border-transparent hover:border-pink-100 transition-all shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100">
                             <span class="material-symbols-outlined text-[20px]">edit_document</span>
                         </button>
                     </td>
@@ -834,10 +846,11 @@
     }
 
     // ================= MODAL DETALLE, TABS Y NOTAS =================
-    function abrirModalDetalle(id, nombre, escuela, estatus, tutor, ingreso, especialista, genero, edad, colonia, telefono_tutor, correo_tutor, fecha_nac_raw, escuela_raw) {
+    function abrirModalDetalle(id, nombre, escuela, estatus, tutor, ingreso, especialista, genero, edad, colonia, telefono_tutor, correo_tutor, fecha_nac_raw, escuela_raw, id_especialista_raw) {
         expedienteActualId = id;
         expedienteActualFechaNac = fecha_nac_raw || '';
         expedienteActualEscuela = escuela_raw || '';
+        expedienteActualIdEspecialista = id_especialista_raw || null;
         document.getElementById('det_id').innerText = 'ID: ' + id;
         document.getElementById('det_nombre').innerText = nombre;
         document.getElementById('det_escuela').innerText = escuela;
@@ -1009,6 +1022,17 @@
             const coloniaActual = document.getElementById('dg_colonia').innerText;
             document.getElementById('edit_ben_genero').value = ['Masculino', 'Femenino', 'Otro'].includes(generoActual) ? generoActual : '';
             document.getElementById('edit_ben_colonia').value = (coloniaActual === 'No especificada' || coloniaActual === '-') ? '' : coloniaActual;
+
+            // Reasignar especialista: accion administrativa, solo visible para Admin.
+            const wrapEsp = document.getElementById('wrap_edit_ben_especialista');
+            if (usuarioActual && usuarioActual.rol === 1) {
+                const selEsp = document.getElementById('edit_ben_especialista');
+                selEsp.innerHTML = '<option value="">Sin asignar</option>' + document.getElementById('sel_especialista').innerHTML.replace('<option value="">Selecciona un psicólogo</option>', '');
+                selEsp.value = expedienteActualIdEspecialista || '';
+                wrapEsp.classList.remove('hidden');
+            } else {
+                wrapEsp.classList.add('hidden');
+            }
         }
     }
 
@@ -1027,6 +1051,29 @@
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
+
+            // Reasignacion de especialista: solo Admin ve el control, y es una llamada
+            // aparte porque el backend la trata como una accion administrativa distinta.
+            if (usuarioActual && usuarioActual.rol === 1) {
+                const selEsp = document.getElementById('edit_ben_especialista');
+                const nuevoIdEspecialista = selEsp.value || null;
+                if (String(nuevoIdEspecialista || '') !== String(expedienteActualIdEspecialista || '')) {
+                    const resEsp = await fetch(`${API_URL}/api/expedientes/${expedienteActualId}/especialista`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({ id_especialista: nuevoIdEspecialista })
+                    });
+                    const dataEsp = await resEsp.json();
+                    if (dataEsp.success) {
+                        expedienteActualIdEspecialista = nuevoIdEspecialista;
+                        const textoEsp = nuevoIdEspecialista ? selEsp.options[selEsp.selectedIndex].text : 'Sin asignar';
+                        document.getElementById('dg_especialista').innerText = textoEsp;
+                    } else {
+                        alert('No se pudo reasignar el especialista: ' + (dataEsp.message || 'Error desconocido.'));
+                    }
+                }
+            }
+
             if (data.success) {
                 document.getElementById('det_nombre').innerText = payload.nombre || document.getElementById('det_nombre').innerText;
                 if (payload.escuela_texto) { document.getElementById('det_escuela').innerText = payload.escuela_texto; expedienteActualEscuela = payload.escuela_texto; }

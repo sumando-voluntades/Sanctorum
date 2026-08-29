@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Resumen | Sanctorum A.C.</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -18,17 +20,17 @@
   <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
     <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
     <nav class="flex-1 px-4 space-y-2">
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="dashboard_admin.html"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">dashboard</span><span class="font-medium">Resumen</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_expedientes_admin.html"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_voluntariado_admin.html"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario_admin.html"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda_admin.html"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_publicaciones_admin.html"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="gestion_reportes_admin.html"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos_admin.html"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="dashboard"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">dashboard</span><span class="font-medium">Resumen</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="expedientes"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="voluntariado"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="publicaciones"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="reportes"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
+      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
     </nav>
     <div class="px-6 mt-auto space-y-4">
-      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index.html"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
+      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
       <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
     </div>
   </aside>
@@ -44,7 +46,7 @@
       <div class="flex items-center gap-4 ml-8 relative">
         <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
         <div class="h-8 w-px bg-slate-200 mx-2"></div>
-        <a href="perfil_admin.html" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
+        <a href="perfil" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
           <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
           <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
         </a>
@@ -167,7 +169,7 @@
         <div class="bg-white p-8 rounded-3xl shadow-sm">
           <div class="flex justify-between items-center mb-5">
             <h3 class="text-lg font-bold flex items-center gap-2"><span class="material-symbols-outlined text-secondary">event_upcoming</span> Acuerdos Pendientes</h3>
-            <a href="agenda_admin.html" class="text-xs font-bold text-secondary hover:underline">Ver Agenda Completa</a>
+            <a href="agenda" class="text-xs font-bold text-secondary hover:underline">Ver Agenda Completa</a>
           </div>
           <div id="lista_acuerdos_pendientes" class="space-y-3">
             <p class="text-slate-400 text-sm">Cargando acuerdos...</p>
@@ -205,14 +207,14 @@
     function aplicarRestriccionesNav(rol, especialidad) {
         const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
         const permisos = {
-            'dashboard_admin.html': [1, 3],
-            'gestion_expedientes_admin.html': esPsico ? [1, 2] : [1],
-            'gestion_voluntariado_admin.html': [1, 3],
-            'inventario_admin.html': [1, 3],
-            'agenda_admin.html': [1, 2, 3, 4],
-            'gestion_publicaciones_admin.html': [1, 2, 3, 4],
-            'gestion_reportes_admin.html': [1, 2, 3, 4],
-            'aliados_donativos_admin.html': [1, 3]
+            'dashboard': [1, 3],
+            'expedientes': esPsico ? [1, 2] : [1],
+            'voluntariado': [1, 3],
+            'inventario': [1, 3],
+            'agenda': [1, 2, 3, 4],
+            'publicaciones': [1, 2, 3, 4],
+            'reportes': [1, 2, 3, 4],
+            'aliados_donativos': [1, 3]
         };
 
         document.querySelectorAll('aside nav a[href]').forEach(a => {
@@ -223,10 +225,13 @@
             }
         });
 
-        const paginaActual = window.location.pathname.split('/').pop();
+        // .replace() de mas: por si alguien entra con la extension .html todavia (ej. un
+        // marcador viejo, o pruebas locales sin el rewrite de Vercel), para que la
+        // comparacion contra el mapa de permisos (sin extension) siga funcionando.
+        const paginaActual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
         const permitidosActual = permisos[paginaActual];
         if (permitidosActual && !permitidosActual.includes(rol)) {
-            window.location.replace('agenda_admin.html');
+            window.location.replace('agenda');
         }
     }
 
@@ -334,12 +339,12 @@
     // su documento profesional -- solo puede ver su Perfil.
     function verificarAccesoDocumento(payload) {
         if (payload.rol !== 2 && payload.rol !== 3) return;
-        fetch(`${API_URL}/api/usuarios/${payload.id}`)
+        fetch(`${API_URL}/api/usuarios/${payload.id}`, { headers: authHeaders() })
             .then(r => r.json())
             .then(j => {
                 const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
                 if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
-                    window.location.replace('perfil_admin.html');
+                    window.location.replace('perfil');
                 }
             })
             .catch(() => {});
@@ -347,7 +352,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token_sanctorum');
-        if(!token) { window.location.replace("login.html"); return; } // .replace evita que puedan regresar
+        if(!token) { window.location.replace("login"); return; } // .replace evita que puedan regresar
         try {
             const payload = decodeJWT(token);
             aplicarRestriccionesNav(payload.rol, payload.especialidad);
@@ -356,7 +361,7 @@
             verificarAccesoDocumento(payload);
         } catch (e) { 
             localStorage.removeItem('token_sanctorum');
-            window.location.replace("login.html");
+            window.location.replace("login");
         }
         cargarResumen();
         cargarNotificaciones();
@@ -369,7 +374,7 @@
 
     function cerrarSesion() {
         localStorage.removeItem('token_sanctorum');
-        window.location.replace("login.html");
+        window.location.replace("login");
     }
 
     async function cargarResumen() {
@@ -530,7 +535,7 @@
                 // (asistencia real reportada tras el evento en Reportes_Evento — el dato más
                 // representativo del público general) y el total combinado.
                 return `
-                  <div onclick="window.location.href='gestion_reportes_admin.html?id_evento=${ev.id_evento}'" title="Ver reporte de este evento" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl gap-3 cursor-pointer transition-colors">
+                  <div onclick="window.location.href='reportes?id_evento=${ev.id_evento}'" title="Ver reporte de este evento" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl gap-3 cursor-pointer transition-colors">
                     <div class="flex items-center gap-3 min-w-0">
                       <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0">${i + 1}</div>
                       <div class="min-w-0">

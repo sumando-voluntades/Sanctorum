@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Acceso Administrativo - Sanctorum A.C.</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -68,7 +70,7 @@
       </form>
 
       <div class="mt-8 text-center border-t border-slate-100 pt-6">
-        <a href="index.html" class="flex items-center justify-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors font-bold">
+        <a href="index" class="flex items-center justify-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors font-bold">
           <span class="material-symbols-outlined text-sm">arrow_back</span> Volver al sitio público
         </a>
       </div>
@@ -140,7 +142,7 @@
               if (response.ok && result.success) {
                   // Guardamos el token para mantener la sesión y redirigimos
                   localStorage.setItem('token_sanctorum', result.token);
-                  window.location.href = "dashboard_admin.html";
+                  window.location.href = "dashboard";
               } else {
                   mostrarAlerta('Acceso Denegado', result.message || 'Credenciales incorrectas.', true);
               }
