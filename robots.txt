@@ -30,19 +30,19 @@ User-agent: Applebot-Extended
 Disallow: /
 
 # Para todo lo demás (buscadores normales): no indexar el panel administrativo,
-# solo las páginas públicas.
+# solo las páginas públicas. URLs sin extensión (ver vercel.json: cleanUrls).
 User-agent: *
-Disallow: /agenda_admin.html
-Disallow: /aliados_donativos_admin.html
-Disallow: /dashboard_admin.html
-Disallow: /gestion_expedientes_admin.html
-Disallow: /gestion_expedientes.html
-Disallow: /gestion_publicaciones_admin.html
-Disallow: /gestion_reportes_admin.html
-Disallow: /gestion_voluntariado_admin.html
-Disallow: /inventario_admin.html
-Disallow: /perfil_admin.html
-Disallow: /login.html
+Disallow: /agenda
+Disallow: /aliados_donativos
+Disallow: /dashboard
+Disallow: /expedientes
+Disallow: /gestion_expedientes
+Disallow: /publicaciones
+Disallow: /reportes
+Disallow: /voluntariado
+Disallow: /inventario
+Disallow: /perfil
+Disallow: /login
 
 # TODO: agrega aquí la línea "Sitemap: https://tu-dominio-final/sitemap.xml"
 # una vez que el sitio esté desplegado con su dominio definitivo.
