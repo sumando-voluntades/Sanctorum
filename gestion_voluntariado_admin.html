@@ -926,7 +926,7 @@
     function toggleContacto(id) { const el = document.getElementById(id); if (el.style.maxHeight && el.style.maxHeight !== '0px') el.style.maxHeight = '0px'; else el.style.maxHeight = el.scrollHeight + "px"; }
 
     function prepararEliminar(id, nombre) { document.getElementById('elim_id').value = id; document.getElementById('elim_nombre').innerText = nombre; abrirModal('modalEliminar', 'modalEliminarContent'); }
-    async function ejecutarEliminar() { await fetch(`${API_URL}/api/usuarios/${document.getElementById('elim_id').value}`, { method: 'DELETE' }); cerrarModal('modalEliminar', 'modalEliminarContent'); cargarVoluntariosKanban(true); }
+    async function ejecutarEliminar() { await fetch(`${API_URL}/api/usuarios/${document.getElementById('elim_id').value}`, { method: 'DELETE', headers: authHeaders() }); cerrarModal('modalEliminar', 'modalEliminarContent'); cargarVoluntariosKanban(true); }
 
     function prepararInactivar(id, nombre) { document.getElementById('inac_id').value = id; document.getElementById('inac_nombre').innerText = nombre; abrirModal('modalInactivar', 'modalInactivarContent'); }
     async function ejecutarInactivar() { await fetch(`${API_URL}/api/usuarios/${document.getElementById('inac_id').value}/inactivo`, { method: 'PUT' }); cerrarModal('modalInactivar', 'modalInactivarContent'); cargarVoluntariosKanban(true); }
