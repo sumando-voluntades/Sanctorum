@@ -918,7 +918,7 @@
     async function eliminarActividad(id, categoria) {
         if(!confirm("¿Estás súper seguro de eliminar este registro? Esta acción no se puede deshacer y regresará el material al inventario.")) return;
         try {
-            await fetch(`${API_URL}/api/agenda/${categoria}/${id}`, { method: 'DELETE' });
+            await fetch(`${API_URL}/api/agenda/${categoria}/${id}`, { method: 'DELETE', headers: authHeaders() });
             recargarVistaActual();
         } catch(e) { alert("Error al eliminar"); }
     }

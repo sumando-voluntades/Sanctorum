@@ -695,12 +695,12 @@
               const response = idExistente
                   ? await fetch(`${API_URL}/api/insumos/${idExistente}`, {
                       method: 'PUT',
-                      headers: { 'Content-Type': 'application/json' },
+                      headers: { 'Content-Type': 'application/json', ...authHeaders() },
                       body: JSON.stringify(data)
                     })
                   : await fetch(`${API_URL}/api/insumos`, {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
+                      headers: { 'Content-Type': 'application/json', ...authHeaders() },
                       body: JSON.stringify(data)
                     });
               if (response.ok) {
@@ -730,7 +730,7 @@
       async function confirmarEliminarInsumo() {
           if (!idInsumoAEliminar) return;
           try {
-              const res = await fetch(`${API_URL}/api/insumos/${idInsumoAEliminar}`, { method: 'DELETE' });
+              const res = await fetch(`${API_URL}/api/insumos/${idInsumoAEliminar}`, { method: 'DELETE', headers: authHeaders() });
               const data = await res.json();
               if (res.ok && data.success) {
                   cerrarModalEliminarInsumo();

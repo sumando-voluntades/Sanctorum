@@ -678,7 +678,7 @@
             const payload = {}; payload[campoUrl] = uploadData.secure_url;
             const dbRes = await fetch(endpoint, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
                 body: JSON.stringify(payload)
             });
             const dbData = await dbRes.json();

@@ -956,14 +956,14 @@
     async function ejecutarEliminar() { await fetch(`${API_URL}/api/usuarios/${document.getElementById('elim_id').value}`, { method: 'DELETE', headers: authHeaders() }); cerrarModal('modalEliminar', 'modalEliminarContent'); cargarVoluntariosKanban(true); }
 
     function prepararInactivar(id, nombre) { document.getElementById('inac_id').value = id; document.getElementById('inac_nombre').innerText = nombre; abrirModal('modalInactivar', 'modalInactivarContent'); }
-    async function ejecutarInactivar() { await fetch(`${API_URL}/api/usuarios/${document.getElementById('inac_id').value}/inactivo`, { method: 'PUT' }); cerrarModal('modalInactivar', 'modalInactivarContent'); cargarVoluntariosKanban(true); }
+    async function ejecutarInactivar() { await fetch(`${API_URL}/api/usuarios/${document.getElementById('inac_id').value}/inactivo`, { method: 'PUT', headers: authHeaders() }); cerrarModal('modalInactivar', 'modalInactivarContent'); cargarVoluntariosKanban(true); }
 
-    async function reactivarUsuario(id) { await fetch(`${API_URL}/api/usuarios/${id}/reactivar`, { method: 'PUT' }); cargarVoluntariosKanban(true); }
+    async function reactivarUsuario(id) { await fetch(`${API_URL}/api/usuarios/${id}/reactivar`, { method: 'PUT', headers: authHeaders() }); cargarVoluntariosKanban(true); }
 
     async function abrirModalExpediente() { const res = await fetch(`${API_URL}/api/beneficiarios`); const json = await res.json(); const sel = document.getElementById('exp_beneficiario'); sel.innerHTML = '<option value="" disabled selected>Selecciona Beneficiario...</option>'; json.data.forEach(b => sel.innerHTML += `<option value="${b.id_beneficiario}">${b.nombre_completo}</option>`); abrirModal('modalExpediente', 'modalExpedienteContent'); }
     async function abrirModalAsignarActivo(id_usuario) { document.getElementById('asig_act_id').value = id_usuario; const res = await fetch(`${API_URL}/api/proyectos`); const json = await res.json(); const sel = document.getElementById('asig_act_evento'); sel.innerHTML = '<option value="" disabled selected>Selecciona Proyecto...</option>'; json.data.forEach(p => sel.innerHTML += `<option value="${p.id_evento}">${p.titulo_evento}</option>`); abrirModal('modalAsignarActivo', 'modalAsignarActivoContent'); }
     
-    document.getElementById('formAsignarActivo').addEventListener('submit', async (e) => { e.preventDefault(); await fetch(`${API_URL}/api/usuarios/${document.getElementById('asig_act_id').value}/participacion`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({id_evento: document.getElementById('asig_act_evento').value}) }); alert("Voluntario vinculado"); cerrarModal('modalAsignarActivo', 'modalAsignarActivoContent'); });
+    document.getElementById('formAsignarActivo').addEventListener('submit', async (e) => { e.preventDefault(); await fetch(`${API_URL}/api/usuarios/${document.getElementById('asig_act_id').value}/participacion`, { method: 'POST', headers: {'Content-Type':'application/json', ...authHeaders()}, body: JSON.stringify({id_evento: document.getElementById('asig_act_evento').value}) }); alert("Voluntario vinculado"); cerrarModal('modalAsignarActivo', 'modalAsignarActivoContent'); });
 
     // --- MANEJO DE ENVÍO DE FORMULARIOS ---
     function extraerCantidad(prefix) {
