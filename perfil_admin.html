@@ -699,14 +699,16 @@
         const btn = e.target.querySelector('button'); const textoOriginal = btn.innerText;
         btn.innerText = "Actualizando..."; btn.disabled = true;
 
+        // H15 (auditoria de seguridad): el backend ya no acepta ni usa "correo" del body para
+        // identificar la cuenta — la identidad sale del token de sesion (Authorization). Se
+        // deja de enviar ese campo y se agrega el header de autenticacion.
         const data = {
-            correo: document.getElementById('perfil_correo').innerText,
             password_actual: document.getElementById('pass_actual').value,
             password_nueva: document.getElementById('pass_nueva').value
         };
 
         try {
-            const res = await fetch(`${API_URL}/api/auth/cambiar-password`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+            const res = await fetch(`${API_URL}/api/auth/cambiar-password`, { method: 'PUT', headers: {'Content-Type':'application/json', ...authHeaders()}, body: JSON.stringify(data) });
             const json = await res.json();
             if (res.ok && json.success) {
                 alert("¡Contraseña actualizada con éxito!");
