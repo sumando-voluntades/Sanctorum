@@ -396,7 +396,7 @@
     // 2. CARGAR PERFIL REAL DESDE LA BASE DE DATOS (no solo lo que trae el token)
     async function cargarPerfil() {
         try {
-            const res = await fetch(`${API_URL}/api/usuarios/${usuarioActual.id}`);
+            const res = await fetch(`${API_URL}/api/usuarios/${usuarioActual.id}`, { headers: authHeaders() });
             const json = await res.json().catch(() => ({}));
             if (!res.ok || !json.success) {
                 console.error("Respuesta del servidor al cargar perfil:", res.status, json);

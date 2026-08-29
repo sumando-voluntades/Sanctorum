@@ -429,7 +429,7 @@
     // aprobado su documento profesional -- solo puede ver su Perfil.
     function verificarAccesoDocumento(payload) {
         if (payload.rol !== 2 && payload.rol !== 3) return;
-        fetch(`${API_URL}/api/usuarios/${payload.id}`)
+        fetch(`${API_URL}/api/usuarios/${payload.id}`, { headers: authHeaders() })
             .then(r => r.json())
             .then(j => {
                 const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';

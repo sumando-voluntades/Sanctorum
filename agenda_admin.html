@@ -535,7 +535,7 @@
     // no tiene aprobado su documento profesional — solo puede ver su Perfil.
     function verificarAccesoDocumento(payload) {
         if (payload.rol !== 2 && payload.rol !== 3) return;
-        fetch(`${API_URL}/api/usuarios/${payload.id}`)
+        fetch(`${API_URL}/api/usuarios/${payload.id}`, { headers: authHeaders() })
             .then(r => r.json())
             .then(j => {
                 const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
@@ -694,7 +694,7 @@
     // ================= CARGA DE DATOS (CATÁLOGOS) =================
     async function cargarCatalogosModal() {
         try {
-            const res = await fetch(`${API_URL}/api/catalogos_agenda`);
+            const res = await fetch(`${API_URL}/api/catalogos_agenda`, { headers: authHeaders() });
             const json = await res.json();
             if(json.success) {
                 // Escuelas
@@ -738,7 +738,7 @@
     // ================= MODIFICAR: PRELLENAR DATOS =================
     async function editarActividad(id, categoria) {
         try {
-            const res = await fetch(`${API_URL}/api/agenda/${categoria}/${id}`);
+            const res = await fetch(`${API_URL}/api/agenda/${categoria}/${id}`, { headers: authHeaders() });
             const json = await res.json();
             if(json.success) {
                 const data = json.data;
@@ -1059,7 +1059,7 @@
         cabecera.innerHTML = '<p class="text-slate-400 text-sm">Cargando...</p>';
         lista.innerHTML = '';
         try {
-            const res = await fetch(`${API_URL}/api/agenda/paciente/${id}/citas`);
+            const res = await fetch(`${API_URL}/api/agenda/paciente/${id}/citas`, { headers: authHeaders() });
             const json = await res.json();
             if (!json.success) { cabecera.innerHTML = '<p class="text-red-400 text-sm">No se pudo cargar el paciente.</p>'; return; }
 
