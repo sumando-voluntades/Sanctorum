@@ -1,0 +1,48 @@
+# Bloquea crawlers de entrenamiento de IA (no afecta buscadores normales como Google/Bing)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+# Para todo lo demás (buscadores normales): no indexar el panel administrativo,
+# solo las páginas públicas.
+User-agent: *
+Disallow: /agenda_admin.html
+Disallow: /aliados_donativos_admin.html
+Disallow: /dashboard_admin.html
+Disallow: /gestion_expedientes_admin.html
+Disallow: /gestion_expedientes.html
+Disallow: /gestion_publicaciones_admin.html
+Disallow: /gestion_reportes_admin.html
+Disallow: /gestion_voluntariado_admin.html
+Disallow: /inventario_admin.html
+Disallow: /perfil_admin.html
+Disallow: /login.html
+
+# TODO: agrega aquí la línea "Sitemap: https://tu-dominio-final/sitemap.xml"
+# una vez que el sitio esté desplegado con su dominio definitivo.
