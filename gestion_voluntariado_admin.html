@@ -955,7 +955,7 @@
       e.preventDefault(); const btn = e.target.querySelector('button[type="submit"]'); btn.innerText = "Creando..."; btn.disabled = true;
       const { mat, cant } = extraerCantidad('reg');
       const data = { nombre_completo: document.getElementById('reg_nombre').value, correo: document.getElementById('reg_correo').value, telefono: document.getElementById('reg_telefono').value, especialidad: obtenerEspecialidadReal('reg'), id_rol: parseInt(document.getElementById('reg_rol').value), material: mat, cantidad: cant };
-      await fetch(`${API_URL}/api/usuarios`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      await fetch(`${API_URL}/api/usuarios`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(data) });
       btn.innerText = "Guardar y Avisar"; btn.disabled = false; cerrarModal('modalRegistro', 'modalContent'); cargarVoluntariosKanban(true);
     });
 
@@ -1011,7 +1011,7 @@
           
           await fetch(`${API_URL}/api/voluntarios/${document.getElementById('proy_id_usuario').value}/asignar`, { 
               method: 'PUT', 
-              headers: {'Content-Type':'application/json'}, 
+              headers: {'Content-Type':'application/json', ...authHeaders()}, 
               body: JSON.stringify(data) 
           });
       } catch (e) {
