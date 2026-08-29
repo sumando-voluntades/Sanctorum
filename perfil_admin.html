@@ -527,7 +527,7 @@
         try {
             const res = await fetch(`${API_URL}/api/usuarios/${usuarioActual.id}/perfil`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
                 body: JSON.stringify({
                     nombre_completo: document.getElementById('edit_perfil_nombre').value,
                     correo: document.getElementById('edit_perfil_correo').value,
@@ -608,7 +608,7 @@
         try {
             const res = await fetch(`${API_URL}/api/usuarios/${usuarioActual.id}/perfil`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
                 body: JSON.stringify({ biografia: document.getElementById('input_biografia').value })
             });
             const json = await res.json();
