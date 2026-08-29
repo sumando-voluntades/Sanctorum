@@ -701,6 +701,33 @@
     function authHeaders() {
         return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
     }
+
+    // H6 (auditoria de seguridad): esta vista renderiza con innerHTML datos que vienen de un
+    // formulario PUBLICO de autorregistro (nombre, correo, especialidad, material donado...),
+    // sin ningun escape. Un atacante anonimo podia autorregistrarse con un "nombre" que
+    // contuviera HTML/JS y ejecutar codigo en la sesion del Admin/Coordinador que abriera este
+    // panel (robando, por ejemplo, el token de localStorage). escapeHtml() es para texto normal
+    // insertado en innerHTML; escapeAttrJs() es para valores interpolados dentro de un atributo
+    // onclick="fn('...')" — ahi escapar solo con entidades HTML NO basta, porque el navegador
+    // decodifica las entidades del atributo antes de ejecutar el JS, así que una comilla simple
+    // codificada como &#39; se vuelve comilla real de nuevo justo antes de correr como código.
+    function escapeHtml(valor) {
+        return String(valor ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+    function escapeAttrJs(valor) {
+        return String(valor ?? '')
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
     let voluntariosGlobales = [];
 
     // --- MANEJO DE MODALES ---
@@ -828,18 +855,18 @@
           
           let btnContactoEliminar = `<button onclick="toggleContacto('contacto_${vol.id_usuario}')" class="p-2 text-slate-400 hover:text-[#b50062] rounded-full bg-slate-50 transition-colors"><span class="material-symbols-outlined text-lg">contact_mail</span></button>`;
           if(status === 'Nuevo' || status === 'Entrevista') {
-            btnContactoEliminar += `<button onclick="prepararEliminar(${vol.id_usuario}, '${vol.nombre_completo}')" class="p-2 text-slate-400 hover:text-red-500 rounded-full bg-slate-50 transition-colors ml-1"><span class="material-symbols-outlined text-lg">delete</span></button>`;
+            btnContactoEliminar += `<button onclick="prepararEliminar(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}')" class="p-2 text-slate-400 hover:text-red-500 rounded-full bg-slate-50 transition-colors ml-1"><span class="material-symbols-outlined text-lg">delete</span></button>`;
           }
 
           if(status === 'Nuevo') {
             cN++;
-            btnAccion = `<button onclick="abrirModalEntrevista(${vol.id_usuario}, '${vol.correo}', '${vol.nombre_completo}')" class="w-full py-3 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-sm hover:bg-[#f39200] hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">calendar_month</span> Agendar Entrevista</button>`;
+            btnAccion = `<button onclick="abrirModalEntrevista(${vol.id_usuario}, '${escapeAttrJs(vol.correo)}', '${escapeAttrJs(vol.nombre_completo)}')" class="w-full py-3 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-sm hover:bg-[#f39200] hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">calendar_month</span> Agendar Entrevista</button>`;
           } else if (status === 'Entrevista') {
             cE++;
             btnAccion = `
                 <div class="flex gap-2 w-full">
-                    <button onclick="abrirModalEntrevista(${vol.id_usuario}, '${vol.correo}', '${vol.nombre_completo}')" class="flex-1 py-2 bg-slate-100 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-200">Reagendar</button>
-                    <button onclick="abrirModalProyecto(${vol.id_usuario}, '${vol.nombre_completo}', ${vol.id_rol}, '${vol.especialidad}', '${vol.material_donado || ''}', '${vol.cantidad_donada || ''}')" class="flex-1 py-2 bg-green-100 text-green-700 font-bold rounded-xl text-xs hover:bg-green-500 hover:text-white">Aprobar</button>
+                    <button onclick="abrirModalEntrevista(${vol.id_usuario}, '${escapeAttrJs(vol.correo)}', '${escapeAttrJs(vol.nombre_completo)}')" class="flex-1 py-2 bg-slate-100 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-200">Reagendar</button>
+                    <button onclick="abrirModalProyecto(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}', ${vol.id_rol}, '${escapeAttrJs(vol.especialidad)}', '${escapeAttrJs(vol.material_donado || '')}', '${escapeAttrJs(vol.cantidad_donada || '')}')" class="flex-1 py-2 bg-green-100 text-green-700 font-bold rounded-xl text-xs hover:bg-green-500 hover:text-white">Aprobar</button>
                 </div>`;
           } else if (status === 'Inactivo') {
             cI++;
@@ -874,8 +901,8 @@
             }
             botonesActivo += `
                 <div class="flex gap-2 w-full border-t border-slate-100 pt-3">
-                    <button onclick="prepararModificar(${vol.id_usuario}, ${vol.id_rol}, '${vol.especialidad}', '${vol.material_donado || ''}', '${vol.cantidad_donada || ''}')" class="flex-1 py-2 bg-slate-50 text-slate-500 font-bold rounded-xl text-[10px] hover:bg-slate-200">Modificar Perfil</button>
-                    <button onclick="prepararInactivar(${vol.id_usuario}, '${vol.nombre_completo}')" class="flex-1 py-2 bg-red-50 text-red-600 font-bold rounded-xl text-[10px] hover:bg-red-100">Pasar a Inactivo</button>
+                    <button onclick="prepararModificar(${vol.id_usuario}, ${vol.id_rol}, '${escapeAttrJs(vol.especialidad)}', '${escapeAttrJs(vol.material_donado || '')}', '${escapeAttrJs(vol.cantidad_donada || '')}')" class="flex-1 py-2 bg-slate-50 text-slate-500 font-bold rounded-xl text-[10px] hover:bg-slate-200">Modificar Perfil</button>
+                    <button onclick="prepararInactivar(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}')" class="flex-1 py-2 bg-red-50 text-red-600 font-bold rounded-xl text-[10px] hover:bg-red-100">Pasar a Inactivo</button>
                 </div>`;
             btnAccion = botonesActivo;
           }
@@ -887,24 +914,24 @@
 
           let extraBadge = '';
           if (vol.id_rol === 5 && vol.material_donado) {
-              extraBadge = `<div class="mt-2 text-[10px] text-slate-500 font-bold flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-md"><span class="material-symbols-outlined text-[12px] text-amber-500">inventory_2</span> Donación: ${vol.cantidad_donada} de ${vol.material_donado}</div>`;
+              extraBadge = `<div class="mt-2 text-[10px] text-slate-500 font-bold flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-md"><span class="material-symbols-outlined text-[12px] text-amber-500">inventory_2</span> Donación: ${escapeHtml(vol.cantidad_donada)} de ${escapeHtml(vol.material_donado)}</div>`;
           } else if (vol.proyectos && vol.proyectos !== '') {
-              extraBadge = `<div class="mt-2 text-[10px] text-slate-500 font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">work</span> ${vol.proyectos}</div>`;
+              extraBadge = `<div class="mt-2 text-[10px] text-slate-500 font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">work</span> ${escapeHtml(vol.proyectos)}</div>`;
           }
 
           const card = `
             <div class="bg-surface-container-lowest p-6 rounded-lg shadow-sm mb-6 hover:scale-[1.02] transition-all relative border border-slate-100 ${status === 'Inactivo' ? 'grayscale opacity-80' : ''}">
               <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xl">${vol.nombre_completo.charAt(0)}</div>
+                <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xl">${escapeHtml(vol.nombre_completo.charAt(0))}</div>
                 <div class="flex">${btnContactoEliminar}</div>
               </div>
-              <h4 class="text-lg font-bold text-slate-800 mb-1">${vol.nombre_completo}</h4>
-              <div class="flex flex-wrap gap-2 mb-2"><span class="px-3 py-1 ${colorBadge} text-[10px] font-bold uppercase rounded-full tracking-wide">${vol.id_rol === 5 ? 'Donador - ' + vol.especialidad : vol.especialidad || 'General'}</span></div>
+              <h4 class="text-lg font-bold text-slate-800 mb-1">${escapeHtml(vol.nombre_completo)}</h4>
+              <div class="flex flex-wrap gap-2 mb-2"><span class="px-3 py-1 ${colorBadge} text-[10px] font-bold uppercase rounded-full tracking-wide">${vol.id_rol === 5 ? 'Donador - ' + escapeHtml(vol.especialidad) : escapeHtml(vol.especialidad) || 'General'}</span></div>
               ${extraBadge}
               
               <div id="contacto_${vol.id_usuario}" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out mt-4">
                   <div class="bg-slate-50 p-3 rounded-lg mb-4 text-xs text-slate-600 space-y-2">
-                      <p class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">mail</span> ${vol.correo}</p>
+                      <p class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">mail</span> ${escapeHtml(vol.correo)}</p>
                       <p class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">phone</span> ${vol.telefono || 'No registrado'}</p>
                   </div>
               </div>
