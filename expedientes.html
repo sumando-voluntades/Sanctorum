@@ -26,65 +26,23 @@
       }
     };
   </script>
-  <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+  <style>
+    .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+    @media (min-width: 768px) { #sidebar-mount { position: fixed; left: 0; top: 0; width: 18rem; height: 100vh; background: #fff; z-index: 50; } }
+  </style>
 </head>
 <body class="bg-surface text-slate-800 min-h-screen">
   
-  <!-- ================= SIDE NAV BAR ================= -->
-  <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
-    <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
-    <nav class="flex-1 px-4 space-y-2">
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="expedientes"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">folder_shared</span><span class="font-medium">Expedientes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="voluntariado"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="publicaciones"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="reportes"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
-    </nav>
-    <div class="px-6 mt-auto space-y-4">
-      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
-      <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
-    </div>
-  </aside>
+  <div id="sidebar-mount"></div>
 
-  <main class="ml-72 min-h-screen flex flex-col">
-    <!-- ================= TOP NAV BAR ================= -->
-    <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
-      <div class="flex items-center flex-1">
-        <div class="relative w-full max-w-md">
-          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-          <input id="buscador_principal" oninput="aplicarFiltros()" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar por ID, paciente o tutor..." type="text" />
-        </div>
-      </div>
-      <div class="flex items-center gap-4 ml-8 relative">
-        <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
-        <div class="h-8 w-px bg-slate-200 mx-2"></div>
-        <a href="perfil" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
-          <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
-          <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
-        </a>
-
-        <!-- Panel de Notificaciones -->
-        <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
-              <h3 class="font-bold text-sm">Notificaciones</h3>
-              <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
-            </div>
-            <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
-                <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
-            </div>
-            <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
-        </div>
-      </div>
-    </header>
+  <main class="md:ml-72 min-h-screen flex flex-col">
+    <div id="header-mount"></div>
 
     <div class="p-8 flex-1 w-full overflow-hidden">
       <!-- ENCABEZADO -->
-      <div class="flex justify-between items-end mb-10">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10">
         <div>
-          <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Expedientes Clínicos</h2>
+          <h2 class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2">Expedientes Clínicos</h2>
           <p class="text-slate-500 max-w-xl">Registro y seguimiento psicológico confidencial de beneficiarios.</p>
         </div>
         <button onclick="abrirModalNuevoExpediente()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-[#b50062] to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
@@ -138,10 +96,11 @@
         </div>
       </div>
     </div>
+    <div id="footer-mount"></div>
   </main>
 
   <!-- ================= MODAL: NUEVO EXPEDIENTE ================= -->
-  <div id="modalNuevo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10">
+  <div id="modalNuevo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0 py-10">
     <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="modalNuevoContent">
       <div class="bg-gradient-to-r from-primary to-orange-500 px-8 py-6 text-white flex justify-between items-center shrink-0">
         <div><h3 class="text-2xl font-bold font-plus">Apertura de Expediente</h3></div>
@@ -196,7 +155,7 @@
   </div>
 
   <!-- ================= MODAL: DETALLE / NOTAS CLÍNICAS (RF-01) ================= -->
-  <div id="modalDetalle" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10">
+  <div id="modalDetalle" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0 py-10">
     <div class="bg-white rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="modalDetalleContent">
       <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-8 py-6 text-white flex justify-between items-center shrink-0">
         <div>
@@ -301,7 +260,7 @@
                     <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Colonia</p><p id="dg_colonia" class="font-medium text-slate-700">-</p></div>
                     <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Especialista Asignado</p><p id="dg_especialista" class="font-medium text-slate-700">-</p></div>
                 </div>
-                <div id="edicion_beneficiario" class="hidden grid grid-cols-2 gap-4 text-sm">
+                <div id="edicion_beneficiario" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div class="col-span-2"><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Nombre completo</label><input id="edit_ben_nombre" type="text" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
                     <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Fecha de Nacimiento</label><input id="edit_ben_fecha_nac" type="date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
                     <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Escuela</label><input id="edit_ben_escuela" type="text" placeholder="Nombre de la escuela" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
@@ -331,12 +290,12 @@
                     <h4 class="font-bold text-slate-800">Información del Tutor <span class="text-[10px] font-normal text-slate-400 normal-case">(contacto de emergencia)</span></h4>
                     <button type="button" onclick="toggleEditarTutor()" id="btn_editar_tutor" class="text-xs font-bold text-secondary hover:underline">Editar</button>
                   </div>
-                  <div id="vista_tutor" class="grid grid-cols-2 gap-4 text-sm">
+                  <div id="vista_tutor" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Nombre del Tutor</p><p id="dg_tutor" class="font-medium text-slate-700">-</p></div>
                       <div><p class="text-slate-400 font-bold text-xs uppercase mb-1">Teléfono</p><p id="dg_tel_tutor" class="font-medium text-slate-700">-</p></div>
                       <div class="col-span-2"><p class="text-slate-400 font-bold text-xs uppercase mb-1">Correo</p><p id="dg_correo_tutor" class="font-medium text-slate-700">-</p></div>
                   </div>
-                  <div id="edicion_tutor" class="hidden grid grid-cols-2 gap-4 text-sm">
+                  <div id="edicion_tutor" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Nombre del Tutor</label><input id="edit_tutor_nombre" type="text" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
                       <div><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Teléfono</label><input id="edit_tutor_telefono" type="tel" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
                       <div class="col-span-2"><label class="block text-slate-400 font-bold text-xs uppercase mb-1">Correo</label><input id="edit_tutor_correo" type="email" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"></div>
@@ -367,163 +326,17 @@
     </div>
   </div>
 
+  <script src="js/comun.js"></script>
+  <script src="js/notificaciones.js"></script>
+  <script src="js/incluir.js"></script>
   <script>
-    // Decodifica el payload de un JWT de forma segura: los JWT usan base64url
-    // (con '-' y '_' en vez de '+' y '/', y sin padding '='), y pueden contener
-    // caracteres UTF-8 (acentos, ñ, etc.). atob() a secas falla o corrompe esos casos.
-    function decodeJWT(token) {
-        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        while (base64.length % 4 !== 0) base64 += '=';
-        const binario = atob(base64);
-        const jsonPayload = decodeURIComponent(
-            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-        );
-        return JSON.parse(jsonPayload);
-    }
-
-    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
-    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
-    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
-    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
-    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
-
-    function obtenerNotifDescartadas() {
-        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
-    }
-    function guardarNotifDescartadas(lista) {
-        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
-    }
-
-    function toggleNotificaciones() {
-        const panel = document.getElementById('modalNotificaciones');
-        const estabaOculto = panel.classList.contains('hidden');
-        panel.classList.toggle('hidden');
-        if (estabaOculto) cargarNotificaciones();
-    }
-
-    async function cargarNotificaciones() {
-        const cont = document.getElementById('lista_notificaciones');
-        try {
-            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
-            const json = await res.json();
-            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
-
-            const descartadas = obtenerNotifDescartadas();
-            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
-                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
-                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
-                titulo: a.titulo, detalle: a.detalle || ''
-            }));
-
-            if (json.data.solicitudes_pendientes > 0) {
-                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
-                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
-            }
-            if (json.data.insumos_bajo_stock > 0) {
-                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
-                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
-            }
-
-            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
-            actualizarPuntoNotificaciones(notificaciones.length);
-
-            if (notificaciones.length === 0) {
-                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
-                return;
-            }
-
-            cont.innerHTML = notificaciones.map(n => `
-                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
-                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
-                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
-                    </div>
-                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
-                </div>`).join('');
-        } catch (e) {
-            console.error("Error al cargar notificaciones:", e);
-            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
-        }
-    }
-
-    function actualizarPuntoNotificaciones(cantidad) {
-        const punto = document.getElementById('punto_notificaciones');
-        if (!punto) return;
-        punto.classList.toggle('hidden', cantidad === 0);
-    }
-
-    function descartarNotificacion(id) {
-        const descartadas = obtenerNotifDescartadas();
-        if (!descartadas.includes(id)) descartadas.push(id);
-        guardarNotifDescartadas(descartadas);
-        cargarNotificaciones();
-    }
-
-    function limpiarTodasNotificaciones() {
-        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
-            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
-            if (match) {
-                const descartadas = obtenerNotifDescartadas();
-                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
-                guardarNotifDescartadas(descartadas);
-            }
-        });
-        cargarNotificaciones();
-    }
-
-    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
-    // entra directo por URL a una página no permitida para su rol, lo redirige.
-    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
-    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
-    function aplicarRestriccionesNav(rol, especialidad) {
-        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
-        const permisos = {
-            'dashboard': [1, 3],
-            'expedientes': esPsico ? [1, 2] : [1],
-            'voluntariado': [1, 3],
-            'inventario': [1, 3],
-            'agenda': [1, 2, 3, 4],
-            'publicaciones': [1, 2, 3, 4],
-            'reportes': [1, 2, 3, 4],
-            'aliados_donativos': [1, 3]
-        };
-
-        document.querySelectorAll('aside nav a[href]').forEach(a => {
-            const pagina = a.getAttribute('href');
-            const permitidos = permisos[pagina];
-            if (permitidos && !permitidos.includes(rol)) {
-                a.remove();
-            }
-        });
-
-        // .replace() de mas: por si alguien entra con la extension .html todavia (ej. un
-        // marcador viejo, o pruebas locales sin el rewrite de Vercel), para que la
-        // comparacion contra el mapa de permisos (sin extension) siga funcionando.
-        const paginaActual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
-        const permitidosActual = permisos[paginaActual];
-        if (permitidosActual && !permitidosActual.includes(rol)) {
-            window.location.replace('agenda');
-        }
-    }
-
-    const API_URL = 'http://localhost:3000/api';
-
-    // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
-    function authHeaders() {
-        return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
-    }
-
     // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
     // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
     // pedirla de nuevo en cada subida.
     let _cloudinaryConfigCache = null;
     async function obtenerConfigCloudinary() {
         if (_cloudinaryConfigCache) return _cloudinaryConfigCache;
-        // Nota: en este archivo API_URL ya incluye el sufijo /api, así que no lo repetimos.
-        const res = await fetch(`${API_URL}/config/cloudinary`);
+        const res = await fetch(`${API_URL}/api/config/cloudinary`);
         const json = await res.json();
         _cloudinaryConfigCache = { cloudName: json.cloud_name, uploadPreset: json.upload_preset };
         return _cloudinaryConfigCache;
@@ -537,7 +350,17 @@
     window.expedientesDB = [];
     let paginaExpedientesActual = 1;
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // Punto de entrada: monta los parciales, valida la sesión y, si es válida, arranca la
+    // carga de catálogos y expedientes.
+    document.addEventListener('DOMContentLoaded', async () => {
+        await incluirParcial('#sidebar-mount', 'partials/navbar_admin.html');
+        await incluirParcial('#header-mount', 'partials/header_admin.html');
+        incluirParcial('#footer-mount', 'partials/footer_admin.html');
+        marcarLinkActivoAdmin('#sidebar-mount [data-pagina]');
+
+        document.getElementById('buscador_principal').placeholder = 'Buscar por ID, paciente o tutor...';
+        document.getElementById('buscador_principal').addEventListener('input', () => aplicarFiltros());
+
         // Carga de credenciales visuales
         const token = localStorage.getItem('token_sanctorum');
         if (!token) { window.location.replace("login"); return; }
@@ -555,30 +378,12 @@
         cargarDatosIniciales();
     });
 
-    // Bloquea el acceso si el usuario (Especialista/Psicólogo) todavía no tiene
-    // aprobado su documento profesional -- solo puede ver su Perfil.
-    function verificarAccesoDocumento(usuario) {
-        if (usuario.rol !== 2 && usuario.rol !== 3) return;
-        fetch(`${API_URL}/usuarios/${usuario.id}`)
-            .then(r => r.json())
-            .then(j => {
-                const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
-                if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
-                    window.location.replace('perfil');
-                }
-            })
-            .catch(() => {});
-    }
-
-    function cerrarSesion() {
-        localStorage.removeItem('token_sanctorum');
-        window.location.replace("login");
-    }
-
     // ================= CARGA DE DATOS PRINCIPALES =================
+    // Trae los catálogos (especialistas y escuelas) para llenar los <select> del modal de
+    // "Nuevo Expediente" y el filtro de especialista, y al final dispara cargarExpedientes().
     async function cargarDatosIniciales() {
         try {
-            const resCat = await fetch(`${API_URL}/catalogos_expedientes`);
+            const resCat = await fetch(`${API_URL}/api/catalogos_expedientes`);
             const cat = await resCat.json();
 
             if (cat.success) {
@@ -614,9 +419,11 @@
         }
     }
 
+    // Trae la lista completa de expedientes del backend, la guarda en window.expedientesDB
+    // (fuente de verdad para los filtros locales) y la pinta en la tabla.
     async function cargarExpedientes() {
         try {
-            const res = await fetch(`${API_URL}/expedientes`, { headers: authHeaders() });
+            const res = await fetch(`${API_URL}/api/expedientes`, { headers: authHeaders() });
             const data = await res.json();
 
             if (data.success) {
@@ -629,6 +436,8 @@
     }
 
     // ================= FUNCIONES AUXILIARES =================
+    // Calcula la edad en años a partir de una fecha de nacimiento, ajustando si el
+    // cumpleaños de este año todavía no ha ocurrido.
     function calcularEdad(fechaString) {
         if (!fechaString) return 'N/A';
         const hoy = new Date();
@@ -639,6 +448,8 @@
         return edad + " años";
     }
 
+    // Recolorea el <select> de nivel de riesgo (verde/amarillo/rojo) según la opción
+    // elegida, para que el color sea una señal visual inmediata al capturar la nota.
     function cambiarColorRiesgo(select) {
         select.className = "w-full border-none rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold transition-colors";
         if (select.value === 'Bajo') select.classList.add('bg-green-50', 'text-green-700');
@@ -647,6 +458,8 @@
     }
 
     // ================= FUNCIONES DE LA TABLA =================
+    // Dibuja los botones de paginación (anterior, hasta 5 números, siguiente) de la tabla
+    // de expedientes, deshabilitando los extremos cuando no hay a dónde avanzar/retroceder.
     function renderControlesPaginacionExpedientes(totalPaginas) {
         const cont = document.getElementById('controles_paginacion_expedientes');
         if (totalPaginas <= 1) { cont.innerHTML = ''; return; }
@@ -668,11 +481,16 @@
         cont.innerHTML = botones;
     }
 
+    // Cambia de página y vuelve a pintar la tabla usando la lista filtrada actual (o la
+    // completa si no hay filtro activo).
     function irAPaginaExpedientes(pagina) {
         paginaExpedientesActual = pagina;
         renderExpedientes(window.expedientesFiltradosActuales || window.expedientesDB);
     }
 
+    // Pinta la tabla de expedientes para la lista dada, aplicando la paginación local (10
+    // por página) y armando el botón de "editar" con todos los datos del expediente
+    // incrustados en el onclick para no tener que volver a pedirlos al abrir el detalle.
     function renderExpedientes(lista) {
         const tbody = document.getElementById('lista_expedientes');
         tbody.innerHTML = '';
@@ -749,6 +567,9 @@
         });
     }
 
+    // Filtra window.expedientesDB por texto libre (id, paciente, tutor), especialista y
+    // estatus; guarda el resultado en window.expedientesFiltradosActuales para que la
+    // paginación pueda reutilizarlo sin recalcular el filtro en cada cambio de página.
     function aplicarFiltros() {
         const texto = document.getElementById('buscador_principal').value.toLowerCase();
         const fEsp = document.getElementById('filtro_especialista').value;
@@ -765,6 +586,8 @@
         renderExpedientes(filtrados);
     }
 
+    // Resetea buscador y selects de filtro a sus valores por defecto y vuelve a mostrar
+    // todos los expedientes.
     function limpiarFiltros() {
         document.getElementById('buscador_principal').value = '';
         document.getElementById('filtro_especialista').value = 'Todos';
@@ -775,6 +598,8 @@
     }
 
     // ================= NUEVO EXPEDIENTE =================
+    // Muestra/oculta el input de texto libre para capturar el nombre de una escuela nueva
+    // cuando el usuario elige la opción "Otra escuela" en el <select> de escuelas.
     function toggleNuevaEscuela() {
         const select = document.getElementById('sel_escuela');
         const input = document.getElementById('input_nueva_escuela');
@@ -803,12 +628,15 @@
         }, 10);
     }
 
+    // Cierra el modal de nuevo expediente con la animación de fade/scale.
     function cerrarModalNuevo() {
         document.getElementById('modalNuevo').classList.add('opacity-0');
         document.getElementById('modalNuevoContent').classList.add('scale-95');
         setTimeout(() => { document.getElementById('modalNuevo').classList.add('hidden'); }, 300);
     }
 
+    // Envía el formulario de "Nuevo Expediente" (submit del form). Si se eligió "otra"
+    // escuela, manda el texto libre en escuela_nueva para que el backend la dé de alta.
     async function guardarExpediente(e) {
         e.preventDefault();
         const valEscuela = document.getElementById('sel_escuela').value;
@@ -831,7 +659,7 @@
         btn.innerText = "Guardando..."; btn.disabled = true;
 
         try {
-            const res = await fetch(`${API_URL}/expedientes`, {
+            const res = await fetch(`${API_URL}/api/expedientes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ...authHeaders() },
                 body: JSON.stringify(payload)
@@ -846,6 +674,10 @@
     }
 
     // ================= MODAL DETALLE, TABS Y NOTAS =================
+    // Abre el modal de detalle del expediente con los datos ya recibidos como argumentos
+    // (vienen incrustados en el botón de la fila, ver renderExpedientes), guarda el
+    // estado del expediente actual en variables globales, resetea el formulario de nueva
+    // nota y dispara la carga de notas y documentos desde el servidor.
     function abrirModalDetalle(id, nombre, escuela, estatus, tutor, ingreso, especialista, genero, edad, colonia, telefono_tutor, correo_tutor, fecha_nac_raw, escuela_raw, id_especialista_raw) {
         expedienteActualId = id;
         expedienteActualFechaNac = fecha_nac_raw || '';
@@ -890,12 +722,15 @@
         }, 10);
     }
 
+    // Cierra el modal de detalle del expediente con la animación de fade/scale.
     function cerrarModalDetalle() {
         document.getElementById('modalDetalle').classList.add('opacity-0');
         document.getElementById('modalDetalleContent').classList.add('scale-95');
         setTimeout(() => { document.getElementById('modalDetalle').classList.add('hidden'); }, 300);
     }
 
+    // Cambia entre las pestañas del modal de detalle (notas/datos/docs): oculta todos los
+    // paneles y desactiva todos los botones, luego muestra solo el panel y botón pedidos.
     function cambiarTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(el => {
             el.classList.add('hidden'); el.classList.remove('block');
@@ -914,11 +749,13 @@
     }
 
     // ================= NOTAS DE EVOLUCIÓN =================
+    // Trae el historial de notas clínicas del expediente y las pinta como una línea de
+    // tiempo (la más reciente resaltada), con su badge de nivel de riesgo.
     async function cargarNotas(id) {
         const contenedor = document.getElementById('contenedor_notas');
         contenedor.innerHTML = '<p class="text-sm text-slate-400">Cargando...</p>';
         try {
-            const res = await fetch(`${API_URL}/expedientes/${id}/notas`, { headers: authHeaders() });
+            const res = await fetch(`${API_URL}/api/expedientes/${id}/notas`, { headers: authHeaders() });
             const data = await res.json();
             if (data.success) {
                 contenedor.innerHTML = '';
@@ -960,6 +797,9 @@
         } catch (e) { console.error(e); }
     }
 
+    // Guarda una nueva nota de evolución del formulario de captura rápida (tipo de sesión,
+    // modalidad, asistencia, riesgo y texto libre); toma el id del especialista del propio
+    // token JWT en localStorage en vez de un campo del formulario.
     async function guardarNota() {
         const texto = document.getElementById('texto_nueva_nota').value.trim();
         if (!texto) return alert("La nota está vacía.");
@@ -978,7 +818,7 @@
         };
 
         try {
-            const res = await fetch(`${API_URL}/expedientes/${expedienteActualId}/notas`, {
+            const res = await fetch(`${API_URL}/api/expedientes/${expedienteActualId}/notas`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ...authHeaders() },
                 body: JSON.stringify(payload)
@@ -992,6 +832,8 @@
     }
 
     // ================= EDITAR DATOS DEL TUTOR =================
+    // Alterna entre la vista de solo lectura y el formulario de edición del tutor; al
+    // entrar en modo edición precarga los inputs con los valores actualmente mostrados.
     function toggleEditarTutor() {
         const vista = document.getElementById('vista_tutor');
         const edicion = document.getElementById('edicion_tutor');
@@ -1036,6 +878,9 @@
         }
     }
 
+    // Guarda los datos generales del beneficiario editados en el formulario. Si quien
+    // edita es Admin y cambió el especialista asignado, hace una segunda llamada aparte
+    // a /especialista, porque el backend trata la reasignación como una acción distinta.
     async function guardarBeneficiario() {
         const payload = {
             nombre: document.getElementById('edit_ben_nombre').value,
@@ -1091,6 +936,7 @@
         } catch (e) { console.error(e); alert('Error de conexión.'); }
     }
 
+    // Guarda los datos del tutor (nombre, teléfono, correo) editados en el formulario.
     async function guardarTutor() {
         const payload = {
             tutor: document.getElementById('edit_tutor_nombre').value,
@@ -1098,7 +944,7 @@
             correo_tutor: document.getElementById('edit_tutor_correo').value
         };
         try {
-            const res = await fetch(`${API_URL}/expedientes/${expedienteActualId}/tutor`, {
+            const res = await fetch(`${API_URL}/api/expedientes/${expedienteActualId}/tutor`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', ...authHeaders() },
                 body: JSON.stringify(payload)
@@ -1116,20 +962,23 @@
         } catch (e) { console.error(e); alert('Error de conexión.'); }
     }
 
+    // Elimina un documento adjunto del expediente tras confirmar.
     function eliminarDocumento(idDoc) {
         if (!confirm('¿Eliminar este documento? Esta acción no se puede deshacer.')) return;
-        fetch(`${API_URL}/expedientes/${expedienteActualId}/documentos/${idDoc}`, { method: 'DELETE', headers: authHeaders() })
+        fetch(`${API_URL}/api/expedientes/${expedienteActualId}/documentos/${idDoc}`, { method: 'DELETE', headers: authHeaders() })
             .then(res => res.json())
             .then(data => { if (data.success) cargarDocumentos(expedienteActualId); else alert('No se pudo eliminar.'); })
             .catch(e => { console.error(e); alert('Error de conexión.'); });
     }
 
     // ================= DOCUMENTOS Y CLOUDINARY =================
+    // Trae la lista de documentos adjuntos del expediente y la pinta con su ícono
+    // (PDF o imagen, según la extensión de la URL) y botones de descarga/eliminar.
     async function cargarDocumentos(id) {
         const contenedor = document.getElementById('contenedor_documentos');
         contenedor.innerHTML = '<p class="text-sm text-slate-400">Cargando...</p>';
         try {
-            const res = await fetch(`${API_URL}/expedientes/${id}/documentos`, { headers: authHeaders() });
+            const res = await fetch(`${API_URL}/api/expedientes/${id}/documentos`, { headers: authHeaders() });
             const data = await res.json();
             if (data.success) {
                 contenedor.innerHTML = '';
@@ -1200,7 +1049,7 @@
             const uploadData = await uploadRes.json();
 
             if (uploadData.secure_url) {
-                const dbRes = await fetch(`${API_URL}/expedientes/${expedienteActualId}/documentos`, {
+                const dbRes = await fetch(`${API_URL}/api/expedientes/${expedienteActualId}/documentos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', ...authHeaders() },
                     body: JSON.stringify({
@@ -1228,7 +1077,7 @@
     // ================= ESTATUS CLÍNICO =================
     async function cambiarEstatusExpediente(nuevoEstatus) {
         try {
-            const res = await fetch(`${API_URL}/expedientes/${expedienteActualId}/estatus`, {
+            const res = await fetch(`${API_URL}/api/expedientes/${expedienteActualId}/estatus`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', ...authHeaders() },
                 body: JSON.stringify({ estatus: nuevoEstatus })

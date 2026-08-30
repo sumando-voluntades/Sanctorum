@@ -37,42 +37,11 @@
     <style>
       body { font-family: "Quicksand", sans-serif; }
       .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+      #header-mount { position: fixed; top: 0; left: 0; width: 100%; height: 76px; background: rgba(255,255,255,0.7); z-index: 50; }
     </style>
   </head>
   <body class="bg-surface text-on-surface">
-    <!-- TopNavBar -->
-    <header class="fixed top-0 w-full z-50 rounded-b-xl bg-white/70 backdrop-blur-md shadow-[0_20px_50px_rgba(23,28,31,0.06)]">
-      <div class="flex justify-between items-center max-w-7xl mx-auto px-8 py-4">
-        <div class="flex items-center gap-3">
-          <img alt="Logo Sumando Voluntades Sanctórum" class="h-12 w-auto object-contain" src="Logo.png" />
-        </div>
-        <nav class="hidden md:flex gap-8 items-center">
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="index">Inicio</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="comunidad_blog">Comunidad</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="solicitud_apoyo_oficial">Solicitud de Apoyo</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="como_ayudar">Cómo Ayudar</a>
-          <a class="text-orange-700 font-bold border-b-2 border-orange-500 hover:text-pink-600 transition-colors duration-300 py-1" href="nosotros">Nosotros</a>
-        </nav>
-        <div class="flex items-center gap-4">
-          <a
-            href="expedientes"
-            title="Panel de Administración"
-            class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
-          >
-            admin_panel_settings
-          </a>
-          <a
-            href="como_ayudar#formVoluntariadoPublico"
-            class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
-          >
-            Voluntariado
-          </a>
-          <a href="index#donacion-monetaria" class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all">
-            Donar
-          </a>
-        </div>
-      </div>
-    </header>
+    <div id="header-mount"></div>
 
     <main class="pt-32">
       <!-- Hero -->
@@ -153,48 +122,32 @@
       </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="w-full rounded-t-xl mt-16 bg-slate-50 font-['Quicksand'] leading-relaxed text-sm">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-12 py-16">
-        <div class="flex flex-col gap-6">
-          <img alt="Logo Sumando Voluntades Sanctórum" class="h-16 w-auto object-contain mb-2" src="Logo.png" />
-          <p class="text-slate-500">
-            La salud mental es responsabilidad en sociedad. Construyendo puentes
-            de bienestar para todos.
-          </p>
-        </div>
-        <div>
-          <h4 class="text-pink-700 font-bold mb-6">Redes Sociales</h4>
-          <ul class="space-y-3">
-            <li><a class="text-slate-500 hover:underline hover:text-orange-600 transition-all" href="#">Facebook</a></li>
-            <li><a class="text-slate-500 hover:underline hover:text-orange-600 transition-all" href="#">Instagram</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-pink-700 font-bold mb-6">Contacto</h4>
-          <ul class="space-y-3 text-slate-500">
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">mail</span> ayuda@sanctorum.org</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">call</span> 800-SANCTORUM</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">location_on</span> Ciudad de México, MX</li>
-          </ul>
-        </div>
-      </div>
-      <div class="max-w-7xl mx-auto px-12 py-8 border-t border-slate-200/50 text-center text-slate-500">
-        © 2024 Sumando Voluntades Sanctórum. La salud mental es responsabilidad en sociedad.
-      </div>
-    </footer>
+    <div id="footer-mount"></div>
 
+    <script src="js/comun.js"></script>
+    <script src="js/incluir.js"></script>
     <script>
-      const API_URL = "http://localhost:3000";
       const NOMBRE_ROL_PUBLICO = { 'Admin': 'Administración', 'Coordinador': 'Coordinador/a' };
       const COLOR_ROL = { 'Admin': 'bg-amber-100 text-amber-700', 'Especialista': 'bg-pink-100 text-secondary', 'Coordinador': 'bg-blue-100 text-blue-700' };
 
-      document.addEventListener('DOMContentLoaded', cargarEquipo);
+      // Al cargar la página: inserta navbar/footer públicos, marca el link activo,
+      // habilita el menú móvil y dispara la carga del equipo.
+      document.addEventListener('DOMContentLoaded', async () => {
+          await incluirParcial('#header-mount', 'partials/navbar_publico.html');
+          incluirParcial('#footer-mount', 'partials/footer_publico.html');
+          marcarLinkActivoPublico('#header-mount [data-pagina]');
+          inicializarMenuMovil();
+
+          cargarEquipo();
+      });
 
       let equipoGlobal = [];
       let paginaEquipo = 0;
       const EQUIPO_POR_PAGINA = 6;
 
+      // Obtiene del backend los perfiles públicos del equipo (especialistas,
+      // coordinadores y admin — nunca voluntarios) y los guarda en
+      // equipoGlobal para paginarlos localmente en el carrusel.
       async function cargarEquipo() {
           const cont = document.getElementById('contenedor_equipo');
           try {
@@ -213,6 +166,11 @@
           }
       }
 
+      // Dibuja la página actual (paginaEquipo) del carrusel de equipo, tomando
+      // un bloque de EQUIPO_POR_PAGINA integrantes de equipoGlobal. Resuelve
+      // etiqueta de rol (con caso especial para psicólogos dentro de
+      // "Especialista"), foto o ícono por defecto, y biografía con texto de
+      // respaldo. Muestra/oculta los controles de paginación según haga falta.
       function renderPaginaEquipo() {
           const cont = document.getElementById('contenedor_equipo');
           const controles = document.getElementById('controles_equipo');
@@ -251,6 +209,9 @@
           }
       }
 
+      // Cambia de página en el carrusel de equipo (direccion: -1 o 1), dando
+      // la vuelta circularmente (de la última página regresa a la primera y
+      // viceversa) usando aritmética modular.
       function moverEquipo(direccion) {
           const totalPaginas = Math.ceil(equipoGlobal.length / EQUIPO_POR_PAGINA);
           paginaEquipo = (paginaEquipo + direccion + totalPaginas) % totalPaginas;

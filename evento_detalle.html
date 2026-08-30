@@ -36,27 +36,11 @@
     <style>
       body { font-family: "Quicksand", sans-serif; }
       .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+      #header-mount { position: fixed; top: 0; left: 0; width: 100%; height: 76px; background: rgba(255,255,255,0.7); z-index: 50; }
     </style>
   </head>
   <body class="bg-surface text-on-surface min-h-screen flex flex-col">
-    <!-- TopNavBar -->
-    <header class="fixed top-0 w-full z-50 rounded-b-xl bg-white/70 backdrop-blur-md shadow-[0_20px_50px_rgba(23,28,31,0.06)]">
-      <div class="flex justify-between items-center max-w-7xl mx-auto px-8 py-4">
-        <div class="flex items-center gap-3">
-          <img alt="Logo Sumando Voluntades Sanctórum" class="h-12 w-auto object-contain" src="Logo.png" />
-        </div>
-        <nav class="hidden md:flex gap-8 items-center">
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="index">Inicio</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="comunidad_blog">Comunidad</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="solicitud_apoyo_oficial">Solicitud de Apoyo</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="como_ayudar">Cómo Ayudar</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="nosotros">Nosotros</a>
-        </nav>
-        <a href="como_ayudar#donaciones-especie" class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all">
-          Donar
-        </a>
-      </div>
-    </header>
+    <div id="header-mount"></div>
 
     <main class="flex-grow pt-32 pb-24 px-6">
       <div class="max-w-4xl mx-auto">
@@ -121,46 +105,22 @@
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="w-full rounded-t-xl mt-16 bg-slate-50 font-['Quicksand'] leading-relaxed text-sm">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-12 py-16">
-        <div class="flex flex-col gap-6">
-          <img alt="Logo Sumando Voluntades Sanctórum" class="h-16 w-auto object-contain mb-2" src="Logo.png" />
-          <p class="text-slate-500">
-            La salud mental es responsabilidad en sociedad. Construyendo puentes
-            de bienestar para todos.
-          </p>
-        </div>
-        <div>
-          <h4 class="text-pink-700 font-bold mb-6">Redes Sociales</h4>
-          <ul class="space-y-3">
-            <li><a class="text-slate-500 hover:underline hover:text-orange-600 transition-all" href="#">Facebook</a></li>
-            <li><a class="text-slate-500 hover:underline hover:text-orange-600 transition-all" href="#">Instagram</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-pink-700 font-bold mb-6">Contacto</h4>
-          <ul class="space-y-3 text-slate-500">
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">mail</span> ayuda@sanctorum.org</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">call</span> 800-SANCTORUM</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">location_on</span> Ciudad de México, MX</li>
-          </ul>
-        </div>
-      </div>
-      <div class="max-w-7xl mx-auto px-12 py-8 border-t border-slate-200/50 text-center text-slate-500">
-        © 2024 Sumando Voluntades Sanctórum. La salud mental es responsabilidad en sociedad.
-      </div>
-    </footer>
+    <div id="footer-mount"></div>
 
+    <script src="js/comun.js"></script>
+    <script src="js/incluir.js"></script>
     <script>
-      const API_URL = "http://localhost:3000";
-
       // ---------- VISOR DE IMÁGENES ESTILO "HISTORIA" ----------
       let storyImagenes = [];
       let storyIndiceActual = 0;
       let storyTimer = null;
       const STORY_DURACION_MS = 4000;
 
+      // Inicializa el visor tipo "historia" con el arreglo de URLs de imagen
+      // recibido (descarta valores vacíos/null con filter(Boolean)). Si no
+      // queda ninguna imagen, oculta el visor por completo; si hay al menos
+      // una, muestra el contenedor, dibuja las barras de progreso y arranca
+      // en la primera imagen.
       function iniciarStory(imagenes) {
           storyImagenes = imagenes.filter(Boolean);
           if (storyImagenes.length === 0) {
@@ -172,6 +132,8 @@
           mostrarImagenStory(0);
       }
 
+      // Dibuja una barra de progreso por cada imagen de la historia (solo si
+      // hay más de una imagen); cada barra se rellena con mostrarImagenStory().
       function renderProgresoStory() {
           const cont = document.getElementById('story_progreso');
           if (storyImagenes.length <= 1) { cont.innerHTML = ''; return; }
@@ -181,6 +143,12 @@
               </div>`).join('');
       }
 
+      // Muestra la imagen en la posición "indice" (se acota al rango válido),
+      // actualiza el src del <img> y el estado visual de las barras de
+      // progreso (llenas antes del índice actual, vacías después). Si hay
+      // más de una imagen, arranca un intervalo que rellena la barra actual
+      // en pasos de 100ms hasta completar STORY_DURACION_MS y entonces avanza
+      // automáticamente a la siguiente imagen (storySiguiente).
       function mostrarImagenStory(indice) {
           if (indice < 0) indice = 0;
           if (indice >= storyImagenes.length) indice = storyImagenes.length - 1;
@@ -209,26 +177,55 @@
           }
       }
 
+      // Avanza a la siguiente imagen de la historia; si ya está en la última,
+      // se queda ahí y solo reinicia el temporizador/barra de esa imagen.
       function storySiguiente() {
           if (storyIndiceActual < storyImagenes.length - 1) mostrarImagenStory(storyIndiceActual + 1);
           else mostrarImagenStory(storyIndiceActual); // se queda en la última, reinicia su barra
       }
+      // Retrocede a la imagen anterior de la historia, sin bajar de la primera.
       function storyAnterior() {
           mostrarImagenStory(Math.max(0, storyIndiceActual - 1));
       }
 
+      // Lee el parámetro "id" de la URL (?id=...), que identifica la
+      // publicación o evento a mostrar.
       function obtenerIdDeURL() {
           const params = new URLSearchParams(window.location.search);
           return params.get('id');
       }
 
+      // Lee el parámetro "tipo" de la URL para saber de dónde viene el
+      // registro: 'noticia' (publicación del CMS, valor por defecto) o
+      // 'evento' (registro de la tabla Eventos operativa).
       function obtenerTipoDeURL() {
           const params = new URLSearchParams(window.location.search);
           return params.get('tipo') || 'noticia'; // 'noticia' (default, CMS) | 'evento' (tabla Eventos operativa)
       }
 
-      document.addEventListener('DOMContentLoaded', cargarDetalle);
+      // Al cargar la página: inserta navbar/footer públicos, marca el link
+      // activo, habilita el menú móvil y carga el detalle según los
+      // parámetros de la URL.
+      document.addEventListener('DOMContentLoaded', async () => {
+          await incluirParcial('#header-mount', 'partials/navbar_publico.html');
+          incluirParcial('#footer-mount', 'partials/footer_publico.html');
+          marcarLinkActivoPublico('#header-mount [data-pagina]');
+          inicializarMenuMovil();
 
+          cargarDetalle();
+      });
+
+      // Carga y renderiza el detalle de la publicación o evento indicado en
+      // la URL (id + tipo). Pide en paralelo el registro principal (endpoint
+      // distinto según sea 'evento' o publicación de noticias) y su galería
+      // de imágenes adicionales; si el id falta o la respuesta no es exitosa,
+      // muestra el estado "no encontrado". Arma la vista de forma distinta
+      // según el origen: un evento no tiene "contenido" narrativo propio, así
+      // que se redacta una descripción a partir de sus datos (tipo, sede);
+      // una publicación normal usa su campo "contenido" directamente. En
+      // ambos casos, arranca el visor tipo historia con portada + galería, y
+      // muestra el mapa de ubicación y/o el enlace de reunión si el registro
+      // los trae.
       async function cargarDetalle() {
           const id = obtenerIdDeURL();
           const tipoOrigen = obtenerTipoDeURL();
@@ -309,6 +306,9 @@
           }
       }
 
+      // Comparte el detalle actual: usa la Web Share API nativa si el
+      // navegador la soporta; si no, copia el enlace al portapapeles (con
+      // aviso), y como último recurso muestra un prompt para copiar manualmente.
       function compartirDetalle() {
           const titulo = document.getElementById('det_titulo').innerText;
           const datosCompartir = { title: titulo, text: titulo, url: window.location.href };

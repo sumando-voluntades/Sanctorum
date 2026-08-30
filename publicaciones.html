@@ -12,64 +12,22 @@
   <script id="tailwind-config">
     tailwind.config = { theme: { extend: { colors: { primary: "#8a5100", secondary: "#b50062", surface: "#f6fafe", "surface-container-low": "#f0f4f8" }, fontFamily: { sans: ["Quicksand", "sans-serif"], plus: ["Plus Jakarta Sans", "sans-serif"] } } } };
   </script>
-  <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+  <style>
+    .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+    @media (min-width: 768px) { #sidebar-mount { position: fixed; left: 0; top: 0; width: 18rem; height: 100vh; background: #fff; z-index: 50; } }
+  </style>
 </head>
 <body class="bg-surface text-slate-800 min-h-screen">
 
-  <!-- ================= SIDE NAV BAR UNIVERSAL ================= -->
-  <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
-    <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
-    <nav class="flex-1 px-4 space-y-2">
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="expedientes"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="voluntariado"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="publicaciones"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">campaign</span><span class="font-medium">Publicaciones</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="reportes"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
-    </nav>
-    <div class="px-6 mt-auto space-y-4">
-      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
-      <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
-    </div>
-  </aside>
+  <div id="sidebar-mount"></div>
 
-  <main class="ml-72 min-h-screen flex flex-col">
-    <!-- ================= TOP NAV BAR UNIVERSAL ================= -->
-    <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
-      <div class="flex items-center flex-1">
-        <div class="relative w-full max-w-md">
-          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-          <input id="buscador_principal" oninput="aplicarFiltrosPublicaciones()" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar publicaciones..." type="text" />
-        </div>
-      </div>
-      <div class="flex items-center gap-4 ml-8 relative">
-        <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
-        <div class="h-8 w-px bg-slate-200 mx-2"></div>
-        <a href="perfil" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
-          <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
-          <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
-        </a>
-
-        <!-- Panel de Notificaciones -->
-        <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
-              <h3 class="font-bold text-sm">Notificaciones</h3>
-              <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
-            </div>
-            <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
-                <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
-            </div>
-            <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
-        </div>
-      </div>
-    </header>
+  <main class="md:ml-72 min-h-screen flex flex-col">
+    <div id="header-mount"></div>
 
     <div class="p-8 flex-1">
-      <div class="flex justify-between items-end mb-10">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10">
         <div>
-          <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Publicaciones</h2>
+          <h2 class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2">Publicaciones</h2>
           <p class="text-slate-500 max-w-xl">Noticias, avisos y eventos que alimentan la página pública (Inicio y Comunidad).</p>
         </div>
         <button onclick="abrirModalPublicacion()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-secondary to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
@@ -101,10 +59,11 @@
         <p class="text-slate-400 col-span-3 text-center py-10">Cargando publicaciones...</p>
       </div>
     </div>
+    <div id="footer-mount"></div>
   </main>
 
   <!-- ================= MODAL: NUEVA / EDITAR PUBLICACIÓN ================= -->
-  <div id="modalPublicacion" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10">
+  <div id="modalPublicacion" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0 py-10">
     <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="modalPublicacionContent">
       <div class="bg-gradient-to-r from-[#b50062] to-[#e2007c] px-8 py-6 text-white flex justify-between items-center shrink-0">
         <div><h3 id="modalPublicacionTitulo" class="text-2xl font-bold font-plus">Nueva Publicación</h3></div>
@@ -125,7 +84,7 @@
             <select id="pub_tipo" required onchange="cambiarTipoPublicacion()" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30">
               <option value="Aviso">Aviso</option>
               <option value="Evento">Evento</option>
-              <option value="Historia de Éxito">Historia de Éxito</option>
+              <option id="opcion_tipo_historia" value="Historia de Éxito">Historia de Éxito</option>
               <option value="Otro">Otro: escribir...</option>
             </select>
             <input type="text" id="pub_tipo_otro" placeholder="Escribe el tipo de publicación" class="hidden mt-2 w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none">
@@ -133,7 +92,14 @@
 
           <div id="bloque_consentimiento_historia" class="hidden bg-rose-50 border border-rose-100 rounded-2xl p-6">
             <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-rose-600">verified_user</span> Documento de Consentimiento</h4>
-            <p class="text-xs text-slate-500 mb-4">Obligatorio para publicar una Historia de Éxito: sube el documento firmado que acredita el permiso para compartir esta historia.</p>
+            <p class="text-xs text-slate-500 mb-4">Obligatorio para publicar una Historia de Éxito: sube el documento firmado que acredita el permiso para compartir esta historia. Este mismo documento se usa como la imagen de referencia de la tarjeta en este panel interno — nunca se muestra en el sitio público, para proteger la identidad del beneficiario.</p>
+            <!-- Vista previa del documento ya guardado/recién subido: miniatura si es imagen, enlace con ícono si es PDF. -->
+            <div id="consentimiento_preview_wrap" class="hidden mb-4">
+              <img id="consentimiento_preview_img" class="hidden max-h-32 mx-auto rounded-xl object-cover border border-rose-200" alt="Vista previa del documento de consentimiento">
+              <a id="consentimiento_preview_pdf" href="#" target="_blank" class="hidden items-center gap-2 justify-center text-xs font-bold text-rose-700 bg-white border border-rose-200 rounded-xl py-3 px-4 hover:bg-rose-50 transition-colors">
+                <span class="material-symbols-outlined text-lg">picture_as_pdf</span> Ver documento actual
+              </a>
+            </div>
             <div class="flex items-center gap-4">
               <span id="consentimiento_nombre_archivo" class="text-xs text-slate-500 flex-1 truncate"></span>
               <input type="file" id="input_consentimiento_historia" class="hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="subirConsentimientoHistoria(event)">
@@ -237,7 +203,7 @@
   </div>
 
   <!-- ================= MODAL: CONFIRMAR ELIMINACIÓN ================= -->
-  <div id="modalEliminarPub" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+  <div id="modalEliminarPub" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300">
     <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform scale-95 transition-all" id="modalEliminarPubContent">
       <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
         <span class="material-symbols-outlined text-3xl">delete</span>
@@ -251,152 +217,10 @@
     </div>
   </div>
 
+  <script src="js/comun.js"></script>
+  <script src="js/notificaciones.js"></script>
+  <script src="js/incluir.js"></script>
   <script>
-    function decodeJWT(token) {
-        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        while (base64.length % 4 !== 0) base64 += '=';
-        const binario = atob(base64);
-        const jsonPayload = decodeURIComponent(
-            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-        );
-        return JSON.parse(jsonPayload);
-    }
-
-    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
-    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
-    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
-    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
-    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
-
-    function obtenerNotifDescartadas() {
-        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
-    }
-    function guardarNotifDescartadas(lista) {
-        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
-    }
-
-    function toggleNotificaciones() {
-        const panel = document.getElementById('modalNotificaciones');
-        const estabaOculto = panel.classList.contains('hidden');
-        panel.classList.toggle('hidden');
-        if (estabaOculto) cargarNotificaciones();
-    }
-
-    async function cargarNotificaciones() {
-        const cont = document.getElementById('lista_notificaciones');
-        try {
-            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
-            const json = await res.json();
-            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
-
-            const descartadas = obtenerNotifDescartadas();
-            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
-                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
-                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
-                titulo: a.titulo, detalle: a.detalle || ''
-            }));
-
-            if (json.data.solicitudes_pendientes > 0) {
-                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
-                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
-            }
-            if (json.data.insumos_bajo_stock > 0) {
-                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
-                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
-            }
-
-            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
-            actualizarPuntoNotificaciones(notificaciones.length);
-
-            if (notificaciones.length === 0) {
-                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
-                return;
-            }
-
-            cont.innerHTML = notificaciones.map(n => `
-                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
-                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
-                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
-                    </div>
-                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
-                </div>`).join('');
-        } catch (e) {
-            console.error("Error al cargar notificaciones:", e);
-            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
-        }
-    }
-
-    function actualizarPuntoNotificaciones(cantidad) {
-        const punto = document.getElementById('punto_notificaciones');
-        if (!punto) return;
-        punto.classList.toggle('hidden', cantidad === 0);
-    }
-
-    function descartarNotificacion(id) {
-        const descartadas = obtenerNotifDescartadas();
-        if (!descartadas.includes(id)) descartadas.push(id);
-        guardarNotifDescartadas(descartadas);
-        cargarNotificaciones();
-    }
-
-    function limpiarTodasNotificaciones() {
-        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
-            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
-            if (match) {
-                const descartadas = obtenerNotifDescartadas();
-                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
-                guardarNotifDescartadas(descartadas);
-            }
-        });
-        cargarNotificaciones();
-    }
-
-    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
-    // entra directo por URL a una página no permitida para su rol, lo redirige.
-    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
-    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
-    function aplicarRestriccionesNav(rol, especialidad) {
-        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
-        const permisos = {
-            'dashboard': [1, 3],
-            'expedientes': esPsico ? [1, 2] : [1],
-            'voluntariado': [1, 3],
-            'inventario': [1, 3],
-            'agenda': [1, 2, 3, 4],
-            'publicaciones': [1, 2, 3, 4],
-            'reportes': [1, 2, 3, 4],
-            'aliados_donativos': [1, 3]
-        };
-
-        document.querySelectorAll('aside nav a[href]').forEach(a => {
-            const pagina = a.getAttribute('href');
-            const permitidos = permisos[pagina];
-            if (permitidos && !permitidos.includes(rol)) {
-                a.remove();
-            }
-        });
-
-        // .replace() de mas: por si alguien entra con la extension .html todavia (ej. un
-        // marcador viejo, o pruebas locales sin el rewrite de Vercel), para que la
-        // comparacion contra el mapa de permisos (sin extension) siga funcionando.
-        const paginaActual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
-        const permitidosActual = permisos[paginaActual];
-        if (permitidosActual && !permitidosActual.includes(rol)) {
-            window.location.replace('agenda');
-        }
-    }
-
-    const API_URL = "http://localhost:3000";
-
-    // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
-    function authHeaders() {
-        return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
-    }
-
     // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
     // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
     // pedirla de nuevo en cada subida.
@@ -413,8 +237,24 @@
     let idPubAEliminar = null;
     let origenPubAEliminar = 'publicacion';
     let esRolVoluntario = false;
+    // Solo un psicólogo (Especialista con "psic" en su especialidad), Coordinador o Admin
+    // puede publicar/editar Historias de Éxito — regla real aplicada en el backend
+    // (puedePublicarHistoria() en server.js); aquí solo se refleja en la interfaz para no
+    // ofrecer una opción que el servidor de todos modos va a rechazar.
+    let puedePublicarHistoriaExito = false;
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // Punto de entrada: monta los parciales, valida la sesión, calcula los permisos
+    // propios de esta página (esRolVoluntario, puedePublicarHistoriaExito) y arranca la
+    // carga de publicaciones y los catálogos que usa el modal (eventos, beneficiarios).
+    document.addEventListener('DOMContentLoaded', async () => {
+        await incluirParcial('#sidebar-mount', 'partials/navbar_admin.html');
+        await incluirParcial('#header-mount', 'partials/header_admin.html');
+        incluirParcial('#footer-mount', 'partials/footer_admin.html');
+        marcarLinkActivoAdmin('#sidebar-mount [data-pagina]');
+
+        document.getElementById('buscador_principal').placeholder = 'Buscar publicaciones...';
+        document.getElementById('buscador_principal').addEventListener('input', () => aplicarFiltrosPublicaciones());
+
         const token = localStorage.getItem('token_sanctorum');
         if (!token) { window.location.replace("login"); return; }
         try {
@@ -423,6 +263,11 @@
             document.getElementById('nav_user_name').innerText = payload.nombre.split(' ')[0];
             cargarNotificaciones();
             esRolVoluntario = payload.rol === 4; // Voluntario no puede eliminar publicaciones
+            puedePublicarHistoriaExito = payload.rol === 1 || payload.rol === 3 || (payload.rol === 2 && (payload.especialidad || '').toLowerCase().includes('psic'));
+            if (!puedePublicarHistoriaExito) {
+                const opcionHistoria = document.getElementById('opcion_tipo_historia');
+                if (opcionHistoria) opcionHistoria.remove();
+            }
             verificarAccesoDocumento(payload);
         } catch (e) { window.location.replace("login"); return; }
         cargarPublicaciones();
@@ -430,21 +275,7 @@
         cargarBeneficiariosParaHistoria();
     });
 
-    // Bloquea el acceso si el usuario (Especialista/Coordinador) todavía no tiene
-    // aprobado su documento profesional -- solo puede ver su Perfil.
-    function verificarAccesoDocumento(payload) {
-        if (payload.rol !== 2 && payload.rol !== 3) return;
-        fetch(`${API_URL}/api/usuarios/${payload.id}`, { headers: authHeaders() })
-            .then(r => r.json())
-            .then(j => {
-                const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
-                if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
-                    window.location.replace('perfil');
-                }
-            })
-            .catch(() => {});
-    }
-
+    // Llena el <select> "Relacionar con un evento" del modal con los eventos existentes.
     async function cargarEventosParaRelacionar() {
         try {
             const res = await fetch(`${API_URL}/api/proyectos`, { headers: authHeaders() });
@@ -456,6 +287,8 @@
         } catch (e) { console.error('Error al cargar eventos para relacionar:', e); }
     }
 
+    // Llena el <select> de "Beneficiario" del bloque de Historia de Éxito con la lista de
+    // beneficiarios existentes.
     async function cargarBeneficiariosParaHistoria() {
         try {
             const res = await fetch(`${API_URL}/api/beneficiarios`, { headers: authHeaders() });
@@ -467,6 +300,9 @@
         } catch (e) { console.error('Error al cargar beneficiarios:', e); }
     }
 
+    // Muestra el bloque de campos de "Historia de Éxito" (y el de consentimiento) u oculta
+    // ambos y muestra los campos normales de publicación, según el tipo elegido; ajusta
+    // también si el textarea de contenido normal es obligatorio.
     function cambiarTipoPublicacion() {
         const esHistoria = document.getElementById('pub_tipo').value === 'Historia de Éxito';
         document.getElementById('bloque_consentimiento_historia').classList.toggle('hidden', !esHistoria);
@@ -476,12 +312,15 @@
         toggleTipoOtraPub();
     }
 
+    // Muestra/marca-como-requerido el input de texto libre para el tipo de publicación
+    // cuando se elige la opción "Otro" en el <select> de tipo.
     function toggleTipoOtraPub() {
         const esOtro = document.getElementById('pub_tipo').value === 'Otro';
         document.getElementById('pub_tipo_otro').classList.toggle('hidden', !esOtro);
         document.getElementById('pub_tipo_otro').required = esOtro;
     }
 
+    // Muestra/oculta el input de texto libre de categoría cuando se marca el checkbox "Otro".
     function toggleCategoriaOtraPub() {
         const esOtra = document.getElementById('pub_categoria_otro_check').checked;
         document.getElementById('pub_categoria_otro').classList.toggle('hidden', !esOtra);
@@ -510,6 +349,41 @@
         document.getElementById('pub_categoria_otro').classList.toggle('hidden', libres.length === 0);
     }
 
+    // Un documento de consentimiento puede ser una foto (jpg/png) o un PDF escaneado —
+    // esta comprobación por extensión decide si se puede mostrar como <img> o no.
+    function esUrlDeImagen(url) {
+        return /\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(url || '');
+    }
+
+    // Actualiza la vista previa del documento de consentimiento dentro del modal
+    // (miniatura si es imagen, enlace con ícono si es PDF, oculto si no hay documento).
+    function actualizarPreviewConsentimiento(url) {
+        const wrap = document.getElementById('consentimiento_preview_wrap');
+        const img = document.getElementById('consentimiento_preview_img');
+        const pdfLink = document.getElementById('consentimiento_preview_pdf');
+        if (!url) {
+            wrap.classList.add('hidden');
+            img.classList.add('hidden');
+            pdfLink.classList.add('hidden');
+            pdfLink.classList.remove('flex');
+            return;
+        }
+        wrap.classList.remove('hidden');
+        if (esUrlDeImagen(url)) {
+            img.src = url;
+            img.classList.remove('hidden');
+            pdfLink.classList.add('hidden');
+            pdfLink.classList.remove('flex');
+        } else {
+            pdfLink.href = url;
+            pdfLink.classList.remove('hidden');
+            pdfLink.classList.add('flex');
+            img.classList.add('hidden');
+        }
+    }
+
+    // Sube el documento de consentimiento (foto o PDF) de una Historia de Éxito a
+    // Cloudinary y guarda su secure_url en el input oculto #pub_url_consentimiento.
     async function subirConsentimientoHistoria(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -534,6 +408,9 @@
             if (uploadData.secure_url) {
                 document.getElementById('pub_url_consentimiento').value = uploadData.secure_url;
                 document.getElementById('consentimiento_nombre_archivo').innerText = file.name;
+                // Refresca la vista previa de inmediato para confirmar visualmente que la
+                // subida sí quedó lista para guardarse al enviar el formulario.
+                actualizarPreviewConsentimiento(uploadData.secure_url);
             } else {
                 alert('No se pudo subir el documento.');
             }
@@ -545,12 +422,9 @@
         }
     }
 
-    function cerrarSesion() {
-        localStorage.removeItem('token_sanctorum');
-        window.location.replace("login");
-    }
-
     // ================= CARGA Y RENDER =================
+    // Trae todas las publicaciones (avisos, eventos e historias de éxito juntos, gracias
+    // a ?incluir_historias=1) y las guarda en publicacionesGlobal antes de filtrarlas.
     async function cargarPublicaciones() {
         try {
             const res = await fetch(`${API_URL}/api/publicaciones?incluir_historias=1`);
@@ -565,6 +439,8 @@
         }
     }
 
+    // Filtra publicacionesGlobal por texto, tipo y categoría (una publicación puede tener
+    // varias categorías separadas por coma) y vuelve a pintar el grid.
     function aplicarFiltrosPublicaciones() {
         const texto = document.getElementById('buscador_principal').value.toLowerCase();
         const fTipo = document.getElementById('filtro_tipo').value;
@@ -579,6 +455,7 @@
         renderPublicaciones(filtradas);
     }
 
+    // Resetea buscador y selects de filtro y vuelve a mostrar todas las publicaciones.
     function limpiarFiltrosPublicaciones() {
         document.getElementById('buscador_principal').value = '';
         document.getElementById('filtro_tipo').value = 'Todos';
@@ -586,6 +463,9 @@
         aplicarFiltrosPublicaciones();
     }
 
+    // Pinta el grid de tarjetas de publicaciones. Oculta el botón de editar en historias
+    // si el usuario no puede publicarlas (puedePublicarHistoriaExito) y el de eliminar
+    // si el usuario es Voluntario (esRolVoluntario).
     function renderPublicaciones(lista) {
         const grid = document.getElementById('grid_publicaciones');
         if (lista.length === 0) {
@@ -594,16 +474,28 @@
         }
         grid.innerHTML = lista.map(p => {
             const fecha = new Date(p.fecha_post).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
-            const img = p.url_imagen || '';
             const esHistoriaCard = p.origen === 'historia';
+            // Las Historias de Éxito no tienen fotografía propia: en este panel interno (nunca en
+            // el sitio público, para proteger la identidad del beneficiario) usamos el documento de
+            // consentimiento como referencia visual — miniatura si es imagen, ícono de PDF si no.
+            const img = esHistoriaCard ? (p.url_documento_consentimiento || '') : (p.url_imagen || '');
+            const imgEsFoto = esHistoriaCard ? esUrlDeImagen(img) : true;
             const badgeTipo = p.tipo === 'Evento' ? 'bg-blue-100 text-blue-700' : (esHistoriaCard ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700');
             const verPublicaBtn = esHistoriaCard
                 ? `<span class="flex-1 text-center text-xs font-bold text-slate-400 bg-slate-50 py-2 rounded-full">En Comunidad</span>`
                 : `<a href="evento_detalle?id=${p.id_publicacion}" target="_blank" class="flex-1 text-center text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 py-2 rounded-full transition-colors">Ver pública</a>`;
+            let bloqueImagen;
+            if (!img) {
+                bloqueImagen = `<div class="w-full h-full flex items-center justify-center text-slate-300"><span class="material-symbols-outlined text-4xl">image</span></div>`;
+            } else if (imgEsFoto) {
+                bloqueImagen = `<img src="${img}" class="w-full h-full object-cover" alt="${p.titulo}">`;
+            } else {
+                bloqueImagen = `<a href="${img}" target="_blank" class="w-full h-full flex flex-col items-center justify-center gap-1 text-rose-400 hover:text-rose-500 transition-colors" title="Ver documento de consentimiento"><span class="material-symbols-outlined text-4xl">picture_as_pdf</span><span class="text-[10px] font-bold uppercase">Ver documento</span></a>`;
+            }
             return `
               <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden group">
                 <div class="h-40 bg-slate-100 relative">
-                  ${img ? `<img src="${img}" class="w-full h-full object-cover" alt="${p.titulo}">` : `<div class="w-full h-full flex items-center justify-center text-slate-300"><span class="material-symbols-outlined text-4xl">image</span></div>`}
+                  ${bloqueImagen}
                   <div class="absolute top-3 left-3 flex gap-2">
                     <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full ${badgeTipo}">${p.tipo}</span>
                     ${(p.categoria || '').split(',').map(c => c.trim()).filter(Boolean).map(c => `<span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-white/90 text-slate-600">${c}</span>`).join('')}
@@ -614,9 +506,9 @@
                   <p class="text-xs text-slate-400 mb-4">${fecha}</p>
                   <div class="flex items-center gap-2">
                     ${verPublicaBtn}
-                    <button onclick="abrirModalEditarPub(${p.id_publicacion}, '${p.origen}')" class="p-2 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
+                    ${(esHistoriaCard && !puedePublicarHistoriaExito) ? '' : `<button onclick="abrirModalEditarPub(${p.id_publicacion}, '${p.origen}')" class="p-2 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
                       <span class="material-symbols-outlined text-[18px]">edit</span>
-                    </button>
+                    </button>`}
                     ${esRolVoluntario ? '' : `<button onclick="abrirModalEliminarPub(${p.id_publicacion}, '${p.origen}')" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
                       <span class="material-symbols-outlined text-[18px]">delete</span>
                     </button>`}
@@ -627,6 +519,8 @@
     }
 
     // ================= MODAL CREAR/EDITAR =================
+    // Abre el modal en modo "crear": limpia por completo el formulario (campos normales,
+    // de historia y de consentimiento) y deja habilitado el <select> de tipo.
     function abrirModalPublicacion() {
         document.getElementById('formPublicacion').reset();
         document.getElementById('pub_id').value = '';
@@ -646,6 +540,7 @@
         document.getElementById('bloque_consentimiento_historia').classList.add('hidden');
         document.getElementById('pub_url_consentimiento').value = '';
         document.getElementById('consentimiento_nombre_archivo').innerText = '';
+        actualizarPreviewConsentimiento('');
         document.getElementById('pub_evento_relacionado').value = '';
         document.getElementById('pub_id_beneficiario').value = '';
         document.getElementById('pub_contenido_preayuda').value = '';
@@ -660,6 +555,9 @@
         }, 10);
     }
 
+    // Abre el modal precargado con los datos de la publicación (o historia) a editar,
+    // tomados de publicacionesGlobal. Bloquea el <select> de tipo porque cambiarlo
+    // implicaría mover el registro entre las tablas de publicaciones e historias.
     function abrirModalEditarPub(id, origen) {
         const pub = publicacionesGlobal.find(p => p.id_publicacion === id && p.origen === origen);
         if (!pub) return;
@@ -685,6 +583,7 @@
             document.getElementById('pub_contenido_postayuda').value = pub.contenido_postayuda || '';
             document.getElementById('pub_url_consentimiento').value = pub.url_documento_consentimiento || '';
             document.getElementById('consentimiento_nombre_archivo').innerText = pub.url_documento_consentimiento ? 'Documento ya cargado' : '';
+            actualizarPreviewConsentimiento(pub.url_documento_consentimiento || '');
             document.getElementById('bloque_galeria_adicional').classList.add('hidden');
             document.getElementById('bloque_generador_redes').classList.add('hidden');
             document.getElementById('pub_imagen_preview_wrap').classList.add('hidden');
@@ -717,6 +616,8 @@
     }
 
     // ================= GALERÍA DE FOTOS ADICIONALES (historia con varias imágenes) =================
+    // Trae y pinta las fotos adicionales ya guardadas para esta publicación (más allá de
+    // la portada), cada una con un botón para eliminarla.
     async function cargarGaleriaAdicional(idPub) {
         const cont = document.getElementById('galeria_adicional_preview');
         cont.innerHTML = '<p class="text-xs text-slate-400">Cargando...</p>';
@@ -740,6 +641,8 @@
         }
     }
 
+    // Sube una o varias fotos adicionales a Cloudinary y las va registrando una por una
+    // en /api/galeria; requiere que la publicación ya tenga id (esté guardada).
     async function subirImagenesGaleria(event) {
         const files = Array.from(event.target.files || []);
         if (files.length === 0) return;
@@ -781,6 +684,7 @@
         }
     }
 
+    // Elimina una foto de la galería adicional tras confirmar.
     async function eliminarImagenGaleria(idImagen, idPub) {
         if (!confirm('¿Eliminar esta foto de la galería?')) return;
         try {
@@ -789,6 +693,7 @@
         } catch (e) { alert('No se pudo eliminar la foto.'); }
     }
 
+    // Cierra el modal de publicación con la animación de fade/scale.
     function cerrarModalPublicacion() {
         document.getElementById('modalPublicacion').classList.add('opacity-0');
         document.getElementById('modalPublicacionContent').classList.add('scale-95');
@@ -906,6 +811,8 @@
     }
 
     // ================= ELIMINAR =================
+    // Abre el modal de confirmación de borrado, recordando el id y el origen
+    // ('publicacion' o 'historia') porque cada uno vive en una tabla distinta.
     function abrirModalEliminarPub(id, origen) {
         idPubAEliminar = id;
         origenPubAEliminar = origen || 'publicacion';
@@ -916,12 +823,15 @@
         }, 10);
     }
 
+    // Cierra el modal de confirmación de borrado sin eliminar nada.
     function cerrarModalEliminarPub() {
         document.getElementById('modalEliminarPub').classList.add('opacity-0');
         document.getElementById('modalEliminarPubContent').classList.add('scale-95');
         setTimeout(() => { document.getElementById('modalEliminarPub').classList.add('hidden'); idPubAEliminar = null; }, 300);
     }
 
+    // Confirma y ejecuta el borrado, mandando el origen como query param para que el
+    // backend sepa en qué tabla buscar.
     async function confirmarEliminarPub() {
         if (!idPubAEliminar) return;
         try {
@@ -1001,6 +911,8 @@
         }
     }
 
+    // Envuelve la carga de una <img> en una Promise para poder usar await antes de
+    // dibujarla en el canvas (usado tanto para la foto de la publicación como el logo).
     function cargarImagenParaCanvas(src) {
         return new Promise((resolve, reject) => {
             const img = new Image();

@@ -13,62 +13,22 @@
   <script id="tailwind-config">
     tailwind.config = { theme: { extend: { colors: { primary: "#8a5100", secondary: "#b50062", surface: "#f6fafe", "surface-container-low": "#f0f4f8" }, fontFamily: { sans: ["Quicksand", "sans-serif"], plus: ["Plus Jakarta Sans", "sans-serif"] } } } };
   </script>
-  <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+  <style>
+    .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+    @media (min-width: 768px) { #sidebar-mount { position: fixed; left: 0; top: 0; width: 18rem; height: 100vh; background: #fff; z-index: 50; } }
+  </style>
 </head>
 <body class="bg-surface text-slate-800 min-h-screen">
   
-  <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
-    <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
-    <nav class="flex-1 px-4 space-y-2">
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="dashboard"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">dashboard</span><span class="font-medium">Resumen</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="expedientes"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="voluntariado"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="publicaciones"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="reportes"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
-    </nav>
-    <div class="px-6 mt-auto space-y-4">
-      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
-      <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
-    </div>
-  </aside>
+  <div id="sidebar-mount"></div>
 
-  <main class="ml-72 min-h-screen flex flex-col">
-    <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
-      <div class="flex items-center flex-1">
-        <div class="relative w-full max-w-md">
-          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-          <input id="buscador_principal" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar..." type="text" />
-        </div>
-      </div>
-      <div class="flex items-center gap-4 ml-8 relative">
-        <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
-        <div class="h-8 w-px bg-slate-200 mx-2"></div>
-        <a href="perfil" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
-          <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
-          <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
-        </a>
-
-        <!-- Panel de Notificaciones -->
-        <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
-              <h3 class="font-bold text-sm">Notificaciones</h3>
-              <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
-            </div>
-            <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
-                <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
-            </div>
-            <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
-        </div>
-      </div>
-    </header>
+  <main class="md:ml-72 min-h-screen flex flex-col">
+    <div id="header-mount"></div>
 
     <div class="p-8 flex-1">
-      <div class="flex justify-between items-end mb-10">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10">
         <div>
-          <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Panel de Control</h2>
+          <h2 class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2">Panel de Control</h2>
           <p id="saludo_admin" class="text-slate-500 max-w-xl">Bienvenida de nuevo. Aquí está el impacto de hoy.</p>
         </div>
         <button onclick="abrirModalReporteExport()" class="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-full shadow-lg hover:bg-orange-800 transition-colors shrink-0">
@@ -184,173 +144,21 @@
         </div>
       </div>
     </div>
+    <div id="footer-mount"></div>
   </main>
 
+  <script src="js/comun.js"></script>
+  <script src="js/notificaciones.js"></script>
+  <script src="js/incluir.js"></script>
   <script>
-    // Decodifica el payload de un JWT de forma segura: los JWT usan base64url
-    // (con '-' y '_' en vez de '+' y '/', y sin padding '='), y pueden contener
-    // caracteres UTF-8 (acentos, ñ, etc.). atob() a secas falla o corrompe esos casos.
-    function decodeJWT(token) {
-        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        while (base64.length % 4 !== 0) base64 += '=';
-        const binario = atob(base64);
-        const jsonPayload = decodeURIComponent(
-            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-        );
-        return JSON.parse(jsonPayload);
-    }
+    // Punto de entrada de la página: inserta los parciales de navbar/header/footer,
+    // valida la sesión (token JWT) y dispara todas las cargas de datos del dashboard.
+    document.addEventListener('DOMContentLoaded', async () => {
+        await incluirParcial('#sidebar-mount', 'partials/navbar_admin.html');
+        await incluirParcial('#header-mount', 'partials/header_admin.html');
+        incluirParcial('#footer-mount', 'partials/footer_admin.html');
+        marcarLinkActivoAdmin('#sidebar-mount [data-pagina]');
 
-    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
-    // entra directo por URL a una página no permitida para su rol, lo redirige.
-    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
-    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
-    function aplicarRestriccionesNav(rol, especialidad) {
-        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
-        const permisos = {
-            'dashboard': [1, 3],
-            'expedientes': esPsico ? [1, 2] : [1],
-            'voluntariado': [1, 3],
-            'inventario': [1, 3],
-            'agenda': [1, 2, 3, 4],
-            'publicaciones': [1, 2, 3, 4],
-            'reportes': [1, 2, 3, 4],
-            'aliados_donativos': [1, 3]
-        };
-
-        document.querySelectorAll('aside nav a[href]').forEach(a => {
-            const pagina = a.getAttribute('href');
-            const permitidos = permisos[pagina];
-            if (permitidos && !permitidos.includes(rol)) {
-                a.remove();
-            }
-        });
-
-        // .replace() de mas: por si alguien entra con la extension .html todavia (ej. un
-        // marcador viejo, o pruebas locales sin el rewrite de Vercel), para que la
-        // comparacion contra el mapa de permisos (sin extension) siga funcionando.
-        const paginaActual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
-        const permitidosActual = permisos[paginaActual];
-        if (permitidosActual && !permitidosActual.includes(rol)) {
-            window.location.replace('agenda');
-        }
-    }
-
-    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
-    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
-    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
-    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
-    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
-
-    function obtenerNotifDescartadas() {
-        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
-    }
-    function guardarNotifDescartadas(lista) {
-        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
-    }
-
-    function toggleNotificaciones() {
-        const panel = document.getElementById('modalNotificaciones');
-        const estabaOculto = panel.classList.contains('hidden');
-        panel.classList.toggle('hidden');
-        if (estabaOculto) cargarNotificaciones();
-    }
-
-    async function cargarNotificaciones() {
-        const cont = document.getElementById('lista_notificaciones');
-        try {
-            const res = await fetch(`${API_URL}/api/dashboard/resumen`, { headers: authHeaders() });
-            const json = await res.json();
-            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
-
-            const descartadas = obtenerNotifDescartadas();
-            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
-                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
-                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
-                titulo: a.titulo, detalle: a.detalle || ''
-            }));
-
-            if (json.data.solicitudes_pendientes > 0) {
-                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
-                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
-            }
-            if (json.data.insumos_bajo_stock > 0) {
-                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
-                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
-            }
-
-            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
-            actualizarPuntoNotificaciones(notificaciones.length);
-
-            if (notificaciones.length === 0) {
-                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
-                return;
-            }
-
-            cont.innerHTML = notificaciones.map(n => `
-                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
-                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
-                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
-                    </div>
-                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
-                </div>`).join('');
-        } catch (e) {
-            console.error("Error al cargar notificaciones:", e);
-            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
-        }
-    }
-
-    function actualizarPuntoNotificaciones(cantidad) {
-        const punto = document.getElementById('punto_notificaciones');
-        if (!punto) return;
-        punto.classList.toggle('hidden', cantidad === 0);
-    }
-
-    function descartarNotificacion(id) {
-        const descartadas = obtenerNotifDescartadas();
-        if (!descartadas.includes(id)) descartadas.push(id);
-        guardarNotifDescartadas(descartadas);
-        cargarNotificaciones();
-    }
-
-    function limpiarTodasNotificaciones() {
-        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
-            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
-            if (match) {
-                const descartadas = obtenerNotifDescartadas();
-                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
-                guardarNotifDescartadas(descartadas);
-            }
-        });
-        cargarNotificaciones();
-    }
-
-    const API_URL = "http://localhost:3000";
-
-    // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
-    function authHeaders() {
-        return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
-    }
-
-    // Bloquea el acceso si el usuario (Coordinador) todavía no tiene aprobado
-    // su documento profesional -- solo puede ver su Perfil.
-    function verificarAccesoDocumento(payload) {
-        if (payload.rol !== 2 && payload.rol !== 3) return;
-        fetch(`${API_URL}/api/usuarios/${payload.id}`, { headers: authHeaders() })
-            .then(r => r.json())
-            .then(j => {
-                const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
-                if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
-                    window.location.replace('perfil');
-                }
-            })
-            .catch(() => {});
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token_sanctorum');
         if(!token) { window.location.replace("login"); return; } // .replace evita que puedan regresar
         try {
@@ -359,7 +167,7 @@
             document.getElementById('nav_user_name').innerText = payload.nombre.split(' ')[0];
             document.getElementById('saludo_admin').innerText = `Bienvenido/a de nuevo, ${payload.nombre.split(' ')[0]}. Aquí está el impacto de hoy.`;
             verificarAccesoDocumento(payload);
-        } catch (e) { 
+        } catch (e) {
             localStorage.removeItem('token_sanctorum');
             window.location.replace("login");
         }
@@ -372,11 +180,9 @@
         cargarAcuerdosPendientes();
     });
 
-    function cerrarSesion() {
-        localStorage.removeItem('token_sanctorum');
-        window.location.replace("login");
-    }
-
+    // Carga los KPIs principales (beneficiarios, voluntarios, visitas, insumos con bajo
+    // stock, solicitudes pendientes y donaciones del mes) y la tarjeta de actividad
+    // reciente. Si el backend indica vista_filtrada_coordinador, agrega una nota al saludo.
     async function cargarResumen() {
         try {
             const res = await fetch(`${API_URL}/api/dashboard/resumen`, { headers: authHeaders() });
@@ -418,6 +224,7 @@
     }
 
     // ---------- GRÁFICO DE IMPACTO SOCIAL (barras reales, sin librerías externas) ----------
+    // Se llama al cambiar el <select> de métrica.
     function cambiarMetricaImpacto() {
         // Al cambiar de métrica reseteamos el selector de año, porque cada métrica
         // (y la comparativa) puede tener un rango de años distinto con datos.
@@ -425,6 +232,9 @@
         cargarGraficaImpacto();
     }
 
+    // Pide al backend los totales mensuales de la métrica y año seleccionados, y
+    // dibuja las barras a mano (con % de altura relativo al máximo) en #grafica_impacto.
+    // Si la métrica es "comparativa" delega todo el trabajo a cargarComparativaBeneficiarios.
     async function cargarGraficaImpacto() {
         const metrica = document.getElementById('filtro_metrica_impacto').value;
         const leyenda = document.getElementById('leyenda_comparativa');
@@ -660,6 +470,9 @@
     }
 
     // ================= GENERAR REPORTE (EXPORTAR A EXCEL) =================
+    // Abre el modal de exportación a Excel. La primera vez que se abre rellena el
+    // <select> de años (año actual +1 hasta -4); las siguientes veces no lo vuelve a
+    // tocar (options.length <= 1 evita duplicar las opciones ya generadas).
     function abrirModalReporteExport() {
         const selAnio = document.getElementById('rpt_anio');
         if (selAnio.options.length <= 1) {
@@ -676,6 +489,7 @@
         }, 10);
     }
 
+    // Cierra el modal de exportación con la animación de fade/scale inversa a la de apertura.
     function cerrarModalReporteExport() {
         document.getElementById('modalReporteExport').classList.add('opacity-0');
         document.getElementById('modalReporteExportContent').classList.add('scale-95');
@@ -703,6 +517,9 @@
         }}
     };
 
+    // Convierte las filas crudas del backend en una hoja de Excel (SheetJS) usando los
+    // nombres de columna legibles definidos en HOJAS_REPORTE, en vez de los nombres
+    // técnicos de la base de datos.
     function construirHoja(tipo, filas) {
         const mapa = HOJAS_REPORTE[tipo].columnas;
         const filasLegibles = filas.map(fila => {
@@ -713,6 +530,10 @@
         return XLSX.utils.json_to_sheet(filasLegibles);
     }
 
+    // Arma y descarga el archivo Excel del modal "Generar Reporte": si el tipo es
+    // "todo" pide los 4 tipos de reporte al backend y los agrega como hojas separadas
+    // al mismo libro; si no hay datos en ningún tipo, avisa y no descarga nada.
+    // XLSX.writeFile dispara la descarga del archivo directamente en el navegador.
     async function generarReporteExport() {
         const tipo = document.getElementById('rpt_tipo').value;
         const anio = document.getElementById('rpt_anio').value;
@@ -751,7 +572,7 @@
     }
   </script>
 <!-- ================= MODAL: GENERAR REPORTE (EXPORTAR A EXCEL) ================= -->
-<div id="modalReporteExport" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0">
+<div id="modalReporteExport" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0">
   <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalReporteExportContent">
     <div class="bg-gradient-to-r from-primary to-[#f39200] px-8 py-6 text-white flex justify-between items-center">
       <div><h3 class="text-2xl font-bold font-plus">Generar Reporte</h3></div>

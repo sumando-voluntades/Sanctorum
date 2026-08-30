@@ -103,75 +103,13 @@
       .organic-shape-1 {
         border-radius: 60% 40% 70% 30% / 30% 60% 40% 70%;
       }
+      #header-mount { position: fixed; top: 0; left: 0; width: 100%; height: 76px; background: rgba(255,255,255,0.7); z-index: 50; }
     </style>
   </head>
   <body
     class="bg-surface text-on-surface selection:bg-secondary-container selection:text-white"
   >
-    <!-- TopNavBar -->
-    <header
-      class="fixed top-0 w-full z-50 rounded-b-xl bg-white/70 backdrop-blur-md shadow-[0_20px_50px_rgba(23,28,31,0.06)]"
-    >
-      <div
-        class="flex justify-between items-center max-w-7xl mx-auto px-8 py-4"
-      >
-        <div class="flex items-center gap-3">
-          <img
-            alt="Logo Sumando Voluntades Sanctórum"
-            class="h-12 w-auto object-contain"
-            src="Logo.png"
-          />
-        </div>
-        <nav class="hidden md:flex gap-8 items-center">
-          <a
-            class="text-orange-700 font-bold border-b-2 border-orange-500 hover:text-pink-600 transition-colors duration-300 py-1"
-            href="index"
-            >Inicio</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="comunidad_blog"
-            >Comunidad</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="solicitud_apoyo_oficial"
-            >Solicitud de Apoyo</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="como_ayudar"
-            >Cómo Ayudar</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="nosotros"
-            >Nosotros</a
-          >
-        </nav>
-        <div class="flex items-center gap-4">
-          <a
-            href="expedientes"
-            title="Panel de Administración"
-            class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
-          >
-            admin_panel_settings
-          </a>
-          <a
-            href="como_ayudar#formVoluntariadoPublico"
-            class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
-          >
-            Voluntariado
-          </a>
-          <a
-            href="#donacion-monetaria"
-            class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
-          >
-            Donar
-          </a>
-        </div>
-      </div>
-    </header>
+    <div id="header-mount"></div>
     <main class="pt-24">
       <!-- Hero Section -->
       <section
@@ -237,7 +175,7 @@
       <section id="seccion_esencia" class="bg-surface-container-low py-24 rounded-xl mx-4 lg:mx-8">
         <div class="max-w-7xl mx-auto px-8">
           <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold text-on-surface mb-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-on-surface mb-4">
               Nuestra Esencia
             </h2>
             <p class="text-on-surface-variant max-w-2xl mx-auto">
@@ -300,7 +238,7 @@
       <!-- Nuestros Proyectos (Carrusel dinámico) -->
       <section class="max-w-7xl mx-auto px-8 py-24 overflow-hidden">
         <div class="flex justify-between items-end mb-12">
-          <h2 class="text-4xl font-bold text-on-surface">Nuestros Proyectos</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-on-surface">Nuestros Proyectos</h2>
           <div class="hidden md:flex gap-2">
             <button onclick="moverCarrusel(-1)" class="w-11 h-11 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
               <span class="material-symbols-outlined">chevron_left</span>
@@ -402,7 +340,7 @@
       <section class="max-w-7xl mx-auto px-8 py-24">
         <div class="grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 class="text-4xl font-bold text-on-surface mb-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-on-surface mb-6">
               Transparencia Financiera
             </h2>
             <p class="text-on-surface-variant mb-6 leading-relaxed">
@@ -524,7 +462,7 @@
       <!-- Contact Section -->
       <section class="max-w-7xl mx-auto px-8 py-24">
         <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-on-surface">
+          <h2 class="text-3xl md:text-4xl font-bold text-on-surface">
             Visítanos o Contáctanos
           </h2>
           <p class="text-on-surface-variant mt-4">
@@ -579,68 +517,21 @@
         </div>
       </section>
     </main>
-    <!-- Footer -->
-    <footer
-      class="w-full rounded-t-xl mt-16 bg-slate-50 dark:bg-slate-950 font-['Quicksand'] leading-relaxed text-sm"
-    >
-      <div
-        class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-12 py-16"
-      >
-        <div class="flex flex-col gap-6">
-          <img
-            alt="Logo Sumando Voluntades Sanctórum"
-            class="h-16 w-auto object-contain mb-2"
-            src="Logo.png"
-          />
-          <p class="text-slate-500 dark:text-slate-400">
-            La salud mental es responsabilidad en sociedad. Construyendo puentes
-            de bienestar para todos.
-          </p>
-        </div>
-        <div>
-          <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Redes Sociales
-          </h4>
-          <ul class="space-y-3">
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >Facebook</a
-              >
-            </li>
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >Instagram</a
-              >
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Contacto
-          </h4>
-          <ul class="space-y-3 text-slate-500 dark:text-slate-400">
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">mail</span> ayuda@sanctorum.org</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">call</span> 800-SANCTORUM</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">location_on</span> Ciudad de México, MX</li>
-          </ul>
-        </div>
-      </div>
-      <div
-        class="max-w-7xl mx-auto px-12 py-8 border-t border-slate-200/50 text-center text-slate-500"
-      >
-        © 2024 Sumando Voluntades Sanctórum. La salud mental es responsabilidad
-        en sociedad.
-      </div>
-    </footer>
+    <div id="footer-mount"></div>
 
+    <script src="js/comun.js"></script>
+    <script src="js/incluir.js"></script>
     <script>
-      const API_URL = "http://localhost:3000";
+      // Al cargar la página: inserta navbar/footer públicos, marca el link
+      // activo, habilita el menú móvil y dispara en paralelo la carga de
+      // todas las secciones dinámicas del home (transparencia financiera,
+      // próximo evento, carrusel de proyectos y estadísticas de psicología).
+      document.addEventListener('DOMContentLoaded', async () => {
+          await incluirParcial('#header-mount', 'partials/navbar_publico.html');
+          incluirParcial('#footer-mount', 'partials/footer_publico.html');
+          marcarLinkActivoPublico('#header-mount [data-pagina]');
+          inicializarMenuMovil();
 
-      document.addEventListener('DOMContentLoaded', () => {
           cargarTransparencia();
           cargarProximoEvento();
           cargarCarruselProyectos();
@@ -650,6 +541,10 @@
       // ---------- CARRUSEL DE PROYECTOS (Noticias_Eventos) ----------
       const IMG_PLACEHOLDER_PROYECTO = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAT5vdApGnMD-IeoRT4e3NMVb1xk7JJenXpAG6aqk3StUisXgILjTC7Atb6DXG1a828Tt4zqF3h7wDgcN0_3ku7JvgUHhw9mj3Z3mWQVk115LFqzPuLG4XYHyU6OEoK3licwLWrYey6DU1YBLBRWcmP3rQpUDa9JxWTV9BXm16WTm7WeKtAN3nrymRcODBwM2_cyauiDoRHEB9HwxvrTjkyF-xd6a9FJhjD5XIGQYG5t7hLhd3SnwmEM_b15NSziuuA8VYCra4aVkI';
 
+      // Obtiene hasta 12 publicaciones (proyectos/noticias) y las renderiza
+      // como tarjetas del carrusel. Marca como "Próximamente" las que son de
+      // tipo Evento y su fecha aún no ha pasado; el resto se etiqueta como
+      // "Realizado". El resumen del contenido se recorta a 90 caracteres.
       async function cargarCarruselProyectos() {
           const cont = document.getElementById('carrusel_proyectos');
           try {
@@ -688,6 +583,8 @@
           }
       }
 
+      // Desplaza horizontalmente el carrusel de proyectos (direccion: -1
+      // retrocede, 1 avanza), 340px por click, con scroll suave.
       function moverCarrusel(direccion) {
           const cont = document.getElementById('carrusel_proyectos');
           cont.scrollBy({ left: direccion * 340, behavior: 'smooth' });
@@ -725,11 +622,16 @@
           }
       }
 
+      // Copia la CLABE interbancaria (quitando espacios) usando el helper
+      // con respaldo de copiado/prompt.
       function copiarClabe() {
           const clabe = document.getElementById('texto_clabe').innerText.replace(/\s/g, '');
           copiarTextoConFallback(clabe, 'CLABE copiada al portapapeles: ' + clabe);
       }
 
+      // Comparte la página actual usando la Web Share API nativa si está
+      // disponible; si no, o si falla de forma síncrona, recurre al helper
+      // de copiado/prompt como respaldo.
       function compartirPagina() {
           const datosCompartir = {
               title: 'Sumando Voluntades Sanctórum',
@@ -757,6 +659,12 @@
           'Operación': { color: '#006491', clase: 'bg-tertiary', label: 'Gastos Operativos y Administrativos' }
       };
 
+      // Obtiene el desglose de donaciones por categoría de gasto y lo
+      // renderiza como leyenda (nombre + porcentaje) y como gráfica de dona
+      // (SVG): reconstruye los <circle> de datos sobre el círculo de fondo
+      // usando stroke-dasharray/stroke-dashoffset acumulado para que cada
+      // categoría ocupe su porción del anillo. Actualiza también el total
+      // donado mostrado en el centro de la dona.
       async function cargarTransparencia() {
           const lista = document.getElementById('lista_transparencia');
           try {

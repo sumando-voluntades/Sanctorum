@@ -112,73 +112,11 @@
       .asymmetric-shape {
         border-radius: 4rem 2rem 5rem 2rem;
       }
+      #header-mount { position: fixed; top: 0; left: 0; width: 100%; height: 76px; background: rgba(255,255,255,0.7); z-index: 50; }
     </style>
   </head>
   <body class="min-h-screen flex flex-col">
-    <!-- TopNavBar -->
-    <header
-      class="fixed top-0 w-full z-50 rounded-b-xl bg-white/70 backdrop-blur-md shadow-[0_20px_50px_rgba(23,28,31,0.06)]"
-    >
-      <div
-        class="flex justify-between items-center max-w-7xl mx-auto px-8 py-4"
-      >
-        <div class="flex items-center gap-3">
-          <img
-            alt="Logo Sumando Voluntades Sanctórum"
-            class="h-12 w-auto object-contain"
-            src="Logo.png"
-          />
-        </div>
-        <nav class="hidden md:flex gap-8 items-center">
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="index"
-            >Inicio</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="comunidad_blog"
-            >Comunidad</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="solicitud_apoyo_oficial"
-            >Solicitud de Apoyo</a
-          >
-          <a
-            class="text-orange-700 font-bold border-b-2 border-orange-500 hover:text-pink-600 transition-colors duration-300 py-1"
-            href="como_ayudar"
-            >Cómo Ayudar</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="nosotros"
-            >Nosotros</a
-          >
-        </nav>
-        <div class="flex items-center gap-4">
-          <a
-            href="login"
-            title="Panel de Administración"
-            class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
-          >
-            admin_panel_settings
-          </a>
-          <a
-            href="#formVoluntariadoPublico"
-            class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
-          >
-            Voluntariado
-          </a>
-          <a
-            href="index#donacion-monetaria"
-            class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
-          >
-            Donar
-          </a>
-        </div>
-      </div>
-    </header>
+    <div id="header-mount"></div>
     <main class="flex-grow pt-24">
       <!-- Hero Section -->
       <section class="relative px-6 py-20 overflow-hidden">
@@ -392,67 +330,11 @@
         </div>
       </section>
     </main>
-    <!-- Footer -->
-    <footer
-      class="w-full rounded-t-xl mt-16 bg-slate-50 dark:bg-slate-950 font-['Quicksand'] leading-relaxed text-sm"
-    >
-      <div
-        class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-12 py-16"
-      >
-        <div class="flex flex-col gap-6">
-          <img
-            alt="Logo Sumando Voluntades Sanctórum"
-            class="h-16 w-auto object-contain mb-2"
-            src="Logo.png"
-          />
-          <p class="text-slate-500 dark:text-slate-400">
-            La salud mental es responsabilidad en sociedad. Construyendo puentes
-            de bienestar para todos.
-          </p>
-        </div>
-        <div>
-          <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Redes Sociales
-          </h4>
-          <ul class="space-y-3">
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >Facebook</a
-              >
-            </li>
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >Instagram</a
-              >
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Contacto
-          </h4>
-          <ul class="space-y-3 text-slate-500 dark:text-slate-400">
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">mail</span> ayuda@sanctorum.org</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">call</span> 800-SANCTORUM</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">location_on</span> Ciudad de México, MX</li>
-          </ul>
-        </div>
-      </div>
-      <div
-        class="max-w-7xl mx-auto px-12 py-8 border-t border-slate-200/50 text-center text-slate-500"
-      >
-        © 2024 Sumando Voluntades Sanctórum. La salud mental es responsabilidad
-        en sociedad.
-      </div>
-    </footer>
+    <div id="footer-mount"></div>
 
+    <script src="js/comun.js"></script>
+    <script src="js/incluir.js"></script>
     <script>
-      const API_URL = "http://localhost:3000";
-
       // ---------- DONACIÓN MONETARIA (CLABE / Compartir) ----------
       // Blindada por completo: ninguna rama puede lanzar una excepción sin atrapar.
       function copiarTextoConFallback(texto, mensajeExito) {
@@ -470,11 +352,16 @@
           }
       }
 
+      // Copia la CLABE interbancaria (quitando espacios) usando el helper
+      // con respaldo de copiado/prompt.
       function copiarClabeAyudar() {
           const clabe = document.getElementById('texto_clabe_ayudar').innerText.replace(/\s/g, '');
           copiarTextoConFallback(clabe, 'CLABE copiada al portapapeles: ' + clabe);
       }
 
+      // Comparte la página actual usando la Web Share API nativa si está
+      // disponible; si no, o si falla de forma síncrona, recurre al helper
+      // de copiado/prompt como respaldo.
       function compartirPaginaAyudar() {
           const datosCompartir = {
               title: 'Cómo Ayudar - Sumando Voluntades Sanctórum',
@@ -544,8 +431,20 @@
           'Outreach': { icon: 'menu_book', bg: 'bg-pink-100', text: 'text-pink-600', bar: 'bg-pink-500' }
       };
 
-      document.addEventListener('DOMContentLoaded', cargarNecesidadesDonacion);
+      // Al cargar la página: inserta navbar/footer públicos, marca el link
+      // activo, habilita el menú móvil y carga las necesidades de donación.
+      document.addEventListener('DOMContentLoaded', async () => {
+          await incluirParcial('#header-mount', 'partials/navbar_publico.html');
+          incluirParcial('#footer-mount', 'partials/footer_publico.html');
+          marcarLinkActivoPublico('#header-mount [data-pagina]');
+          inicializarMenuMovil();
 
+          cargarNecesidadesDonacion();
+      });
+
+      // Obtiene del backend los insumos en bajo stock (ya filtrados y
+      // ordenados por urgencia) y los renderiza como tarjetas con ícono por
+      // área de proyecto y barra de progreso hacia la meta de donación.
       async function cargarNecesidadesDonacion() {
           const cont = document.getElementById('contenedor_necesidades');
           try {
@@ -560,7 +459,7 @@
               cont.innerHTML = json.data.map(item => {
                   const estilo = ICONOS_AREA[item.area_proyecto] || ICONOS_AREA['Outreach'];
                   return `
-                    <div class="snap-start shrink-0 w-80 bg-surface-container-lowest rounded-lg p-8 group hover:scale-[1.02] transition-all shadow-[0_10px_30px_rgba(23,28,31,0.04)]">
+                    <div class="snap-start shrink-0 w-72 md:w-80 bg-surface-container-lowest rounded-lg p-8 group hover:scale-[1.02] transition-all shadow-[0_10px_30px_rgba(23,28,31,0.04)]">
                       <div class="w-16 h-16 ${estilo.bg} rounded-full flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined ${estilo.text} text-3xl">${estilo.icon}</span>
                       </div>
@@ -578,6 +477,8 @@
           }
       }
 
+      // Desplaza horizontalmente el carrusel de necesidades de donación
+      // (direccion: -1 retrocede, 1 avanza), 340px por click, con scroll suave.
       function moverSliderNecesidades(direccion) {
           document.getElementById('contenedor_necesidades').scrollBy({ left: direccion * 340, behavior: 'smooth' });
       }

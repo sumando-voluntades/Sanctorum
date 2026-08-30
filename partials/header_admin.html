@@ -1,0 +1,52 @@
+<!--
+  Barra superior (topbar) compartida por todas las páginas del panel de administración:
+  buscador, campana de notificaciones y acceso rápido al perfil. Antes estaba duplicada
+  en cada página con el panel de notificaciones idéntico; ahora vive aquí una sola vez.
+
+  El buscador (#buscador_principal) se deja genérico (placeholder "Buscar...", sin
+  oninput): cada página conecta su propia función de búsqueda después de insertar este
+  parcial, por ejemplo:
+    document.getElementById('buscador_principal').placeholder = 'Buscar aliados...';
+    document.getElementById('buscador_principal').addEventListener('input', e => filtrarAlgo(e.target.value));
+  Así cada página conserva su lógica de búsqueda propia sin duplicar el HTML del header.
+
+  Botón de menú (#btn_menu_sidebar_movil): solo visible en pantallas angostas (md:hidden);
+  abre la barra lateral (partials/navbar_admin.html) llamando a toggleSidebarMovil() (en
+  js/comun.js), ya que en teléfono esa barra empieza oculta fuera de la pantalla.
+-->
+<header class="sticky top-0 z-40 flex justify-between items-center px-4 md:px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
+  <div class="flex items-center flex-1 gap-2">
+    <button id="btn_menu_sidebar_movil" type="button" onclick="toggleSidebarMovil()" class="md:hidden p-2 text-slate-600 shrink-0" aria-label="Abrir menú">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div class="relative w-full max-w-md">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+      <input id="buscador_principal" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar..." type="text" />
+    </div>
+  </div>
+  <div class="flex items-center gap-2 md:gap-4 ml-2 md:ml-8 relative">
+    <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
+    <div class="h-8 w-px bg-slate-200 mx-2 hidden sm:block"></div>
+    <a href="perfil" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
+      <span id="nav_user_name" class="hidden sm:inline text-sm font-bold text-slate-700">Cargando...</span>
+      <!-- id="nav_user_avatar_wrap": si el usuario tiene foto de perfil, perfil.html (pintarPerfil())
+           la inserta aquí como <img>, en todas las páginas del panel — antes esto solo existía
+           en la copia del header de perfil.html; ahora es consistente en las 9 páginas. -->
+      <div id="nav_user_avatar_wrap" class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold overflow-hidden shrink-0"><span class="material-symbols-outlined">person</span></div>
+    </a>
+
+    <!-- Panel de Notificaciones: en pantallas angostas ocupa casi todo el ancho (calc) y se
+         ancla al borde derecho (right-0) para no salirse de la pantalla; desde sm: recupera
+         el ancho fijo y la posición original. -->
+    <div id="modalNotificaciones" class="hidden absolute top-14 right-0 sm:right-32 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+        <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
+          <h3 class="font-bold text-sm">Notificaciones</h3>
+          <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
+        </div>
+        <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+            <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
+        </div>
+        <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
+    </div>
+  </div>
+</header>

@@ -12,65 +12,23 @@
     <script id="tailwind-config">
       tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#8a5100", "primary-container": "#f39200", secondary: "#b50062", "secondary-container": "#e2007c", surface: "#f6fafe", "surface-container-low": "#f0f4f8", "surface-container-lowest": "#ffffff", "on-surface": "#171c1f", "on-surface-variant": "#544434" }, fontFamily: { sans: ["Quicksand", "sans-serif"], plus: ["Plus Jakarta Sans", "sans-serif"] } } } };
     </script>
-    <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+    <style>
+      .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+      @media (min-width: 768px) { #sidebar-mount { position: fixed; left: 0; top: 0; width: 18rem; height: 100vh; background: #fff; z-index: 50; } }
+    </style>
   </head>
   <body class="bg-surface text-slate-800 min-h-screen">
     
-    <!-- ================= SIDE NAV BAR UNIVERSAL ================= -->
-    <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
-      <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
-      <nav class="flex-1 px-4 space-y-2">
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="expedientes"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="voluntariado"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="publicaciones"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="reportes"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
-      <!-- PESTAÑA ACTIVA -->
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="aliados_donativos"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
-      </nav>
-      <div class="px-6 mt-auto space-y-4">
-        <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
-        <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
-      </div>
-    </aside><main class="ml-72 min-h-screen flex flex-col">
-      <!-- ================= TOP NAV BAR UNIVERSAL ================= -->
-      <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
-        <div class="flex items-center flex-1">
-          <div class="relative w-full max-w-md">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-            <input id="buscador_principal" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar aliados..." type="text" />
-          </div>
-        </div>
-        <div class="flex items-center gap-4 ml-8 relative">
-          <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
-          <div class="h-8 w-px bg-slate-200 mx-2"></div>
-          <a href="perfil" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
-            <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
-            <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
-          </a>
-  
-          <!-- PANEL DE NOTIFICACIONES -->
-          <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-              <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
-                <h3 class="font-bold text-sm">Notificaciones</h3>
-                <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
-              </div>
-              <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
-                  <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
-              </div>
-              <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
-          </div>
-        </div>
-      </header>
+    <div id="sidebar-mount"></div>
+    <main class="md:ml-72 min-h-screen flex flex-col">
+      <div id="header-mount"></div>
   
       <div class="p-8 flex-1">
 
         <!-- TÍTULO Y BOTÓN SUPERIOR -->
-        <div class="flex justify-between items-end mb-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-6">
             <div>
-              <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Aliados y Donativos</h2>
+              <h2 class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2">Aliados y Donativos</h2>
               <p class="text-slate-500 max-w-xl">Directorio de aliados externos y registro de donativos recibidos.</p>
             </div>
             <button id="btn_nuevo_aliado" onclick="abrirModalAliado()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-secondary to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
@@ -89,6 +47,10 @@
 
         <div id="panel_aliados">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <!-- overflow-x-auto: en pantallas angostas la tabla se desplaza horizontalmente en
+               vez de recortarse (antes el contenedor era overflow-hidden y las columnas de la
+               derecha, incluyendo los botones de Editar/Eliminar, quedaban inaccesibles). -->
+          <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead class="bg-slate-50 border-b border-slate-200">
               <tr>
@@ -103,11 +65,13 @@
               <tr><td colspan="5" class="px-8 py-10 text-center text-slate-400">Cargando...</td></tr>
             </tbody>
           </table>
+          </div>
         </div>
         </div>
 
         <div id="panel_donativos" class="hidden">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead class="bg-slate-50 border-b border-slate-200">
               <tr>
@@ -123,14 +87,16 @@
               <tr><td colspan="6" class="px-8 py-10 text-center text-slate-400">Cargando...</td></tr>
             </tbody>
           </table>
+          </div>
         </div>
         </div>
 
       </div>
+      <div id="footer-mount"></div>
     </main>
 
     <!-- ================= MODAL: NUEVO / EDITAR ALIADO ================= -->
-    <div id="modalAliado" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0">
+    <div id="modalAliado" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0">
         <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalAliadoContent">
           <div class="bg-gradient-to-r from-[#8a5100] to-[#f39200] px-8 py-6 text-white flex justify-between items-center">
             <div><h3 id="modalAliadoTitulo" class="text-2xl font-bold font-plus">Nuevo Aliado</h3></div>
@@ -142,7 +108,7 @@
                 <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Nombre del Aliado</label>
                 <input type="text" id="ali_nombre" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none" placeholder="Ej. Fundación Ejemplo A.C.">
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                   <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Tipo de Aliado</label>
                   <select id="ali_tipo" onchange="toggleAliTipoOtro()" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
@@ -173,7 +139,7 @@
     </div>
 
     <!-- ================= MODAL: NUEVO DONATIVO ================= -->
-    <div id="modalDonativo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0">
+    <div id="modalDonativo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0">
         <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalDonativoContent">
           <div class="bg-gradient-to-r from-[#8a5100] to-[#f39200] px-8 py-6 text-white flex justify-between items-center">
             <div><h3 class="text-2xl font-bold font-plus">Nuevo Donativo</h3></div>
@@ -186,7 +152,7 @@
                     <option value="">Selecciona un aliado...</option>
                 </select>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                   <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Monto ($)</label>
                   <input type="number" step="0.01" min="0" id="don_monto" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none" value="0">
@@ -196,7 +162,7 @@
                   <input type="date" id="don_fecha" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                   <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Método de Pago</label>
                   <p class="text-[11px] text-slate-400 mb-1 ml-1">¿Cómo se recibió este donativo?</p>
@@ -244,7 +210,7 @@
     </div>
 
     <!-- ================= MODAL: CONFIRMAR ELIMINACIÓN ================= -->
-    <div id="modalEliminarGenerico" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div id="modalEliminarGenerico" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300">
       <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform scale-95 transition-all" id="modalEliminarGenericoContent">
         <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span class="material-symbols-outlined text-3xl">delete</span>
@@ -257,164 +223,13 @@
         </div>
       </div>
     </div>
+<script src="js/comun.js"></script>
+<script src="js/notificaciones.js"></script>
+<script src="js/incluir.js"></script>
 <script>
-    // Decodifica el payload de un JWT de forma segura: los JWT usan base64url
-    // (con '-' y '_' en vez de '+' y '/', y sin padding '='), y pueden contener
-    // caracteres UTF-8 (acentos, ñ, etc.). atob() a secas falla o corrompe esos casos.
-    function decodeJWT(token) {
-        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        while (base64.length % 4 !== 0) base64 += '=';
-        const binario = atob(base64);
-        const jsonPayload = decodeURIComponent(
-            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-        );
-        return JSON.parse(jsonPayload);
-    }
-
-    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
-    // entra directo por URL a una página no permitida para su rol, lo redirige.
-    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
-    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
-    function aplicarRestriccionesNav(rol, especialidad) {
-        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
-        const permisos = {
-            'dashboard': [1, 3],
-            'expedientes': esPsico ? [1, 2] : [1],
-            'voluntariado': [1, 3],
-            'inventario': [1, 3],
-            'agenda': [1, 2, 3, 4],
-            'publicaciones': [1, 2, 3, 4],
-            'reportes': [1, 2, 3, 4],
-            'aliados_donativos': [1, 3]
-        };
-
-        document.querySelectorAll('aside nav a[href]').forEach(a => {
-            const pagina = a.getAttribute('href');
-            const permitidos = permisos[pagina];
-            if (permitidos && !permitidos.includes(rol)) {
-                a.remove();
-            }
-        });
-
-        // .replace() de mas: por si alguien entra con la extension .html todavia (ej. un
-        // marcador viejo, o pruebas locales sin el rewrite de Vercel), para que la
-        // comparacion contra el mapa de permisos (sin extension) siga funcionando.
-        const paginaActual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
-        const permitidosActual = permisos[paginaActual];
-        if (permitidosActual && !permitidosActual.includes(rol)) {
-            window.location.replace('agenda');
-        }
-    }
-
-    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
-    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
-    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
-    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
-    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
-
-    function obtenerNotifDescartadas() {
-        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
-    }
-    function guardarNotifDescartadas(lista) {
-        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
-    }
-
-    function toggleNotificaciones() {
-        const panel = document.getElementById('modalNotificaciones');
-        const estabaOculto = panel.classList.contains('hidden');
-        panel.classList.toggle('hidden');
-        if (estabaOculto) cargarNotificaciones();
-    }
-
-    async function cargarNotificaciones() {
-        const cont = document.getElementById('lista_notificaciones');
-        try {
-            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
-            const json = await res.json();
-            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
-
-            const descartadas = obtenerNotifDescartadas();
-            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
-                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
-                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
-                titulo: a.titulo, detalle: a.detalle || ''
-            }));
-
-            if (json.data.solicitudes_pendientes > 0) {
-                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
-                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
-            }
-            if (json.data.insumos_bajo_stock > 0) {
-                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
-                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
-            }
-
-            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
-            actualizarPuntoNotificaciones(notificaciones.length);
-
-            if (notificaciones.length === 0) {
-                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
-                return;
-            }
-
-            cont.innerHTML = notificaciones.map(n => `
-                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
-                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
-                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
-                    </div>
-                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
-                </div>`).join('');
-        } catch (e) {
-            console.error("Error al cargar notificaciones:", e);
-            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
-        }
-    }
-
-    function actualizarPuntoNotificaciones(cantidad) {
-        const punto = document.getElementById('punto_notificaciones');
-        if (!punto) return;
-        punto.classList.toggle('hidden', cantidad === 0);
-    }
-
-    function descartarNotificacion(id) {
-        const descartadas = obtenerNotifDescartadas();
-        if (!descartadas.includes(id)) descartadas.push(id);
-        guardarNotifDescartadas(descartadas);
-        cargarNotificaciones();
-    }
-
-    function limpiarTodasNotificaciones() {
-        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
-            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
-            if (match) {
-                const descartadas = obtenerNotifDescartadas();
-                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
-                guardarNotifDescartadas(descartadas);
-            }
-        });
-        cargarNotificaciones();
-    }
-
-      // Bloquea el acceso si el usuario (Especialista/Coordinador) todavía no tiene
-      // aprobado su documento profesional -- solo puede ver su Perfil.
-      function verificarAccesoDocumento(payload) {
-          if (payload.rol !== 2 && payload.rol !== 3) return;
-          fetch(`${API_URL}/api/usuarios/${payload.id}`, { headers: authHeaders() })
-              .then(r => r.json())
-              .then(j => {
-                  const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
-                  if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
-                      window.location.replace('perfil');
-                  }
-              })
-              .catch(() => {});
-      }
-  
-      function cerrarSesion() { localStorage.removeItem('token_sanctorum'); window.location.replace("login"); }
+      // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
+      // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
+      // pedirla de nuevo en cada subida.
       let _cloudinaryConfigCache = null;
       async function obtenerConfigCloudinary() {
           if (_cloudinaryConfigCache) return _cloudinaryConfigCache;
@@ -424,16 +239,20 @@
           return _cloudinaryConfigCache;
       }
 
-      const API_URL = "http://localhost:3000";
-
-      function authHeaders() {
-          return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
-      }
-
       let aliadosGlobal = [];
       let donativosGlobal = [];
 
-      document.addEventListener('DOMContentLoaded', () => {
+      // Punto de entrada: monta los parciales, valida sesión y arranca la carga de
+      // aliados y de los catálogos que usan los modales (voluntarios, insumos).
+      document.addEventListener('DOMContentLoaded', async () => {
+          await incluirParcial('#sidebar-mount', 'partials/navbar_admin.html');
+          await incluirParcial('#header-mount', 'partials/header_admin.html');
+          incluirParcial('#footer-mount', 'partials/footer_admin.html');
+          marcarLinkActivoAdmin('#sidebar-mount [data-pagina]');
+
+          document.getElementById('buscador_principal').placeholder = 'Buscar aliados...';
+          document.getElementById('buscador_principal').addEventListener('input', () => filtrarTablaActual());
+
           const token = localStorage.getItem('token_sanctorum');
           if (!token) { window.location.replace("login"); return; }
           try {
@@ -446,17 +265,18 @@
           cargarAliados();
           cargarCatalogosDonativos();
           cargarNotificaciones();
-
-          const inputBuscador = document.getElementById('buscador_principal');
-          if (inputBuscador) { inputBuscador.addEventListener('input', () => { filtrarTablaActual(); }); }
       });
 
+      // Se llama al escribir en el buscador principal: re-pinta la tabla de la pestaña
+      // que esté visible en ese momento (Aliados o Donativos).
       function filtrarTablaActual() {
           const enDonativos = !document.getElementById('panel_donativos').classList.contains('hidden');
           if (enDonativos) renderDonativos(); else renderAliados();
       }
 
       // ================= PESTAÑAS =================
+      // Cambia entre la pestaña "Aliados" y "Donativos": alterna qué panel y qué botón de
+      // "Nuevo..." se muestran, y carga los donativos la primera vez que se entra a esa pestaña.
       function cambiarTabAliados(tab) {
           const esDonativos = tab === 'donativos';
           document.getElementById('panel_aliados').classList.toggle('hidden', esDonativos);
@@ -475,6 +295,7 @@
       }
 
       // ================= ALIADOS =================
+      // Trae el directorio de aliados del backend y lo pinta en su tabla.
       async function cargarAliados() {
           try {
               const res = await fetch(`${API_URL}/api/aliados`, { headers: authHeaders() });
@@ -487,6 +308,7 @@
           }
       }
 
+      // Pinta la tabla de aliados filtrada por el texto del buscador principal.
       function renderAliados() {
           const texto = (document.getElementById('buscador_principal').value || '').toLowerCase();
           const filtrados = aliadosGlobal.filter(a => !texto || a.nombre_aliado.toLowerCase().includes(texto));
@@ -503,10 +325,10 @@
                   <td class="px-6 py-5 text-slate-500 font-medium">${a.usuario_enlace || 'Sin asignar'}</td>
                   <td class="px-6 py-5 text-center">
                     <div class="flex items-center justify-center gap-2">
-                      <button onclick="abrirModalEditarAliado(${a.id_contacto})" class="p-2 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
+                      <button onclick="abrirModalEditarAliado(${a.id_contacto})" class="p-2.5 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
                         <span class="material-symbols-outlined text-[18px]">edit</span>
                       </button>
-                      <button onclick="prepararEliminar('aliado', ${a.id_contacto}, '${(a.nombre_aliado || '').replace(/'/g, "\\'")}')" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
+                      <button onclick="prepararEliminar('aliado', ${a.id_contacto}, '${(a.nombre_aliado || '').replace(/'/g, "\\'")}')" class="p-2.5 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
                         <span class="material-symbols-outlined text-[18px]">delete</span>
                       </button>
                     </div>
@@ -514,6 +336,8 @@
                 </tr>`).join('');
       }
 
+      // Llena el <select> de "Enlace Interno" del modal de Aliado (con voluntarios/staff) y
+      // el de "Insumo relacionado" del modal de Donativo (con el catálogo de insumos).
       async function cargarCatalogosDonativos() {
           try {
               const res = await fetch(`${API_URL}/api/catalogos_agenda`, { headers: authHeaders() });
@@ -525,21 +349,26 @@
           } catch (e) { console.error('Error al cargar catálogos:', e); }
       }
 
+      // Muestra el input de texto libre de "tipo de aliado" cuando se elige "Otro".
       function toggleAliTipoOtro() {
           const esOtro = document.getElementById('ali_tipo').value === 'Otro';
           document.getElementById('ali_tipo_otro').classList.toggle('hidden', !esOtro);
       }
 
+      // Muestra el input de texto libre de "categoría de gasto" cuando se elige "Otro".
       function toggleDonCategoriaOtro() {
           const esOtro = document.getElementById('don_categoria').value === 'Otro';
           document.getElementById('don_categoria_otro').classList.toggle('hidden', !esOtro);
       }
 
+      // Muestra el input de texto libre para el nombre de un insumo nuevo cuando se elige
+      // la opción "__otro__" en el <select> de insumo relacionado (donativo en especie).
       function toggleDonInsumoOtro() {
           const esOtro = document.getElementById('don_id_insumo').value === '__otro__';
           document.getElementById('don_insumo_otro').classList.toggle('hidden', !esOtro);
       }
 
+      // Abre el modal de aliado en modo "crear" (formulario vacío).
       function abrirModalAliado() {
           document.getElementById('formAliado').reset();
           document.getElementById('ali_id').value = '';
@@ -551,6 +380,9 @@
           setTimeout(() => { document.getElementById('modalAliado').classList.remove('opacity-0'); document.getElementById('modalAliadoContent').classList.remove('scale-95'); }, 10);
       }
 
+      // Abre el modal de aliado precargado con sus datos actuales para editarlo. Si el tipo
+      // guardado no es uno de los tipos fijos del <select>, lo trata como "Otro" y lo
+      // muestra en el input de texto libre.
       function abrirModalEditarAliado(id) {
           const item = aliadosGlobal.find(a => a.id_contacto == id);
           if (!item) return;
@@ -575,12 +407,14 @@
           setTimeout(() => { document.getElementById('modalAliado').classList.remove('opacity-0'); document.getElementById('modalAliadoContent').classList.remove('scale-95'); }, 10);
       }
 
+      // Cierra el modal de aliado con la animación de fade/scale y resetea el formulario.
       function cerrarModalAliado() {
           document.getElementById('modalAliado').classList.add('opacity-0');
           document.getElementById('modalAliadoContent').classList.add('scale-95');
           setTimeout(() => { document.getElementById('modalAliado').classList.add('hidden'); document.getElementById('formAliado').reset(); }, 300);
       }
 
+      // Envía el formulario de Aliado: POST si es nuevo, PUT si ya tiene id (edición).
       document.getElementById('formAliado').addEventListener('submit', async (e) => {
           e.preventDefault();
           const btn = e.target.querySelector('button[type="submit"]'); const textoOriginal = btn.innerText; btn.innerText = "Guardando..."; btn.disabled = true;
@@ -604,6 +438,7 @@
       });
 
       // ================= DONATIVOS =================
+      // Trae la lista de donativos registrados del backend y la pinta en su tabla.
       async function cargarDonativos() {
           try {
               const res = await fetch(`${API_URL}/api/donativos`, { headers: authHeaders() });
@@ -616,6 +451,9 @@
           }
       }
 
+      // Pinta la tabla de donativos filtrada por el nombre del aliado. El comprobante solo
+      // se muestra como enlace "Ver" si la URL guardada realmente apunta a Cloudinary
+      // (res.cloudinary.com); cualquier otro valor se marca como "Comprobante inválido".
       function renderDonativos() {
           const texto = (document.getElementById('buscador_principal').value || '').toLowerCase();
           const filtrados = donativosGlobal.filter(d => !texto || (d.nombre_aliado || '').toLowerCase().includes(texto));
@@ -638,7 +476,7 @@
                   <td class="px-6 py-5 text-slate-500 font-medium">${d.metodo_pago || '-'}</td>
                   <td class="px-6 py-5 text-slate-500 font-medium">${d.categoria_gasto || '-'} ${comprobante}</td>
                   <td class="px-6 py-5 text-center">
-                    <button onclick="prepararEliminar('donativo', ${d.id_donacion}, 'este donativo')" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
+                    <button onclick="prepararEliminar('donativo', ${d.id_donacion}, 'este donativo')" class="p-2.5 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
                       <span class="material-symbols-outlined text-[18px]">delete</span>
                     </button>
                   </td>
@@ -646,11 +484,15 @@
           }).join('');
       }
 
+      // Llena el <select> de "Aliado / Donante" del modal de donativo con aliadosGlobal
+      // (ya cargado en memoria, sin volver a pedirlo al servidor).
       async function cargarSelectorAliadosDonativo() {
           const sel = document.getElementById('don_id_contacto');
           sel.innerHTML = '<option value="">Selecciona un aliado...</option>' + aliadosGlobal.map(a => `<option value="${a.id_contacto}">${a.nombre_aliado}</option>`).join('');
       }
 
+      // Abre el modal de nuevo donativo (requiere que ya exista al menos un aliado
+      // registrado); precarga la fecha con el día de hoy.
       function abrirModalDonativo() {
           if (aliadosGlobal.length === 0) { alert('Registra primero al menos un aliado antes de capturar un donativo.'); return; }
           document.getElementById('formDonativo').reset();
@@ -666,12 +508,15 @@
           setTimeout(() => { document.getElementById('modalDonativo').classList.remove('opacity-0'); document.getElementById('modalDonativoContent').classList.remove('scale-95'); }, 10);
       }
 
+      // Cierra el modal de donativo con la animación de fade/scale y resetea el formulario.
       function cerrarModalDonativo() {
           document.getElementById('modalDonativo').classList.add('opacity-0');
           document.getElementById('modalDonativoContent').classList.add('scale-95');
           setTimeout(() => { document.getElementById('modalDonativo').classList.add('hidden'); document.getElementById('formDonativo').reset(); }, 300);
       }
 
+      // Sube el comprobante de un donativo (imagen o PDF) a Cloudinary y guarda su
+      // secure_url en el input oculto #don_comprobante_url.
       async function subirComprobanteDonativo(event) {
           const file = event.target.files[0];
           if (!file) return;
@@ -703,6 +548,8 @@
           } finally { btn.innerText = textoOriginal; btn.disabled = false; }
       }
 
+      // Envía el formulario de nuevo donativo. Si el insumo relacionado es "__otro__",
+      // manda el nombre escrito a mano en insumo_nuevo para que el backend lo dé de alta.
       document.getElementById('formDonativo').addEventListener('submit', async (e) => {
           e.preventDefault();
           const btn = e.target.querySelector('button[type="submit"]'); const textoOriginal = btn.innerText; btn.innerText = "Guardando..."; btn.disabled = true;
@@ -729,6 +576,8 @@
 
       // ================= ELIMINAR (genérico para aliados y donativos) =================
       let elimPendiente = { tipo: null, id: null };
+      // Abre el modal de confirmación de borrado compartido por ambas tablas, guardando el
+      // tipo ('aliado' o 'donativo') y el id en elimPendiente para saber qué endpoint llamar.
       function prepararEliminar(tipo, id, nombre) {
           elimPendiente = { tipo, id };
           document.getElementById('elim_generico_titulo').innerText = tipo === 'aliado' ? '¿Eliminar este aliado?' : '¿Eliminar este donativo?';
@@ -736,11 +585,14 @@
           document.getElementById('modalEliminarGenerico').classList.remove('hidden');
           setTimeout(() => { document.getElementById('modalEliminarGenerico').classList.remove('opacity-0'); document.getElementById('modalEliminarGenericoContent').classList.remove('scale-95'); }, 10);
       }
+      // Cierra el modal de confirmación de borrado sin eliminar nada.
       function cerrarModalEliminarGenerico() {
           document.getElementById('modalEliminarGenerico').classList.add('opacity-0');
           document.getElementById('modalEliminarGenericoContent').classList.add('scale-95');
           setTimeout(() => { document.getElementById('modalEliminarGenerico').classList.add('hidden'); elimPendiente = { tipo: null, id: null }; }, 300);
       }
+      // Ejecuta el borrado confirmado, eligiendo el endpoint (aliados o donativos) y la
+      // recarga correspondiente según elimPendiente.tipo.
       async function confirmarEliminarGenerico() {
           if (!elimPendiente.id) return;
           const endpoint = elimPendiente.tipo === 'aliado' ? `${API_URL}/api/aliados/${elimPendiente.id}` : `${API_URL}/api/donativos/${elimPendiente.id}`;

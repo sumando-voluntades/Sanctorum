@@ -12,64 +12,22 @@
   <script id="tailwind-config">
     tailwind.config = { theme: { extend: { colors: { primary: "#8a5100", secondary: "#b50062", surface: "#f6fafe" }, fontFamily: { sans: ["Quicksand", "sans-serif"], plus: ["Plus Jakarta Sans", "sans-serif"] } } } };
   </script>
-  <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+  <style>
+    .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+    @media (min-width: 768px) { #sidebar-mount { position: fixed; left: 0; top: 0; width: 18rem; height: 100vh; background: #fff; z-index: 50; } }
+  </style>
 </head>
 <body class="bg-surface text-slate-800 min-h-screen">
   
-  <!-- ================= SIDE NAV BAR ================= -->
-  <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
-    <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
-    <nav class="flex-1 px-4 space-y-2">
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="expedientes"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="voluntariado"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="inventario"><span class="material-symbols-outlined">inventory_2</span><span class="font-medium">Inventario</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="agenda"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">school</span><span class="font-medium">Agenda</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="publicaciones"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="reportes"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
-    </nav>
-    <div class="px-6 mt-auto space-y-4">
-      <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
-      <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
-    </div>
-  </aside>
+  <div id="sidebar-mount"></div>
 
-  <main class="ml-72 min-h-screen flex flex-col">
-    <!-- ================= TOP NAV BAR ================= -->
-    <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
-      <div class="flex items-center flex-1">
-        <div class="relative w-full max-w-md">
-          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-          <input id="buscador_principal" oninput="buscarGlobalAgenda(this.value)" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar escuela, paciente o actividad..." type="text" />
-        </div>
-      </div>
-      <div class="flex items-center gap-4 ml-8">
-        <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
-        <div class="h-8 w-px bg-slate-200 mx-2"></div>
-        <a href="perfil" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
-          <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
-          <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
-        </a>
-
-        <!-- Panel de Notificaciones -->
-        <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-            <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
-              <h3 class="font-bold text-sm">Notificaciones</h3>
-              <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
-            </div>
-            <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
-                <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
-            </div>
-            <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
-        </div>
-      </div>
-    </header>
+  <main class="md:ml-72 min-h-screen flex flex-col">
+    <div id="header-mount"></div>
 
     <div class="p-8 flex-1 w-full overflow-hidden">
-      <div class="flex justify-between items-end mb-8">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
         <div>
-          <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Agenda</h2>
+          <h2 class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2">Agenda</h2>
           <p class="text-slate-500 max-w-xl">Eventos, reuniones escolares y citas clínicas — todo en un solo lugar.</p>
         </div>
         <button id="btn_agendar_actividad" onclick="abrirModalAgenda()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-[#b50062] to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
@@ -148,10 +106,11 @@
         </div>
       </div>
     </div>
+    <div id="footer-mount"></div>
   </main>
 
   <!-- ================= EL GRAN MODAL MULTI-PROPÓSITO ================= -->
-  <div id="modalAgenda" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0 py-10">
+  <div id="modalAgenda" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0 py-10">
     <div class="bg-white rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-full flex flex-col" id="modalAgendaContent">
       
       <div class="bg-gradient-to-r from-blue-700 to-indigo-600 px-8 py-6 text-white flex justify-between items-center shrink-0">
@@ -181,17 +140,17 @@
                 <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4">
                     <p class="text-xs text-blue-700 font-bold"><span class="material-symbols-outlined text-sm align-middle">info</span> Este formulario registrará una nueva escuela en la base de datos y programará la visita.</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div><label class="block text-sm font-bold text-slate-700 mb-1">Nombre de la Escuela / Institución</label><input type="text" id="vis_escuela" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"></div>
                     <div><label class="block text-sm font-bold text-slate-700 mb-1">Asistentes esperados</label><input type="number" min="0" id="vis_asistentes_plan" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none" placeholder="Ej. 15"></div>
                 </div>
 
                 <h4 class="font-bold text-slate-800 border-b pb-2 mt-4">Datos del Contacto</h4>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div><label class="block text-sm font-bold text-slate-700 mb-1">Nombre</label><input type="text" id="vis_contacto" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"></div>
                     <div><label class="block text-sm font-bold text-slate-700 mb-1">Puesto (Ej. Director)</label><input type="text" id="vis_puesto" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div><label class="block text-sm font-bold text-slate-700 mb-1">Teléfono</label><input type="tel" id="vis_telefono" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"></div>
                     <div>
                       <label class="block text-sm font-bold text-slate-700 mb-1">Ubicación (Link de Google Maps o Dirección física)</label>
@@ -206,7 +165,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-1">Título del Evento</label>
                     <input type="text" id="ev_titulo" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-1">Sede / Escuela</label>
                         <select id="ev_escuela" class="cat_escuelas w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none cursor-pointer">
@@ -224,7 +183,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
                     <!-- SECCIÓN MATERIALES (BARRA DESPLAZADORA) -->
                     <div class="bg-amber-50 p-5 rounded-2xl border border-amber-100">
                         <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-amber-600">inventory_2</span> Material a utilizar</h4>
@@ -294,7 +253,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Título de la Sesión</label>
                     <input type="text" id="cli_titulo" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none" placeholder="Ej. Sesión Diagnóstica - 1ra vez">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Beneficiario (Paciente)</label>
                         <select id="cli_beneficiario" class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none cursor-pointer">
@@ -329,7 +288,7 @@
             </div>
 
             <!-- FECHA Y HORA UNIVERSAL -->
-            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                 <div><label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Fecha de Actividad</label><input type="date" id="gral_fecha" required class="w-full px-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></div>
                 <div><label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Hora</label><input type="time" id="gral_hora" required class="w-full px-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></div>
             </div>
@@ -346,161 +305,10 @@
   <!-- INSUMOS TEMPLATE (OCULTO, SOLO PARA COPIAR JS) -->
   <select id="insumos_template" class="hidden"><option value="0">No requiere material...</option><option value="otro">Otro: escribir... (no está en inventario)</option></select>
 
+  <script src="js/comun.js"></script>
+  <script src="js/notificaciones.js"></script>
+  <script src="js/incluir.js"></script>
   <script>
-    // Decodifica el payload de un JWT de forma segura: los JWT usan base64url
-    // (con '-' y '_' en vez de '+' y '/', y sin padding '='), y pueden contener
-    // caracteres UTF-8 (acentos, ñ, etc.). atob() a secas falla o corrompe esos casos.
-    function decodeJWT(token) {
-        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        while (base64.length % 4 !== 0) base64 += '=';
-        const binario = atob(base64);
-        const jsonPayload = decodeURIComponent(
-            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-        );
-        return JSON.parse(jsonPayload);
-    }
-
-    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
-    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
-    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
-    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
-    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
-
-    function obtenerNotifDescartadas() {
-        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
-    }
-    function guardarNotifDescartadas(lista) {
-        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
-    }
-
-    function toggleNotificaciones() {
-        const panel = document.getElementById('modalNotificaciones');
-        const estabaOculto = panel.classList.contains('hidden');
-        panel.classList.toggle('hidden');
-        if (estabaOculto) cargarNotificaciones();
-    }
-
-    async function cargarNotificaciones() {
-        const cont = document.getElementById('lista_notificaciones');
-        try {
-            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
-            const json = await res.json();
-            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
-
-            const descartadas = obtenerNotifDescartadas();
-            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
-                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
-                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
-                titulo: a.titulo, detalle: a.detalle || ''
-            }));
-
-            if (json.data.solicitudes_pendientes > 0) {
-                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
-                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
-            }
-            if (json.data.insumos_bajo_stock > 0) {
-                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
-                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
-            }
-
-            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
-            actualizarPuntoNotificaciones(notificaciones.length);
-
-            if (notificaciones.length === 0) {
-                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
-                return;
-            }
-
-            cont.innerHTML = notificaciones.map(n => `
-                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
-                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
-                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
-                    </div>
-                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
-                </div>`).join('');
-        } catch (e) {
-            console.error("Error al cargar notificaciones:", e);
-            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
-        }
-    }
-
-    function actualizarPuntoNotificaciones(cantidad) {
-        const punto = document.getElementById('punto_notificaciones');
-        if (!punto) return;
-        punto.classList.toggle('hidden', cantidad === 0);
-    }
-
-    function descartarNotificacion(id) {
-        const descartadas = obtenerNotifDescartadas();
-        if (!descartadas.includes(id)) descartadas.push(id);
-        guardarNotifDescartadas(descartadas);
-        cargarNotificaciones();
-    }
-
-    function limpiarTodasNotificaciones() {
-        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
-            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
-            if (match) {
-                const descartadas = obtenerNotifDescartadas();
-                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
-                guardarNotifDescartadas(descartadas);
-            }
-        });
-        cargarNotificaciones();
-    }
-
-    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
-    // entra directo por URL a una página no permitida para su rol, lo redirige.
-    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
-    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
-    function aplicarRestriccionesNav(rol, especialidad) {
-        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
-        esUsuarioPsicologo = esPsico;
-        const permisos = {
-            'dashboard': [1, 3],
-            'expedientes': esPsico ? [1, 2] : [1],
-            'voluntariado': [1, 3],
-            'inventario': [1, 3],
-            'agenda': [1, 2, 3, 4],
-            'publicaciones': [1, 2, 3, 4],
-            'reportes': [1, 2, 3, 4],
-            'aliados_donativos': [1, 3]
-        };
-
-        document.querySelectorAll('aside nav a[href]').forEach(a => {
-            const pagina = a.getAttribute('href');
-            const permitidos = permisos[pagina];
-            if (permitidos && !permitidos.includes(rol)) {
-                a.remove();
-            }
-        });
-
-        // .replace() de mas: por si alguien entra con la extension .html todavia (ej. un
-        // marcador viejo, o pruebas locales sin el rewrite de Vercel), para que la
-        // comparacion contra el mapa de permisos (sin extension) siga funcionando.
-        const paginaActual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
-        const permitidosActual = permisos[paginaActual];
-        if (permitidosActual && !permitidosActual.includes(rol)) {
-            window.location.replace('agenda');
-        }
-
-        // Solo Admin, Coordinador y Psicólogo pueden agendar actividades.
-        const puedeAgendar = rol === 1 || rol === 3 || esPsico;
-        const btnAgendar = document.getElementById('btn_agendar_actividad');
-        if (btnAgendar) btnAgendar.classList.toggle('hidden', !puedeAgendar);
-    }
-
-    const API_URL = "http://localhost:3000";
-
-    // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
-    function authHeaders() {
-        return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
-    }
-
     // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
     // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
     // pedirla de nuevo en cada subida.
@@ -516,13 +324,33 @@
     let userIdActual = null;
     let esUsuarioPsicologo = false;
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // Punto de entrada: monta los parciales, valida sesión, calcula permisos propios de
+    // Agenda (quién puede agendar, quién ve el directorio de pacientes) y dispara todas
+    // las cargas iniciales (directorios, calendario, catálogos del modal).
+    document.addEventListener('DOMContentLoaded', async () => {
+        await incluirParcial('#sidebar-mount', 'partials/navbar_admin.html');
+        await incluirParcial('#header-mount', 'partials/header_admin.html');
+        incluirParcial('#footer-mount', 'partials/footer_admin.html');
+        marcarLinkActivoAdmin('#sidebar-mount [data-pagina]');
+
+        document.getElementById('buscador_principal').placeholder = 'Buscar escuela, paciente o actividad...';
+        document.getElementById('buscador_principal').addEventListener('input', e => buscarGlobalAgenda(e.target.value));
+
         const token = localStorage.getItem('token_sanctorum');
         if(!token) { window.location.replace("login"); return; }
         try {
             const payload = decodeJWT(token);
             aplicarRestriccionesNav(payload.rol, payload.especialidad);
             document.getElementById('nav_user_name').innerText = payload.nombre.split(' ')[0];
+
+            // Solo Admin, Coordinador y Psicólogo pueden agendar actividades — lógica propia
+            // de esta página (no forma parte de aplicarRestriccionesNav compartida).
+            const esPsico = Number(payload.rol) === ROL_ESPECIALISTA && (payload.especialidad || '').toLowerCase().includes('psic');
+            esUsuarioPsicologo = esPsico;
+            const puedeAgendar = Number(payload.rol) === ROL_ADMIN || Number(payload.rol) === ROL_COORDINADOR || esPsico;
+            const btnAgendar = document.getElementById('btn_agendar_actividad');
+            if (btnAgendar) btnAgendar.classList.toggle('hidden', !puedeAgendar);
+
             cargarNotificaciones();
             userIdActual = payload.id;
             restringirPestanaPacientes(payload.rol, payload.especialidad);
@@ -536,25 +364,11 @@
         cambiarVistaFormulario();
     });
 
-    // Bloquea el acceso a esta página si el usuario (Especialista o Coordinador) todavía
-    // no tiene aprobado su documento profesional — solo puede ver su Perfil.
-    function verificarAccesoDocumento(payload) {
-        if (payload.rol !== 2 && payload.rol !== 3) return;
-        fetch(`${API_URL}/api/usuarios/${payload.id}`, { headers: authHeaders() })
-            .then(r => r.json())
-            .then(j => {
-                const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
-                if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
-                    window.location.replace('perfil');
-                }
-            })
-            .catch(() => {});
-    }
-
-    function cerrarSesion() { localStorage.removeItem('token_sanctorum'); window.location.replace("login"); }
-
     // ================= MODAL LÓGICA =================
-    function abrirModalAgenda() { 
+    // Abre el modal en modo "crear": limpia el formulario, resetea el título/botón a modo
+    // alta, fuerza el tipo "clinica" y lo bloquea si el usuario es psicólogo (solo puede
+    // agendar citas clínicas), y arranca con una fila de insumos vacía.
+    function abrirModalAgenda() {
         document.getElementById('edit_id').value = '';
         document.getElementById('formAgenda').reset();
         document.getElementById('titulo_modal').innerText = "Agendar Nueva Actividad";
@@ -574,8 +388,12 @@
         setTimeout(() => { document.getElementById('modalAgenda').classList.remove('opacity-0'); document.getElementById('modalAgendaContent').classList.remove('scale-95'); }, 10); 
     }
 
+    // Cierra el modal con la animación de fade/scale y resetea el formulario a la vista por defecto.
     function cerrarModalAgenda() { document.getElementById('modalAgenda').classList.add('opacity-0'); document.getElementById('modalAgendaContent').classList.add('scale-95'); setTimeout(() => { document.getElementById('modalAgenda').classList.add('hidden'); document.getElementById('formAgenda').reset(); cambiarVistaFormulario(); }, 300); }
 
+    // Muestra la sub-sección del formulario correspondiente al tipo elegido (visita,
+    // evento o clínica) y ajusta qué campos son "required" según esa vista, para que el
+    // navegador no exija campos ocultos de las otras vistas.
     function cambiarVistaFormulario() {
         const tipo = document.getElementById('tipo_agendamiento').value;
         document.getElementById('vista_visita').classList.toggle('hidden', tipo !== 'visita');
@@ -588,6 +406,8 @@
         document.getElementById('cli_beneficiario').required = (tipo === 'clinica');
     }
 
+    // Alterna entre mostrar el campo de ubicación física o el de link de Meet, según si
+    // la cita clínica se marcó como presencial o en línea.
     function cambiarModalidadClinica() {
         const campoOnline = document.getElementById('cli_modalidad_online');
         const online = campoOnline ? campoOnline.checked : false;
@@ -595,6 +415,8 @@
         document.getElementById('cli_campo_ubicacion').classList.toggle('hidden', online);
     }
 
+    // Filtra visualmente (oculta con .hidden) las etiquetas de voluntarios del equipo de
+    // campo cuyo nombre no coincide con el texto buscado.
     function filtrarEquipoCampo() {
         const campo = document.getElementById('ev_buscar_equipo');
         const texto = (campo ? campo.value : '').trim().toLowerCase();
@@ -606,6 +428,10 @@
 
     // ================= LÓGICA DE INVENTARIO =================
     // ================= FOTOGRAFÍA DEL EVENTO (Cloudinary) =================
+    // Sube la foto del evento directamente desde el navegador a Cloudinary (sin pasar por
+    // nuestro backend) usando el cloud_name/upload_preset públicos. La respuesta trae
+    // "secure_url", que es lo único que guardamos: se mete en el input oculto
+    // #ev_url_imagen y es lo que se envía al backend al guardar el evento.
     async function subirImagenEvento(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -642,6 +468,9 @@
         }
     }
 
+    // Agrega dinámicamente una fila de "material a utilizar" al formulario de evento,
+    // clonando las opciones del <select id="insumos_template"> oculto (que ya trae el
+    // catálogo de insumos cargado por cargarCatalogosModal).
     function agregarFilaInsumo() {
         const div = document.createElement('div');
         div.className = 'flex flex-col gap-1 bg-white p-2 rounded-xl shadow-sm mt-2';
@@ -660,6 +489,8 @@
         document.getElementById('contenedor_insumos').appendChild(div);
     }
 
+    // Muestra el campo de texto libre "Nombre del material" cuando el usuario elige la
+    // opción "otro" (material que no está en el inventario) en el <select> de la fila.
     function toggleInsumoOtro(selectEl) {
         const contenedorFila = selectEl.closest('div.flex.flex-col');
         const inputOtro = contenedorFila ? contenedorFila.querySelector('.insumo_otro') : null;
@@ -682,6 +513,9 @@
         }
     }
 
+    // Evita pedir más cantidad de un insumo de la que hay en stock: compara la cantidad
+    // escrita contra el data-stock de la opción seleccionada y, si se pasa, la recorta
+    // al máximo disponible y avisa con un alert.
     function validarStock(inputField) {
         const select = inputField.parentElement.querySelector('.insumo_select');
         if (!select) return;
@@ -905,6 +739,8 @@
     });
 
     // ================= LISTADO, FILTROS Y ELIMINAR =================
+    // Marca una visita de prospección como realizada: pide por prompt() cuántas personas
+    // asistieron de verdad y lo manda al backend para cerrar el registro.
     async function completarVisita(id) {
         const asistentesReales = prompt('¿Cuántas personas asistieron realmente a esta visita?');
         if (asistentesReales === null) return;
@@ -920,6 +756,8 @@
         } catch (e) { console.error(e); alert('Error de conexión.'); }
     }
 
+    // Elimina una actividad (visita, evento o cita) tras confirmar; el backend se encarga
+    // de regresar el material usado al inventario.
     async function eliminarActividad(id, categoria) {
         if(!confirm("¿Estás súper seguro de eliminar este registro? Esta acción no se puede deshacer y regresará el material al inventario.")) return;
         try {
@@ -934,6 +772,8 @@
     let tabDirectorioActivo = 'escuelas';
     let seleccionActual = null; // { tipo: 'escuela'|'paciente', id: N } o null (vista general)
 
+    // Carga en paralelo el directorio de escuelas y el de pacientes/beneficiarios y los
+    // guarda en las variables globales que usa renderDirectorio() para pintarlos.
     async function cargarDirectorios() {
         try {
             const [resEsc, resPac] = await Promise.all([
@@ -963,6 +803,8 @@
         }
     }
 
+    // Cambia entre la pestaña "Escuelas" y "Pacientes" del panel izquierdo: actualiza los
+    // estilos de las pestañas, limpia el buscador y vuelve a pintar la lista.
     function cambiarTabDirectorio(tab) {
         tabDirectorioActivo = tab;
         const btnEsc = document.getElementById('tabDirEscuelas');
@@ -979,8 +821,12 @@
         renderDirectorio();
     }
 
+    // Se llama al escribir en el buscador del directorio; simplemente re-pinta la lista
+    // (el filtrado por texto ocurre dentro de renderDirectorio).
     function filtrarDirectorio() { renderDirectorio(); }
 
+    // Pinta la lista del directorio (escuelas o pacientes según la pestaña activa),
+    // aplicando el filtro de texto y resaltando el elemento actualmente seleccionado.
     function renderDirectorio() {
         const texto = document.getElementById('buscador_directorio').value.toLowerCase();
         const cont = document.getElementById('lista_directorio');
@@ -1118,6 +964,9 @@
         }
     }
 
+    // Vuelve a cargar lo que se esté mostrando ahora mismo (vista general, escuela o
+    // paciente seleccionados) tras crear/editar/eliminar una actividad, y refresca
+    // también los directorios y el calendario porque pudieron cambiar.
     function recargarVistaActual() {
         if (!seleccionActual) cargarVistaGeneral();
         else if (seleccionActual.tipo === 'escuela') seleccionarEscuela(seleccionActual.id);
@@ -1130,6 +979,10 @@
     let ultimaListaActividades = [];
     let contextoActividadesActual = 'general';
 
+    // Determina si una actividad coincide con el buscador de texto y el filtro de tipo
+    // de la vista de "Actividades Generales". El caso especial del tipo "visita" hace
+    // match tanto por ev.tipo como por ev.categoria, porque las visitas no tienen un
+    // "tipo" propio como los eventos.
     function actividadCoincideFiltro(ev) {
         const campoTexto = document.getElementById('buscador_actividades');
         const texto = (campoTexto ? campoTexto.value : '').trim().toLowerCase();
@@ -1140,10 +993,14 @@
         return coincideTexto && coincideTipo;
     }
 
+    // Re-pinta la lista de actividades ya cargada (ultimaListaActividades) aplicando los
+    // filtros actuales, sin volver a pedirla al servidor.
     function filtrarActividadesGenerales() {
         renderActividadesGenerico(ultimaListaActividades, contextoActividadesActual, true);
     }
 
+    // Conecta el buscador principal del navbar (#buscador_principal) con los dos
+    // buscadores propios de esta página: replica el texto en ambos y dispara sus filtros.
     function buscarGlobalAgenda(valor) {
         const campoDirectorio = document.getElementById('buscador_directorio');
         const campoActividades = document.getElementById('buscador_actividades');
@@ -1213,6 +1070,8 @@
         }).join('');
     }
 
+    // Permite que el usuario actual se agregue como voluntario/staff a un evento
+    // operativo existente, sin pasar por el modal de edición completo.
     async function unirseAEvento(idEvento) {
         try {
             const res = await fetch(`${API_URL}/api/agenda/evento/${idEvento}/unirse`, { method: 'POST', headers: authHeaders() });
@@ -1230,6 +1089,8 @@
     let actividadesPorFecha = {}; // { 'YYYY-MM-DD': [ {titulo, categoria, id}, ... ] }
     let diaSeleccionadoCalendario = null;
 
+    // Trae todas las actividades y las agrupa en actividadesPorFecha por día (clave
+    // 'YYYY-MM-DD'), para que el calendario mensual pueda marcar qué días tienen eventos.
     async function cargarCalendario() {
         try {
             const res = await fetch(`${API_URL}/api/agenda`, { headers: authHeaders() });
@@ -1248,11 +1109,15 @@
         }
     }
 
+    // Avanza o retrocede el calendario un mes (direccion: 1 o -1) y vuelve a pintarlo.
     function cambiarMesCalendario(direccion) {
         mesCalendarioActual.setMonth(mesCalendarioActual.getMonth() + direccion);
         renderCalendario();
     }
 
+    // Dibuja la cuadrícula de días del mes actual (relleno con celdas vacías antes del
+    // día 1 según el día de la semana en que cae), resaltando el día de hoy, el día
+    // seleccionado y los días que tienen actividades registradas (punto rosa).
     function renderCalendario() {
         const anio = mesCalendarioActual.getFullYear();
         const mes = mesCalendarioActual.getMonth();
@@ -1293,6 +1158,8 @@
         grid.innerHTML = celdas;
     }
 
+    // Al hacer clic en un día del calendario: lo marca como seleccionado, limpia la
+    // selección de escuela/paciente del directorio y muestra solo las actividades de ese día.
     function verDiaCalendario(claveFecha) {
         diaSeleccionadoCalendario = claveFecha;
         seleccionActual = null;

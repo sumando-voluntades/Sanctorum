@@ -36,42 +36,11 @@
     <style>
       body { font-family: "Quicksand", sans-serif; }
       .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+      #header-mount { position: fixed; top: 0; left: 0; width: 100%; height: 76px; background: rgba(255,255,255,0.7); z-index: 50; }
     </style>
   </head>
   <body class="bg-surface text-on-surface">
-    <!-- TopNavBar -->
-    <header class="fixed top-0 w-full z-50 rounded-b-xl bg-white/70 backdrop-blur-md shadow-[0_20px_50px_rgba(23,28,31,0.06)]">
-      <div class="flex justify-between items-center max-w-7xl mx-auto px-8 py-4">
-        <div class="flex items-center gap-3">
-          <img alt="Logo Sumando Voluntades Sanctórum" class="h-12 w-auto object-contain" src="Logo.png" />
-        </div>
-        <nav class="hidden md:flex gap-8 items-center">
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="index">Inicio</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="comunidad_blog">Comunidad</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="solicitud_apoyo_oficial">Solicitud de Apoyo</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="como_ayudar">Cómo Ayudar</a>
-          <a class="text-slate-600 hover:text-pink-600 transition-colors duration-300" href="nosotros">Nosotros</a>
-        </nav>
-        <div class="flex items-center gap-4">
-          <a
-            href="expedientes"
-            title="Panel de Administración"
-            class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
-          >
-            admin_panel_settings
-          </a>
-          <a
-            href="como_ayudar#formVoluntariadoPublico"
-            class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
-          >
-            Voluntariado
-          </a>
-          <a href="index#donacion-monetaria" class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all">
-            Donar
-          </a>
-        </div>
-      </div>
-    </header>
+    <div id="header-mount"></div>
 
     <main class="pt-32 pb-24 px-6">
       <div class="max-w-6xl mx-auto">
@@ -117,45 +86,31 @@
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="w-full rounded-t-xl mt-16 bg-slate-50 font-['Quicksand'] leading-relaxed text-sm">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-12 py-16">
-        <div class="flex flex-col gap-6">
-          <img alt="Logo Sumando Voluntades Sanctórum" class="h-16 w-auto object-contain mb-2" src="Logo.png" />
-          <p class="text-slate-500">
-            La salud mental es responsabilidad en sociedad. Construyendo puentes
-            de bienestar para todos.
-          </p>
-        </div>
-        <div>
-          <h4 class="text-pink-700 font-bold mb-6">Redes Sociales</h4>
-          <ul class="space-y-3">
-            <li><a class="text-slate-500 hover:underline hover:text-orange-600 transition-all" href="#">Facebook</a></li>
-            <li><a class="text-slate-500 hover:underline hover:text-orange-600 transition-all" href="#">Instagram</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-pink-700 font-bold mb-6">Contacto</h4>
-          <ul class="space-y-3 text-slate-500">
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">mail</span> ayuda@sanctorum.org</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">call</span> 800-SANCTORUM</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">location_on</span> Ciudad de México, MX</li>
-          </ul>
-        </div>
-      </div>
-      <div class="max-w-7xl mx-auto px-12 py-8 border-t border-slate-200/50 text-center text-slate-500">
-        © 2024 Sumando Voluntades Sanctórum. La salud mental es responsabilidad en sociedad.
-      </div>
-    </footer>
+    <div id="footer-mount"></div>
 
+    <script src="js/comun.js"></script>
+    <script src="js/incluir.js"></script>
     <script>
-      const API_URL = "http://localhost:3000";
       let mesCalendarioActual = new Date();
       let eventosPorFecha = {};
       let diaSeleccionado = null;
 
-      document.addEventListener('DOMContentLoaded', cargarEventosCalendario);
+      // Al cargar la página: inserta navbar/footer públicos, marca el link activo,
+      // habilita el menú móvil y dispara la carga de eventos del calendario.
+      document.addEventListener('DOMContentLoaded', async () => {
+          await incluirParcial('#header-mount', 'partials/navbar_publico.html');
+          incluirParcial('#footer-mount', 'partials/footer_publico.html');
+          marcarLinkActivoPublico('#header-mount [data-pagina]');
+          inicializarMenuMovil();
 
+          cargarEventosCalendario();
+      });
+
+      // Obtiene del backend todos los eventos públicos y los indexa en
+      // eventosPorFecha (clave = fecha en formato YYYY-MM-DD) para poder
+      // pintarlos rápido en cualquier mes del calendario. Al terminar,
+      // renderiza el calendario y selecciona automáticamente el día futuro
+      // más cercano a hoy, si existe alguno.
       async function cargarEventosCalendario() {
           try {
               const res = await fetch(`${API_URL}/api/eventos_calendario_publico`);
@@ -180,11 +135,17 @@
           }
       }
 
+      // Avanza o retrocede el mes mostrado (direccion: -1 o 1) y vuelve a
+      // dibujar la grilla del calendario para el nuevo mes.
       function cambiarMesCalendario(direccion) {
           mesCalendarioActual.setMonth(mesCalendarioActual.getMonth() + direccion);
           renderCalendario();
       }
 
+      // Dibuja la grilla de días del mes actual (mesCalendarioActual): calcula
+      // el día de la semana en que empieza el mes para rellenar celdas vacías
+      // al inicio, y para cada día marca si tiene eventos (punto rosa), si es
+      // hoy (anillo) y si está seleccionado (fondo resaltado).
       function renderCalendario() {
           const anio = mesCalendarioActual.getFullYear();
           const mes = mesCalendarioActual.getMonth();
@@ -222,6 +183,9 @@
           grid.innerHTML = celdas;
       }
 
+      // Selecciona un día del calendario (claveFecha en formato YYYY-MM-DD),
+      // resalta la celda correspondiente y renderiza en el panel lateral la
+      // lista de eventos programados ese día, con enlace al detalle de cada uno.
       function verDiaCalendario(claveFecha) {
           diaSeleccionado = claveFecha;
           renderCalendario();

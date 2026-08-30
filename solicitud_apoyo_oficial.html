@@ -104,75 +104,13 @@
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(24px);
       }
+      #header-mount { position: fixed; top: 0; left: 0; width: 100%; height: 76px; background: rgba(255,255,255,0.7); z-index: 50; }
     </style>
   </head>
   <body
     class="bg-surface text-on-surface selection:bg-secondary-fixed selection:text-on-secondary-fixed"
   >
-    <!-- TopNavBar -->
-    <header
-      class="fixed top-0 w-full z-50 rounded-b-xl bg-white/70 backdrop-blur-md shadow-[0_20px_50px_rgba(23,28,31,0.06)]"
-    >
-      <div
-        class="flex justify-between items-center max-w-7xl mx-auto px-8 py-4"
-      >
-        <div class="flex items-center gap-3">
-          <img
-            alt="Logo Sumando Voluntades Sanctórum"
-            class="h-12 w-auto object-contain"
-            src="Logo.png"
-          />
-        </div>
-        <nav class="hidden md:flex gap-8 items-center">
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="index"
-            >Inicio</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="comunidad_blog"
-            >Comunidad</a
-          >
-          <a
-            class="text-orange-700 font-bold border-b-2 border-orange-500 hover:text-pink-600 transition-colors duration-300 py-1"
-            href="solicitud_apoyo_oficial"
-            >Solicitud de Apoyo</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="como_ayudar"
-            >Cómo Ayudar</a
-          >
-          <a
-            class="text-slate-600 hover:text-pink-600 transition-colors duration-300"
-            href="nosotros"
-            >Nosotros</a
-          >
-        </nav>
-        <div class="flex items-center gap-4">
-          <a
-            href="login"
-            title="Panel de Administración"
-            class="material-symbols-outlined text-slate-600 hover:text-orange-600 transition-all"
-          >
-            admin_panel_settings
-          </a>
-          <a
-            href="como_ayudar#formVoluntariadoPublico"
-            class="hidden lg:block px-6 py-2 rounded-full border border-secondary text-secondary font-semibold hover:bg-secondary-container hover:text-white transition-all"
-          >
-            Voluntariado
-          </a>
-          <a
-            href="index#donacion-monetaria"
-            class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
-          >
-            Donar
-          </a>
-        </div>
-      </div>
-    </header>
+    <div id="header-mount"></div>
     <main class="pt-24">
       <!-- ¿Necesitas ayuda inmediata? (recursos de crisis, siempre visibles primero) -->
       <section class="px-8 pt-10">
@@ -261,7 +199,7 @@
       <section class="px-8 py-24 bg-surface-container-low">
         <div class="max-w-7xl mx-auto">
           <div class="text-center mb-16 space-y-4">
-            <h2 class="text-4xl font-bold text-on-surface" style="">
+            <h2 class="text-2xl md:text-4xl font-bold text-on-surface" style="">
               Servicios de Orientación Especializada
             </h2>
             <p class="text-slate-500 max-w-2xl mx-auto" style="">
@@ -388,7 +326,7 @@
             class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
           >
             <div class="space-y-4">
-              <h2 class="text-4xl font-bold text-primary" style="">
+              <h2 class="text-2xl md:text-4xl font-bold text-primary" style="">
                 Calendario de Comunidad
               </h2>
               <p class="text-slate-500 max-w-xl" style="">
@@ -410,63 +348,7 @@
         </div>
       </section>
     </main>
-    <!-- Footer -->
-    <footer
-      class="w-full rounded-t-xl mt-16 bg-slate-50 dark:bg-slate-950 font-['Quicksand'] leading-relaxed text-sm"
-    >
-      <div
-        class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-12 py-16"
-      >
-        <div class="flex flex-col gap-6">
-          <img
-            alt="Logo Sumando Voluntades Sanctórum"
-            class="h-16 w-auto object-contain mb-2"
-            src="Logo.png"
-          />
-          <p class="text-slate-500 dark:text-slate-400">
-            La salud mental es responsabilidad en sociedad. Construyendo puentes
-            de bienestar para todos.
-          </p>
-        </div>
-        <div>
-          <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Redes Sociales
-          </h4>
-          <ul class="space-y-3">
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >Facebook</a
-              >
-            </li>
-            <li>
-              <a
-                class="text-slate-500 hover:underline hover:text-orange-600 transition-all"
-                href="#"
-                >Instagram</a
-              >
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-pink-700 dark:text-pink-400 font-bold mb-6">
-            Contacto
-          </h4>
-          <ul class="space-y-3 text-slate-500 dark:text-slate-400">
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">mail</span> ayuda@sanctorum.org</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">call</span> 800-SANCTORUM</li>
-            <li class="flex items-center gap-2"><span class="material-symbols-outlined text-base">location_on</span> Ciudad de México, MX</li>
-          </ul>
-        </div>
-      </div>
-      <div
-        class="max-w-7xl mx-auto px-12 py-8 border-t border-slate-200/50 text-center text-slate-500"
-      >
-        © 2024 Sumando Voluntades Sanctórum. La salud mental es responsabilidad
-        en sociedad.
-      </div>
-    </footer>
+    <div id="footer-mount"></div>
 
     <div id="modalSolicitud" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300">
       <div class="bg-white p-8 rounded-3xl max-w-md w-full mx-4 text-center shadow-2xl">
@@ -479,11 +361,9 @@
       </div>
     </div>
     
+    <script src="js/comun.js"></script>
+    <script src="js/incluir.js"></script>
     <script>
-      // IMPORTANTE: para pruebas locales debe apuntar a tu server.js en localhost:3000.
-      // Cuando despliegues el backend en Render, cambia esto por tu URL pública (ej. https://sanctorum-backend.onrender.com).
-      const API_URL = "http://localhost:3000";
-
       // ---------- FORMULARIO: ASISTENCIA PSICOLÓGICA ----------
       document.getElementById('formPsicologica').addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -497,6 +377,11 @@
           await enviarSolicitud(data, 'formPsicologica');
       });
 
+      // Envía "data" (los campos del formulario indicado por idFormulario)
+      // al endpoint genérico de solicitudes de apoyo. Deshabilita el botón
+      // mientras dura la petición, muestra el modal de éxito y limpia el
+      // formulario si todo sale bien, o el modal de error con el mensaje del
+      // servidor (o uno genérico) si algo falla.
       async function enviarSolicitud(data, idFormulario) {
           const form = document.getElementById(idFormulario);
           const btn = form.querySelector('button[type="submit"]');
@@ -526,6 +411,9 @@
       }
 
       // Funciones para controlar el modal (Ventana emergente)
+      // Rellena el modal de resultado con título, mensaje, color de fondo del
+      // ícono y el ícono/símbolo (texto plano, p.ej. '✓', '✕', '⚠') y lo
+      // muestra quitando la clase 'hidden'.
       function mostrarModal(titulo, mensaje, colorFondo, icono) {
           document.getElementById('modalTitulo').innerText = titulo;
           document.getElementById('modalMensaje').innerText = mensaje;
@@ -535,13 +423,26 @@
           document.getElementById('modalSolicitud').classList.remove('hidden');
       }
 
+      // Oculta el modal de resultado.
       function cerrarModal() {
           document.getElementById('modalSolicitud').classList.add('hidden');
       }
 
       // ---------- CALENDARIO DE COMUNIDAD (eventos públicos reales) ----------
-      document.addEventListener('DOMContentLoaded', cargarEventosPublicos);
+      // Al cargar la página: inserta navbar/footer públicos, marca el link
+      // activo, habilita el menú móvil y carga los próximos eventos públicos.
+      document.addEventListener('DOMContentLoaded', async () => {
+          await incluirParcial('#header-mount', 'partials/navbar_publico.html');
+          incluirParcial('#footer-mount', 'partials/footer_publico.html');
+          marcarLinkActivoPublico('#header-mount [data-pagina]');
+          inicializarMenuMovil();
 
+          cargarEventosPublicos();
+      });
+
+      // Obtiene del backend los próximos eventos públicos y renderiza los
+      // primeros 3 como tarjetas (día/mes/hora, tipo, lugar y enlace al
+      // detalle), alternando dos combinaciones de color entre tarjetas.
       async function cargarEventosPublicos() {
           const cont = document.getElementById('contenedor_eventos_publicos');
           try {

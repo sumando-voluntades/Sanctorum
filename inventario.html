@@ -12,67 +12,24 @@
     <script id="tailwind-config">
       tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#8a5100", "primary-container": "#f39200", secondary: "#b50062", "secondary-container": "#e2007c", surface: "#f6fafe", "surface-container-low": "#f0f4f8", "surface-container-lowest": "#ffffff", "on-surface": "#171c1f", "on-surface-variant": "#544434" }, fontFamily: { sans: ["Quicksand", "sans-serif"], plus: ["Plus Jakarta Sans", "sans-serif"] } } } };
     </script>
-    <style>.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }</style>
+    <style>
+      .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+      @media (min-width: 768px) { #sidebar-mount { position: fixed; left: 0; top: 0; width: 18rem; height: 100vh; background: #fff; z-index: 50; } }
+    </style>
   </head>
   <body class="bg-surface text-slate-800 min-h-screen">
     
-    <!-- ================= SIDE NAV BAR UNIVERSAL ================= -->
-    <aside class="fixed left-0 top-0 flex flex-col py-8 bg-white rounded-r-[2rem] h-screen w-72 shadow-[0_20px_50px_rgba(23,28,31,0.06)] z-50">
-      <div class="flex justify-center mb-10 px-8"><img src="Logo.png" alt="Logo" class="w-40 h-auto object-contain" /></div>
-      <nav class="flex-1 px-4 space-y-2">
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="dashboard"><span class="material-symbols-outlined">dashboard</span><span class="font-medium">Resumen</span></a>
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="expedientes"><span class="material-symbols-outlined">folder_shared</span><span class="font-medium">Expedientes</span></a>
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="voluntariado"><span class="material-symbols-outlined">group</span><span class="font-medium">Voluntariado</span></a>
-        <!-- PESTAÑA ACTIVA -->
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-primary font-bold bg-[#f8ecdb] transition-all" href="inventario"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">inventory_2</span><span class="font-medium">Inventario</span></a>
-        <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="agenda"><span class="material-symbols-outlined">school</span><span class="font-medium">Agenda</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="publicaciones"><span class="material-symbols-outlined">campaign</span><span class="font-medium">Publicaciones</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="reportes"><span class="material-symbols-outlined">fact_check</span><span class="font-medium">Reportes</span></a>
-      <a class="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-500 hover:bg-slate-50 transition-all" href="aliados_donativos"><span class="material-symbols-outlined">volunteer_activism</span><span class="font-medium">Aliados y Donativos</span></a>
-      </nav>
-      <div class="px-6 mt-auto space-y-4">
-        <a class="flex items-center justify-center gap-2 w-full py-3 text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-full font-bold transition-all border border-slate-200" href="index"><span class="material-symbols-outlined">home</span>Volver al Inicio</a>
-        <button onclick="cerrarSesion()" class="flex items-center justify-center gap-2 w-full py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full font-bold transition-all"><span class="material-symbols-outlined">logout</span>Cerrar Sesión</button>
-      </div>
-    </aside>
-  
-    <main class="ml-72 min-h-screen flex flex-col">
-      <!-- ================= TOP NAV BAR UNIVERSAL ================= -->
-      <header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus">
-        <div class="flex items-center flex-1">
-          <div class="relative w-full max-w-md">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-            <input id="buscador_principal" class="w-full pl-10 pr-4 py-2 bg-[#f0f4f8] border-none rounded-full focus:ring-2 focus:ring-[#e2007c]/20 transition-all text-sm" placeholder="Buscar insumos..." type="text" />
-          </div>
-        </div>
-        <div class="flex items-center gap-4 ml-8 relative">
-          <button onclick="toggleNotificaciones()" class="p-2 text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative"><span class="material-symbols-outlined">notifications</span><span id="punto_notificaciones" class="hidden absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span></button>
-          <div class="h-8 w-px bg-slate-200 mx-2"></div>
-          <a href="perfil" class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-full transition-all">
-            <span id="nav_user_name" class="text-sm font-bold text-slate-700">Cargando...</span>
-            <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center text-slate-500 font-bold"><span class="material-symbols-outlined">person</span></div>
-          </a>
-  
-          <!-- PANEL DE NOTIFICACIONES -->
-          <div id="modalNotificaciones" class="hidden absolute top-14 right-32 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-              <div class="bg-slate-800 px-4 py-3 text-white flex justify-between items-center">
-                <h3 class="font-bold text-sm">Notificaciones</h3>
-                <button onclick="limpiarTodasNotificaciones()" class="text-[10px] font-bold text-slate-300 hover:text-white uppercase tracking-wide transition-colors">Limpiar todas</button>
-              </div>
-              <div id="lista_notificaciones" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
-                  <p class="text-slate-400 text-sm text-center py-6">Cargando...</p>
-              </div>
-              <div class="p-2 text-center border-t border-slate-100 bg-slate-50"><button onclick="document.getElementById('modalNotificaciones').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cerrar panel</button></div>
-          </div>
-        </div>
-      </header>
+    <div id="sidebar-mount"></div>
+
+    <main class="md:ml-72 min-h-screen flex flex-col">
+      <div id="header-mount"></div>
   
       <div class="p-8 flex-1">
         
         <!-- TÍTULO Y BOTÓN SUPERIOR -->
-        <div class="flex justify-between items-end mb-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-6">
             <div>
-              <h2 class="text-4xl font-bold text-primary font-plus tracking-tight mb-2">Gestión de Inventario</h2>
+              <h2 class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2">Gestión de Inventario</h2>
               <p class="text-slate-500 max-w-xl">Control de insumos, materiales y equipo físico de la AC.</p>
             </div>
             <button id="btn_nuevo_insumo" onclick="abrirModalInsumo()" class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-secondary to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
@@ -119,6 +76,10 @@
 
         <!-- TABLA DE INVENTARIO -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <!-- overflow-x-auto: en pantallas angostas la tabla se desplaza horizontalmente en
+               vez de recortarse (antes el contenedor era overflow-hidden y las columnas de la
+               derecha, incluyendo los botones de Editar/Eliminar, quedaban inaccesibles). -->
+          <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead class="bg-slate-50 border-b border-slate-200">
               <tr>
@@ -133,6 +94,7 @@
               <!-- Los datos se inyectarán aquí con Javascript -->
             </tbody>
           </table>
+          </div>
         </div>
 
         <!-- PAGINACIÓN -->
@@ -145,6 +107,7 @@
         <div id="panel_activos" class="hidden">
         <!-- TABLA DE ACTIVOS FIJOS -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead class="bg-slate-50 border-b border-slate-200">
               <tr>
@@ -159,14 +122,16 @@
               <tr><td colspan="5" class="px-8 py-10 text-center text-slate-400">Cargando...</td></tr>
             </tbody>
           </table>
+          </div>
         </div>
         </div>
 
       </div>
+      <div id="footer-mount"></div>
     </main>
 
     <!-- ================= MODAL: NUEVO INSUMO ================= -->
-    <div id="modalInsumo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0">
+    <div id="modalInsumo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0">
         <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalInsumoContent">
           <div class="bg-gradient-to-r from-[#8a5100] to-[#f39200] px-8 py-6 text-white flex justify-between items-center">
             <div><h3 id="modalInsumoTitulo" class="text-2xl font-bold font-plus">Nuevo Artículo</h3></div>
@@ -179,7 +144,7 @@
                 <input type="text" id="ins_nombre" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none" placeholder="Ej. Pintura Vinílica">
             </div>
             
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                   <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Unidad de Medida</label>
                   <select id="ins_unidad" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
@@ -201,7 +166,7 @@
               </div>
             </div>
             
-            <div class="grid grid-cols-3 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
               <div>
                   <label class="block text-xs font-bold text-slate-500 mb-1 ml-1 uppercase">Stock Inicial</label>
                   <input type="number" step="0.01" id="ins_stock" required class="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none" value="0">
@@ -225,7 +190,7 @@
     </div>
 
     <!-- ================= MODAL: NUEVO / EDITAR ACTIVO FIJO ================= -->
-    <div id="modalActivo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300 opacity-0">
+    <div id="modalActivo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0">
         <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalActivoContent">
           <div class="bg-gradient-to-r from-[#8a5100] to-[#f39200] px-8 py-6 text-white flex justify-between items-center">
             <div><h3 id="modalActivoTitulo" class="text-2xl font-bold font-plus">Nuevo Activo</h3></div>
@@ -237,7 +202,7 @@
                 <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Nombre del Equipo</label>
                 <input type="text" id="act_nombre" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none" placeholder="Ej. Cámara Canon EOS">
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                   <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Estado</label>
                   <select id="act_estado" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
@@ -266,7 +231,7 @@
     </div>
 
     <!-- ================= MODAL: CONFIRMAR ELIMINACIÓN DE ACTIVO ================= -->
-    <div id="modalEliminarActivo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div id="modalEliminarActivo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300">
       <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform scale-95 transition-all" id="modalEliminarActivoContent">
         <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span class="material-symbols-outlined text-3xl">delete</span>
@@ -281,7 +246,7 @@
     </div>
 
     <!-- ================= MODAL: CONFIRMAR ELIMINACIÓN ================= -->
-    <div id="modalEliminarInsumo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div id="modalEliminarInsumo" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300">
       <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform scale-95 transition-all" id="modalEliminarInsumoContent">
         <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span class="material-symbols-outlined text-3xl">delete</span>
@@ -296,158 +261,22 @@
     </div>
 
     <!-- ================= SCRIPT DE SEGURIDAD Y LÓGICA ================= -->
+    <script src="js/comun.js"></script>
+    <script src="js/notificaciones.js"></script>
+    <script src="js/incluir.js"></script>
     <script>
-    // Decodifica el payload de un JWT de forma segura: los JWT usan base64url
-    // (con '-' y '_' en vez de '+' y '/', y sin padding '='), y pueden contener
-    // caracteres UTF-8 (acentos, ñ, etc.). atob() a secas falla o corrompe esos casos.
-    function decodeJWT(token) {
-        let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        while (base64.length % 4 !== 0) base64 += '=';
-        const binario = atob(base64);
-        const jsonPayload = decodeURIComponent(
-            binario.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-        );
-        return JSON.parse(jsonPayload);
-    }
-
-    // Oculta del sidebar las secciones que el rol actual no debe ver, y si el usuario
-    // entra directo por URL a una página no permitida para su rol, lo redirige.
-    // IMPORTANTE: esto es solo UX — la restricción real ocurre en el backend
-    // (verificarToken + requiereRol en server.js). Ocultar un botón no es seguridad.
-    function aplicarRestriccionesNav(rol, especialidad) {
-        const esPsico = rol === 2 && (especialidad || '').toLowerCase().includes('psic');
-        const permisos = {
-            'dashboard': [1, 3],
-            'expedientes': esPsico ? [1, 2] : [1],
-            'voluntariado': [1, 3],
-            'inventario': [1, 3],
-            'agenda': [1, 2, 3, 4],
-            'publicaciones': [1, 2, 3, 4],
-            'reportes': [1, 2, 3, 4],
-            'aliados_donativos': [1, 3]
-        };
-
-        document.querySelectorAll('aside nav a[href]').forEach(a => {
-            const pagina = a.getAttribute('href');
-            const permitidos = permisos[pagina];
-            if (permitidos && !permitidos.includes(rol)) {
-                a.remove();
-            }
-        });
-
-        // .replace() de mas: por si alguien entra con la extension .html todavia (ej. un
-        // marcador viejo, o pruebas locales sin el rewrite de Vercel), para que la
-        // comparacion contra el mapa de permisos (sin extension) siga funcionando.
-        const paginaActual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
-        const permitidosActual = permisos[paginaActual];
-        if (permitidosActual && !permitidosActual.includes(rol)) {
-            window.location.replace('agenda');
-        }
-    }
-
-    // ================= NOTIFICACIONES (dinámicas, eliminables) =================
-    // No existe tabla de notificaciones en la BD: las construimos a partir de datos
-    // reales (/api/dashboard/resumen) y guardamos qué IDs fueron descartadas en
-    // localStorage, para que "eliminar" persista en este navegador sin tocar el backend.
-    const CLAVE_NOTIF_DESCARTADAS = 'notificaciones_descartadas_sanctorum';
-
-    function obtenerNotifDescartadas() {
-        try { return JSON.parse(localStorage.getItem(CLAVE_NOTIF_DESCARTADAS) || '[]'); } catch (e) { return []; }
-    }
-    function guardarNotifDescartadas(lista) {
-        localStorage.setItem(CLAVE_NOTIF_DESCARTADAS, JSON.stringify(lista));
-    }
-
-    function toggleNotificaciones() {
-        const panel = document.getElementById('modalNotificaciones');
-        const estabaOculto = panel.classList.contains('hidden');
-        panel.classList.toggle('hidden');
-        if (estabaOculto) cargarNotificaciones();
-    }
-
-    async function cargarNotificaciones() {
-        const cont = document.getElementById('lista_notificaciones');
-        try {
-            const res = await fetch(`${API_URL}/api/dashboard/resumen`);
-            const json = await res.json();
-            if (!json.success) { cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>'; return; }
-
-            const descartadas = obtenerNotifDescartadas();
-            let notificaciones = (json.data.actividad_reciente || []).map((a, i) => ({
-                id: 'act_' + i + '_' + new Date(a.fecha).getTime(),
-                icono: 'notifications', color: 'bg-pink-100 text-[#b50062]',
-                titulo: a.titulo, detalle: a.detalle || ''
-            }));
-
-            if (json.data.solicitudes_pendientes > 0) {
-                notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
-                    titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
-            }
-            if (json.data.insumos_bajo_stock > 0) {
-                notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
-                    titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });
-            }
-
-            notificaciones = notificaciones.filter(n => !descartadas.includes(n.id));
-            actualizarPuntoNotificaciones(notificaciones.length);
-
-            if (notificaciones.length === 0) {
-                cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No tienes notificaciones nuevas.</p>';
-                return;
-            }
-
-            cont.innerHTML = notificaciones.map(n => `
-                <div class="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
-                    <div class="w-8 h-8 rounded-full ${n.color} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-sm">${n.icono}</span></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-slate-800">${n.titulo}</p>
-                        <p class="text-xs text-slate-500 mt-0.5">${n.detalle}</p>
-                    </div>
-                    <button onclick="descartarNotificacion('${n.id}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all shrink-0" title="Eliminar">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
-                </div>`).join('');
-        } catch (e) {
-            console.error("Error al cargar notificaciones:", e);
-            cont.innerHTML = '<p class="text-slate-400 text-sm text-center py-6">No se pudieron cargar.</p>';
-        }
-    }
-
-    function actualizarPuntoNotificaciones(cantidad) {
-        const punto = document.getElementById('punto_notificaciones');
-        if (!punto) return;
-        punto.classList.toggle('hidden', cantidad === 0);
-    }
-
-    function descartarNotificacion(id) {
-        const descartadas = obtenerNotifDescartadas();
-        if (!descartadas.includes(id)) descartadas.push(id);
-        guardarNotifDescartadas(descartadas);
-        cargarNotificaciones();
-    }
-
-    function limpiarTodasNotificaciones() {
-        document.querySelectorAll('#lista_notificaciones button[onclick^="descartarNotificacion"]').forEach(btn => {
-            const match = btn.getAttribute('onclick').match(/descartarNotificacion\('([^']+)'\)/);
-            if (match) {
-                const descartadas = obtenerNotifDescartadas();
-                if (!descartadas.includes(match[1])) descartadas.push(match[1]);
-                guardarNotifDescartadas(descartadas);
-            }
-        });
-        cargarNotificaciones();
-    }
-
-      const API_URL = "http://localhost:3000";
-
-      // Adjunta el token real de sesión para los endpoints protegidos por verificarToken.
-      function authHeaders() {
-          return { 'Authorization': 'Bearer ' + (localStorage.getItem('token_sanctorum') || '') };
-      }
       let inventarioGlobal = [];
 
       // 1. Proteger la ruta y cargar nombre
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', async () => {
+          await incluirParcial('#sidebar-mount', 'partials/navbar_admin.html');
+          await incluirParcial('#header-mount', 'partials/header_admin.html');
+          incluirParcial('#footer-mount', 'partials/footer_admin.html');
+          marcarLinkActivoAdmin('#sidebar-mount [data-pagina]');
+
+          document.getElementById('buscador_principal').placeholder = 'Buscar insumos...';
+          document.getElementById('buscador_principal').addEventListener('input', () => aplicarFiltrosInventario());
+
           const token = localStorage.getItem('token_sanctorum');
           if(!token) { window.location.replace("login"); return; }
           try {
@@ -466,6 +295,9 @@
       // ================= PESTAÑAS: INSUMOS / ACTIVOS FIJOS =================
       let activosFijosGlobal = [];
 
+      // Cambia entre la pestaña "Insumos" y "Activos Fijos": alterna qué panel y qué
+      // botón de "Nuevo..." se muestran, y carga los activos fijos la primera vez que se
+      // entra a esa pestaña.
       function cambiarTabInventario(tab) {
           const esActivos = tab === 'activos';
           document.getElementById('panel_insumos').classList.toggle('hidden', esActivos);
@@ -483,6 +315,8 @@
           if (esActivos) cargarActivosFijos();
       }
 
+      // Llena el <select> de "Responsable" del modal de Activo Fijo con el listado de
+      // voluntarios/staff (reutiliza el mismo catálogo que usa la página de Agenda).
       async function cargarUsuariosParaResponsable() {
           try {
               const res = await fetch(`${API_URL}/api/catalogos_agenda`, { headers: authHeaders() });
@@ -494,6 +328,7 @@
           } catch (e) { console.error('Error al cargar usuarios:', e); }
       }
 
+      // Trae la lista de activos fijos (equipo físico) del backend y la pinta en su tabla.
       async function cargarActivosFijos() {
           const tbody = document.getElementById('tabla_activos');
           try {
@@ -507,6 +342,8 @@
           }
       }
 
+      // Pinta la tabla de activos fijos con un badge de color según su estado
+      // (Funcional/Dañado/En Mantenimiento) y los botones de editar/eliminar.
       function renderActivosFijos() {
           const tbody = document.getElementById('tabla_activos');
           if (activosFijosGlobal.length === 0) {
@@ -526,10 +363,10 @@
                   <td class="px-6 py-5 text-slate-500 font-medium">${item.responsable}</td>
                   <td class="px-6 py-5 text-center">
                     <div class="flex items-center justify-center gap-2">
-                      <button onclick="abrirModalEditarActivo(${item.id_activo})" class="p-2 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
+                      <button onclick="abrirModalEditarActivo(${item.id_activo})" class="p-2.5 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
                         <span class="material-symbols-outlined text-[18px]">edit</span>
                       </button>
-                      <button onclick="abrirModalEliminarActivo(${item.id_activo})" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
+                      <button onclick="abrirModalEliminarActivo(${item.id_activo})" class="p-2.5 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
                         <span class="material-symbols-outlined text-[18px]">delete</span>
                       </button>
                     </div>
@@ -537,6 +374,7 @@
                 </tr>`).join('');
       }
 
+      // Abre el modal de activo fijo en modo "crear" (formulario vacío).
       function abrirModalActivo() {
           document.getElementById('formActivo').reset();
           document.getElementById('act_id').value = '';
@@ -546,6 +384,9 @@
           setTimeout(() => { document.getElementById('modalActivo').classList.remove('opacity-0'); document.getElementById('modalActivoContent').classList.remove('scale-95'); }, 10);
       }
 
+      // Abre el modal de activo fijo precargado con los datos del activo indicado, para
+      // editarlo. Los datos se toman de activosFijosGlobal (ya cargados en memoria), sin
+      // volver a pedirlos al servidor.
       function abrirModalEditarActivo(id) {
           const item = activosFijosGlobal.find(a => a.id_activo == id);
           if (!item) return;
@@ -561,12 +402,14 @@
           setTimeout(() => { document.getElementById('modalActivo').classList.remove('opacity-0'); document.getElementById('modalActivoContent').classList.remove('scale-95'); }, 10);
       }
 
+      // Cierra el modal de activo fijo con la animación de fade/scale y limpia el formulario.
       function cerrarModalActivo() {
           document.getElementById('modalActivo').classList.add('opacity-0');
           document.getElementById('modalActivoContent').classList.add('scale-95');
           setTimeout(() => { document.getElementById('modalActivo').classList.add('hidden'); document.getElementById('formActivo').reset(); }, 300);
       }
 
+      // Envía el formulario de Activo Fijo: POST si es nuevo, PUT si ya tiene id (edición).
       document.getElementById('formActivo').addEventListener('submit', async (e) => {
           e.preventDefault();
           const btn = e.target.querySelector('button[type="submit"]'); const textoOriginal = btn.innerText; btn.innerText = "Guardando..."; btn.disabled = true;
@@ -589,6 +432,8 @@
       });
 
       let idActivoAEliminar = null;
+      // Abre el modal de confirmación de borrado de un activo fijo, guardando su id en
+      // idActivoAEliminar para que confirmarEliminarActivo() sepa cuál eliminar.
       function abrirModalEliminarActivo(id) {
           const item = activosFijosGlobal.find(a => a.id_activo == id);
           if (!item) return;
@@ -597,11 +442,13 @@
           document.getElementById('modalEliminarActivo').classList.remove('hidden');
           setTimeout(() => { document.getElementById('modalEliminarActivo').classList.remove('opacity-0'); document.getElementById('modalEliminarActivoContent').classList.remove('scale-95'); }, 10);
       }
+      // Cierra el modal de confirmación de borrado de activo fijo sin eliminar nada.
       function cerrarModalEliminarActivo() {
           document.getElementById('modalEliminarActivo').classList.add('opacity-0');
           document.getElementById('modalEliminarActivoContent').classList.add('scale-95');
           setTimeout(() => { document.getElementById('modalEliminarActivo').classList.add('hidden'); idActivoAEliminar = null; }, 300);
       }
+      // Confirma y ejecuta el borrado del activo guardado en idActivoAEliminar.
       async function confirmarEliminarActivo() {
           if (!idActivoAEliminar) return;
           try {
@@ -612,26 +459,10 @@
           } catch (error) { alert("Error de conexión al eliminar."); }
       }
 
-      // Bloquea el acceso si el usuario (Especialista/Coordinador) todavía no tiene
-      // aprobado su documento profesional -- solo puede ver su Perfil.
-      function verificarAccesoDocumento(payload) {
-          if (payload.rol !== 2 && payload.rol !== 3) return;
-          fetch(`${API_URL}/api/usuarios/${payload.id}`, { headers: authHeaders() })
-              .then(r => r.json())
-              .then(j => {
-                  const estatusDoc = (j.success && j.data.documento_profesional_estatus) || 'Pendiente';
-                  if (!['Aprobado', 'No Aplica'].includes(estatusDoc)) {
-                      window.location.replace('perfil');
-                  }
-              })
-              .catch(() => {});
-      }
-  
-      function cerrarSesion() { localStorage.removeItem('token_sanctorum'); window.location.replace("login"); }
-
       // 2. Lógica del Modal (Crear / Editar)
       let idInsumoAEliminar = null;
 
+      // Abre el modal de insumo en modo "crear" (formulario vacío, campo "otra área" oculto).
       function abrirModalInsumo() {
           document.getElementById('formInsumo').reset();
           document.getElementById('ins_id').value = '';
@@ -643,12 +474,17 @@
           setTimeout(() => { document.getElementById('modalInsumo').classList.remove('opacity-0'); document.getElementById('modalInsumoContent').classList.remove('scale-95'); }, 10);
       }
 
+      // Muestra/oculta y marca como requerido el input de texto libre de "área destino"
+      // cuando el usuario elige la opción "Otro" en el <select> de área.
       function toggleAreaOtro() {
           const esOtro = document.getElementById('ins_area').value === 'Otro';
           document.getElementById('ins_area_otro').classList.toggle('hidden', !esOtro);
           document.getElementById('ins_area_otro').required = esOtro;
       }
 
+      // Abre el modal de insumo precargado con sus datos actuales para editarlo. Si el
+      // área guardada no es una de las áreas fijas del <select> (Muralismo/Alimentario/
+      // Outreach), asume que es un área "Otro" y la muestra en el input de texto libre.
       function abrirModalEditarInsumo(id) {
           const item = inventarioGlobal.find(i => i.id_insumo == id);
           if (!item) return;
@@ -675,6 +511,7 @@
           setTimeout(() => { document.getElementById('modalInsumo').classList.remove('opacity-0'); document.getElementById('modalInsumoContent').classList.remove('scale-95'); }, 10);
       }
 
+      // Cierra el modal de insumo con la animación de fade/scale y resetea el formulario.
       function cerrarModalInsumo() {
           document.getElementById('modalInsumo').classList.add('opacity-0');
           document.getElementById('modalInsumoContent').classList.add('scale-95');
@@ -726,12 +563,14 @@
           setTimeout(() => { document.getElementById('modalEliminarInsumo').classList.remove('opacity-0'); document.getElementById('modalEliminarInsumoContent').classList.remove('scale-95'); }, 10);
       }
 
+      // Cierra el modal de confirmación de borrado de insumo sin eliminar nada.
       function cerrarModalEliminarInsumo() {
           document.getElementById('modalEliminarInsumo').classList.add('opacity-0');
           document.getElementById('modalEliminarInsumoContent').classList.add('scale-95');
           setTimeout(() => { document.getElementById('modalEliminarInsumo').classList.add('hidden'); idInsumoAEliminar = null; }, 300);
       }
 
+      // Confirma y ejecuta el borrado del insumo guardado en idInsumoAEliminar.
       async function confirmarEliminarInsumo() {
           if (!idInsumoAEliminar) return;
           try {
@@ -747,6 +586,9 @@
       }
 
       // 4. Lógica de Tabla y Filtros
+      // Trae el catálogo de insumos del backend y lo guarda en inventarioGlobal, salvo que
+      // ya haya datos en caché y no se pida forzar la recarga (forzar=true tras crear,
+      // editar o eliminar un insumo). Siempre termina reaplicando los filtros actuales.
       async function cargarInventario(forzar = false) {
           try {
               if (inventarioGlobal.length === 0 || forzar) {
@@ -760,6 +602,9 @@
 
       let paginaInventarioActual = 1;
 
+      // Filtra inventarioGlobal por texto, área y estado de stock, guarda el resultado en
+      // window.inventarioFiltradoActual y pinta la página actual de la tabla con paginación
+      // local (10 registros por página).
       function aplicarFiltrosInventario() {
           const texto = document.getElementById('buscador_principal').value.toLowerCase();
           const fArea = document.getElementById('filtro_area').value;
@@ -816,10 +661,10 @@
                   <td class="px-6 py-5">${badge}</td>
                   <td class="px-6 py-5 text-center">
                     <div class="flex items-center justify-center gap-2">
-                      <button onclick="abrirModalEditarInsumo(${item.id_insumo})" class="p-2 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
+                      <button onclick="abrirModalEditarInsumo(${item.id_insumo})" class="p-2.5 text-slate-400 hover:text-primary bg-slate-50 hover:bg-orange-50 rounded-full transition-colors" title="Editar">
                         <span class="material-symbols-outlined text-[18px]">edit</span>
                       </button>
-                      <button onclick="abrirModalEliminarInsumo(${item.id_insumo})" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
+                      <button onclick="abrirModalEliminarInsumo(${item.id_insumo})" class="p-2.5 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
                         <span class="material-symbols-outlined text-[18px]">delete</span>
                       </button>
                     </div>
@@ -829,6 +674,8 @@
           });
       }
 
+      // Dibuja los botones de paginación de la tabla de inventario (anterior, hasta 5
+      // números, siguiente), igual que su equivalente en Expedientes.
       function renderControlesPaginacionInventario(totalPaginas) {
           const cont = document.getElementById('controles_paginacion_inventario');
           if (totalPaginas <= 1) { cont.innerHTML = ''; return; }
@@ -849,21 +696,19 @@
           cont.innerHTML = botones;
       }
 
+      // Cambia de página de la tabla de inventario y vuelve a pintarla.
       function irAPaginaInventario(pagina) {
           paginaInventarioActual = pagina;
           aplicarFiltrosInventario();
       }
 
+      // Resetea buscador y selects de filtro del inventario y vuelve a mostrar todo.
       function limpiarFiltrosInventario() {
           document.getElementById('buscador_principal').value = '';
           document.getElementById('filtro_area').value = 'Todas';
           document.getElementById('filtro_estado').value = 'Todos';
           aplicarFiltrosInventario();
       }
-
-      // Conectar buscador de texto en vivo
-      const inputBuscador = document.getElementById('buscador_principal'); 
-      if(inputBuscador) { inputBuscador.addEventListener('input', () => { aplicarFiltrosInventario(); }); }
     </script>
   </body>
 </html>
