@@ -110,6 +110,14 @@
 
           <div id="bloque_historia_campos" class="hidden bg-blue-50 border border-blue-100 rounded-2xl p-6 space-y-4">
             <h4 class="font-bold text-slate-800 flex items-center gap-2"><span class="material-symbols-outlined text-blue-600">favorite</span> Datos de la Historia de Éxito</h4>
+            <!-- Visible solo cuando el modal llegó precargado desde "Atender" (ver
+                 manejarHandoffSolicitud): el relato de abajo es texto sin revisar, escrito
+                 por quien envió la solicitud desde el sitio público — recordatorio para que
+                 el staff lo lea, edite y anonimice antes de publicar. -->
+            <div id="aviso_handoff_historia" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-bold flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">warning</span>
+              El "Contenido: Antes" es el relato tal cual lo escribió quien envió la solicitud, sin revisar — léelo, edítalo y anonimízalo antes de publicar.
+            </div>
             <div>
               <label class="block text-sm font-bold text-slate-700 mb-1">Beneficiario</label>
               <select id="pub_id_beneficiario" class="w-full px-4 py-3 bg-white border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30">
@@ -273,7 +281,32 @@
         cargarPublicaciones();
         cargarEventosParaRelacionar();
         cargarBeneficiariosParaHistoria();
+        manejarHandoffSolicitud();
     });
+
+    // Si se llegó aquí desde el botón "Atender" de una solicitud de "Compartir Historia
+    // de Éxito" en Perfil (ver atenderSolicitud() en perfil.html): abre el modal de nueva
+    // publicación ya en modo Historia de Éxito y precarga lo que se puede. El relato de la
+    // solicitud queda como borrador en "Contenido: Antes" para que el staff lo revise y
+    // anonimice antes de publicar — el documento de consentimiento y el beneficiario los
+    // tiene que completar a mano, no vienen en la solicitud.
+    let solicitudHandoffIdActual = null;
+    function manejarHandoffSolicitud() {
+        const datos = leerYLimpiarHandoffSolicitud();
+        if (!datos || datos.tipo_solicitud !== 'Compartir Historia de Éxito') return;
+        if (!puedePublicarHistoriaExito) {
+            alert('No tienes permiso para publicar Historias de Éxito. Pide a un Admin, Coordinador o Psicólogo que la gestione.');
+            return;
+        }
+        abrirModalPublicacion();
+        document.getElementById('pub_tipo').value = 'Historia de Éxito';
+        cambiarTipoPublicacion();
+        document.getElementById('pub_titulo').value = `Historia de éxito compartida por ${datos.nombre_contacto}`;
+        document.getElementById('pub_contenido_preayuda').value =
+            `Relato recibido de ${datos.nombre_contacto} (${datos.correo}${datos.telefono ? ' · ' + datos.telefono : ''}):\n\n${datos.mensaje}`;
+        document.getElementById('aviso_handoff_historia').classList.remove('hidden');
+        solicitudHandoffIdActual = datos.id_solicitud;
+    }
 
     // Llena el <select> "Relacionar con un evento" del modal con los eventos existentes.
     async function cargarEventosParaRelacionar() {
@@ -488,7 +521,7 @@
             if (!img) {
                 bloqueImagen = `<div class="w-full h-full flex items-center justify-center text-slate-300"><span class="material-symbols-outlined text-4xl">image</span></div>`;
             } else if (imgEsFoto) {
-                bloqueImagen = `<img src="${img}" class="w-full h-full object-cover" alt="${p.titulo}">`;
+                bloqueImagen = `<img src="${img}" class="w-full h-full object-cover" alt="${escapeHtml(p.titulo)}">`;
             } else {
                 bloqueImagen = `<a href="${img}" target="_blank" class="w-full h-full flex flex-col items-center justify-center gap-1 text-rose-400 hover:text-rose-500 transition-colors" title="Ver documento de consentimiento"><span class="material-symbols-outlined text-4xl">picture_as_pdf</span><span class="text-[10px] font-bold uppercase">Ver documento</span></a>`;
             }
@@ -497,12 +530,16 @@
                 <div class="h-40 bg-slate-100 relative">
                   ${bloqueImagen}
                   <div class="absolute top-3 left-3 flex gap-2">
-                    <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full ${badgeTipo}">${p.tipo}</span>
-                    ${(p.categoria || '').split(',').map(c => c.trim()).filter(Boolean).map(c => `<span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-white/90 text-slate-600">${c}</span>`).join('')}
+                    <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full ${badgeTipo}">${escapeHtml(p.tipo)}</span>
+                    ${(p.categoria || '').split(',').map(c => c.trim()).filter(Boolean).map(c => `<span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-white/90 text-slate-600">${escapeHtml(c)}</span>`).join('')}
                   </div>
                 </div>
                 <div class="p-5">
-                  <h4 class="font-bold text-slate-800 mb-1 line-clamp-2">${p.titulo}</h4>
+                  <!-- H18 (auditoria de seguridad): el título de una Historia de Éxito puede
+                       venir del botón "Atender" de Perfil, precargado desde una solicitud
+                       pública sin autenticación (ver manejarHandoffSolicitud más abajo) — se
+                       escapa por si se publicó sin editar el borrador. -->
+                  <h4 class="font-bold text-slate-800 mb-1 line-clamp-2">${escapeHtml(p.titulo)}</h4>
                   <p class="text-xs text-slate-400 mb-4">${fecha}</p>
                   <div class="flex items-center gap-2">
                     ${verPublicaBtn}
@@ -526,6 +563,7 @@
         document.getElementById('pub_id').value = '';
         document.getElementById('pub_origen').value = 'publicacion';
         document.getElementById('pub_tipo').disabled = false;
+        document.getElementById('aviso_handoff_historia').classList.add('hidden');
         document.getElementById('pub_url_imagen').value = '';
         document.getElementById('pub_imagen_preview_wrap').classList.add('hidden');
         document.getElementById('bloque_generador_redes').classList.add('hidden');
@@ -800,6 +838,13 @@
             if (res.ok && data.success) {
                 cerrarModalPublicacion();
                 cargarPublicaciones();
+                // Si esta publicación vino del botón "Atender" de una solicitud (ver
+                // manejarHandoffSolicitud arriba), ya se gestionó de verdad — hasta aquí sí
+                // se marca como Atendida, nunca antes de guardar con éxito.
+                if (solicitudHandoffIdActual) {
+                    marcarSolicitudAtendidaSilenciosa(solicitudHandoffIdActual);
+                    solicitudHandoffIdActual = null;
+                }
             } else {
                 alert('Error al guardar: ' + (data.message || 'revisa que la migración ronda 6 se haya ejecutado en Supabase.'));
             }
