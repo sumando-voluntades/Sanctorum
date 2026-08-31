@@ -829,7 +829,7 @@
       abrirModal('modalProyecto', 'modalProyectoContent');
   }
 
-  // SUBMIT DEL MODAL BLINDADO CON TRY/CATCH (CORREGIDO)
+  // Submit del modal con manejo de errores (try/catch)
   document.getElementById('formProyecto').addEventListener('submit', async (e) => {
       e.preventDefault(); 
       const btn = e.target.querySelector('button[type="submit"]'); 
