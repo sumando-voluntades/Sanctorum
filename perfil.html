@@ -133,6 +133,45 @@
         </div>
       </div>
 
+      <!-- TARJETA: SOLICITUDES DE LA COMUNIDAD (Admin/Coordinador ven todas; un Psicólogo
+           solo ve las de "Compartir Historia de Éxito", igual que filtra el backend).
+           Antes "Agendar Donación" y "Compartir Historia de Éxito" eran solo enlaces
+           mailto: sin ningún registro; ahora quedan aquí, con el mismo patrón de tarjeta
+           de revisión que los documentos profesionales. -->
+      <div id="tarjeta_solicitudes_comunidad" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 hidden">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4">
+          <div>
+            <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-primary">forum</span> Solicitudes de la Comunidad</h4>
+            <p class="text-sm text-slate-500">Donaciones en especie, historias de éxito propuestas y solicitudes de ayuda psicológica enviadas desde el sitio público.</p>
+          </div>
+          <!-- Filtro por tipo: igual que el resto de la tarjeta, se recalcula contra lo
+               que ya trajo el backend (no dispara una nueva petición al servidor). -->
+          <div id="filtro_solicitudes" class="flex flex-wrap gap-2">
+            <button type="button" onclick="filtrarSolicitudesComunidad('Todas')" data-filtro="Todas" class="px-4 py-1.5 rounded-full text-xs font-bold border transition-colors bg-primary text-white border-primary">Todas</button>
+            <button type="button" onclick="filtrarSolicitudesComunidad('Compartir Historia de Éxito')" data-filtro="Compartir Historia de Éxito" class="px-4 py-1.5 rounded-full text-xs font-bold border transition-colors bg-white text-slate-500 border-slate-200">Historias</button>
+            <button type="button" onclick="filtrarSolicitudesComunidad('Donación en Especie')" data-filtro="Donación en Especie" class="px-4 py-1.5 rounded-full text-xs font-bold border transition-colors bg-white text-slate-500 border-slate-200">Donaciones</button>
+            <button type="button" onclick="filtrarSolicitudesComunidad('Ayuda Psicológica')" data-filtro="Ayuda Psicológica" class="px-4 py-1.5 rounded-full text-xs font-bold border transition-colors bg-white text-slate-500 border-slate-200">Apoyo Psicológico</button>
+          </div>
+        </div>
+        <!-- Carrusel horizontal: muestra hasta 5 solicitudes pendientes (las más
+             recientes primero, igual que las devuelve el backend) y se desplaza a la
+             derecha con las mismas flechas que usan los demás carruseles del sitio
+             (ver contenedor_necesidades en como_ayudar.html). -->
+        <div class="relative">
+          <div id="lista_solicitudes_comunidad" class="flex gap-4 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory">
+            <p class="text-sm text-slate-400">Cargando...</p>
+          </div>
+          <div id="flechas_solicitudes" class="flex justify-end gap-2 mt-3 hidden">
+            <button type="button" onclick="moverCarruselSolicitudes(-1)" class="w-9 h-9 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center hover:bg-slate-100 transition-all">
+              <span class="material-symbols-outlined text-lg">chevron_left</span>
+            </button>
+            <button type="button" onclick="moverCarruselSolicitudes(1)" class="w-9 h-9 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center hover:bg-slate-100 transition-all">
+              <span class="material-symbols-outlined text-lg">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- TARJETA: BIOGRAFÍA PÚBLICA (solo Especialistas, Coordinadores y Admin — se muestra en la página "Nosotros") -->
       <div id="tarjeta_biografia" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 hidden">
         <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-primary">badge</span> Biografía Pública</h4>
@@ -323,6 +362,15 @@
             cargarDocumentosPendientes();
         }
 
+        // Solicitudes de la comunidad: Admin (1), Coordinador (3), o un Especialista (2)
+        // que además sea Psicólogo — mismo criterio que usa el backend (esPsicologo) para
+        // decidir qué le devuelve GET /api/solicitudes.
+        const esPsicologoPerfil = p.id_rol === 2 && (p.especialidad || '').toLowerCase().includes('psic');
+        if (p.id_rol === 1 || p.id_rol === 3 || esPsicologoPerfil) {
+            document.getElementById('tarjeta_solicitudes_comunidad').classList.remove('hidden');
+            cargarSolicitudesPendientes();
+        }
+
         // Biografía pública: visible para Especialista (2), Coordinador (3) y Admin (1) —
         // el mismo criterio de roles que usa /api/equipo para la página "Nosotros".
         if (p.id_rol === 1 || p.id_rol === 2 || p.id_rol === 3) {
@@ -429,6 +477,175 @@
             const json = await res.json();
             if (json.success) cargarDocumentosPendientes();
             else alert('No se pudo actualizar la revisión.');
+        } catch (e) { alert('Error de conexión.'); }
+    }
+
+    // Colores de la etiqueta de tipo, para distinguir de un vistazo qué clase de
+    // solicitud es cada tarjeta de la lista.
+    const ESTILO_TIPO_SOLICITUD = {
+        'Compartir Historia de Éxito': 'bg-teal-100 text-teal-700',
+        'Donación en Especie': 'bg-orange-100 text-orange-700',
+        'Ayuda Psicológica': 'bg-pink-100 text-pink-700'
+    };
+
+    // Estado del carrusel de solicitudes: la lista completa que devolvió el backend
+    // (ya filtrada por rol allá) y qué filtro de tipo tiene seleccionado el usuario en
+    // pantalla. filtrarSolicitudesComunidad() solo vuelve a pintar sobre estos datos ya
+    // cargados — no dispara una petición nueva cada vez que se cambia el filtro.
+    let solicitudesComunidadGlobal = [];
+    let filtroSolicitudesActivo = 'Todas';
+    const MAX_SOLICITUDES_MOSTRADAS = 5;
+
+    // Trae la lista de solicitudes pendientes enviadas desde los formularios públicos
+    // (Ayuda Psicológica, Donación en Especie, Compartir Historia de Éxito). El backend
+    // (GET /api/solicitudes) ya filtra por rol: un Psicólogo solo recibe las de tipo
+    // "Compartir Historia de Éxito", Admin/Coordinador reciben todas.
+    async function cargarSolicitudesPendientes() {
+        const cont = document.getElementById('lista_solicitudes_comunidad');
+        try {
+            const res = await fetch(`${API_URL}/api/solicitudes`, { headers: authHeaders() });
+            const json = await res.json();
+            if (!json.success) {
+                cont.innerHTML = '<p class="text-sm text-red-400">No se pudo cargar la lista.</p>';
+                return;
+            }
+            // Mostramos solo las Pendientes aquí — "Atendida"/"Descartada" ya salieron de la bandeja de trabajo.
+            solicitudesComunidadGlobal = json.data.filter(s => (s.estatus || 'Pendiente') === 'Pendiente');
+            renderSolicitudesComunidad();
+        } catch (e) {
+            console.error('Error al cargar solicitudes de la comunidad:', e);
+            cont.innerHTML = '<p class="text-sm text-red-400">No se pudo cargar la lista.</p>';
+        }
+    }
+
+    // Cambia el filtro de tipo activo (botones "Todas" / "Historias" / "Donaciones" /
+    // "Apoyo Psicológico") y vuelve a pintar el carrusel con ese filtro aplicado.
+    function filtrarSolicitudesComunidad(tipo) {
+        filtroSolicitudesActivo = tipo;
+        document.querySelectorAll('#filtro_solicitudes [data-filtro]').forEach(btn => {
+            const activo = btn.dataset.filtro === tipo;
+            btn.classList.toggle('bg-primary', activo);
+            btn.classList.toggle('text-white', activo);
+            btn.classList.toggle('border-primary', activo);
+            btn.classList.toggle('bg-white', !activo);
+            btn.classList.toggle('text-slate-500', !activo);
+            btn.classList.toggle('border-slate-200', !activo);
+        });
+        renderSolicitudesComunidad();
+    }
+
+    // Pinta el carrusel horizontal a partir de solicitudesComunidadGlobal + el filtro de
+    // tipo activo, limitado a MAX_SOLICITUDES_MOSTRADAS tarjetas (las más recientes
+    // primero, tal como las devuelve el backend) — el resto se ve desplazando el
+    // carrusel a la derecha con las flechas, igual que "Necesidades Actuales" en
+    // como_ayudar.html o "Historias de Éxito" en comunidad_blog.html.
+    function renderSolicitudesComunidad() {
+        const cont = document.getElementById('lista_solicitudes_comunidad');
+        const flechas = document.getElementById('flechas_solicitudes');
+        const filtradas = filtroSolicitudesActivo === 'Todas'
+            ? solicitudesComunidadGlobal
+            : solicitudesComunidadGlobal.filter(s => s.tipo_solicitud === filtroSolicitudesActivo);
+
+        if (filtradas.length === 0) {
+            cont.innerHTML = '<p class="text-sm text-slate-400 italic">No hay solicitudes pendientes por ahora.</p>';
+            flechas.classList.add('hidden');
+            return;
+        }
+
+        const visibles = filtradas.slice(0, MAX_SOLICITUDES_MOSTRADAS);
+        cont.innerHTML = visibles.map(s => {
+            // El nombre de la columna PK de Solicitudes_Web no estaba confirmado en el
+            // diccionario de datos (ver comentario en server.js) — se acepta cualquiera
+            // de los dos nombres posibles para no depender de cuál termine siendo real.
+            const idFila = s.id_solicitud ?? s.id;
+            const estiloTipo = ESTILO_TIPO_SOLICITUD[s.tipo_solicitud] || 'bg-slate-100 text-slate-600';
+            const fecha = s.fecha_envio ? new Date(s.fecha_envio).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+            return `
+            <div class="w-80 flex-shrink-0 snap-start p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                <div class="flex items-start justify-between gap-3 mb-2">
+                    <div>
+                        <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${estiloTipo}">${escapeHtml(s.tipo_solicitud)}</span>
+                        <p class="font-bold text-slate-800 text-sm mt-1">${escapeHtml(s.nombre_contacto)}</p>
+                        <p class="text-xs text-slate-500">${escapeHtml(s.correo)}${s.telefono ? ' · ' + escapeHtml(s.telefono) : ''}</p>
+                    </div>
+                    <span class="text-[11px] text-slate-400 whitespace-nowrap">${fecha}</span>
+                </div>
+                <p class="text-sm text-slate-600 mb-3 whitespace-pre-line line-clamp-4">${escapeHtml(s.mensaje)}</p>
+                <div class="flex gap-2 justify-end">
+                    <button onclick="revisarSolicitud(${idFila}, 'Descartada')" class="px-4 py-2 bg-red-100 text-red-700 font-bold rounded-full text-xs hover:bg-red-200 transition-colors">Descartar</button>
+                    <button onclick="atenderSolicitud(${idFila})" class="px-4 py-2 bg-green-100 text-green-700 font-bold rounded-full text-xs hover:bg-green-200 transition-colors">Atender</button>
+                </div>
+            </div>`;
+        }).join('');
+
+        // Las flechas solo tienen caso si hay más de una tarjeta para desplazarse.
+        flechas.classList.toggle('hidden', visibles.length <= 1);
+    }
+
+    // Desplaza el carrusel de solicitudes a la izquierda/derecha, igual que
+    // moverSliderNecesidades() en como_ayudar.html.
+    function moverCarruselSolicitudes(direccion) {
+        document.getElementById('lista_solicitudes_comunidad').scrollBy({ left: direccion * 336, behavior: 'smooth' });
+    }
+
+    // A qué página del panel se manda al staff para completar cada tipo de solicitud —
+    // "Atender" ya no marca Atendida al toque, lleva a donde en verdad se gestiona.
+    const DESTINO_POR_TIPO_SOLICITUD = {
+        'Compartir Historia de Éxito': 'publicaciones',
+        'Donación en Especie': 'aliados_donativos',
+        'Ayuda Psicológica': 'expedientes'
+    };
+
+    // Solo Admin o el propio Psicólogo pueden crear un expediente (ver permisosPorPagina
+    // en comun.js y requiereRol en server.js) — un Coordinador ve las solicitudes de Ayuda
+    // Psicológica para darles seguimiento, pero no tiene acceso a Expedientes.
+    function usuarioPuedeCrearExpediente() {
+        if (!perfilActual) return false;
+        return perfilActual.id_rol === 1 || (perfilActual.id_rol === 2 && (perfilActual.especialidad || '').toLowerCase().includes('psic'));
+    }
+
+    // Botón "Atender": en vez de marcar la solicitud como Atendida de inmediato, manda al
+    // staff a la página donde se gestiona de verdad (Publicaciones, Aliados y Donativos, o
+    // Expedientes) con el modal de "nuevo" ya abierto y precargado con los datos de la
+    // solicitud (ver manejarHandoffSolicitud() en cada una de esas páginas). Esa página es
+    // la que, al guardar con éxito, marca esta solicitud como Atendida — así el estatus
+    // solo cambia cuando la gestión ya quedó hecha de verdad, no antes.
+    function atenderSolicitud(idSolicitud) {
+        const solicitud = solicitudesComunidadGlobal.find(s => (s.id_solicitud ?? s.id) === idSolicitud);
+        if (!solicitud) return;
+
+        if (solicitud.tipo_solicitud === 'Ayuda Psicológica' && !usuarioPuedeCrearExpediente()) {
+            if (confirm('Solo un Admin o un Psicólogo puede crear el expediente clínico de esta solicitud. ¿La marcas como atendida de todas formas (por ejemplo, si ya la gestionaste por otro medio)?')) {
+                revisarSolicitud(idSolicitud, 'Atendida');
+            }
+            return;
+        }
+
+        const destino = DESTINO_POR_TIPO_SOLICITUD[solicitud.tipo_solicitud];
+        if (!destino) { revisarSolicitud(idSolicitud, 'Atendida'); return; }
+
+        sessionStorage.setItem(SOLICITUD_HANDOFF_KEY, JSON.stringify({
+            id_solicitud: idSolicitud,
+            tipo_solicitud: solicitud.tipo_solicitud,
+            nombre_contacto: solicitud.nombre_contacto,
+            correo: solicitud.correo,
+            telefono: solicitud.telefono,
+            mensaje: solicitud.mensaje
+        }));
+        window.location.href = destino;
+    }
+
+    // Marca una solicitud como Atendida o Descartada, y refresca la lista al terminar.
+    async function revisarSolicitud(idSolicitud, estatus) {
+        try {
+            const res = await fetch(`${API_URL}/api/solicitudes/${idSolicitud}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                body: JSON.stringify({ estatus })
+            });
+            const json = await res.json();
+            if (json.success) cargarSolicitudesPendientes();
+            else alert('No se pudo actualizar la solicitud: ' + (json.message || ''));
         } catch (e) { alert('Error de conexión.'); }
     }
 
