@@ -365,6 +365,9 @@
     <script src="js/incluir.js"></script>
     <script>
       // ---------- FORMULARIO: ASISTENCIA PSICOLÓGICA ----------
+      // enviarSolicitudWeb() y mostrarModalSolicitud()/cerrarModalSolicitud() ahora viven
+      // en js/comun.js — las usan también como_ayudar.html y comunidad_blog.html para sus
+      // propios formularios de "Donación en Especie" y "Compartir Historia de Éxito".
       document.getElementById('formPsicologica').addEventListener('submit', async (e) => {
           e.preventDefault();
           const data = {
@@ -374,59 +377,15 @@
               tipo_solicitud: 'Ayuda Psicológica',
               mensaje: document.getElementById('psi_mensaje').value
           };
-          await enviarSolicitud(data, 'formPsicologica');
+          await enviarSolicitudWeb(data, 'formPsicologica', {
+              onExito: () => mostrarModalSolicitud('¡Solicitud Enviada!', 'Tu mensaje ha sido registrado en el sistema. Un coordinador de Sanctorum te contactará pronto.', '#4CAF50', '✓'),
+              onError: (mensajeError) => mostrarModalSolicitud('Error', mensajeError, '#F44336', '✕')
+          });
       });
 
-      // Envía "data" (los campos del formulario indicado por idFormulario)
-      // al endpoint genérico de solicitudes de apoyo. Deshabilita el botón
-      // mientras dura la petición, muestra el modal de éxito y limpia el
-      // formulario si todo sale bien, o el modal de error con el mensaje del
-      // servidor (o uno genérico) si algo falla.
-      async function enviarSolicitud(data, idFormulario) {
-          const form = document.getElementById(idFormulario);
-          const btn = form.querySelector('button[type="submit"]');
-          const textoOriginal = btn.innerText;
-          btn.innerText = 'Enviando...'; btn.disabled = true;
-
-          try {
-              const response = await fetch(`${API_URL}/api/solicitudes`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(data)
-              });
-
-              const result = await response.json();
-
-              if (response.ok && result.success) {
-                  mostrarModal('¡Solicitud Enviada!', 'Tu mensaje ha sido registrado en el sistema. Un coordinador de Sanctorum te contactará pronto.', '#4CAF50', '✓');
-                  form.reset();
-              } else {
-                  mostrarModal('Error', result.message || 'No pudimos guardar tu solicitud. Revisa tus datos.', '#F44336', '✕');
-              }
-          } catch (error) {
-              mostrarModal('Error de Conexión', 'No pudimos conectar con el servidor. Intenta más tarde.', '#FF9800', '⚠');
-          } finally {
-              btn.innerText = textoOriginal; btn.disabled = false;
-          }
-      }
-
-      // Funciones para controlar el modal (Ventana emergente)
-      // Rellena el modal de resultado con título, mensaje, color de fondo del
-      // ícono y el ícono/símbolo (texto plano, p.ej. '✓', '✕', '⚠') y lo
-      // muestra quitando la clase 'hidden'.
-      function mostrarModal(titulo, mensaje, colorFondo, icono) {
-          document.getElementById('modalTitulo').innerText = titulo;
-          document.getElementById('modalMensaje').innerText = mensaje;
-          const iconoDiv = document.getElementById('modalIcono');
-          iconoDiv.style.backgroundColor = colorFondo;
-          iconoDiv.innerText = icono;
-          document.getElementById('modalSolicitud').classList.remove('hidden');
-      }
-
-      // Oculta el modal de resultado.
-      function cerrarModal() {
-          document.getElementById('modalSolicitud').classList.add('hidden');
-      }
+      // Alias retrocompatible: el botón "Entendido" del modal en el HTML de esta página
+      // ya usaba onclick="cerrarModal()" antes de que la función se moviera a comun.js.
+      function cerrarModal() { cerrarModalSolicitud(); }
 
       // ---------- CALENDARIO DE COMUNIDAD (eventos públicos reales) ----------
       // Al cargar la página: inserta navbar/footer públicos, marca el link
