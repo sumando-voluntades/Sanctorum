@@ -43,7 +43,7 @@
     >
       <div class="text-center mb-8">
         <img
-          src="assets/logo.png"
+          src="/assets/logo.png"
           alt="Logo Sanctorum A.C."
           class="h-16 mx-auto mb-6 object-contain"
         />
@@ -229,8 +229,9 @@
         }
       })();
 
-      // IMPORTANTE: Recuerda que esto debe estar en http://localhost:3000 para tus pruebas locales
-      const API_URL = "http://localhost:3000";
+      const API_URL = window.location.hostname === "localhost" && window.location.port === "5500" 
+  ? "http://localhost:3000" 
+  : "";
 
       // 1. FUNCIÓN PARA EL LOGIN PRINCIPAL
       // Envía correo/contraseña al backend. Si la autenticación es exitosa,
