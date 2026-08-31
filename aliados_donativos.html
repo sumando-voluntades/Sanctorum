@@ -146,11 +146,19 @@
             <button onclick="cerrarModalDonativo()" class="text-white/80 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
           </div>
           <form id="formDonativo" class="p-8 space-y-4">
+            <!-- Se muestra solo cuando el modal se abrió desde el botón "Atender" de una
+                 solicitud web (ver manejarHandoffSolicitud): es puramente informativo — el
+                 correo/teléfono del remitente no tienen columna propia en Contactos_Externos,
+                 así que se enseñan aquí para que quien captura los tenga a la vista, pero no
+                 se guardan en ningún campo del formulario. -->
+            <div id="don_info_solicitud" class="hidden p-3 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-800 space-y-1"></div>
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1 ml-1">Aliado / Donante</label>
-                <select id="don_id_contacto" required class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
+                <select id="don_id_contacto" required onchange="toggleDonContactoOtro()" class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none">
                     <option value="">Selecciona un aliado...</option>
+                    <option value="__otro__">Otro: escribir... (se agregará como nuevo aliado)</option>
                 </select>
+                <input type="text" id="don_contacto_nuevo" placeholder="Nombre de la persona u organización donante" class="hidden mt-2 w-full px-4 py-2 bg-white border border-slate-200 rounded-full outline-none">
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -262,10 +270,54 @@
               verificarAccesoDocumento(payload);
           } catch (e) { window.location.replace("login"); return; }
 
-          cargarAliados();
+          // Se espera a que carguen los aliados antes de revisar un posible traspaso de
+          // solicitud: abrirModalDonativo() (llamado desde manejarHandoffSolicitud) exige
+          // que aliadosGlobal ya tenga datos, o aborta pensando que no hay ninguno.
+          await cargarAliados();
           cargarCatalogosDonativos();
           cargarNotificaciones();
+          manejarHandoffSolicitud();
       });
+
+      // Si se llegó aquí desde el botón "Atender" de una solicitud de "Donación en
+      // Especie" en Perfil (ver atenderSolicitud() en perfil.html): cambia a la pestaña de
+      // Donativos y abre el modal ya en modo "En especie", con todo lo que se puede
+      // precargar directo en los campos del formulario (no en un alert que interrumpe):
+      // el nombre del remitente queda listo como aliado nuevo ("Otro: escribir...") y el
+      // artículo como insumo nuevo. Solo el correo/teléfono no tienen dónde ir — Contactos
+      // Externos no tiene esas columnas — así que se muestran en una nota dentro del mismo
+      // modal, no bloqueante, para que quien captura los tenga a la vista.
+      let solicitudHandoffIdActual = null;
+      function manejarHandoffSolicitud() {
+          const datos = leerYLimpiarHandoffSolicitud();
+          if (!datos || datos.tipo_solicitud !== 'Donación en Especie') return;
+          cambiarTabAliados('donativos');
+          abrirModalDonativo();
+
+          document.getElementById('don_id_contacto').value = '__otro__';
+          document.getElementById('don_contacto_nuevo').value = datos.nombre_contacto;
+          toggleDonContactoOtro();
+
+          document.getElementById('don_metodo').value = 'En especie';
+          const articuloMatch = datos.mensaje.match(/Artículo\(s\) a donar:\s*(.+)/);
+          const articulo = (articuloMatch ? articuloMatch[1].split('\n')[0] : datos.mensaje.split('\n')[0]).trim();
+          document.getElementById('don_id_insumo').value = '__otro__';
+          document.getElementById('don_insumo_otro').value = articulo;
+          toggleDonInsumoOtro();
+
+          // H6 (auditoria de seguridad, generalizada — ver js/comun.js): estos datos vienen
+          // de un formulario público sin autenticación, así que se escapan antes de insertarlos
+          // con innerHTML — sin esto, un "correo" o "mensaje" con HTML/JS se ejecutaría en la
+          // sesión de quien esté atendiendo la solicitud.
+          const infoDiv = document.getElementById('don_info_solicitud');
+          infoDiv.innerHTML = `
+              <p class="font-bold">Solicitud recibida del sitio público (no se guarda en este formulario):</p>
+              <p>${escapeHtml(datos.correo)}${datos.telefono ? ' · ' + escapeHtml(datos.telefono) : ''}</p>
+              <p class="whitespace-pre-line">${escapeHtml(datos.mensaje)}</p>`;
+          infoDiv.classList.remove('hidden');
+
+          solicitudHandoffIdActual = datos.id_solicitud;
+      }
 
       // Se llama al escribir en el buscador principal: re-pinta la tabla de la pestaña
       // que esté visible en ese momento (Aliados o Donativos).
@@ -488,13 +540,23 @@
       // (ya cargado en memoria, sin volver a pedirlo al servidor).
       async function cargarSelectorAliadosDonativo() {
           const sel = document.getElementById('don_id_contacto');
-          sel.innerHTML = '<option value="">Selecciona un aliado...</option>' + aliadosGlobal.map(a => `<option value="${a.id_contacto}">${a.nombre_aliado}</option>`).join('');
+          sel.innerHTML = '<option value="">Selecciona un aliado...</option>'
+              + aliadosGlobal.map(a => `<option value="${a.id_contacto}">${a.nombre_aliado}</option>`).join('')
+              + '<option value="__otro__">Otro: escribir... (se agregará como nuevo aliado)</option>';
+      }
+
+      // Muestra el input de texto libre para dar de alta un aliado nuevo al vuelo, cuando
+      // se elige "Otro: escribir..." en el <select> de Aliado/Donante — mismo patrón que
+      // toggleDonInsumoOtro() para el insumo.
+      function toggleDonContactoOtro() {
+          const esOtro = document.getElementById('don_id_contacto').value === '__otro__';
+          document.getElementById('don_contacto_nuevo').classList.toggle('hidden', !esOtro);
+          document.getElementById('don_contacto_nuevo').required = esOtro;
       }
 
       // Abre el modal de nuevo donativo (requiere que ya exista al menos un aliado
       // registrado); precarga la fecha con el día de hoy.
       function abrirModalDonativo() {
-          if (aliadosGlobal.length === 0) { alert('Registra primero al menos un aliado antes de capturar un donativo.'); return; }
           document.getElementById('formDonativo').reset();
           document.getElementById('don_comprobante_url').value = '';
           document.getElementById('don_comprobante_nombre').innerText = '';
@@ -502,6 +564,10 @@
           document.getElementById('don_categoria_otro').classList.add('hidden');
           document.getElementById('don_insumo_otro').value = '';
           document.getElementById('don_insumo_otro').classList.add('hidden');
+          document.getElementById('don_contacto_nuevo').value = '';
+          document.getElementById('don_contacto_nuevo').classList.add('hidden');
+          document.getElementById('don_info_solicitud').classList.add('hidden');
+          document.getElementById('don_info_solicitud').innerHTML = '';
           document.getElementById('don_fecha').value = new Date().toISOString().split('T')[0];
           cargarSelectorAliadosDonativo();
           document.getElementById('modalDonativo').classList.remove('hidden');
@@ -554,9 +620,11 @@
           e.preventDefault();
           const btn = e.target.querySelector('button[type="submit"]'); const textoOriginal = btn.innerText; btn.innerText = "Guardando..."; btn.disabled = true;
           const idInsumoRaw = document.getElementById('don_id_insumo').value;
+          const idContactoRaw = document.getElementById('don_id_contacto').value;
           const categoriaGastoRaw = document.getElementById('don_categoria').value;
           const data = {
-              id_contacto: document.getElementById('don_id_contacto').value,
+              id_contacto: (idContactoRaw && idContactoRaw !== '__otro__') ? idContactoRaw : null,
+              contacto_nuevo: idContactoRaw === '__otro__' ? document.getElementById('don_contacto_nuevo').value.trim() : null,
               id_insumo: (idInsumoRaw && idInsumoRaw !== '__otro__') ? idInsumoRaw : null,
               insumo_nuevo: idInsumoRaw === '__otro__' ? document.getElementById('don_insumo_otro').value.trim() : null,
               monto: parseFloat(document.getElementById('don_monto').value),
@@ -568,7 +636,17 @@
           try {
               const response = await fetch(`${API_URL}/api/donativos`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(data) });
               const json = await response.json();
-              if (response.ok && json.success) { cerrarModalDonativo(); cargarDonativos(); }
+              if (response.ok && json.success) {
+                  cerrarModalDonativo();
+                  cargarDonativos();
+                  // Si este donativo vino del botón "Atender" de una solicitud (ver
+                  // manejarHandoffSolicitud arriba), ya se gestionó de verdad — hasta
+                  // aquí sí se marca como Atendida, nunca antes de guardar con éxito.
+                  if (solicitudHandoffIdActual) {
+                      marcarSolicitudAtendidaSilenciosa(solicitudHandoffIdActual);
+                      solicitudHandoffIdActual = null;
+                  }
+              }
               else alert(json.message || "Error al registrar el donativo.");
           } catch (error) { alert("Error de conexión"); }
           finally { btn.innerText = textoOriginal; btn.disabled = false; }
