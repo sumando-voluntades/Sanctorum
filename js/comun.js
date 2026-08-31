@@ -16,6 +16,39 @@
 // cambia esta línea a la URL real del backend en Render (ej. "https://sanctorum-backend.onrender.com").
 const API_URL = "http://localhost:3000";
 
+// ================= ESCAPE DE HTML (H6, generalizado) =================
+// H6 (auditoria de seguridad) documentó este mismo problema en voluntariado.html: varias
+// vistas del panel renderizan con innerHTML datos que vienen de formularios PÚBLICOS sin
+// autenticación (autorregistro de voluntario/donador, y ahora también las Solicitudes de
+// la Comunidad — donación en especie, historia de éxito, ayuda psicológica). Un atacante
+// anónimo podía mandar un "nombre" o "mensaje" con HTML/JS y ejecutarlo en la sesión del
+// Admin/Coordinador/Psicólogo que abriera ese panel (robando, por ejemplo, el token de
+// localStorage). El arreglo de H6 vivía solo copiado en voluntariado.html; aquí se
+// generaliza a un solo lugar compartido, para que cualquier página que renderice datos de
+// origen público pase por esto.
+// escapeHtml() es para texto normal insertado en innerHTML; escapeAttrJs() es para valores
+// interpolados dentro de un atributo onclick="fn('...')" — ahí escapar solo con entidades
+// HTML NO basta, porque el navegador decodifica las entidades del atributo antes de
+// ejecutar el JS, así que una comilla simple codificada como &#39; se vuelve comilla real
+// de nuevo justo antes de correr como código.
+function escapeHtml(valor) {
+    return String(valor ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+function escapeAttrJs(valor) {
+    return String(valor ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 // ================= AUTENTICACIÓN =================
 
 // Decodifica el payload de un JWT (sin verificar la firma — eso ya lo hizo el backend;
@@ -200,4 +233,113 @@ function inicializarMenuMovil() {
         menu.classList.remove('flex');
         btn.setAttribute('aria-expanded', 'false');
     }));
+}
+
+// ================= FORMULARIOS PÚBLICOS DE SOLICITUD =================
+// Antes: "Agendar Entrega" (como_ayudar.html) y "Compartir Mi Historia"
+// (comunidad_blog.html) eran solo enlaces mailto: sin ningún registro en la
+// plataforma, así que el equipo dependía de revisar el correo manualmente y
+// nada quedaba guardado para dar seguimiento. Ahora ambos, junto con
+// "Ayuda Psicológica" (solicitud_apoyo_oficial.html), son formularios reales
+// que usan esta misma función para enviar al buzón compartido POST /api/solicitudes
+// (tabla Solicitudes_Web) — el backend avisa por correo al staff que corresponda
+// según tipo_solicitud, y la solicitud queda visible para revisión en Perfil.
+//
+// Parámetros:
+//   data: { nombre_contacto, correo, telefono, tipo_solicitud, mensaje }
+//   idFormulario: id del <form> que se está enviando (para deshabilitar su botón y limpiarlo)
+//   opciones: { onExito, onError } callbacks opcionales para que cada página reaccione
+//             a su manera (ej. cerrar un modal) en vez de solo mostrar el modal genérico.
+async function enviarSolicitudWeb(data, idFormulario, opciones) {
+    opciones = opciones || {};
+    const form = document.getElementById(idFormulario);
+    const btn = form ? form.querySelector('button[type="submit"]') : null;
+    const textoOriginal = btn ? btn.innerText : '';
+    if (btn) { btn.innerText = 'Enviando...'; btn.disabled = true; }
+
+    try {
+        const response = await fetch(`${API_URL}/api/solicitudes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            if (form) form.reset();
+            if (typeof opciones.onExito === 'function') opciones.onExito(result);
+        } else {
+            if (typeof opciones.onError === 'function') opciones.onError(result.message || 'No pudimos enviar tu solicitud. Verifica tus datos.');
+        }
+    } catch (error) {
+        console.error('Error de conexión al enviar solicitud web:', error);
+        if (typeof opciones.onError === 'function') opciones.onError('Error de conexión con el servidor. Intenta más tarde.');
+    } finally {
+        if (btn) { btn.innerText = textoOriginal; btn.disabled = false; }
+    }
+}
+
+// Modal genérico de resultado ("¡Solicitud Enviada!" / "Error") para los formularios
+// públicos de arriba. Cada página que lo use debe incluir el mismo bloque de HTML con
+// id="modalSolicitud" (ver solicitud_apoyo_oficial.html, como_ayudar.html o
+// comunidad_blog.html como referencia) — así solo existe una copia de la lógica aunque
+// el marcado se repita, igual que con el resto de partials compartidos.
+function mostrarModalSolicitud(titulo, mensaje, colorFondo, icono) {
+    const elTitulo = document.getElementById('modalTitulo');
+    const elMensaje = document.getElementById('modalMensaje');
+    const elIcono = document.getElementById('modalIcono');
+    const elModal = document.getElementById('modalSolicitud');
+    if (!elTitulo || !elMensaje || !elIcono || !elModal) return;
+    elTitulo.innerText = titulo;
+    elMensaje.innerText = mensaje;
+    elIcono.style.backgroundColor = colorFondo;
+    elIcono.innerText = icono;
+    elModal.classList.remove('hidden');
+}
+
+function cerrarModalSolicitud() {
+    const elModal = document.getElementById('modalSolicitud');
+    if (elModal) elModal.classList.add('hidden');
+}
+
+// ================= TRASPASO DE SOLICITUDES A SU MODAL DE GESTIÓN =================
+// El botón "Atender" de la tarjeta "Solicitudes de la Comunidad" (perfil.html) no marca
+// la solicitud como Atendida directamente — manda al staff a la página donde en verdad
+// se gestiona (Publicaciones, Aliados y Donativos, o Expedientes) con el modal de "nuevo"
+// ya abierto y precargado. Estas funciones son compartidas por las 4 páginas: perfil.html
+// escribe el traspaso antes de navegar, y la página destino lo lee (y lo borra) al cargar.
+
+const SOLICITUD_HANDOFF_KEY = 'sanctorum_handoff_solicitud';
+
+// Lee (y borra de inmediato) los datos de una solicitud en traspaso, si la página actual
+// se abrió desde el botón "Atender" de Perfil. Devuelve null si no hay ninguno pendiente.
+// Se borra al leerlo para que recargar la página (F5) no vuelva a abrir el modal solo.
+function leerYLimpiarHandoffSolicitud() {
+    try {
+        const crudo = sessionStorage.getItem(SOLICITUD_HANDOFF_KEY);
+        if (!crudo) return null;
+        sessionStorage.removeItem(SOLICITUD_HANDOFF_KEY);
+        return JSON.parse(crudo);
+    } catch (e) {
+        console.error('No se pudo leer el traspaso de solicitud:', e);
+        sessionStorage.removeItem(SOLICITUD_HANDOFF_KEY);
+        return null;
+    }
+}
+
+// Marca una Solicitud de la Comunidad como Atendida después de que la página destino ya
+// completó la gestión real (publicó la historia, registró el donativo o creó el
+// expediente). Es "silenciosa" a propósito: si esta llamada falla, no debe interrumpir
+// ni deshacer lo que sí se guardó — solo se registra en consola para revisarlo aparte.
+async function marcarSolicitudAtendidaSilenciosa(idSolicitud) {
+    if (!idSolicitud) return;
+    try {
+        await fetch(`${API_URL}/api/solicitudes/${idSolicitud}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...authHeaders() },
+            body: JSON.stringify({ estatus: 'Atendida' })
+        });
+    } catch (e) {
+        console.error('No se pudo marcar automáticamente la solicitud como atendida:', e);
+    }
 }
