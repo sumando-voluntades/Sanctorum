@@ -375,8 +375,31 @@
             return;
         }
 
-        cargarDatosIniciales();
+        // Se espera a que carguen los catálogos (especialistas y escuelas) antes de
+        // revisar un posible traspaso de solicitud: abrirModalNuevoExpediente() (llamado
+        // desde manejarHandoffSolicitud) necesita el <select> de especialistas ya lleno.
+        await cargarDatosIniciales();
+        manejarHandoffSolicitud();
     });
+
+    // Si se llegó aquí desde el botón "Atender" de una solicitud de "Ayuda Psicológica"
+    // en Perfil (ver atenderSolicitud() en perfil.html — solo llega hasta acá si quien
+    // atiende es Admin o Psicólogo): abre el modal de nuevo expediente precargado con los
+    // datos de contacto. El remitente queda como paciente y como tutor por defecto — el
+    // staff corrige si en realidad son personas distintas. El motivo de la solicitud no
+    // tiene un campo propio en este formulario, así que se agrega como la primera Nota de
+    // Evolución en cuanto el expediente se crea (ver guardarExpediente).
+    let solicitudHandoffPendiente = null;
+    function manejarHandoffSolicitud() {
+        const datos = leerYLimpiarHandoffSolicitud();
+        if (!datos || datos.tipo_solicitud !== 'Ayuda Psicológica') return;
+        abrirModalNuevoExpediente();
+        document.getElementById('nom_paciente').value = datos.nombre_contacto;
+        document.getElementById('nom_tutor').value = datos.nombre_contacto;
+        document.getElementById('tel_tutor').value = datos.telefono || '';
+        document.getElementById('correo_tutor').value = datos.correo;
+        solicitudHandoffPendiente = datos;
+    }
 
     // ================= CARGA DE DATOS PRINCIPALES =================
     // Trae los catálogos (especialistas y escuelas) para llenar los <select> del modal de
@@ -668,6 +691,34 @@
             if (data.success) {
                 cerrarModalNuevo();
                 cargarDatosIniciales(); // Recarga catálogos (por si hay escuela nueva) y expedientes
+
+                // Si este expediente vino del botón "Atender" de una solicitud de Ayuda
+                // Psicológica (ver manejarHandoffSolicitud arriba): el motivo original no
+                // tiene dónde ir en este formulario, así que se agrega como la primera
+                // Nota de Evolución del expediente recién creado (data.id_beneficiario —
+                // ver el RETURNING agregado en POST /api/expedientes). Recién hasta aquí,
+                // con el expediente Y la nota ya guardados, se marca la solicitud como
+                // Atendida — nunca antes de que la gestión real haya quedado hecha.
+                if (solicitudHandoffPendiente) {
+                    const datosHandoff = solicitudHandoffPendiente;
+                    solicitudHandoffPendiente = null;
+                    if (data.id_beneficiario) {
+                        try {
+                            await fetch(`${API_URL}/api/expedientes/${data.id_beneficiario}/notas`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                                body: JSON.stringify({
+                                    id_especialista: document.getElementById('sel_especialista').value || null,
+                                    nota: `Solicitud de apoyo recibida desde el sitio público (${datosHandoff.correo}${datosHandoff.telefono ? ' · ' + datosHandoff.telefono : ''}):\n\n${datosHandoff.mensaje}`,
+                                    tipo_sesion: 'Evaluación'
+                                })
+                            });
+                        } catch (e) {
+                            console.error('No se pudo agregar la nota inicial desde la solicitud:', e);
+                        }
+                    }
+                    marcarSolicitudAtendidaSilenciosa(datosHandoff.id_solicitud);
+                }
             } else alert("Error al guardar.");
         } catch (error) { console.error(error); alert("Error de conexión al guardar el expediente."); }
         finally { btn.innerText = textoOriginal; btn.disabled = false; }
@@ -782,14 +833,19 @@
                                   <p class="text-xs font-bold text-slate-800 flex items-center gap-1">
                                     <span class="material-symbols-outlined text-[14px]">calendar_today</span> ${fechaFormat}
                                   </p>
-                                  <p class="text-[10px] text-slate-500 mt-0.5 font-medium">Por: ${nota.especialista}</p>
+                                  <p class="text-[10px] text-slate-500 mt-0.5 font-medium">Por: ${escapeHtml(nota.especialista)}</p>
                               </div>
                               <div class="flex flex-col items-end gap-1">
                                   ${badgeRiesgo}
-                                  <span class="text-[10px] text-slate-500 font-bold">${nota.tipo_sesion || ''} • ${nota.modalidad || ''} • ${nota.asistencia || ''}</span>
+                                  <span class="text-[10px] text-slate-500 font-bold">${escapeHtml(nota.tipo_sesion || '')} • ${escapeHtml(nota.modalidad || '')} • ${escapeHtml(nota.asistencia || '')}</span>
                               </div>
                           </div>
-                          <p class="text-sm text-slate-700 whitespace-pre-line">${nota.contenido_nota}</p>
+                          <!-- H18 (auditoria de seguridad): el botón "Atender" de Perfil puede crear
+                               la primera nota de un expediente automáticamente a partir del mensaje
+                               libre de una solicitud pública sin autenticación (ver
+                               manejarHandoffSolicitud arriba) — contenido_nota puede traer HTML/JS
+                               de un remitente anónimo, así que se escapa antes de insertarlo. -->
+                          <p class="text-sm text-slate-700 whitespace-pre-line">${escapeHtml(nota.contenido_nota)}</p>
                       </div>
                     </div>`;
                 });
