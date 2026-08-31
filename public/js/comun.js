@@ -14,7 +14,7 @@
 
 // En desarrollo local el backend corre en localhost:3000. Al desplegar a producción,
 // cambia esta línea a la URL real del backend en Render (ej. "https://sanctorum-backend.onrender.com").
-const API_URL = "http://localhost:3000";
+const API_URL = "";
 
 // ================= ESCAPE DE HTML (H6, generalizado) =================
 // H6 (auditoria de seguridad) documentó este mismo problema en voluntariado.html: varias
