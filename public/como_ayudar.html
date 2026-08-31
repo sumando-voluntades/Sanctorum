@@ -6,8 +6,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Cómo Ayudar - Sumando Voluntades</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -22,75 +22,7 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "surface-bright": "#f6fafe",
-              "surface-container-high": "#e4e9ed",
-              "on-error": "#ffffff",
-              tertiary: "#006491",
-              "on-primary-fixed-variant": "#693c00",
-              "tertiary-container": "#02b3ff",
-              "on-tertiary-fixed-variant": "#004b6f",
-              error: "#ba1a1a",
-              "on-background": "#171c1f",
-              outline: "#877362",
-              "on-secondary-fixed": "#3e001e",
-              "on-primary-fixed": "#2c1600",
-              "surface-container": "#eaeef2",
-              "on-surface-variant": "#544434",
-              "surface-container-low": "#f0f4f8",
-              "primary-fixed": "#ffdcbd",
-              "primary-fixed-dim": "#ffb86e",
-              "on-secondary-container": "#fffbff",
-              "surface-variant": "#dfe3e7",
-              "on-tertiary-fixed": "#001e2f",
-              "secondary-fixed-dim": "#ffb0c9",
-              "surface-container-highest": "#dfe3e7",
-              "on-primary": "#ffffff",
-              "on-tertiary-container": "#004261",
-              "surface-tint": "#8a5100",
-              secondary: "#b50062",
-              primary: "#8a5100",
-              "inverse-on-surface": "#edf1f5",
-              "surface-container-lowest": "#ffffff",
-              "on-tertiary": "#ffffff",
-              "on-error-container": "#93000a",
-              background: "#f6fafe",
-              "primary-container": "#f39200",
-              "secondary-container": "#e2007c",
-              "on-primary-container": "#5c3400",
-              "tertiary-fixed-dim": "#8aceff",
-              "inverse-primary": "#ffb86e",
-              "error-container": "#ffdad6",
-              "outline-variant": "#dac2ae",
-              "on-secondary": "#ffffff",
-              "on-surface": "#171c1f",
-              "secondary-fixed": "#ffd9e2",
-              "on-secondary-fixed-variant": "#8e004b",
-              surface: "#f6fafe",
-              "surface-dim": "#d6dade",
-              "inverse-surface": "#2c3134",
-              "tertiary-fixed": "#c9e6ff",
-            },
-            borderRadius: {
-              DEFAULT: "1rem",
-              lg: "2rem",
-              xl: "3rem",
-              full: "9999px",
-            },
-            fontFamily: {
-              headline: ["Quicksand", "sans-serif"],
-              body: ["Quicksand", "sans-serif"],
-              label: ["Quicksand", "sans-serif"],
-            },
-          },
-        },
-      };
+    <link rel="stylesheet" href="/css/output.css" />
     </script>
     <style>
       .material-symbols-outlined {
@@ -112,7 +44,15 @@
       .asymmetric-shape {
         border-radius: 4rem 2rem 5rem 2rem;
       }
-      #header-mount { position: fixed; top: 0; left: 0; width: 100%; height: 76px; background: rgba(255,255,255,0.7); z-index: 50; }
+      #header-mount {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 76px;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 50;
+      }
     </style>
   </head>
   <body class="min-h-screen flex flex-col">
@@ -177,7 +117,10 @@
               comenzar esta jornada.
             </p>
           </div>
-          <form id="formVoluntariadoPublico" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form
+            id="formVoluntariadoPublico"
+            class="grid grid-cols-1 md:grid-cols-2 gap-8"
+          >
             <div class="space-y-2">
               <label class="block text-sm font-semibold ml-2 text-on-surface"
                 >Nombre Completo</label
@@ -227,7 +170,10 @@
                 <option>Talleres</option>
               </select>
             </div>
-            <div id="vol_form_msg" class="md:col-span-2 text-center text-sm font-bold hidden"></div>
+            <div
+              id="vol_form_msg"
+              class="md:col-span-2 text-center text-sm font-bold hidden"
+            ></div>
             <div class="md:col-span-2 text-center mt-6">
               <button
                 class="bg-primary-container text-on-primary-container text-lg font-bold px-12 py-4 rounded-full shadow-lg hover:scale-105 transition-transform active:scale-95"
@@ -240,7 +186,10 @@
         </div>
       </section>
       <!-- Section 2: Donaciones en Especie -->
-      <section id="donaciones-especie" class="py-24 px-6 bg-surface-container-low scroll-mt-24">
+      <section
+        id="donaciones-especie"
+        class="py-24 px-6 bg-surface-container-low scroll-mt-24"
+      >
         <div class="max-w-7xl mx-auto">
           <div
             class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
@@ -267,14 +216,27 @@
             </button>
           </div>
           <div class="flex justify-end gap-2 mb-4">
-            <button onclick="moverSliderNecesidades(-1)" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
-              <span class="material-symbols-outlined text-lg">chevron_left</span>
+            <button
+              onclick="moverSliderNecesidades(-1)"
+              class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all"
+            >
+              <span class="material-symbols-outlined text-lg"
+                >chevron_left</span
+              >
             </button>
-            <button onclick="moverSliderNecesidades(1)" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
-              <span class="material-symbols-outlined text-lg">chevron_right</span>
+            <button
+              onclick="moverSliderNecesidades(1)"
+              class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all"
+            >
+              <span class="material-symbols-outlined text-lg"
+                >chevron_right</span
+              >
             </button>
           </div>
-          <div id="contenedor_necesidades" class="flex gap-6 overflow-x-auto pb-6 scroll-smooth snap-x snap-mandatory">
+          <div
+            id="contenedor_necesidades"
+            class="flex gap-6 overflow-x-auto pb-6 scroll-smooth snap-x snap-mandatory"
+          >
             <p class="text-slate-400 py-8">Cargando necesidades actuales...</p>
           </div>
         </div>
@@ -341,60 +303,118 @@
          "Donación en Especie"; el backend avisa a Admin/Coordinador y la solicitud
          queda visible para revisión en su Perfil, igual que la validación de
          documentos profesionales. -->
-    <div id="modalAgendarDonacion" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-      <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div
+      id="modalAgendarDonacion"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-3xl max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+      >
         <div class="p-8">
           <div class="flex justify-between items-start mb-6">
             <div>
               <h3 class="text-2xl font-bold text-secondary">Agendar Entrega</h3>
-              <p class="text-slate-500 text-sm mt-1">Cuéntanos qué quieres donar y cuándo puedes traerlo; te confirmaremos por correo.</p>
+              <p class="text-slate-500 text-sm mt-1">
+                Cuéntanos qué quieres donar y cuándo puedes traerlo; te
+                confirmaremos por correo.
+              </p>
             </div>
-            <button type="button" onclick="cerrarModalAgendarDonacion()" class="text-slate-400 hover:text-slate-600 p-1">
+            <button
+              type="button"
+              onclick="cerrarModalAgendarDonacion()"
+              class="text-slate-400 hover:text-slate-600 p-1"
+            >
               <span class="material-symbols-outlined">close</span>
             </button>
           </div>
           <form id="formAgendarDonacion" class="space-y-4">
             <div class="space-y-2">
-              <label class="text-sm font-semibold text-slate-600 px-4">Nombre Completo</label>
-              <input id="don_nombre" required type="text" placeholder="Ej. Ana García"
-                class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+              <label class="text-sm font-semibold text-slate-600 px-4"
+                >Nombre Completo</label
+              >
+              <input
+                id="don_nombre"
+                required
+                type="text"
+                placeholder="Ej. Ana García"
+                class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all"
+              />
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <label class="text-sm font-semibold text-slate-600 px-4">Correo Electrónico</label>
-                <input id="don_correo" required type="email" placeholder="tu@correo.com"
-                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+                <label class="text-sm font-semibold text-slate-600 px-4"
+                  >Correo Electrónico</label
+                >
+                <input
+                  id="don_correo"
+                  required
+                  type="email"
+                  placeholder="tu@correo.com"
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all"
+                />
               </div>
               <div class="space-y-2">
-                <label class="text-sm font-semibold text-slate-600 px-4">Teléfono (opcional)</label>
-                <input id="don_telefono" type="tel" placeholder="+52 000 000 0000"
-                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+                <label class="text-sm font-semibold text-slate-600 px-4"
+                  >Teléfono (opcional)</label
+                >
+                <input
+                  id="don_telefono"
+                  type="tel"
+                  placeholder="+52 000 000 0000"
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all"
+                />
               </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <label class="text-sm font-semibold text-slate-600 px-4">¿Qué vas a donar?</label>
-                <input id="don_articulo" required type="text" placeholder="Ej. Ropa de invierno, útiles escolares..."
-                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+                <label class="text-sm font-semibold text-slate-600 px-4"
+                  >¿Qué vas a donar?</label
+                >
+                <input
+                  id="don_articulo"
+                  required
+                  type="text"
+                  placeholder="Ej. Ropa de invierno, útiles escolares..."
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all"
+                />
               </div>
               <div class="space-y-2">
-                <label class="text-sm font-semibold text-slate-600 px-4">Cantidad aproximada (opcional)</label>
-                <input id="don_cantidad" type="text" placeholder="Ej. 3 bolsas grandes"
-                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+                <label class="text-sm font-semibold text-slate-600 px-4"
+                  >Cantidad aproximada (opcional)</label
+                >
+                <input
+                  id="don_cantidad"
+                  type="text"
+                  placeholder="Ej. 3 bolsas grandes"
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all"
+                />
               </div>
             </div>
             <div class="space-y-2">
-              <label class="text-sm font-semibold text-slate-600 px-4">Fecha propuesta de entrega (opcional)</label>
-              <input id="don_fecha" type="date"
-                class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+              <label class="text-sm font-semibold text-slate-600 px-4"
+                >Fecha propuesta de entrega (opcional)</label
+              >
+              <input
+                id="don_fecha"
+                type="date"
+                class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all"
+              />
             </div>
             <div class="space-y-2">
-              <label class="text-sm font-semibold text-slate-600 px-4">Comentarios adicionales (opcional)</label>
-              <textarea id="don_comentarios" rows="3" placeholder="Cualquier detalle que nos ayude a coordinar la entrega..."
-                class="w-full bg-surface-container-low border-none rounded-2xl px-6 py-3 focus:ring-2 focus:ring-secondary transition-all"></textarea>
+              <label class="text-sm font-semibold text-slate-600 px-4"
+                >Comentarios adicionales (opcional)</label
+              >
+              <textarea
+                id="don_comentarios"
+                rows="3"
+                placeholder="Cualquier detalle que nos ayude a coordinar la entrega..."
+                class="w-full bg-surface-container-low border-none rounded-2xl px-6 py-3 focus:ring-2 focus:ring-secondary transition-all"
+              ></textarea>
             </div>
-            <button type="submit"
-              class="w-full bg-gradient-to-r from-primary to-primary-container text-white py-4 rounded-full font-bold text-lg hover:shadow-lg transition-all active:scale-95">
+            <button
+              type="submit"
+              class="w-full bg-gradient-to-r from-primary to-primary-container text-white py-4 rounded-full font-bold text-lg hover:shadow-lg transition-all active:scale-95"
+            >
               Enviar Solicitud
             </button>
           </form>
@@ -405,12 +425,26 @@
     <!-- Modal genérico de resultado (éxito/error) — misma estructura y funciones
          compartidas (mostrarModalSolicitud/cerrarModalSolicitud, en js/comun.js) que
          usa solicitud_apoyo_oficial.html. -->
-    <div id="modalSolicitud" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300">
-      <div class="bg-white p-8 rounded-3xl max-w-md w-full mx-4 text-center shadow-2xl">
-        <div id="modalIcono" class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full text-white font-bold text-3xl"></div>
-        <h3 id="modalTitulo" class="text-2xl font-bold mb-2 text-slate-800"></h3>
+    <div
+      id="modalSolicitud"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300"
+    >
+      <div
+        class="bg-white p-8 rounded-3xl max-w-md w-full mx-4 text-center shadow-2xl"
+      >
+        <div
+          id="modalIcono"
+          class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full text-white font-bold text-3xl"
+        ></div>
+        <h3
+          id="modalTitulo"
+          class="text-2xl font-bold mb-2 text-slate-800"
+        ></h3>
         <p id="modalMensaje" class="text-slate-500 mb-6"></p>
-        <button onclick="cerrarModalSolicitud()" class="w-full py-3 bg-gradient-to-r from-[#8a5100] to-[#f39200] text-white rounded-full font-bold shadow-lg hover:scale-[1.02] transition-all">
+        <button
+          onclick="cerrarModalSolicitud()"
+          class="w-full py-3 bg-gradient-to-r from-[#8a5100] to-[#f39200] text-white rounded-full font-bold shadow-lg hover:scale-[1.02] transition-all"
+        >
           Entendido
         </button>
       </div>
@@ -422,46 +456,76 @@
       // ---------- DONACIÓN MONETARIA (CLABE / Compartir) ----------
       // Blindada por completo: ninguna rama puede lanzar una excepción sin atrapar.
       function copiarTextoConFallback(texto, mensajeExito) {
-          try {
-              if (navigator.clipboard && navigator.clipboard.writeText) {
-                  navigator.clipboard.writeText(texto)
-                      .then(() => { try { alert(mensajeExito); } catch (e2) {} })
-                      .catch(() => { try { window.prompt('Copia manualmente (Ctrl+C / Cmd+C):', texto); } catch (e3) {} });
-              } else {
-                  window.prompt('Copia manualmente (Ctrl+C / Cmd+C):', texto);
-              }
-          } catch (errorCopiar) {
-              console.error('copiarTextoConFallback falló, mostrando alerta simple:', errorCopiar);
-              try { alert('Enlace: ' + texto); } catch (e4) {}
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard
+              .writeText(texto)
+              .then(() => {
+                try {
+                  alert(mensajeExito);
+                } catch (e2) {}
+              })
+              .catch(() => {
+                try {
+                  window.prompt("Copia manualmente (Ctrl+C / Cmd+C):", texto);
+                } catch (e3) {}
+              });
+          } else {
+            window.prompt("Copia manualmente (Ctrl+C / Cmd+C):", texto);
           }
+        } catch (errorCopiar) {
+          console.error(
+            "copiarTextoConFallback falló, mostrando alerta simple:",
+            errorCopiar,
+          );
+          try {
+            alert("Enlace: " + texto);
+          } catch (e4) {}
+        }
       }
 
       // Copia la CLABE interbancaria (quitando espacios) usando el helper
       // con respaldo de copiado/prompt.
       function copiarClabeAyudar() {
-          const clabe = document.getElementById('texto_clabe_ayudar').innerText.replace(/\s/g, '');
-          copiarTextoConFallback(clabe, 'CLABE copiada al portapapeles: ' + clabe);
+        const clabe = document
+          .getElementById("texto_clabe_ayudar")
+          .innerText.replace(/\s/g, "");
+        copiarTextoConFallback(
+          clabe,
+          "CLABE copiada al portapapeles: " + clabe,
+        );
       }
 
       // Comparte la página actual usando la Web Share API nativa si está
       // disponible; si no, o si falla de forma síncrona, recurre al helper
       // de copiado/prompt como respaldo.
       function compartirPaginaAyudar() {
-          const datosCompartir = {
-              title: 'Cómo Ayudar - Sumando Voluntades Sanctórum',
-              text: 'Conoce las formas de apoyar a Sumando Voluntades Sanctórum A.C.',
-              url: window.location.href
-          };
-          try {
-              if (navigator.share) {
-                  navigator.share(datosCompartir).catch(() => { /* el usuario canceló el share */ });
-              } else {
-                  copiarTextoConFallback(window.location.href, 'Enlace copiado al portapapeles. ¡Compártelo con quien quieras!');
-              }
-          } catch (errorSincrono) {
-              console.error('navigator.share falló de forma síncrona, usando respaldo:', errorSincrono);
-              copiarTextoConFallback(window.location.href, 'Enlace copiado al portapapeles. ¡Compártelo con quien quieras!');
+        const datosCompartir = {
+          title: "Cómo Ayudar - Sumando Voluntades Sanctórum",
+          text: "Conoce las formas de apoyar a Sumando Voluntades Sanctórum A.C.",
+          url: window.location.href,
+        };
+        try {
+          if (navigator.share) {
+            navigator.share(datosCompartir).catch(() => {
+              /* el usuario canceló el share */
+            });
+          } else {
+            copiarTextoConFallback(
+              window.location.href,
+              "Enlace copiado al portapapeles. ¡Compártelo con quien quieras!",
+            );
           }
+        } catch (errorSincrono) {
+          console.error(
+            "navigator.share falló de forma síncrona, usando respaldo:",
+            errorSincrono,
+          );
+          copiarTextoConFallback(
+            window.location.href,
+            "Enlace copiado al portapapeles. ¡Compártelo con quien quieras!",
+          );
+        }
       }
 
       // ---------- FORMULARIO: AGENDAR ENTREGA DE DONACIÓN EN ESPECIE ----------
@@ -469,123 +533,164 @@
       // Solicitud Web real (tipo_solicitud = 'Donación en Especie') que Admin/Coordinador
       // revisan desde su Perfil, igual que la validación de documentos profesionales.
       function abrirModalAgendarDonacion() {
-          document.getElementById('modalAgendarDonacion').classList.remove('hidden');
-          document.getElementById('modalAgendarDonacion').classList.add('flex');
+        document
+          .getElementById("modalAgendarDonacion")
+          .classList.remove("hidden");
+        document.getElementById("modalAgendarDonacion").classList.add("flex");
       }
       function cerrarModalAgendarDonacion() {
-          document.getElementById('modalAgendarDonacion').classList.add('hidden');
-          document.getElementById('modalAgendarDonacion').classList.remove('flex');
+        document.getElementById("modalAgendarDonacion").classList.add("hidden");
+        document
+          .getElementById("modalAgendarDonacion")
+          .classList.remove("flex");
       }
 
-      document.getElementById('formAgendarDonacion').addEventListener('submit', async (e) => {
+      document
+        .getElementById("formAgendarDonacion")
+        .addEventListener("submit", async (e) => {
           e.preventDefault();
           // Solicitudes_Web solo tiene una columna de mensaje libre (no columnas propias
           // para artículo/cantidad/fecha), así que armamos un mensaje legible con todo
           // lo que el formulario pidió — el staff lo ve completo al revisar la solicitud.
-          const articulo = document.getElementById('don_articulo').value;
-          const cantidad = document.getElementById('don_cantidad').value;
-          const fecha = document.getElementById('don_fecha').value;
-          const comentarios = document.getElementById('don_comentarios').value;
+          const articulo = document.getElementById("don_articulo").value;
+          const cantidad = document.getElementById("don_cantidad").value;
+          const fecha = document.getElementById("don_fecha").value;
+          const comentarios = document.getElementById("don_comentarios").value;
           let mensaje = `Artículo(s) a donar: ${articulo}`;
           if (cantidad) mensaje += `\nCantidad aproximada: ${cantidad}`;
           if (fecha) mensaje += `\nFecha propuesta de entrega: ${fecha}`;
           if (comentarios) mensaje += `\nComentarios: ${comentarios}`;
 
           const data = {
-              nombre_contacto: document.getElementById('don_nombre').value,
-              correo: document.getElementById('don_correo').value,
-              telefono: document.getElementById('don_telefono').value,
-              tipo_solicitud: 'Donación en Especie',
-              mensaje
+            nombre_contacto: document.getElementById("don_nombre").value,
+            correo: document.getElementById("don_correo").value,
+            telefono: document.getElementById("don_telefono").value,
+            tipo_solicitud: "Donación en Especie",
+            mensaje,
           };
-          await enviarSolicitudWeb(data, 'formAgendarDonacion', {
-              onExito: () => {
-                  cerrarModalAgendarDonacion();
-                  mostrarModalSolicitud('¡Solicitud Enviada!', 'Registramos tu propuesta de entrega. Nuestro equipo te contactará para confirmar fecha y lugar.', '#4CAF50', '✓');
-              },
-              onError: (mensajeError) => mostrarModalSolicitud('Error', mensajeError, '#F44336', '✕')
+          await enviarSolicitudWeb(data, "formAgendarDonacion", {
+            onExito: () => {
+              cerrarModalAgendarDonacion();
+              mostrarModalSolicitud(
+                "¡Solicitud Enviada!",
+                "Registramos tu propuesta de entrega. Nuestro equipo te contactará para confirmar fecha y lugar.",
+                "#4CAF50",
+                "✓",
+              );
+            },
+            onError: (mensajeError) =>
+              mostrarModalSolicitud("Error", mensajeError, "#F44336", "✕"),
           });
-      });
+        });
 
       // ---------- FORMULARIO PÚBLICO DE VOLUNTARIADO (RF-05) ----------
-      document.getElementById('formVoluntariadoPublico').addEventListener('submit', async (e) => {
+      document
+        .getElementById("formVoluntariadoPublico")
+        .addEventListener("submit", async (e) => {
           e.preventDefault();
           const btn = e.target.querySelector('button[type="submit"]');
           const textoOriginal = btn.innerText;
-          const msg = document.getElementById('vol_form_msg');
-          btn.innerText = "Enviando..."; btn.disabled = true;
-          msg.classList.add('hidden');
+          const msg = document.getElementById("vol_form_msg");
+          btn.innerText = "Enviando...";
+          btn.disabled = true;
+          msg.classList.add("hidden");
 
           const data = {
-              nombre_completo: document.getElementById('vol_nombre').value,
-              correo: document.getElementById('vol_correo').value,
-              telefono: document.getElementById('vol_telefono').value,
-              especialidad: document.getElementById('vol_especialidad').value,
-              id_rol: 4, // Voluntario por defecto; el área administrativa puede reasignar el rol al aprobarlo
-              material: null,
-              cantidad: null
+            nombre_completo: document.getElementById("vol_nombre").value,
+            correo: document.getElementById("vol_correo").value,
+            telefono: document.getElementById("vol_telefono").value,
+            especialidad: document.getElementById("vol_especialidad").value,
+            id_rol: 4, // Voluntario por defecto; el área administrativa puede reasignar el rol al aprobarlo
+            material: null,
+            cantidad: null,
           };
 
           try {
-              const res = await fetch(`${API_URL}/api/usuarios`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(data)
-              });
-              const json = await res.json();
-              msg.classList.remove('hidden');
-              if (res.ok && json.success) {
-                  msg.className = 'md:col-span-2 text-center text-sm font-bold text-green-600';
-                  msg.innerText = '¡Gracias! Tu solicitud fue registrada. Te contactaremos pronto para agendar tu entrevista.';
-                  e.target.reset();
-              } else {
-                  msg.className = 'md:col-span-2 text-center text-sm font-bold text-red-600';
-                  msg.innerText = json.message || 'No pudimos registrar tu solicitud. Verifica tus datos.';
-              }
+            const res = await fetch(`${API_URL}/api/usuarios`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+            const json = await res.json();
+            msg.classList.remove("hidden");
+            if (res.ok && json.success) {
+              msg.className =
+                "md:col-span-2 text-center text-sm font-bold text-green-600";
+              msg.innerText =
+                "¡Gracias! Tu solicitud fue registrada. Te contactaremos pronto para agendar tu entrevista.";
+              e.target.reset();
+            } else {
+              msg.className =
+                "md:col-span-2 text-center text-sm font-bold text-red-600";
+              msg.innerText =
+                json.message ||
+                "No pudimos registrar tu solicitud. Verifica tus datos.";
+            }
           } catch (error) {
-              msg.classList.remove('hidden');
-              msg.className = 'md:col-span-2 text-center text-sm font-bold text-red-600';
-              msg.innerText = 'Error de conexión con el servidor. Intenta más tarde.';
+            msg.classList.remove("hidden");
+            msg.className =
+              "md:col-span-2 text-center text-sm font-bold text-red-600";
+            msg.innerText =
+              "Error de conexión con el servidor. Intenta más tarde.";
           } finally {
-              btn.innerText = textoOriginal; btn.disabled = false;
+            btn.innerText = textoOriginal;
+            btn.disabled = false;
           }
-      });
+        });
 
       // ---------- NECESIDADES DE DONACIÓN (metas dinámicas por insumo) ----------
       const ICONOS_AREA = {
-          'Muralismo': { icon: 'format_paint', bg: 'bg-orange-100', text: 'text-orange-600', bar: 'bg-orange-500' },
-          'Alimentario': { icon: 'shopping_basket', bg: 'bg-blue-100', text: 'text-blue-600', bar: 'bg-blue-500' },
-          'Outreach': { icon: 'menu_book', bg: 'bg-pink-100', text: 'text-pink-600', bar: 'bg-pink-500' }
+        Muralismo: {
+          icon: "format_paint",
+          bg: "bg-orange-100",
+          text: "text-orange-600",
+          bar: "bg-orange-500",
+        },
+        Alimentario: {
+          icon: "shopping_basket",
+          bg: "bg-blue-100",
+          text: "text-blue-600",
+          bar: "bg-blue-500",
+        },
+        Outreach: {
+          icon: "menu_book",
+          bg: "bg-pink-100",
+          text: "text-pink-600",
+          bar: "bg-pink-500",
+        },
       };
 
       // Al cargar la página: inserta navbar/footer públicos, marca el link
       // activo, habilita el menú móvil y carga las necesidades de donación.
-      document.addEventListener('DOMContentLoaded', async () => {
-          await incluirParcial('#header-mount', 'partials/navbar_publico.html');
-          incluirParcial('#footer-mount', 'partials/footer_publico.html');
-          marcarLinkActivoPublico('#header-mount [data-pagina]');
-          inicializarMenuMovil();
+      document.addEventListener("DOMContentLoaded", async () => {
+        await incluirParcial("#header-mount", "partials/navbar_publico.html");
+        incluirParcial("#footer-mount", "partials/footer_publico.html");
+        marcarLinkActivoPublico("#header-mount [data-pagina]");
+        inicializarMenuMovil();
 
-          cargarNecesidadesDonacion();
+        cargarNecesidadesDonacion();
       });
 
       // Obtiene del backend los insumos en bajo stock (ya filtrados y
       // ordenados por urgencia) y los renderiza como tarjetas con ícono por
       // área de proyecto y barra de progreso hacia la meta de donación.
       async function cargarNecesidadesDonacion() {
-          const cont = document.getElementById('contenedor_necesidades');
-          try {
-              const res = await fetch(`${API_URL}/api/necesidades_donacion`);
-              const json = await res.json();
-              if (!json.success || json.data.length === 0) {
-                  cont.innerHTML = '<p class="text-slate-400 py-8">¡Buenas noticias! Por ahora ningún insumo está en bajo stock. Vuelve pronto para ver nuevas necesidades.</p>';
-                  return;
-              }
-              // El backend ya filtra solo insumos en bajo stock / punto de reorden, ordenados
-              // por urgencia (los que menos porcentaje de meta tienen, primero).
-              cont.innerHTML = json.data.map(item => {
-                  const estilo = ICONOS_AREA[item.area_proyecto] || ICONOS_AREA['Outreach'];
-                  return `
+        const cont = document.getElementById("contenedor_necesidades");
+        try {
+          const res = await fetch(`${API_URL}/api/necesidades_donacion`);
+          const json = await res.json();
+          if (!json.success || json.data.length === 0) {
+            cont.innerHTML =
+              '<p class="text-slate-400 py-8">¡Buenas noticias! Por ahora ningún insumo está en bajo stock. Vuelve pronto para ver nuevas necesidades.</p>';
+            return;
+          }
+          // El backend ya filtra solo insumos en bajo stock / punto de reorden, ordenados
+          // por urgencia (los que menos porcentaje de meta tienen, primero).
+          cont.innerHTML = json.data
+            .map((item) => {
+              const estilo =
+                ICONOS_AREA[item.area_proyecto] || ICONOS_AREA["Outreach"];
+              return `
                     <div class="snap-start shrink-0 w-72 md:w-80 bg-surface-container-lowest rounded-lg p-8 group hover:scale-[1.02] transition-all shadow-[0_10px_30px_rgba(23,28,31,0.04)]">
                       <div class="w-16 h-16 ${estilo.bg} rounded-full flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined ${estilo.text} text-3xl">${estilo.icon}</span>
@@ -597,17 +702,21 @@
                       </div>
                       <p class="text-[10px] font-bold mt-2 uppercase tracking-widest text-slate-400 text-right">${item.porcentaje}% de la meta</p>
                     </div>`;
-              }).join('');
-          } catch (e) {
-              console.error("Error al cargar necesidades de donación:", e);
-              cont.innerHTML = '<p class="text-slate-400 py-8">No se pudo cargar la información en este momento.</p>';
-          }
+            })
+            .join("");
+        } catch (e) {
+          console.error("Error al cargar necesidades de donación:", e);
+          cont.innerHTML =
+            '<p class="text-slate-400 py-8">No se pudo cargar la información en este momento.</p>';
+        }
       }
 
       // Desplaza horizontalmente el carrusel de necesidades de donación
       // (direccion: -1 retrocede, 1 avanza), 340px por click, con scroll suave.
       function moverSliderNecesidades(direccion) {
-          document.getElementById('contenedor_necesidades').scrollBy({ left: direccion * 340, behavior: 'smooth' });
+        document
+          .getElementById("contenedor_necesidades")
+          .scrollBy({ left: direccion * 340, behavior: "smooth" });
       }
     </script>
   </body>

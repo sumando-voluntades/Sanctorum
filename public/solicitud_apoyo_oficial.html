@@ -3,8 +3,8 @@
 <html class="light" lang="es">
   <head>
     <title>Solicitud de Apoyo | Sanctorum A.C.</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <link
@@ -19,75 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "on-tertiary-fixed": "#001e2f",
-              "on-error-container": "#93000a",
-              "tertiary-fixed-dim": "#8aceff",
-              "surface-container": "#eaeef2",
-              "primary-fixed-dim": "#ffb86e",
-              "surface-container-highest": "#dfe3e7",
-              outline: "#877362",
-              background: "#f6fafe",
-              "inverse-surface": "#2c3134",
-              error: "#ba1a1a",
-              surface: "#f6fafe",
-              "secondary-fixed": "#ffd9e2",
-              "on-surface-variant": "#544434",
-              "on-primary-fixed-variant": "#693c00",
-              "on-secondary-container": "#fffbff",
-              "on-secondary": "#ffffff",
-              "on-primary-container": "#5c3400",
-              "on-primary": "#ffffff",
-              "surface-container-lowest": "#ffffff",
-              "primary-container": "#f39200",
-              "tertiary-container": "#02b3ff",
-              "surface-bright": "#f6fafe",
-              "on-tertiary-fixed-variant": "#004b6f",
-              "on-tertiary": "#ffffff",
-              "on-surface": "#171c1f",
-              "on-background": "#171c1f",
-              "surface-dim": "#d6dade",
-              primary: "#8a5100",
-              "surface-container-low": "#f0f4f8",
-              "tertiary-fixed": "#c9e6ff",
-              "secondary-container": "#e2007c",
-              "secondary-fixed-dim": "#ffb0c9",
-              "primary-fixed": "#ffdcbd",
-              "on-secondary-fixed": "#3e001e",
-              "on-error": "#ffffff",
-              "inverse-primary": "#ffb86e",
-              "on-tertiary-container": "#004261",
-              "on-primary-fixed": "#2c1600",
-              "error-container": "#ffdad6",
-              "surface-variant": "#dfe3e7",
-              "outline-variant": "#dac2ae",
-              "inverse-on-surface": "#edf1f5",
-              "on-secondary-fixed-variant": "#8e004b",
-              "surface-container-high": "#e4e9ed",
-              secondary: "#b50062",
-              "surface-tint": "#8a5100",
-              tertiary: "#006491",
-            },
-            borderRadius: {
-              DEFAULT: "1rem",
-              lg: "2rem",
-              xl: "3rem",
-              full: "9999px",
-            },
-            fontFamily: {
-              headline: ["Quicksand", "sans-serif"],
-              body: ["Quicksand", "sans-serif"],
-              label: ["Quicksand", "sans-serif"],
-            },
-          },
-        },
-      };
+    <link rel="stylesheet" href="/css/output.css" />
     </script>
     <style>
       body {
@@ -104,7 +36,15 @@
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(24px);
       }
-      #header-mount { position: fixed; top: 0; left: 0; width: 100%; height: 76px; background: rgba(255,255,255,0.7); z-index: 50; }
+      #header-mount {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 76px;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 50;
+      }
     </style>
   </head>
   <body
@@ -114,21 +54,71 @@
     <main class="pt-24">
       <!-- ¿Necesitas ayuda inmediata? (recursos de crisis, siempre visibles primero) -->
       <section class="px-8 pt-10">
-        <div class="max-w-7xl mx-auto bg-red-50 border border-red-100 rounded-3xl p-8 md:p-10">
-          <h2 class="text-xl md:text-2xl font-bold text-on-surface text-center mb-2">¿Necesitas ayuda inmediata?</h2>
-          <p class="text-center text-slate-500 text-sm mb-8">Si estás en una situación de emergencia, contacta inmediatamente a estos servicios:</p>
+        <div
+          class="max-w-7xl mx-auto bg-red-50 border border-red-100 rounded-3xl p-8 md:p-10"
+        >
+          <h2
+            class="text-xl md:text-2xl font-bold text-on-surface text-center mb-2"
+          >
+            ¿Necesitas ayuda inmediata?
+          </h2>
+          <p class="text-center text-slate-500 text-sm mb-8">
+            Si estás en una situación de emergencia, contacta inmediatamente a
+            estos servicios:
+          </p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a href="tel:911" class="flex items-center gap-4 bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all">
-              <div class="w-11 h-11 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0"><span class="material-symbols-outlined">call</span></div>
-              <div><p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Emergencias</p><p class="text-lg font-bold text-red-600">911</p></div>
+            <a
+              href="tel:911"
+              class="flex items-center gap-4 bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all"
+            >
+              <div
+                class="w-11 h-11 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0"
+              >
+                <span class="material-symbols-outlined">call</span>
+              </div>
+              <div>
+                <p
+                  class="text-[11px] font-bold text-slate-400 uppercase tracking-wide"
+                >
+                  Emergencias
+                </p>
+                <p class="text-lg font-bold text-red-600">911</p>
+              </div>
             </a>
-            <a href="tel:8009112000" class="flex items-center gap-4 bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all">
-              <div class="w-11 h-11 rounded-full bg-teal-700 text-white flex items-center justify-center shrink-0"><span class="material-symbols-outlined">call</span></div>
-              <div><p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Línea de la Vida</p><p class="text-lg font-bold text-teal-700">800-911-2000</p></div>
+            <a
+              href="tel:8009112000"
+              class="flex items-center gap-4 bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all"
+            >
+              <div
+                class="w-11 h-11 rounded-full bg-teal-700 text-white flex items-center justify-center shrink-0"
+              >
+                <span class="material-symbols-outlined">call</span>
+              </div>
+              <div>
+                <p
+                  class="text-[11px] font-bold text-slate-400 uppercase tracking-wide"
+                >
+                  Línea de la Vida
+                </p>
+                <p class="text-lg font-bold text-teal-700">800-911-2000</p>
+              </div>
             </a>
-            <div class="flex items-center gap-4 bg-white rounded-2xl p-5 shadow-sm">
-              <div class="w-11 h-11 rounded-full bg-secondary text-white flex items-center justify-center shrink-0"><span class="material-symbols-outlined">support_agent</span></div>
-              <div><p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Sanctórum 24/7</p><p class="text-lg font-bold text-secondary">800-SANCTORUM</p></div>
+            <div
+              class="flex items-center gap-4 bg-white rounded-2xl p-5 shadow-sm"
+            >
+              <div
+                class="w-11 h-11 rounded-full bg-secondary text-white flex items-center justify-center shrink-0"
+              >
+                <span class="material-symbols-outlined">support_agent</span>
+              </div>
+              <div>
+                <p
+                  class="text-[11px] font-bold text-slate-400 uppercase tracking-wide"
+                >
+                  Sanctórum 24/7
+                </p>
+                <p class="text-lg font-bold text-secondary">800-SANCTORUM</p>
+              </div>
             </div>
           </div>
         </div>
@@ -164,12 +154,20 @@
               especialistas están listos para escucharte.
             </p>
             <div class="flex flex-wrap gap-3 pt-2">
-              <span class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-full text-sm font-semibold shadow-sm">
-                <span class="material-symbols-outlined text-sm text-primary">self_improvement</span>
+              <span
+                class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-full text-sm font-semibold shadow-sm"
+              >
+                <span class="material-symbols-outlined text-sm text-primary"
+                  >self_improvement</span
+                >
                 Bienestar Integral
               </span>
-              <span class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-full text-sm font-semibold shadow-sm">
-                <span class="material-symbols-outlined text-sm text-secondary">diversity_3</span>
+              <span
+                class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-full text-sm font-semibold shadow-sm"
+              >
+                <span class="material-symbols-outlined text-sm text-secondary"
+                  >diversity_3</span
+                >
                 Red de Apoyo
               </span>
             </div>
@@ -342,25 +340,44 @@
               Ver Calendario Completo
             </a>
           </div>
-          <div id="contenedor_eventos_publicos" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <p class="text-slate-400 col-span-3 text-center py-8">Cargando próximos eventos...</p>
+          <div
+            id="contenedor_eventos_publicos"
+            class="grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
+            <p class="text-slate-400 col-span-3 text-center py-8">
+              Cargando próximos eventos...
+            </p>
           </div>
         </div>
       </section>
     </main>
     <div id="footer-mount"></div>
 
-    <div id="modalSolicitud" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300">
-      <div class="bg-white p-8 rounded-3xl max-w-md w-full mx-4 text-center shadow-2xl">
-        <div id="modalIcono" class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full text-white font-bold text-3xl"></div>
-        <h3 id="modalTitulo" class="text-2xl font-bold mb-2 text-slate-800"></h3>
+    <div
+      id="modalSolicitud"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300"
+    >
+      <div
+        class="bg-white p-8 rounded-3xl max-w-md w-full mx-4 text-center shadow-2xl"
+      >
+        <div
+          id="modalIcono"
+          class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full text-white font-bold text-3xl"
+        ></div>
+        <h3
+          id="modalTitulo"
+          class="text-2xl font-bold mb-2 text-slate-800"
+        ></h3>
         <p id="modalMensaje" class="text-slate-500 mb-6"></p>
-        <button onclick="cerrarModal()" class="w-full py-3 bg-gradient-to-r from-[#8a5100] to-[#f39200] text-white rounded-full font-bold shadow-lg hover:scale-[1.02] transition-all">
+        <button
+          onclick="cerrarModal()"
+          class="w-full py-3 bg-gradient-to-r from-[#8a5100] to-[#f39200] text-white rounded-full font-bold shadow-lg hover:scale-[1.02] transition-all"
+        >
           Entendido
         </button>
       </div>
     </div>
-    
+
     <script src="js/comun.js"></script>
     <script src="js/incluir.js"></script>
     <script>
@@ -368,61 +385,88 @@
       // enviarSolicitudWeb() y mostrarModalSolicitud()/cerrarModalSolicitud() ahora viven
       // en js/comun.js — las usan también como_ayudar.html y comunidad_blog.html para sus
       // propios formularios de "Donación en Especie" y "Compartir Historia de Éxito".
-      document.getElementById('formPsicologica').addEventListener('submit', async (e) => {
+      document
+        .getElementById("formPsicologica")
+        .addEventListener("submit", async (e) => {
           e.preventDefault();
           const data = {
-              nombre_contacto: document.getElementById('psi_nombre').value,
-              correo: document.getElementById('psi_correo').value,
-              telefono: document.getElementById('psi_telefono').value,
-              tipo_solicitud: 'Ayuda Psicológica',
-              mensaje: document.getElementById('psi_mensaje').value
+            nombre_contacto: document.getElementById("psi_nombre").value,
+            correo: document.getElementById("psi_correo").value,
+            telefono: document.getElementById("psi_telefono").value,
+            tipo_solicitud: "Ayuda Psicológica",
+            mensaje: document.getElementById("psi_mensaje").value,
           };
-          await enviarSolicitudWeb(data, 'formPsicologica', {
-              onExito: () => mostrarModalSolicitud('¡Solicitud Enviada!', 'Tu mensaje ha sido registrado en el sistema. Un coordinador de Sanctorum te contactará pronto.', '#4CAF50', '✓'),
-              onError: (mensajeError) => mostrarModalSolicitud('Error', mensajeError, '#F44336', '✕')
+          await enviarSolicitudWeb(data, "formPsicologica", {
+            onExito: () =>
+              mostrarModalSolicitud(
+                "¡Solicitud Enviada!",
+                "Tu mensaje ha sido registrado en el sistema. Un coordinador de Sanctorum te contactará pronto.",
+                "#4CAF50",
+                "✓",
+              ),
+            onError: (mensajeError) =>
+              mostrarModalSolicitud("Error", mensajeError, "#F44336", "✕"),
           });
-      });
+        });
 
       // Alias retrocompatible: el botón "Entendido" del modal en el HTML de esta página
       // ya usaba onclick="cerrarModal()" antes de que la función se moviera a comun.js.
-      function cerrarModal() { cerrarModalSolicitud(); }
+      function cerrarModal() {
+        cerrarModalSolicitud();
+      }
 
       // ---------- CALENDARIO DE COMUNIDAD (eventos públicos reales) ----------
       // Al cargar la página: inserta navbar/footer públicos, marca el link
       // activo, habilita el menú móvil y carga los próximos eventos públicos.
-      document.addEventListener('DOMContentLoaded', async () => {
-          await incluirParcial('#header-mount', 'partials/navbar_publico.html');
-          incluirParcial('#footer-mount', 'partials/footer_publico.html');
-          marcarLinkActivoPublico('#header-mount [data-pagina]');
-          inicializarMenuMovil();
+      document.addEventListener("DOMContentLoaded", async () => {
+        await incluirParcial("#header-mount", "partials/navbar_publico.html");
+        incluirParcial("#footer-mount", "partials/footer_publico.html");
+        marcarLinkActivoPublico("#header-mount [data-pagina]");
+        inicializarMenuMovil();
 
-          cargarEventosPublicos();
+        cargarEventosPublicos();
       });
 
       // Obtiene del backend los próximos eventos públicos y renderiza los
       // primeros 3 como tarjetas (día/mes/hora, tipo, lugar y enlace al
       // detalle), alternando dos combinaciones de color entre tarjetas.
       async function cargarEventosPublicos() {
-          const cont = document.getElementById('contenedor_eventos_publicos');
-          try {
-              const res = await fetch(`${API_URL}/api/eventos_publicos`);
-              const json = await res.json();
-              if (!json.success || json.data.length === 0) {
-                  cont.innerHTML = '<p class="text-slate-400 col-span-3 text-center py-8">Aún no hay eventos próximos programados. ¡Vuelve pronto!</p>';
-                  return;
-              }
-              const colores = [
-                  { badge: 'bg-secondary-fixed text-on-secondary-fixed', num: 'text-secondary', btn: 'border-secondary-fixed text-secondary hover:bg-secondary hover:text-white' },
-                  { badge: 'bg-primary-fixed text-on-primary-fixed', num: 'text-primary', btn: 'border-primary-fixed text-primary hover:bg-primary-container hover:text-on-primary' }
-              ];
-              cont.innerHTML = json.data.slice(0, 3).map((ev, i) => {
-                  const fecha = new Date(ev.fecha_realizacion);
-                  const dia = fecha.toLocaleDateString('es-MX', { day: '2-digit' });
-                  const mes = fecha.toLocaleDateString('es-MX', { month: 'short' }).replace('.', '');
-                  const hora = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                  const c = colores[i % colores.length];
-                  const lugar = ev.nombre_escuela || 'Sede Sanctórum';
-                  return `
+        const cont = document.getElementById("contenedor_eventos_publicos");
+        try {
+          const res = await fetch(`${API_URL}/api/eventos_publicos`);
+          const json = await res.json();
+          if (!json.success || json.data.length === 0) {
+            cont.innerHTML =
+              '<p class="text-slate-400 col-span-3 text-center py-8">Aún no hay eventos próximos programados. ¡Vuelve pronto!</p>';
+            return;
+          }
+          const colores = [
+            {
+              badge: "bg-secondary-fixed text-on-secondary-fixed",
+              num: "text-secondary",
+              btn: "border-secondary-fixed text-secondary hover:bg-secondary hover:text-white",
+            },
+            {
+              badge: "bg-primary-fixed text-on-primary-fixed",
+              num: "text-primary",
+              btn: "border-primary-fixed text-primary hover:bg-primary-container hover:text-on-primary",
+            },
+          ];
+          cont.innerHTML = json.data
+            .slice(0, 3)
+            .map((ev, i) => {
+              const fecha = new Date(ev.fecha_realizacion);
+              const dia = fecha.toLocaleDateString("es-MX", { day: "2-digit" });
+              const mes = fecha
+                .toLocaleDateString("es-MX", { month: "short" })
+                .replace(".", "");
+              const hora = fecha.toLocaleTimeString("es-MX", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+              const c = colores[i % colores.length];
+              const lugar = ev.nombre_escuela || "Sede Sanctórum";
+              return `
                     <div class="group relative bg-white p-8 rounded-3xl shadow-[0_10px_30px_rgba(23,28,31,0.05)] transition-all hover:scale-[1.02] hover:shadow-xl">
                       <div class="mb-6 flex justify-between items-start">
                         <div class="text-center">
@@ -438,11 +482,13 @@
                       </div>
                       <a href="evento_detalle?tipo=evento&id=${ev.id_evento}" class="block text-center w-full border-2 ${c.btn} font-bold py-2 rounded-full transition-all">Más información</a>
                     </div>`;
-              }).join('');
-          } catch (e) {
-              console.error("Error al cargar eventos públicos:", e);
-              cont.innerHTML = '<p class="text-slate-400 col-span-3 text-center py-8">No se pudo cargar el calendario en este momento.</p>';
-          }
+            })
+            .join("");
+        } catch (e) {
+          console.error("Error al cargar eventos públicos:", e);
+          cont.innerHTML =
+            '<p class="text-slate-400 col-span-3 text-center py-8">No se pudo cargar el calendario en este momento.</p>';
+        }
       }
     </script>
   </body>

@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #8a5100;
+  --color-primary-container: #f39200;
+  --color-secondary: #b50062;
+  --color-secondary-container: #e2007c;
+  --color-surface: #f6fafe;
+  --color-surface-container-low: #f0f4f8;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface: #171c1f;
+  --color-on-surface-variant: #544434;
+
+  --font-sans: "Quicksand", sans-serif;
+  --font-plus: "Plus Jakarta Sans", sans-serif;
+}

@@ -4,39 +4,34 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Detalle | Sumando Voluntades Sanctórum</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link
       href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              primary: "#8a5100",
-              "primary-container": "#f39200",
-              secondary: "#b50062",
-              "secondary-container": "#e2007c",
-              surface: "#f6fafe",
-              "surface-container-low": "#f0f4f8",
-              "surface-container-lowest": "#ffffff",
-              "on-surface": "#171c1f",
-              "on-surface-variant": "#544434",
-            },
-            borderRadius: { DEFAULT: "1rem", lg: "2rem", xl: "3rem", full: "9999px" },
-            fontFamily: { headline: ["Quicksand", "sans-serif"], body: ["Quicksand", "sans-serif"] },
-          },
-        },
-      };
+    <link rel="stylesheet" href="/css/output.css" />
     </script>
     <style>
-      body { font-family: "Quicksand", sans-serif; }
-      .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
-      #header-mount { position: fixed; top: 0; left: 0; width: 100%; height: 76px; background: rgba(255,255,255,0.7); z-index: 50; }
+      body {
+        font-family: "Quicksand", sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      #header-mount {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 76px;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 50;
+      }
     </style>
   </head>
   <body class="bg-surface text-on-surface min-h-screen flex flex-col">
@@ -44,8 +39,12 @@
 
     <main class="flex-grow pt-32 pb-24 px-6">
       <div class="max-w-4xl mx-auto">
-        <a href="comunidad_blog" class="inline-flex items-center gap-2 text-secondary font-bold text-sm mb-8 hover:underline">
-          <span class="material-symbols-outlined text-lg">arrow_back</span> Volver a Comunidad
+        <a
+          href="comunidad_blog"
+          class="inline-flex items-center gap-2 text-secondary font-bold text-sm mb-8 hover:underline"
+        >
+          <span class="material-symbols-outlined text-lg">arrow_back</span>
+          Volver a Comunidad
         </a>
 
         <div id="estado_carga" class="text-center py-24">
@@ -53,54 +52,120 @@
         </div>
 
         <article id="contenido_detalle" class="hidden">
-          <span id="det_badge_tipo" class="inline-block px-4 py-1.5 bg-secondary text-white rounded-full text-sm font-semibold tracking-wide mb-6"></span>
-          <h1 id="det_titulo" class="text-3xl md:text-5xl font-bold text-on-surface mb-4 leading-tight"></h1>
+          <span
+            id="det_badge_tipo"
+            class="inline-block px-4 py-1.5 bg-secondary text-white rounded-full text-sm font-semibold tracking-wide mb-6"
+          ></span>
+          <h1
+            id="det_titulo"
+            class="text-3xl md:text-5xl font-bold text-on-surface mb-4 leading-tight"
+          ></h1>
           <p id="det_fecha" class="text-slate-500 font-medium mb-8"></p>
 
           <!-- Visor de imágenes estilo "historia" (soporta 1 o varias imágenes) -->
-          <div id="det_imagen_wrap" class="relative rounded-3xl overflow-hidden shadow-xl mb-10 bg-slate-900 hidden select-none" style="aspect-ratio: 4/3;">
-            <div id="story_progreso" class="absolute top-3 left-3 right-3 z-20 flex gap-1.5"></div>
+          <div
+            id="det_imagen_wrap"
+            class="relative rounded-3xl overflow-hidden shadow-xl mb-10 bg-slate-900 hidden select-none"
+            style="aspect-ratio: 4/3"
+          >
+            <div
+              id="story_progreso"
+              class="absolute top-3 left-3 right-3 z-20 flex gap-1.5"
+            ></div>
             <img id="det_imagen" class="w-full h-full object-cover" alt="" />
-            <button onclick="storyAnterior()" class="absolute left-0 top-0 h-full w-1/3 z-10 cursor-pointer" aria-label="Imagen anterior"></button>
-            <button onclick="storySiguiente()" class="absolute right-0 top-0 h-full w-1/3 z-10 cursor-pointer" aria-label="Siguiente imagen"></button>
-            <button onclick="storyAnterior()" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full items-center justify-center hover:bg-white transition-all">
+            <button
+              onclick="storyAnterior()"
+              class="absolute left-0 top-0 h-full w-1/3 z-10 cursor-pointer"
+              aria-label="Imagen anterior"
+            ></button>
+            <button
+              onclick="storySiguiente()"
+              class="absolute right-0 top-0 h-full w-1/3 z-10 cursor-pointer"
+              aria-label="Siguiente imagen"
+            ></button>
+            <button
+              onclick="storyAnterior()"
+              class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full items-center justify-center hover:bg-white transition-all"
+            >
               <span class="material-symbols-outlined">chevron_left</span>
             </button>
-            <button onclick="storySiguiente()" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full items-center justify-center hover:bg-white transition-all">
+            <button
+              onclick="storySiguiente()"
+              class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 rounded-full items-center justify-center hover:bg-white transition-all"
+            >
               <span class="material-symbols-outlined">chevron_right</span>
             </button>
           </div>
 
-          <div id="det_contenido" class="prose prose-lg max-w-none text-on-surface-variant leading-relaxed whitespace-pre-line mb-8"></div>
+          <div
+            id="det_contenido"
+            class="prose prose-lg max-w-none text-on-surface-variant leading-relaxed whitespace-pre-line mb-8"
+          ></div>
 
           <!-- Ubicación (mapa) -->
           <div id="det_mapa_wrap" class="hidden mb-8">
-            <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-secondary">location_on</span> Ubicación</h3>
-            <iframe id="det_mapa_iframe" class="w-full h-72 rounded-2xl border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary"
+                >location_on</span
+              >
+              Ubicación
+            </h3>
+            <iframe
+              id="det_mapa_iframe"
+              class="w-full h-72 rounded-2xl border-0"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
           </div>
 
           <!-- Enlace de reunión -->
           <div id="det_reunion_wrap" class="hidden mb-8">
-            <a id="det_reunion_link" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-teal-700 text-white px-6 py-3 rounded-full font-bold hover:bg-teal-800 transition-all">
-              <span class="material-symbols-outlined">videocam</span> Unirse a la reunión
+            <a
+              id="det_reunion_link"
+              href="#"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 bg-teal-700 text-white px-6 py-3 rounded-full font-bold hover:bg-teal-800 transition-all"
+            >
+              <span class="material-symbols-outlined">videocam</span> Unirse a
+              la reunión
             </a>
           </div>
 
-          <div class="mt-12 pt-8 border-t border-slate-200 flex flex-wrap gap-4">
-            <button onclick="compartirDetalle()" class="px-8 py-3 bg-secondary text-white rounded-full font-bold shadow-lg hover:shadow-secondary/20 transition-all flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg">share</span> Compartir
+          <div
+            class="mt-12 pt-8 border-t border-slate-200 flex flex-wrap gap-4"
+          >
+            <button
+              onclick="compartirDetalle()"
+              class="px-8 py-3 bg-secondary text-white rounded-full font-bold shadow-lg hover:shadow-secondary/20 transition-all flex items-center gap-2"
+            >
+              <span class="material-symbols-outlined text-lg">share</span>
+              Compartir
             </button>
-            <a href="comunidad_blog" class="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-full font-bold hover:bg-slate-50 transition-all">
+            <a
+              href="comunidad_blog"
+              class="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-full font-bold hover:bg-slate-50 transition-all"
+            >
               Ver más publicaciones
             </a>
           </div>
         </article>
 
         <div id="estado_no_encontrado" class="hidden text-center py-24">
-          <span class="material-symbols-outlined text-5xl text-slate-300 mb-4">search_off</span>
-          <h2 class="text-2xl font-bold text-slate-600 mb-2">No encontramos esta publicación</h2>
-          <p class="text-slate-400 mb-6">Puede que haya sido movida o eliminada.</p>
-          <a href="comunidad_blog" class="text-secondary font-bold hover:underline">Volver a Comunidad</a>
+          <span class="material-symbols-outlined text-5xl text-slate-300 mb-4"
+            >search_off</span
+          >
+          <h2 class="text-2xl font-bold text-slate-600 mb-2">
+            No encontramos esta publicación
+          </h2>
+          <p class="text-slate-400 mb-6">
+            Puede que haya sido movida o eliminada.
+          </p>
+          <a
+            href="comunidad_blog"
+            class="text-secondary font-bold hover:underline"
+            >Volver a Comunidad</a
+          >
         </div>
       </div>
     </main>
@@ -122,25 +187,32 @@
       // una, muestra el contenedor, dibuja las barras de progreso y arranca
       // en la primera imagen.
       function iniciarStory(imagenes) {
-          storyImagenes = imagenes.filter(Boolean);
-          if (storyImagenes.length === 0) {
-              document.getElementById('det_imagen_wrap').classList.add('hidden');
-              return;
-          }
-          document.getElementById('det_imagen_wrap').classList.remove('hidden');
-          renderProgresoStory();
-          mostrarImagenStory(0);
+        storyImagenes = imagenes.filter(Boolean);
+        if (storyImagenes.length === 0) {
+          document.getElementById("det_imagen_wrap").classList.add("hidden");
+          return;
+        }
+        document.getElementById("det_imagen_wrap").classList.remove("hidden");
+        renderProgresoStory();
+        mostrarImagenStory(0);
       }
 
       // Dibuja una barra de progreso por cada imagen de la historia (solo si
       // hay más de una imagen); cada barra se rellena con mostrarImagenStory().
       function renderProgresoStory() {
-          const cont = document.getElementById('story_progreso');
-          if (storyImagenes.length <= 1) { cont.innerHTML = ''; return; }
-          cont.innerHTML = storyImagenes.map((_, i) => `
+        const cont = document.getElementById("story_progreso");
+        if (storyImagenes.length <= 1) {
+          cont.innerHTML = "";
+          return;
+        }
+        cont.innerHTML = storyImagenes
+          .map(
+            (_, i) => `
               <div class="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
                   <div id="story_barra_${i}" class="h-full bg-white rounded-full" style="width: 0%"></div>
-              </div>`).join('');
+              </div>`,
+          )
+          .join("");
       }
 
       // Muestra la imagen en la posición "indice" (se acota al rango válido),
@@ -150,69 +222,71 @@
       // en pasos de 100ms hasta completar STORY_DURACION_MS y entonces avanza
       // automáticamente a la siguiente imagen (storySiguiente).
       function mostrarImagenStory(indice) {
-          if (indice < 0) indice = 0;
-          if (indice >= storyImagenes.length) indice = storyImagenes.length - 1;
-          storyIndiceActual = indice;
-          document.getElementById('det_imagen').src = storyImagenes[indice];
+        if (indice < 0) indice = 0;
+        if (indice >= storyImagenes.length) indice = storyImagenes.length - 1;
+        storyIndiceActual = indice;
+        document.getElementById("det_imagen").src = storyImagenes[indice];
 
-          storyImagenes.forEach((_, i) => {
-              const barra = document.getElementById(`story_barra_${i}`);
-              if (!barra) return;
-              if (i < indice) barra.style.width = '100%';
-              else if (i > indice) barra.style.width = '0%';
-          });
+        storyImagenes.forEach((_, i) => {
+          const barra = document.getElementById(`story_barra_${i}`);
+          if (!barra) return;
+          if (i < indice) barra.style.width = "100%";
+          else if (i > indice) barra.style.width = "0%";
+        });
 
-          if (storyTimer) clearInterval(storyTimer);
-          if (storyImagenes.length > 1) {
-              let progreso = 0;
-              const barraActual = document.getElementById(`story_barra_${indice}`);
-              storyTimer = setInterval(() => {
-                  progreso += 100 / (STORY_DURACION_MS / 100);
-                  if (barraActual) barraActual.style.width = Math.min(progreso, 100) + '%';
-                  if (progreso >= 100) {
-                      clearInterval(storyTimer);
-                      storySiguiente();
-                  }
-              }, 100);
-          }
+        if (storyTimer) clearInterval(storyTimer);
+        if (storyImagenes.length > 1) {
+          let progreso = 0;
+          const barraActual = document.getElementById(`story_barra_${indice}`);
+          storyTimer = setInterval(() => {
+            progreso += 100 / (STORY_DURACION_MS / 100);
+            if (barraActual)
+              barraActual.style.width = Math.min(progreso, 100) + "%";
+            if (progreso >= 100) {
+              clearInterval(storyTimer);
+              storySiguiente();
+            }
+          }, 100);
+        }
       }
 
       // Avanza a la siguiente imagen de la historia; si ya está en la última,
       // se queda ahí y solo reinicia el temporizador/barra de esa imagen.
       function storySiguiente() {
-          if (storyIndiceActual < storyImagenes.length - 1) mostrarImagenStory(storyIndiceActual + 1);
-          else mostrarImagenStory(storyIndiceActual); // se queda en la última, reinicia su barra
+        if (storyIndiceActual < storyImagenes.length - 1)
+          mostrarImagenStory(storyIndiceActual + 1);
+        else mostrarImagenStory(storyIndiceActual); // se queda en la última, reinicia su barra
       }
       // Retrocede a la imagen anterior de la historia, sin bajar de la primera.
       function storyAnterior() {
-          mostrarImagenStory(Math.max(0, storyIndiceActual - 1));
+        mostrarImagenStory(Math.max(0, storyIndiceActual - 1));
       }
 
       // Lee el parámetro "id" de la URL (?id=...), que identifica la
       // publicación o evento a mostrar.
       function obtenerIdDeURL() {
-          const params = new URLSearchParams(window.location.search);
-          return params.get('id');
+        const params = new URLSearchParams(window.location.search);
+        return params.get("id");
       }
 
       // Lee el parámetro "tipo" de la URL para saber de dónde viene el
       // registro: 'noticia' (publicación del CMS, valor por defecto) o
       // 'evento' (registro de la tabla Eventos operativa).
       function obtenerTipoDeURL() {
-          const params = new URLSearchParams(window.location.search);
-          return params.get('tipo') || 'noticia'; // 'noticia' (default, CMS) | 'evento' (tabla Eventos operativa)
+        const params = new URLSearchParams(window.location.search);
+        return params.get("tipo") || "noticia"; // 'noticia' (default, CMS) | 'evento' (tabla Eventos operativa)
       }
 
       // Al cargar la página: inserta navbar/footer públicos, marca el link
       // activo, habilita el menú móvil y carga el detalle según los
       // parámetros de la URL.
-      document.addEventListener('DOMContentLoaded', async () => {
-          await incluirParcial('#header-mount', 'partials/navbar_publico.html');
-          incluirParcial('#footer-mount', 'partials/footer_publico.html');
-          marcarLinkActivoPublico('#header-mount [data-pagina]');
-          inicializarMenuMovil();
+      document.addEventListener("DOMContentLoaded", async () => {
+        await incluirParcial("#header-mount", "partials/navbar_publico.html");
+        incluirParcial("#footer-mount", "partials/footer_publico.html");
+        marcarLinkActivoPublico("#header-mount [data-pagina]");
+        inicializarMenuMovil();
 
-          cargarDetalle();
+        cargarDetalle();
       });
 
       // Carga y renderiza el detalle de la publicación o evento indicado en
@@ -227,100 +301,148 @@
       // muestra el mapa de ubicación y/o el enlace de reunión si el registro
       // los trae.
       async function cargarDetalle() {
-          const id = obtenerIdDeURL();
-          const tipoOrigen = obtenerTipoDeURL();
-          const estadoCarga = document.getElementById('estado_carga');
-          const contenido = document.getElementById('contenido_detalle');
-          const noEncontrado = document.getElementById('estado_no_encontrado');
+        const id = obtenerIdDeURL();
+        const tipoOrigen = obtenerTipoDeURL();
+        const estadoCarga = document.getElementById("estado_carga");
+        const contenido = document.getElementById("contenido_detalle");
+        const noEncontrado = document.getElementById("estado_no_encontrado");
 
-          if (!id) {
-              estadoCarga.classList.add('hidden');
-              noEncontrado.classList.remove('hidden');
-              return;
+        if (!id) {
+          estadoCarga.classList.add("hidden");
+          noEncontrado.classList.remove("hidden");
+          return;
+        }
+
+        try {
+          const endpoint =
+            tipoOrigen === "evento"
+              ? `${API_URL}/api/eventos/${id}`
+              : `${API_URL}/api/publicaciones/${id}`;
+          const [res, resGaleria] = await Promise.all([
+            fetch(endpoint),
+            fetch(`${API_URL}/api/galeria/${tipoOrigen}/${id}`).catch(
+              () => null,
+            ),
+          ]);
+          const json = await res.json();
+
+          estadoCarga.classList.add("hidden");
+
+          if (!res.ok || !json.success) {
+            noEncontrado.classList.remove("hidden");
+            return;
           }
 
+          const n = json.data;
+
+          // Galería: la imagen de portada (url_imagen) va primero, seguida de las
+          // imágenes adicionales registradas en Galeria_Imagenes (si las hay).
+          let galeriaExtra = [];
           try {
-              const endpoint = tipoOrigen === 'evento' ? `${API_URL}/api/eventos/${id}` : `${API_URL}/api/publicaciones/${id}`;
-              const [res, resGaleria] = await Promise.all([
-                  fetch(endpoint),
-                  fetch(`${API_URL}/api/galeria/${tipoOrigen}/${id}`).catch(() => null)
-              ]);
-              const json = await res.json();
-
-              estadoCarga.classList.add('hidden');
-
-              if (!res.ok || !json.success) {
-                  noEncontrado.classList.remove('hidden');
-                  return;
-              }
-
-              const n = json.data;
-
-              // Galería: la imagen de portada (url_imagen) va primero, seguida de las
-              // imágenes adicionales registradas en Galeria_Imagenes (si las hay).
-              let galeriaExtra = [];
-              try {
-                  if (resGaleria) {
-                      const jsonGaleria = await resGaleria.json();
-                      if (jsonGaleria.success) galeriaExtra = jsonGaleria.data.map(g => g.url_imagen);
-                  }
-              } catch (e) { /* si falla la galería, seguimos solo con la portada */ }
-
-              if (tipoOrigen === 'evento') {
-                  // Proviene de la tabla Eventos (operativa): no tiene "contenido" narrativo,
-                  // así que armamos una descripción a partir de sus datos reales.
-                  document.title = n.titulo_evento + ' | Sumando Voluntades Sanctórum';
-                  document.getElementById('det_badge_tipo').innerText = n.tipo_evento || 'Evento';
-                  document.getElementById('det_titulo').innerText = n.titulo_evento;
-                  document.getElementById('det_fecha').innerText = new Date(n.fecha_realizacion).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                  const lugar = n.nombre_escuela ? `Realizado en ${n.nombre_escuela}.` : 'Realizado en nuestra sede.';
-                  document.getElementById('det_contenido').innerText = `Actividad de tipo "${n.tipo_evento}" organizada por Sumando Voluntades Sanctórum. ${lugar}`;
-
-                  iniciarStory([n.url_imagen, ...galeriaExtra]);
-
-                  // Mapa de ubicación
-                  if (n.direccion_mapa) {
-                      document.getElementById('det_mapa_iframe').src = `https://www.google.com/maps?q=${encodeURIComponent(n.direccion_mapa)}&output=embed`;
-                      document.getElementById('det_mapa_wrap').classList.remove('hidden');
-                  }
-                  // Link de reunión
-                  if (n.link_reunion) {
-                      document.getElementById('det_reunion_link').href = n.link_reunion;
-                      document.getElementById('det_reunion_wrap').classList.remove('hidden');
-                  }
-              } else {
-                  document.title = n.titulo + ' | Sumando Voluntades Sanctórum';
-                  document.getElementById('det_badge_tipo').innerText = n.tipo || 'Aviso';
-                  document.getElementById('det_titulo').innerText = n.titulo;
-                  document.getElementById('det_fecha').innerText = new Date(n.fecha_post).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
-                  document.getElementById('det_contenido').innerText = n.contenido || 'Esta publicación aún no tiene contenido detallado.';
-
-                  iniciarStory([n.url_imagen, ...galeriaExtra]);
-              }
-
-              contenido.classList.remove('hidden');
+            if (resGaleria) {
+              const jsonGaleria = await resGaleria.json();
+              if (jsonGaleria.success)
+                galeriaExtra = jsonGaleria.data.map((g) => g.url_imagen);
+            }
           } catch (e) {
-              console.error("Error al cargar el detalle:", e);
-              estadoCarga.classList.add('hidden');
-              noEncontrado.classList.remove('hidden');
+            /* si falla la galería, seguimos solo con la portada */
           }
+
+          if (tipoOrigen === "evento") {
+            // Proviene de la tabla Eventos (operativa): no tiene "contenido" narrativo,
+            // así que armamos una descripción a partir de sus datos reales.
+            document.title =
+              n.titulo_evento + " | Sumando Voluntades Sanctórum";
+            document.getElementById("det_badge_tipo").innerText =
+              n.tipo_evento || "Evento";
+            document.getElementById("det_titulo").innerText = n.titulo_evento;
+            document.getElementById("det_fecha").innerText = new Date(
+              n.fecha_realizacion,
+            ).toLocaleDateString("es-MX", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            const lugar = n.nombre_escuela
+              ? `Realizado en ${n.nombre_escuela}.`
+              : "Realizado en nuestra sede.";
+            document.getElementById("det_contenido").innerText =
+              `Actividad de tipo "${n.tipo_evento}" organizada por Sumando Voluntades Sanctórum. ${lugar}`;
+
+            iniciarStory([n.url_imagen, ...galeriaExtra]);
+
+            // Mapa de ubicación
+            if (n.direccion_mapa) {
+              document.getElementById("det_mapa_iframe").src =
+                `https://www.google.com/maps?q=${encodeURIComponent(n.direccion_mapa)}&output=embed`;
+              document
+                .getElementById("det_mapa_wrap")
+                .classList.remove("hidden");
+            }
+            // Link de reunión
+            if (n.link_reunion) {
+              document.getElementById("det_reunion_link").href = n.link_reunion;
+              document
+                .getElementById("det_reunion_wrap")
+                .classList.remove("hidden");
+            }
+          } else {
+            document.title = n.titulo + " | Sumando Voluntades Sanctórum";
+            document.getElementById("det_badge_tipo").innerText =
+              n.tipo || "Aviso";
+            document.getElementById("det_titulo").innerText = n.titulo;
+            document.getElementById("det_fecha").innerText = new Date(
+              n.fecha_post,
+            ).toLocaleDateString("es-MX", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            });
+            document.getElementById("det_contenido").innerText =
+              n.contenido ||
+              "Esta publicación aún no tiene contenido detallado.";
+
+            iniciarStory([n.url_imagen, ...galeriaExtra]);
+          }
+
+          contenido.classList.remove("hidden");
+        } catch (e) {
+          console.error("Error al cargar el detalle:", e);
+          estadoCarga.classList.add("hidden");
+          noEncontrado.classList.remove("hidden");
+        }
       }
 
       // Comparte el detalle actual: usa la Web Share API nativa si el
       // navegador la soporta; si no, copia el enlace al portapapeles (con
       // aviso), y como último recurso muestra un prompt para copiar manualmente.
       function compartirDetalle() {
-          const titulo = document.getElementById('det_titulo').innerText;
-          const datosCompartir = { title: titulo, text: titulo, url: window.location.href };
-          if (navigator.share) {
-              navigator.share(datosCompartir).catch(() => {});
-          } else if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(window.location.href)
-                  .then(() => alert('Enlace copiado al portapapeles.'))
-                  .catch(() => window.prompt('Copia manualmente (Ctrl+C / Cmd+C):', window.location.href));
-          } else {
-              window.prompt('Copia manualmente (Ctrl+C / Cmd+C):', window.location.href);
-          }
+        const titulo = document.getElementById("det_titulo").innerText;
+        const datosCompartir = {
+          title: titulo,
+          text: titulo,
+          url: window.location.href,
+        };
+        if (navigator.share) {
+          navigator.share(datosCompartir).catch(() => {});
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(window.location.href)
+            .then(() => alert("Enlace copiado al portapapeles."))
+            .catch(() =>
+              window.prompt(
+                "Copia manualmente (Ctrl+C / Cmd+C):",
+                window.location.href,
+              ),
+            );
+        } else {
+          window.prompt(
+            "Copia manualmente (Ctrl+C / Cmd+C):",
+            window.location.href,
+          );
+        }
       }
     </script>
   </body>
