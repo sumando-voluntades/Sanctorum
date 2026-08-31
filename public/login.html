@@ -1,0 +1,408 @@
+<!doctype html>
+<html class="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Acceso Administrativo - Sanctorum A.C.</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/output.css" />
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-surface text-on-surface min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+  >
+    <!-- Fondos decorativos -->
+    <div
+      class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-container/20 rounded-full blur-3xl"
+    ></div>
+    <div
+      class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-secondary-container/20 rounded-full blur-3xl"
+    ></div>
+
+    <div
+      class="w-full max-w-md bg-white rounded-3xl shadow-[0_20px_50px_rgba(23,28,31,0.06)] p-10 relative z-10 border border-slate-100"
+    >
+      <div class="text-center mb-8">
+        <img
+          src="assets/logo.png"
+          alt="Logo Sanctorum A.C."
+          class="h-16 mx-auto mb-6 object-contain"
+        />
+        <h1 class="text-2xl font-bold text-primary">Acceso Administrativo</h1>
+        <p class="text-slate-500 text-sm mt-2">
+          Ingresa tus credenciales para continuar al portal.
+        </p>
+      </div>
+
+      <form id="formLogin" class="space-y-6">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2 ml-1"
+            >Correo Electrónico</label
+          >
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              >mail</span
+            >
+            <input
+              type="email"
+              id="login_correo"
+              class="w-full pl-12 pr-4 py-3 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-primary/50 transition-all outline-none"
+              placeholder="tu@correo.com"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2 ml-1"
+            >Contraseña</label
+          >
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              >lock</span
+            >
+            <input
+              type="password"
+              id="login_password"
+              class="w-full pl-12 pr-4 py-3 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-primary/50 transition-all outline-none"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <div class="text-right mt-2">
+            <!-- BOTÓN PARA ABRIR MODAL DE RECUPERACIÓN -->
+            <button
+              type="button"
+              onclick="abrirModalRecuperar()"
+              class="text-xs text-secondary font-bold hover:underline bg-transparent border-none cursor-pointer"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-white rounded-full font-bold shadow-lg hover:shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all"
+        >
+          Iniciar Sesión
+        </button>
+      </form>
+
+      <div class="mt-8 text-center border-t border-slate-100 pt-6">
+        <a
+          href="index"
+          class="flex items-center justify-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors font-bold"
+        >
+          <span class="material-symbols-outlined text-sm">arrow_back</span>
+          Volver al sitio público
+        </a>
+      </div>
+    </div>
+
+    <!-- ==================== MODALES ==================== -->
+
+    <!-- MODAL DE RECUPERAR CONTRASEÑA -->
+    <div
+      id="modalRecuperar"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300"
+    >
+      <div
+        class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl transform scale-95 transition-all"
+        id="modalRecuperarContent"
+      >
+        <div
+          class="w-16 h-16 bg-pink-100 text-[#b50062] rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <span class="material-symbols-outlined text-3xl">lock_reset</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Recuperar Acceso</h3>
+        <p class="text-sm text-slate-500 mb-6">
+          Ingresa tu correo registrado y te enviaremos una contraseña temporal
+          nueva.
+        </p>
+        <form id="formRecuperar" class="space-y-4 text-left">
+          <div>
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                >mail</span
+              >
+              <input
+                type="email"
+                id="rec_correo"
+                required
+                class="w-full pl-12 pr-4 py-3 bg-[#f0f4f8] border-none rounded-xl focus:ring-2 focus:ring-[#b50062]/50 outline-none"
+                placeholder="tu@correo.com"
+              />
+            </div>
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button
+              type="button"
+              onclick="cerrarModalRecuperar()"
+              class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="flex-1 py-3 bg-[#b50062] text-white font-bold rounded-full hover:bg-[#e2007c] transition-colors shadow-lg"
+            >
+              Enviar Correo
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL DE ALERTAS (ÉXITO O ERROR) -->
+    <div
+      id="modalAlerta"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300"
+    >
+      <div
+        class="bg-white p-8 rounded-3xl max-w-sm w-full mx-4 text-center shadow-2xl transform scale-95 transition-all"
+        id="modalAlertaContent"
+      >
+        <div
+          id="alertaIcono"
+          class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full text-white font-bold text-3xl material-symbols-outlined"
+        ></div>
+        <h3
+          id="alertaTitulo"
+          class="text-xl font-bold mb-2 text-slate-800"
+        ></h3>
+        <p id="alertaMensaje" class="text-sm text-slate-500 mb-6"></p>
+        <button
+          onclick="cerrarModalAlerta()"
+          class="w-full py-3 bg-slate-800 text-white rounded-full font-bold shadow-lg hover:bg-slate-700 transition-all"
+        >
+          Aceptar
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Si en este navegador ya hay un token guardado y todavía no venció, la sesión sigue
+      // "abierta" — no tiene caso mostrar el formulario de login otra vez, así que se manda
+      // directo al panel. Antes login.html no revisaba esto nunca, así que ir a "Volver al
+      // Inicio" desde el panel y luego intentar volver a entrar se sentía como si la sesión
+      // se hubiera cerrado, aunque el token siguiera siendo válido.
+      (function redirigirSiYaHaySesionActiva() {
+        const token = localStorage.getItem("token_sanctorum");
+        if (!token) return;
+        try {
+          const base64 = token
+            .split(".")[1]
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+          const payload = JSON.parse(atob(base64));
+          if (payload.exp && payload.exp * 1000 > Date.now()) {
+            window.location.replace("dashboard");
+          } else {
+            localStorage.removeItem("token_sanctorum"); // token vencido: se limpia para no volver a intentarlo
+          }
+        } catch (e) {
+          localStorage.removeItem("token_sanctorum"); // token corrupto/ilegible
+        }
+      })();
+
+      // IMPORTANTE: Recuerda que esto debe estar en http://localhost:3000 para tus pruebas locales
+      const API_URL = "http://localhost:3000";
+
+      // 1. FUNCIÓN PARA EL LOGIN PRINCIPAL
+      // Envía correo/contraseña al backend. Si la autenticación es exitosa,
+      // guarda el JWT devuelto en localStorage bajo la clave 'token_sanctorum'
+      // (usado luego por las páginas de administración para autenticar sus
+      // peticiones) y redirige al dashboard. Si falla, muestra el modal de
+      // alerta con el mensaje de error del servidor.
+      document
+        .getElementById("formLogin")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const btn = e.target.querySelector('button[type="submit"]');
+          const originalText = btn.innerText;
+          btn.innerText = "Verificando...";
+          btn.disabled = true;
+
+          const data = {
+            correo: document.getElementById("login_correo").value,
+            contraseña: document.getElementById("login_password").value,
+          };
+
+          try {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+              // Guardamos el token para mantener la sesión y redirigimos
+              localStorage.setItem("token_sanctorum", result.token);
+              window.location.href = "dashboard";
+            } else {
+              mostrarAlerta(
+                "Acceso Denegado",
+                result.message || "Credenciales incorrectas.",
+                true,
+              );
+            }
+          } catch (error) {
+            mostrarAlerta(
+              "Error de Conexión",
+              "No se pudo contactar al servidor de Sanctorum.",
+              true,
+            );
+          } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+          }
+        });
+
+      // 2. FUNCIÓN PARA RECUPERAR CONTRASEÑA
+      // Muestra el modal de recuperación de contraseña. Primero quita la
+      // clase 'hidden' y, tras un pequeño retraso (para que la transición
+      // CSS surta efecto), quita 'opacity-0'/'scale-95' para animar la entrada.
+      function abrirModalRecuperar() {
+        document.getElementById("modalRecuperar").classList.remove("hidden");
+        setTimeout(() => {
+          document
+            .getElementById("modalRecuperar")
+            .classList.remove("opacity-0");
+          document
+            .getElementById("modalRecuperarContent")
+            .classList.remove("scale-95");
+        }, 10);
+      }
+
+      // Cierra el modal de recuperación animando su salida (opacidad/escala)
+      // y, al terminar la transición, lo oculta con 'hidden' y limpia el
+      // formulario para la próxima vez que se abra.
+      function cerrarModalRecuperar() {
+        document.getElementById("modalRecuperar").classList.add("opacity-0");
+        document
+          .getElementById("modalRecuperarContent")
+          .classList.add("scale-95");
+        setTimeout(() => {
+          document.getElementById("modalRecuperar").classList.add("hidden");
+          document.getElementById("formRecuperar").reset();
+        }, 300);
+      }
+
+      // Envía el correo capturado al endpoint de recuperación de contraseña.
+      // Cierra el modal de recuperación de inmediato y, tras la animación de
+      // cierre, muestra el modal de alerta de éxito o error según la
+      // respuesta del servidor.
+      document
+        .getElementById("formRecuperar")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = e.target.querySelector('button[type="submit"]');
+          const originalText = btn.innerText;
+          btn.innerText = "Buscando cuenta...";
+          btn.disabled = true;
+
+          const correoInput = document.getElementById("rec_correo").value;
+
+          try {
+            const response = await fetch(`${API_URL}/api/auth/recuperar`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ correo: correoInput }),
+            });
+
+            const result = await response.json();
+
+            cerrarModalRecuperar(); // Cerramos el modal de recuperar
+
+            if (response.ok && result.success) {
+              // Mostramos modal verde de éxito
+              setTimeout(
+                () => mostrarAlerta("Correo Enviado", result.message, false),
+                350,
+              );
+            } else {
+              // Mostramos modal rojo de error
+              setTimeout(
+                () => mostrarAlerta("Error", result.message, true),
+                350,
+              );
+            }
+          } catch (error) {
+            cerrarModalRecuperar();
+            setTimeout(
+              () =>
+                mostrarAlerta(
+                  "Error de Conexión",
+                  "No pudimos conectarnos al servidor.",
+                  true,
+                ),
+              350,
+            );
+          } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+          }
+        });
+
+      // 3. CONTROLADOR DE ALERTAS VISUALES DINÁMICAS
+      function mostrarAlerta(titulo, mensaje, esError) {
+        document.getElementById("alertaTitulo").innerText = titulo;
+        document.getElementById("alertaMensaje").innerText = mensaje;
+
+        const iconoDiv = document.getElementById("alertaIcono");
+        if (esError) {
+          iconoDiv.style.backgroundColor = "#F44336"; // Rojo
+          iconoDiv.innerText = "error"; // Icono material
+        } else {
+          iconoDiv.style.backgroundColor = "#4CAF50"; // Verde
+          iconoDiv.innerText = "check_circle"; // Icono material
+        }
+
+        document.getElementById("modalAlerta").classList.remove("hidden");
+        setTimeout(() => {
+          document.getElementById("modalAlerta").classList.remove("opacity-0");
+          document
+            .getElementById("modalAlertaContent")
+            .classList.remove("scale-95");
+        }, 10);
+      }
+
+      // Cierra el modal de alerta animando su salida y ocultándolo al terminar
+      // la transición (mismo patrón que cerrarModalRecuperar).
+      function cerrarModalAlerta() {
+        document.getElementById("modalAlerta").classList.add("opacity-0");
+        document.getElementById("modalAlertaContent").classList.add("scale-95");
+        setTimeout(() => {
+          document.getElementById("modalAlerta").classList.add("hidden");
+        }, 300);
+      }
+    </script>
+  </body>
+</html>

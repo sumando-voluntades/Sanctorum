@@ -1,0 +1,285 @@
+<!doctype html>
+<html class="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Nosotros | Sumando Voluntades Sanctórum</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/output.css" />
+    </script>
+    <style>
+      body {
+        font-family: "Quicksand", sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      #header-mount {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 76px;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 50;
+      }
+    </style>
+  </head>
+  <body class="bg-surface text-on-surface">
+    <div id="header-mount"></div>
+
+    <main class="pt-32">
+      <!-- Hero -->
+      <section class="max-w-7xl mx-auto px-8 mb-20">
+        <div
+          class="relative overflow-hidden rounded-xl bg-primary-container/10 p-12 md:p-20 text-center"
+        >
+          <div
+            class="absolute -top-24 -right-24 w-64 h-64 bg-secondary/10 rounded-full blur-3xl"
+          ></div>
+          <div
+            class="absolute -bottom-24 -left-24 w-64 h-64 bg-primary/10 rounded-full blur-3xl"
+          ></div>
+          <span
+            class="inline-block px-4 py-1.5 mb-6 text-sm font-bold tracking-wider text-secondary uppercase bg-white rounded-full"
+            >Quiénes Somos</span
+          >
+          <h1
+            class="text-4xl md:text-6xl font-bold text-primary mb-6 leading-tight"
+          >
+            Sumando Voluntades en Sanctórum
+          </h1>
+          <p
+            class="max-w-2xl mx-auto text-lg text-on-surface/80 leading-relaxed"
+          >
+            Somos una asociación civil dedicada al bienestar emocional y social
+            de niñas, niños y adolescentes en Sanctórum, Puebla. Trabajamos
+            desde la salud mental, el arte comunitario y la cultura de paz.
+          </p>
+        </div>
+      </section>
+
+      <!-- Misión / Visión / Valores -->
+      <section class="max-w-7xl mx-auto px-8 mb-24">
+        <div class="grid md:grid-cols-3 gap-8">
+          <div
+            class="bg-white p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div
+              class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <span class="material-symbols-outlined text-primary text-3xl"
+                >volunteer_activism</span
+              >
+            </div>
+            <h3 class="text-2xl font-bold mb-4">Misión</h3>
+            <p class="text-on-surface-variant leading-relaxed">
+              Promover el desarrollo integral y la salud mental mediante
+              programas comunitarios inclusivos y sostenibles.
+            </p>
+          </div>
+          <div
+            class="bg-white p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div
+              class="w-14 h-14 bg-secondary/10 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <span class="material-symbols-outlined text-secondary text-3xl"
+                >visibility</span
+              >
+            </div>
+            <h3 class="text-2xl font-bold mb-4">Visión</h3>
+            <p class="text-on-surface-variant leading-relaxed">
+              Ser el referente regional en la construcción de entornos seguros y
+              pacíficos para las nuevas generaciones.
+            </p>
+          </div>
+          <div
+            class="bg-white p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div
+              class="w-14 h-14 bg-tertiary/10 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <span class="material-symbols-outlined text-tertiary text-3xl"
+                >favorite</span
+              >
+            </div>
+            <h3 class="text-2xl font-bold mb-4">Valores</h3>
+            <p class="text-on-surface-variant leading-relaxed">
+              Empatía, Integridad, Transparencia y el compromiso inquebrantable
+              con la dignidad humana.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Equipo (dinámico: solo Especialistas, Coordinadores y Admin — nunca voluntarios) -->
+      <section class="max-w-7xl mx-auto px-8 mb-24">
+        <div class="text-center mb-14">
+          <h2 class="text-3xl md:text-4xl font-bold text-on-surface mb-4">
+            Nuestro Equipo
+          </h2>
+          <p class="text-on-surface-variant max-w-2xl mx-auto">
+            Las personas detrás de cada acompañamiento: nuestro cuerpo de
+            psicólogos y el equipo de coordinación que hace posible el trabajo
+            en campo.
+          </p>
+        </div>
+        <div
+          id="contenedor_equipo"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          <p class="text-on-surface/50 col-span-3 text-center py-10">
+            Cargando equipo...
+          </p>
+        </div>
+        <div
+          id="controles_equipo"
+          class="hidden justify-center items-center gap-4 mt-10"
+        >
+          <button
+            onclick="moverEquipo(-1)"
+            class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all"
+          >
+            <span class="material-symbols-outlined text-lg">chevron_left</span>
+          </button>
+          <span id="indicador_equipo" class="text-xs font-bold text-slate-400"
+            >1 / 1</span
+          >
+          <button
+            onclick="moverEquipo(1)"
+            class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all"
+          >
+            <span class="material-symbols-outlined text-lg">chevron_right</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <div id="footer-mount"></div>
+
+    <script src="js/comun.js"></script>
+    <script src="js/incluir.js"></script>
+    <script>
+      const NOMBRE_ROL_PUBLICO = {
+        Admin: "Administración",
+        Coordinador: "Coordinador/a",
+      };
+      const COLOR_ROL = {
+        Admin: "bg-amber-100 text-amber-700",
+        Especialista: "bg-pink-100 text-secondary",
+        Coordinador: "bg-blue-100 text-blue-700",
+      };
+
+      // Al cargar la página: inserta navbar/footer públicos, marca el link activo,
+      // habilita el menú móvil y dispara la carga del equipo.
+      document.addEventListener("DOMContentLoaded", async () => {
+        await incluirParcial("#header-mount", "partials/navbar_publico.html");
+        incluirParcial("#footer-mount", "partials/footer_publico.html");
+        marcarLinkActivoPublico("#header-mount [data-pagina]");
+        inicializarMenuMovil();
+
+        cargarEquipo();
+      });
+
+      let equipoGlobal = [];
+      let paginaEquipo = 0;
+      const EQUIPO_POR_PAGINA = 6;
+
+      // Obtiene del backend los perfiles públicos del equipo (especialistas,
+      // coordinadores y admin — nunca voluntarios) y los guarda en
+      // equipoGlobal para paginarlos localmente en el carrusel.
+      async function cargarEquipo() {
+        const cont = document.getElementById("contenedor_equipo");
+        try {
+          const res = await fetch(`${API_URL}/api/equipo`);
+          const json = await res.json();
+          if (!json.success || json.data.length === 0) {
+            cont.innerHTML =
+              '<p class="text-on-surface/50 col-span-3 text-center py-10">Aún no hay perfiles de equipo publicados.</p>';
+            return;
+          }
+          equipoGlobal = json.data;
+          paginaEquipo = 0;
+          renderPaginaEquipo();
+        } catch (e) {
+          console.error("Error al cargar el equipo:", e);
+          cont.innerHTML =
+            '<p class="text-on-surface/50 col-span-3 text-center py-10">No se pudo cargar el equipo en este momento.</p>';
+        }
+      }
+
+      // Dibuja la página actual (paginaEquipo) del carrusel de equipo, tomando
+      // un bloque de EQUIPO_POR_PAGINA integrantes de equipoGlobal. Resuelve
+      // etiqueta de rol (con caso especial para psicólogos dentro de
+      // "Especialista"), foto o ícono por defecto, y biografía con texto de
+      // respaldo. Muestra/oculta los controles de paginación según haga falta.
+      function renderPaginaEquipo() {
+        const cont = document.getElementById("contenedor_equipo");
+        const controles = document.getElementById("controles_equipo");
+        const totalPaginas = Math.ceil(equipoGlobal.length / EQUIPO_POR_PAGINA);
+        const inicio = paginaEquipo * EQUIPO_POR_PAGINA;
+        const grupo = equipoGlobal.slice(inicio, inicio + EQUIPO_POR_PAGINA);
+
+        cont.innerHTML = grupo
+          .map((m) => {
+            const avatar = m.foto_perfil_url
+              ? `<img src="${m.foto_perfil_url}" alt="${m.nombre_completo}" class="w-full h-full object-cover">`
+              : `<div class="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300"><span class="material-symbols-outlined text-4xl">person</span></div>`;
+            const esPsico =
+              m.nombre_rol === "Especialista" &&
+              (m.especialidad || "").toLowerCase().includes("psic");
+            const rolBadge = esPsico
+              ? COLOR_ROL["Especialista"]
+              : COLOR_ROL[m.nombre_rol] || "bg-slate-100 text-slate-600";
+            const rolTexto = esPsico
+              ? "Psicólogo/a"
+              : m.nombre_rol === "Especialista"
+                ? "Especialista"
+                : NOMBRE_ROL_PUBLICO[m.nombre_rol] || m.nombre_rol;
+            const bio =
+              m.biografia ||
+              "Miembro del equipo de Sumando Voluntades Sanctórum, comprometido con el bienestar de nuestra comunidad.";
+            return `
+                <div class="bg-white rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(23,28,31,0.06)] hover:shadow-xl transition-all">
+                  <div class="h-56 bg-slate-50">${avatar}</div>
+                  <div class="p-6">
+                    <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full ${rolBadge}">${rolTexto}</span>
+                    <h3 class="text-lg font-bold text-slate-800 mt-3">${m.nombre_completo}</h3>
+                    ${m.especialidad ? `<p class="text-xs text-slate-400 font-bold mb-3">${m.especialidad}</p>` : '<div class="mb-3"></div>'}
+                    <p class="text-on-surface-variant text-sm leading-relaxed">${bio}</p>
+                  </div>
+                </div>`;
+          })
+          .join("");
+
+        if (totalPaginas > 1) {
+          controles.classList.remove("hidden");
+          controles.classList.add("flex");
+          document.getElementById("indicador_equipo").innerText =
+            `${paginaEquipo + 1} / ${totalPaginas}`;
+        } else {
+          controles.classList.add("hidden");
+        }
+      }
+
+      // Cambia de página en el carrusel de equipo (direccion: -1 o 1), dando
+      // la vuelta circularmente (de la última página regresa a la primera y
+      // viceversa) usando aritmética modular.
+      function moverEquipo(direccion) {
+        const totalPaginas = Math.ceil(equipoGlobal.length / EQUIPO_POR_PAGINA);
+        paginaEquipo = (paginaEquipo + direccion + totalPaginas) % totalPaginas;
+        renderPaginaEquipo();
+      }
+    </script>
+  </body>
+</html>

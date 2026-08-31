@@ -1,0 +1,1018 @@
+<!doctype html>
+<html class="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Resumen | Sanctorum A.C.</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/output.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      @media (min-width: 768px) {
+        #sidebar-mount {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: 18rem;
+          height: 100vh;
+          background: #fff;
+          z-index: 50;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-surface text-slate-800 min-h-screen">
+    <div id="sidebar-mount"></div>
+
+    <main class="md:ml-72 min-h-screen flex flex-col">
+      <div id="header-mount"></div>
+
+      <div class="p-8 flex-1">
+        <div
+          class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10"
+        >
+          <div>
+            <h2
+              class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2"
+            >
+              Panel de Control
+            </h2>
+            <p id="saludo_admin" class="text-slate-500 max-w-xl">
+              Bienvenida de nuevo. Aquí está el impacto de hoy.
+            </p>
+          </div>
+          <button
+            onclick="abrirModalReporteExport()"
+            class="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-full shadow-lg hover:bg-orange-800 transition-colors shrink-0"
+          >
+            <span class="material-symbols-outlined text-[18px]">download</span>
+            Generar Reporte
+          </button>
+        </div>
+
+        <!-- KPIs principales -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div
+            class="bg-white p-6 rounded-3xl shadow-sm flex items-center gap-4"
+          >
+            <div class="p-4 bg-[#fbeedd] text-primary rounded-2xl">
+              <span class="material-symbols-outlined">groups</span>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 font-bold">
+                Beneficiarios Atendidos
+              </p>
+              <p
+                id="kpi_expedientes"
+                class="text-3xl font-extrabold text-slate-800"
+              >
+                --
+              </p>
+            </div>
+          </div>
+          <div
+            class="bg-white p-6 rounded-3xl shadow-sm flex items-center gap-4"
+          >
+            <div class="p-4 bg-pink-50 text-secondary rounded-2xl">
+              <span class="material-symbols-outlined">volunteer_activism</span>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 font-bold">
+                Voluntarios Activos
+              </p>
+              <p
+                id="kpi_voluntarios"
+                class="text-3xl font-extrabold text-slate-800"
+              >
+                --
+              </p>
+            </div>
+          </div>
+          <div
+            class="bg-white p-6 rounded-3xl shadow-sm flex items-center gap-4"
+          >
+            <div class="p-4 bg-blue-50 text-blue-600 rounded-2xl">
+              <span class="material-symbols-outlined">school</span>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 font-bold">Visitas Escolares</p>
+              <p
+                id="kpi_visitas"
+                class="text-3xl font-extrabold text-slate-800"
+              >
+                --
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div
+            class="bg-white p-6 rounded-3xl shadow-sm flex items-center gap-4"
+          >
+            <div class="p-4 bg-green-50 text-green-600 rounded-2xl">
+              <span class="material-symbols-outlined">inventory_2</span>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 font-bold">
+                Insumos en Bajo Stock
+              </p>
+              <p
+                id="kpi_bajo_stock"
+                class="text-3xl font-extrabold text-slate-800"
+              >
+                --
+              </p>
+            </div>
+          </div>
+          <div
+            class="bg-white p-6 rounded-3xl shadow-sm flex items-center gap-4"
+          >
+            <div class="p-4 bg-purple-50 text-purple-600 rounded-2xl">
+              <span class="material-symbols-outlined">mail</span>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 font-bold">
+                Solicitudes Pendientes
+              </p>
+              <p
+                id="kpi_solicitudes"
+                class="text-3xl font-extrabold text-slate-800"
+              >
+                --
+              </p>
+            </div>
+          </div>
+          <div
+            class="bg-white p-6 rounded-3xl shadow-sm flex items-center gap-4"
+          >
+            <div class="p-4 bg-amber-50 text-amber-600 rounded-2xl">
+              <span class="material-symbols-outlined">payments</span>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 font-bold">
+                Donaciones (mes actual)
+              </p>
+              <p
+                id="kpi_donaciones"
+                class="text-3xl font-extrabold text-slate-800"
+              >
+                --
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico de Impacto Social -->
+        <div class="bg-white p-8 rounded-3xl shadow-sm mb-8">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-4"
+          >
+            <div>
+              <h3 class="text-lg font-bold text-slate-800">
+                Gráfico de Impacto Social
+              </h3>
+              <p id="etiqueta_grafica_impacto" class="text-sm text-slate-400">
+                Beneficiarios distintos atendidos por mes
+              </p>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+              <select
+                id="filtro_metrica_impacto"
+                onchange="cambiarMetricaImpacto(this.value)"
+                class="bg-[#f0f4f8] border-none rounded-full px-4 py-2 text-sm font-bold text-slate-600 outline-none cursor-pointer"
+              >
+                <option value="beneficiarios">Beneficiarios recibidos</option>
+                <option value="voluntarios">Voluntarios activos</option>
+                <option value="donaciones">Donaciones recibidas</option>
+                <option value="eventos">Eventos realizados</option>
+                <option value="participacion">
+                  Eventos con más participantes
+                </option>
+                <option value="comparativa">
+                  Beneficiarios: Activos vs Alta
+                </option>
+              </select>
+              <select
+                id="filtro_anio_impacto"
+                onchange="cargarGraficaImpacto()"
+                class="bg-[#f0f4f8] border-none rounded-full px-4 py-2 text-sm font-bold text-slate-600 outline-none cursor-pointer"
+              >
+                <option value="">Cargando años...</option>
+              </select>
+            </div>
+          </div>
+          <div
+            id="leyenda_comparativa"
+            class="hidden items-center gap-4 mb-4 mt-2 text-xs font-bold"
+          >
+            <span class="flex items-center gap-1.5"
+              ><span
+                class="w-3 h-3 rounded-full bg-primary inline-block"
+              ></span>
+              Activos</span
+            >
+            <span class="flex items-center gap-1.5"
+              ><span
+                class="w-3 h-3 rounded-full bg-amber-400 inline-block"
+              ></span>
+              En Pausa</span
+            >
+            <span class="flex items-center gap-1.5"
+              ><span
+                class="w-3 h-3 rounded-full bg-secondary inline-block"
+              ></span>
+              Dados de Alta</span
+            >
+          </div>
+          <div
+            id="grafica_impacto"
+            class="flex items-end justify-between gap-2 h-56 mt-6"
+          >
+            <p class="text-slate-400 text-sm m-auto">Cargando gráfica...</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Top Eventos con más participación -->
+          <div class="bg-white p-8 rounded-3xl shadow-sm">
+            <h3 class="text-lg font-bold mb-5 flex items-center gap-2">
+              <span class="material-symbols-outlined text-blue-500"
+                >emoji_events</span
+              >
+              Eventos con Más Participación
+            </h3>
+            <div id="lista_top_eventos" class="space-y-3">
+              <p class="text-slate-400 text-sm">Cargando...</p>
+            </div>
+          </div>
+
+          <!-- Top Voluntarios con más participación -->
+          <div class="bg-white p-8 rounded-3xl shadow-sm">
+            <h3 class="text-lg font-bold mb-5 flex items-center gap-2">
+              <span class="material-symbols-outlined text-pink-500"
+                >military_tech</span
+              >
+              Voluntarios con Más Participación
+            </h3>
+            <div id="lista_top_voluntarios" class="space-y-3">
+              <p class="text-slate-400 text-sm">Cargando...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Alertas de Inventario -->
+          <div class="bg-white p-8 rounded-3xl shadow-sm">
+            <h3 class="text-lg font-bold mb-5 flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-500"
+                >warning</span
+              >
+              Alertas de Inventario
+            </h3>
+            <div id="lista_alertas_inventario" class="space-y-3">
+              <p class="text-slate-400 text-sm">Cargando alertas...</p>
+            </div>
+          </div>
+
+          <!-- Acuerdos Pendientes (visitas escolares próximas) -->
+          <div class="bg-white p-8 rounded-3xl shadow-sm">
+            <div class="flex justify-between items-center mb-5">
+              <h3 class="text-lg font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary"
+                  >event_upcoming</span
+                >
+                Acuerdos Pendientes
+              </h3>
+              <a
+                href="agenda"
+                class="text-xs font-bold text-secondary hover:underline"
+                >Ver Agenda Completa</a
+              >
+            </div>
+            <div id="lista_acuerdos_pendientes" class="space-y-3">
+              <p class="text-slate-400 text-sm">Cargando acuerdos...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-3xl shadow-sm mt-6">
+          <h3 class="text-lg font-bold mb-4">Actividad Reciente</h3>
+          <div id="lista_actividad_reciente" class="divide-y divide-slate-100">
+            <p class="text-slate-500 text-sm">Cargando actividad reciente...</p>
+          </div>
+        </div>
+      </div>
+      <div id="footer-mount"></div>
+    </main>
+
+    <script src="js/comun.js"></script>
+    <script src="js/notificaciones.js"></script>
+    <script src="js/incluir.js"></script>
+    <script>
+      // Punto de entrada de la página: inserta los parciales de navbar/header/footer,
+      // valida la sesión (token JWT) y dispara todas las cargas de datos del dashboard.
+      document.addEventListener("DOMContentLoaded", async () => {
+        await incluirParcial("#sidebar-mount", "partials/navbar_admin.html");
+        await incluirParcial("#header-mount", "partials/header_admin.html");
+        incluirParcial("#footer-mount", "partials/footer_admin.html");
+        marcarLinkActivoAdmin("#sidebar-mount [data-pagina]");
+
+        const token = localStorage.getItem("token_sanctorum");
+        if (!token) {
+          window.location.replace("login");
+          return;
+        } // .replace evita que puedan regresar
+        try {
+          const payload = decodeJWT(token);
+          aplicarRestriccionesNav(payload.rol, payload.especialidad);
+          document.getElementById("nav_user_name").innerText =
+            payload.nombre.split(" ")[0];
+          document.getElementById("saludo_admin").innerText =
+            `Bienvenido/a de nuevo, ${payload.nombre.split(" ")[0]}. Aquí está el impacto de hoy.`;
+          verificarAccesoDocumento(payload);
+        } catch (e) {
+          localStorage.removeItem("token_sanctorum");
+          window.location.replace("login");
+        }
+        cargarResumen();
+        cargarNotificaciones();
+        cargarGraficaImpacto();
+        cargarTopEventos();
+        cargarTopVoluntarios();
+        cargarAlertasInventario();
+        cargarAcuerdosPendientes();
+      });
+
+      // Carga los KPIs principales (beneficiarios, voluntarios, visitas, insumos con bajo
+      // stock, solicitudes pendientes y donaciones del mes) y la tarjeta de actividad
+      // reciente. Si el backend indica vista_filtrada_coordinador, agrega una nota al saludo.
+      async function cargarResumen() {
+        try {
+          const res = await fetch(`${API_URL}/api/dashboard/resumen`, {
+            headers: authHeaders(),
+          });
+          const json = await res.json();
+          if (!json.success) return;
+          const d = json.data;
+
+          if (d.vista_filtrada_coordinador) {
+            const saludo = document.getElementById("saludo_admin");
+            if (saludo && !saludo.innerText.includes("(vista filtrada")) {
+              saludo.innerText +=
+                " (vista filtrada a tus propias actividades — Coordinador)";
+            }
+          }
+
+          document.getElementById("kpi_expedientes").innerText =
+            d.beneficiarios_atendidos ?? 0;
+          document.getElementById("kpi_voluntarios").innerText =
+            d.voluntarios_activos ?? 0;
+          document.getElementById("kpi_visitas").innerText =
+            d.visitas_programadas ?? 0;
+          document.getElementById("kpi_bajo_stock").innerText =
+            d.insumos_bajo_stock ?? 0;
+          document.getElementById("kpi_solicitudes").innerText =
+            d.solicitudes_pendientes ?? 0;
+          document.getElementById("kpi_donaciones").innerText =
+            "$" +
+            Number(d.donaciones_mes ?? 0).toLocaleString("es-MX", {
+              minimumFractionDigits: 2,
+            });
+
+          const cont = document.getElementById("lista_actividad_reciente");
+          if (!d.actividad_reciente || d.actividad_reciente.length === 0) {
+            cont.innerHTML =
+              '<p class="text-slate-500 text-sm">Sin actividad registrada en los últimos días.</p>';
+            return;
+          }
+          cont.innerHTML = d.actividad_reciente
+            .map(
+              (item) => `
+                <div class="py-3 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-slate-700">${item.titulo}</p>
+                        <p class="text-xs text-slate-500">${item.detalle || ""}</p>
+                    </div>
+                    <span class="text-xs text-slate-400">${new Date(item.fecha).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                </div>
+            `,
+            )
+            .join("");
+        } catch (e) {
+          console.error("Error cargando resumen del dashboard:", e);
+        }
+      }
+
+      // ---------- GRÁFICO DE IMPACTO SOCIAL (barras reales, sin librerías externas) ----------
+      // Se llama al cambiar el <select> de métrica.
+      function cambiarMetricaImpacto() {
+        // Al cambiar de métrica reseteamos el selector de año, porque cada métrica
+        // (y la comparativa) puede tener un rango de años distinto con datos.
+        document.getElementById("filtro_anio_impacto").innerHTML =
+          '<option value="">Cargando años...</option>';
+        cargarGraficaImpacto();
+      }
+
+      // Pide al backend los totales mensuales de la métrica y año seleccionados, y
+      // dibuja las barras a mano (con % de altura relativo al máximo) en #grafica_impacto.
+      // Si la métrica es "comparativa" delega todo el trabajo a cargarComparativaBeneficiarios.
+      async function cargarGraficaImpacto() {
+        const metrica = document.getElementById("filtro_metrica_impacto").value;
+        const leyenda = document.getElementById("leyenda_comparativa");
+
+        if (metrica === "comparativa") {
+          leyenda.classList.remove("hidden");
+          leyenda.classList.add("flex");
+          await cargarComparativaBeneficiarios();
+          return;
+        }
+        leyenda.classList.add("hidden");
+        leyenda.classList.remove("flex");
+
+        const cont = document.getElementById("grafica_impacto");
+        const anio = document.getElementById("filtro_anio_impacto").value;
+        try {
+          const params = new URLSearchParams({ metrica });
+          if (anio) params.set("anio", anio);
+          const res = await fetch(
+            `${API_URL}/api/dashboard/impacto_mensual?${params.toString()}`,
+            { headers: authHeaders() },
+          );
+          const json = await res.json();
+          if (!json.success) {
+            cont.innerHTML =
+              '<p class="text-slate-400 text-sm m-auto">No se pudo cargar la gráfica.</p>';
+            return;
+          }
+
+          document.getElementById("etiqueta_grafica_impacto").innerText =
+            json.etiqueta;
+
+          const selAnio = document.getElementById("filtro_anio_impacto");
+          const aniosActuales = Array.from(selAnio.options)
+            .map((o) => o.value)
+            .join(",");
+          const aniosNuevos = json.anios_disponibles.join(",");
+          if (aniosActuales !== aniosNuevos) {
+            selAnio.innerHTML = json.anios_disponibles
+              .map((a) => `<option value="${a}">${a}</option>`)
+              .join("");
+          }
+          selAnio.value = json.anio_actual;
+
+          const datos = json.data;
+          const maximo = Math.max(1, ...datos.map((d) => d.total));
+          const formatearValor = (v) =>
+            json.formato === "moneda"
+              ? "$" +
+                Number(v).toLocaleString("es-MX", { maximumFractionDigits: 0 })
+              : v;
+
+          cont.innerHTML = datos
+            .map((d) => {
+              const alturaPct = Math.round((d.total / maximo) * 100);
+              return `
+                  <div class="flex-1 flex flex-col items-center justify-end h-full gap-2 group">
+                    <span class="text-xs font-bold text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">${formatearValor(d.total)}</span>
+                    <div class="w-full bg-[#f0e4d3] rounded-t-xl transition-all hover:bg-primary" style="height: ${Math.max(alturaPct, 3)}%"></div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">${d.mes}</span>
+                  </div>`;
+            })
+            .join("");
+        } catch (e) {
+          console.error("Error al cargar gráfica de impacto:", e);
+          cont.innerHTML =
+            '<p class="text-slate-400 text-sm m-auto">No se pudo cargar la gráfica.</p>';
+        }
+      }
+
+      // ---------- COMPARATIVA: BENEFICIARIOS ACTIVOS VS DADOS DE ALTA (misma tarjeta/contenedor) ----------
+      async function cargarComparativaBeneficiarios() {
+        const cont = document.getElementById("grafica_impacto");
+        const anio = document.getElementById("filtro_anio_impacto").value;
+        document.getElementById("etiqueta_grafica_impacto").innerText =
+          "Por mes de registro (el sistema no guarda historial de cambios de estatus, solo el estatus actual)";
+        try {
+          const url = anio
+            ? `${API_URL}/api/dashboard/comparativa_beneficiarios?anio=${anio}`
+            : `${API_URL}/api/dashboard/comparativa_beneficiarios`;
+          const res = await fetch(url, { headers: authHeaders() });
+          const json = await res.json();
+          if (!json.success) {
+            cont.innerHTML =
+              '<p class="text-slate-400 text-sm m-auto">No se pudo cargar la gráfica.</p>';
+            return;
+          }
+
+          const selAnio = document.getElementById("filtro_anio_impacto");
+          const aniosActuales = Array.from(selAnio.options)
+            .map((o) => o.value)
+            .join(",");
+          const aniosNuevos = json.anios_disponibles.join(",");
+          if (aniosActuales !== aniosNuevos) {
+            selAnio.innerHTML = json.anios_disponibles
+              .map((a) => `<option value="${a}">${a}</option>`)
+              .join("");
+          }
+          selAnio.value = json.anio_actual;
+
+          const datos = json.data;
+          const maximo = Math.max(
+            1,
+            ...datos.map((d) => Math.max(d.activos, d.en_pausa, d.altas)),
+          );
+
+          cont.innerHTML = datos
+            .map((d) => {
+              const altActivos = Math.round((d.activos / maximo) * 100);
+              const altEnPausa = Math.round((d.en_pausa / maximo) * 100);
+              const altAltas = Math.round((d.altas / maximo) * 100);
+              return `
+                  <div class="flex-1 flex flex-col items-center justify-end h-full gap-2 group">
+                    <span class="text-[10px] font-bold text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">${d.activos} / ${d.en_pausa} / ${d.altas}</span>
+                    <div class="w-full flex items-end justify-center gap-1 h-full">
+                      <div class="w-1/3 bg-primary/70 rounded-t-lg transition-all hover:bg-primary" style="height: ${Math.max(altActivos, d.activos > 0 ? 3 : 0)}%" title="Activos: ${d.activos}"></div>
+                      <div class="w-1/3 bg-amber-400/70 rounded-t-lg transition-all hover:bg-amber-400" style="height: ${Math.max(altEnPausa, d.en_pausa > 0 ? 3 : 0)}%" title="En Pausa: ${d.en_pausa}"></div>
+                      <div class="w-1/3 bg-secondary/70 rounded-t-lg transition-all hover:bg-secondary" style="height: ${Math.max(altAltas, d.altas > 0 ? 3 : 0)}%" title="Dados de alta: ${d.altas}"></div>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">${d.mes}</span>
+                  </div>`;
+            })
+            .join("");
+        } catch (e) {
+          console.error("Error al cargar comparativa de beneficiarios:", e);
+          cont.innerHTML =
+            '<p class="text-slate-400 text-sm m-auto">No se pudo cargar la gráfica.</p>';
+        }
+      }
+
+      // ---------- TOP EVENTOS CON MÁS PARTICIPACIÓN ----------
+      async function cargarTopEventos() {
+        const cont = document.getElementById("lista_top_eventos");
+        try {
+          const res = await fetch(
+            `${API_URL}/api/dashboard/top_eventos?limite=5`,
+            { headers: authHeaders() },
+          );
+          const json = await res.json();
+          if (!json.success || json.data.length === 0) {
+            cont.innerHTML =
+              '<p class="text-slate-400 text-sm">Aún no hay eventos con participantes registrados.</p>';
+            return;
+          }
+          cont.innerHTML = json.data
+            .map((ev, i) => {
+              const fecha = new Date(ev.fecha_realizacion).toLocaleDateString(
+                "es-MX",
+                { day: "numeric", month: "short", year: "numeric" },
+              );
+              // 3 etiquetas separadas: voluntarios/personal (Participacion), ciudadanos
+              // (asistencia real reportada tras el evento en Reportes_Evento — el dato más
+              // representativo del público general) y el total combinado.
+              return `
+                  <div onclick="window.location.href='reportes?id_evento=${ev.id_evento}'" title="Ver reporte de este evento" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl gap-3 cursor-pointer transition-colors">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0">${i + 1}</div>
+                      <div class="min-w-0">
+                        <p class="text-sm font-bold text-slate-700 truncate">${ev.titulo_evento}</p>
+                        <p class="text-xs text-slate-400">${ev.tipo_evento} · ${fecha}</p>
+                      </div>
+                    </div>
+                    <div class="flex flex-col gap-1 items-end shrink-0">
+                      <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap">${ev.total_participantes} total</span>
+                      <div class="flex gap-1">
+                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 whitespace-nowrap">${ev.num_staff} voluntarios</span>
+                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 whitespace-nowrap">${ev.asistentes_reportados} ciudadanos</span>
+                      </div>
+                    </div>
+                  </div>`;
+            })
+            .join("");
+        } catch (e) {
+          console.error("Error al cargar top eventos:", e);
+          cont.innerHTML =
+            '<p class="text-slate-400 text-sm">No se pudo cargar la información.</p>';
+        }
+      }
+
+      // ---------- TOP VOLUNTARIOS CON MÁS PARTICIPACIÓN ----------
+      async function cargarTopVoluntarios() {
+        const cont = document.getElementById("lista_top_voluntarios");
+        try {
+          const res = await fetch(
+            `${API_URL}/api/dashboard/top_voluntarios?limite=5`,
+            { headers: authHeaders() },
+          );
+          const json = await res.json();
+          if (!json.success || json.data.length === 0) {
+            cont.innerHTML =
+              '<p class="text-slate-400 text-sm">Aún no hay participación registrada.</p>';
+            return;
+          }
+          cont.innerHTML = json.data
+            .map(
+              (v, i) => `
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-700 font-bold text-xs flex items-center justify-center shrink-0">${i + 1}</div>
+                      <div>
+                        <p class="text-sm font-bold text-slate-700">${v.nombre_completo}</p>
+                        <p class="text-xs text-slate-400">${v.nombre_rol || "Voluntario"}${v.especialidad ? " · " + v.especialidad : ""}</p>
+                      </div>
+                    </div>
+                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-pink-100 text-pink-700 shrink-0">${v.num_eventos} eventos</span>
+                </div>`,
+            )
+            .join("");
+        } catch (e) {
+          console.error("Error al cargar top voluntarios:", e);
+          cont.innerHTML =
+            '<p class="text-slate-400 text-sm">No se pudo cargar la información.</p>';
+        }
+      }
+
+      // ---------- ALERTAS DE INVENTARIO (reutiliza /api/insumos, filtra bajo stock) ----------
+      async function cargarAlertasInventario() {
+        const cont = document.getElementById("lista_alertas_inventario");
+        try {
+          const res = await fetch(`${API_URL}/api/insumos`, {
+            headers: authHeaders(),
+          });
+          const json = await res.json();
+          if (!json.success) {
+            cont.innerHTML =
+              '<p class="text-slate-400 text-sm">No se pudo cargar el inventario.</p>';
+            return;
+          }
+
+          const bajoStock = json.data
+            .filter(
+              (i) => parseFloat(i.stock_actual) <= parseFloat(i.punto_reorden),
+            )
+            .slice(0, 4);
+
+          if (bajoStock.length === 0) {
+            cont.innerHTML =
+              '<p class="text-slate-400 text-sm">Todo el inventario está en niveles óptimos. 🎉</p>';
+            return;
+          }
+          cont.innerHTML = bajoStock
+            .map((i) => {
+              const agotado = parseFloat(i.stock_actual) <= 0;
+              const badge = agotado
+                ? '<span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-red-100 text-red-600">Agotado</span>'
+                : '<span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-amber-100 text-amber-700">Bajo Stock</span>';
+              return `
+                  <div class="flex items-center justify-between p-3 bg-slate-50 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm"><span class="material-symbols-outlined text-[18px]">inventory_2</span></div>
+                      <div>
+                        <p class="text-sm font-bold text-slate-700">${i.nombre_insumo}</p>
+                        <p class="text-xs text-slate-400">Stock: ${i.stock_actual} ${i.unidad_medida}</p>
+                      </div>
+                    </div>
+                    ${badge}
+                  </div>`;
+            })
+            .join("");
+        } catch (e) {
+          console.error("Error al cargar alertas de inventario:", e);
+          cont.innerHTML =
+            '<p class="text-slate-400 text-sm">No se pudo cargar el inventario.</p>';
+        }
+      }
+
+      // ---------- ACUERDOS PENDIENTES (visitas escolares próximas, tabla Agenda_Visitas) ----------
+      async function cargarAcuerdosPendientes() {
+        const cont = document.getElementById("lista_acuerdos_pendientes");
+        try {
+          const res = await fetch(
+            `${API_URL}/api/dashboard/acuerdos_pendientes`,
+          );
+          const json = await res.json();
+          if (!json.success || json.data.length === 0) {
+            cont.innerHTML =
+              '<p class="text-slate-400 text-sm">No hay visitas escolares pendientes de confirmar.</p>';
+            return;
+          }
+          const badgeEstado = {
+            Pendiente: "bg-amber-100 text-amber-700",
+            "Confirmado (3 días)": "bg-pink-100 text-secondary",
+          };
+          cont.innerHTML = json.data
+            .map((a) => {
+              const fecha = new Date(a.fecha_cita).toLocaleDateString("es-MX", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+              const badge =
+                badgeEstado[a.estatus_alerta] || "bg-slate-100 text-slate-600";
+              return `
+                  <div class="flex items-center justify-between p-3 bg-slate-50 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-white flex items-center justify-center text-blue-500 shadow-sm"><span class="material-symbols-outlined text-[18px]">school</span></div>
+                      <div>
+                        <p class="text-sm font-bold text-slate-700">${a.nombre_escuela}</p>
+                        <p class="text-xs text-slate-400">${fecha}</p>
+                      </div>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full ${badge}">${a.estatus_alerta}</span>
+                  </div>`;
+            })
+            .join("");
+        } catch (e) {
+          console.error("Error al cargar acuerdos pendientes:", e);
+          cont.innerHTML =
+            '<p class="text-slate-400 text-sm">No se pudieron cargar los acuerdos pendientes.</p>';
+        }
+      }
+
+      // ================= GENERAR REPORTE (EXPORTAR A EXCEL) =================
+      // Abre el modal de exportación a Excel. La primera vez que se abre rellena el
+      // <select> de años (año actual +1 hasta -4); las siguientes veces no lo vuelve a
+      // tocar (options.length <= 1 evita duplicar las opciones ya generadas).
+      function abrirModalReporteExport() {
+        const selAnio = document.getElementById("rpt_anio");
+        if (selAnio.options.length <= 1) {
+          const anioActual = new Date().getFullYear();
+          for (let a = anioActual + 1; a >= anioActual - 4; a--) {
+            selAnio.innerHTML += `<option value="${a}">${a}</option>`;
+          }
+          selAnio.value = anioActual;
+        }
+        document
+          .getElementById("modalReporteExport")
+          .classList.remove("hidden");
+        setTimeout(() => {
+          document
+            .getElementById("modalReporteExport")
+            .classList.remove("opacity-0");
+          document
+            .getElementById("modalReporteExportContent")
+            .classList.remove("scale-95");
+        }, 10);
+      }
+
+      // Cierra el modal de exportación con la animación de fade/scale inversa a la de apertura.
+      function cerrarModalReporteExport() {
+        document
+          .getElementById("modalReporteExport")
+          .classList.add("opacity-0");
+        document
+          .getElementById("modalReporteExportContent")
+          .classList.add("scale-95");
+        setTimeout(
+          () =>
+            document
+              .getElementById("modalReporteExport")
+              .classList.add("hidden"),
+          300,
+        );
+      }
+
+      // Nombres de hoja / columnas legibles por tipo de reporte, para no volcar los nombres
+      // técnicos de la base de datos directamente al Excel.
+      const HOJAS_REPORTE = {
+        voluntarios: {
+          nombre: "Voluntarios",
+          columnas: {
+            nombre_completo: "Nombre",
+            correo: "Correo",
+            telefono: "Teléfono",
+            nombre_rol: "Rol",
+            especialidad: "Especialidad",
+            estatus: "Estatus",
+            fecha_registro: "Fecha de registro",
+          },
+        },
+        eventos: {
+          nombre: "Eventos y Visitas",
+          columnas: {
+            titulo: "Título",
+            categoria: "Tipo de registro",
+            tipo: "Detalle",
+            fecha: "Fecha",
+            lugar: "Lugar / Escuela",
+            num_asistentes: "Personas del equipo",
+          },
+        },
+        beneficiarios: {
+          nombre: "Beneficiarios",
+          columnas: {
+            nombre_completo: "Nombre",
+            genero: "Género",
+            colonia_puebla: "Colonia",
+            escuela: "Escuela",
+            especialista: "Especialista asignado",
+            estatus: "Estatus",
+            fecha_registro: "Fecha de ingreso",
+          },
+        },
+        donativos: {
+          nombre: "Donativos",
+          columnas: {
+            fecha_donacion: "Fecha",
+            nombre_aliado: "Aliado",
+            monto: "Monto",
+            metodo_pago: "Método de pago",
+            categoria_gasto: "Categoría de gasto",
+            nombre_insumo: "Insumo relacionado",
+          },
+        },
+      };
+
+      // Convierte las filas crudas del backend en una hoja de Excel (SheetJS) usando los
+      // nombres de columna legibles definidos en HOJAS_REPORTE, en vez de los nombres
+      // técnicos de la base de datos.
+      function construirHoja(tipo, filas) {
+        const mapa = HOJAS_REPORTE[tipo].columnas;
+        const filasLegibles = filas.map((fila) => {
+          const nueva = {};
+          Object.keys(mapa).forEach((clave) => {
+            nueva[mapa[clave]] = fila[clave] ?? "";
+          });
+          return nueva;
+        });
+        return XLSX.utils.json_to_sheet(filasLegibles);
+      }
+
+      // Arma y descarga el archivo Excel del modal "Generar Reporte": si el tipo es
+      // "todo" pide los 4 tipos de reporte al backend y los agrega como hojas separadas
+      // al mismo libro; si no hay datos en ningún tipo, avisa y no descarga nada.
+      // XLSX.writeFile dispara la descarga del archivo directamente en el navegador.
+      async function generarReporteExport() {
+        const tipo = document.getElementById("rpt_tipo").value;
+        const anio = document.getElementById("rpt_anio").value;
+        const mes = document.getElementById("rpt_mes").value;
+        const btn = document.getElementById("btnGenerarReporteExport");
+        const textoOriginal = btn.innerText;
+        btn.innerText = "Generando...";
+        btn.disabled = true;
+        try {
+          const tipos =
+            tipo === "todo"
+              ? ["voluntarios", "eventos", "beneficiarios", "donativos"]
+              : [tipo];
+          const wb = XLSX.utils.book_new();
+          let huboDatos = false;
+
+          for (const t of tipos) {
+            const params = new URLSearchParams({ tipo: t, anio, mes });
+            const res = await fetch(
+              `${API_URL}/api/reportes/exportar?${params.toString()}`,
+              { headers: authHeaders() },
+            );
+            const json = await res.json();
+            if (!json.success) continue;
+            if (json.data.length > 0) huboDatos = true;
+            const hoja = construirHoja(t, json.data);
+            XLSX.utils.book_append_sheet(wb, hoja, HOJAS_REPORTE[t].nombre);
+          }
+
+          if (!huboDatos) {
+            alert("No hay datos para el período y tipo seleccionados.");
+            return;
+          }
+
+          const etiquetaPeriodo =
+            anio === "todos"
+              ? "todos-los-anios"
+              : mes === "todos"
+                ? anio
+                : `${anio}-${mes.padStart(2, "0")}`;
+          XLSX.writeFile(
+            wb,
+            `reporte-sanctorum-${tipo}-${etiquetaPeriodo}.xlsx`,
+          );
+          cerrarModalReporteExport();
+        } catch (e) {
+          console.error("Error al generar el reporte:", e);
+          alert("No se pudo generar el reporte.");
+        } finally {
+          btn.innerText = textoOriginal;
+          btn.disabled = false;
+        }
+      }
+    </script>
+    <!-- ================= MODAL: GENERAR REPORTE (EXPORTAR A EXCEL) ================= -->
+    <div
+      id="modalReporteExport"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0"
+    >
+      <div
+        class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300"
+        id="modalReporteExportContent"
+      >
+        <div
+          class="bg-gradient-to-r from-primary to-[#f39200] px-8 py-6 text-white flex justify-between items-center"
+        >
+          <div>
+            <h3 class="text-2xl font-bold font-plus">Generar Reporte</h3>
+          </div>
+          <button
+            type="button"
+            onclick="cerrarModalReporteExport()"
+            class="text-white/80 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-3xl">close</span>
+          </button>
+        </div>
+        <div class="p-8 space-y-4">
+          <p class="text-xs text-slate-400">
+            Descarga un Excel con los datos para analizarlos fuera de la
+            plataforma.
+          </p>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1"
+              >Qué quieres reportar</label
+            >
+            <select
+              id="rpt_tipo"
+              class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              <option value="todo">Todo (una hoja por tema)</option>
+              <option value="voluntarios">Voluntarios y Especialistas</option>
+              <option value="eventos">Eventos y Visitas</option>
+              <option value="beneficiarios">Beneficiarios</option>
+              <option value="donativos">Donativos</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1"
+                >Año</label
+              >
+              <select
+                id="rpt_anio"
+                class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                <option value="todos">Todos los años</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1"
+                >Mes</label
+              >
+              <select
+                id="rpt_mes"
+                class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                <option value="todos">Todos los meses</option>
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3">Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+              </select>
+            </div>
+          </div>
+          <div class="pt-2 flex gap-4">
+            <button
+              type="button"
+              onclick="cerrarModalReporteExport()"
+              class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              id="btnGenerarReporteExport"
+              onclick="generarReporteExport()"
+              class="flex-1 py-3 bg-primary text-white font-bold rounded-full shadow-lg hover:bg-orange-800 transition-colors"
+            >
+              Descargar Excel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
