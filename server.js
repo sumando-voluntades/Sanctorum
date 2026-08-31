@@ -45,6 +45,7 @@ app.use(express.json());
 // Servir archivos estáticos desde /public y permitir URLs sin extensión
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 app.use('/partials', express.static(path.join(__dirname, 'public', 'partials')));
+app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
 
 // ==========================================
 // CABECERAS DE SEGURIDAD (fallback sin helmet)
