@@ -269,18 +269,116 @@
             Tu experiencia puede inspirar a otros jóvenes. Comparte tu testimonio de
             manera segura y anónima si lo prefieres.
           </p>
-          <a href="mailto:sumandovoluntadesensanctorum@gmail.com?subject=Quiero%20compartir%20mi%20historia" class="inline-flex items-center gap-2 bg-white text-teal-900 font-bold px-8 py-3 rounded-full hover:scale-105 transition-all">
+          <!-- Antes esto era un enlace mailto: sin ningún registro en la plataforma;
+               ahora abre un formulario real que se guarda como Solicitud Web (tipo
+               "Compartir Historia de Éxito") y avisa a Admin, Coordinador y Psicólogos. -->
+          <button type="button" onclick="abrirModalCompartirHistoria()" class="inline-flex items-center gap-2 bg-white text-teal-900 font-bold px-8 py-3 rounded-full hover:scale-105 transition-all">
             <span class="material-symbols-outlined text-lg">share</span> Compartir Mi Historia
-          </a>
+          </button>
         </div>
       </section>
     </main>
     <div id="footer-mount"></div>
 
+    <!-- Formulario real de "Compartir Mi Historia" (antes era un enlace mailto:).
+         Envía a POST /api/solicitudes con tipo_solicitud "Compartir Historia de
+         Éxito"; el backend avisa a Admin, Coordinador y Psicólogos, y la solicitud
+         queda visible para revisión en su Perfil. Esto es solo el primer contacto —
+         un Psicólogo, Coordinador o Admin da seguimiento y, si procede, publica la
+         historia ya anonimizada desde el panel de Publicaciones. -->
+    <div id="modalCompartirHistoria" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="p-8">
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <h3 class="text-2xl font-bold text-teal-900">Comparte Tu Historia</h3>
+              <p class="text-slate-500 text-sm mt-1">Cuéntanos brevemente tu experiencia. Un Psicólogo de nuestro equipo te contactará de forma confidencial para dar seguimiento — tú decides qué tanto compartir públicamente.</p>
+            </div>
+            <button type="button" onclick="cerrarModalCompartirHistoria()" class="text-slate-400 hover:text-slate-600 p-1">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <form id="formCompartirHistoria" class="space-y-4">
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-600 px-4">Nombre Completo</label>
+              <input id="hist_nombre" required type="text" placeholder="Ej. Ana García"
+                class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-teal-700 transition-all" />
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="text-sm font-semibold text-slate-600 px-4">Correo Electrónico</label>
+                <input id="hist_correo" required type="email" placeholder="tu@correo.com"
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-teal-700 transition-all" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-semibold text-slate-600 px-4">Teléfono (opcional)</label>
+                <input id="hist_telefono" type="tel" placeholder="+52 000 000 0000"
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-teal-700 transition-all" />
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-600 px-4">Tu relato, en breve</label>
+              <textarea id="hist_relato" required rows="5" placeholder="Cuéntanos qué te gustaría compartir..."
+                class="w-full bg-surface-container-low border-none rounded-2xl px-6 py-3 focus:ring-2 focus:ring-teal-700 transition-all"></textarea>
+            </div>
+            <button type="submit"
+              class="w-full bg-gradient-to-br from-teal-800 to-teal-900 text-white py-4 rounded-full font-bold text-lg hover:shadow-lg transition-all active:scale-95">
+              Enviar Mi Historia
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal genérico de resultado (éxito/error) — funciones compartidas
+         (mostrarModalSolicitud/cerrarModalSolicitud, en js/comun.js). -->
+    <div id="modalSolicitud" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300">
+      <div class="bg-white p-8 rounded-3xl max-w-md w-full mx-4 text-center shadow-2xl">
+        <div id="modalIcono" class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full text-white font-bold text-3xl"></div>
+        <h3 id="modalTitulo" class="text-2xl font-bold mb-2 text-slate-800"></h3>
+        <p id="modalMensaje" class="text-slate-500 mb-6"></p>
+        <button onclick="cerrarModalSolicitud()" class="w-full py-3 bg-gradient-to-r from-[#8a5100] to-[#f39200] text-white rounded-full font-bold shadow-lg hover:scale-[1.02] transition-all">
+          Entendido
+        </button>
+      </div>
+    </div>
+
     <script src="js/comun.js"></script>
     <script src="js/incluir.js"></script>
     <script>
-      const IMG_PLACEHOLDER_NOTICIA = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCnegNE53o1QknLomEAXCAsibRyUfTvd3FpTDfA1Hld5pwnVI8FOjbtTt43xNzCPid61zlkHOJ5b3cxwOdnT73S4iz1lHArs65RwRszWFj4TaQXjFDwS9Q2gAr3_hBZeUpaKYJjwLdWPFwL9w0mwEa56LoXVjJUPPe-GgEraF1pK4E2fmVngR1vIE_0jJHy3c76-U9FJxwVjG6lT8L1BbvvRIyg_BUxrUESXDY-xgJOgpAN8IyjYKQCKDP-DW8zIJfgdlzkaX6fTSg';
+      // ---------- FORMULARIO: COMPARTIR HISTORIA DE ÉXITO ----------
+      // Antes era un enlace mailto: sin ningún registro; ahora este modal envía una
+      // Solicitud Web real (tipo_solicitud = 'Compartir Historia de Éxito') que Admin,
+      // Coordinador y Psicólogos revisan desde su Perfil. Es solo el contacto inicial:
+      // el equipo da seguimiento y, si procede, publica la historia ya anonimizada.
+      function abrirModalCompartirHistoria() {
+          document.getElementById('modalCompartirHistoria').classList.remove('hidden');
+          document.getElementById('modalCompartirHistoria').classList.add('flex');
+      }
+      function cerrarModalCompartirHistoria() {
+          document.getElementById('modalCompartirHistoria').classList.add('hidden');
+          document.getElementById('modalCompartirHistoria').classList.remove('flex');
+      }
+
+      document.getElementById('formCompartirHistoria').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const data = {
+              nombre_contacto: document.getElementById('hist_nombre').value,
+              correo: document.getElementById('hist_correo').value,
+              telefono: document.getElementById('hist_telefono').value,
+              tipo_solicitud: 'Compartir Historia de Éxito',
+              mensaje: document.getElementById('hist_relato').value
+          };
+          await enviarSolicitudWeb(data, 'formCompartirHistoria', {
+              onExito: () => {
+                  cerrarModalCompartirHistoria();
+                  mostrarModalSolicitud('¡Gracias por Compartir!', 'Recibimos tu historia. Un Psicólogo de nuestro equipo se pondrá en contacto contigo pronto.', '#4CAF50', '✓');
+              },
+              onError: (mensajeError) => mostrarModalSolicitud('Error', mensajeError, '#F44336', '✕')
+          });
+      });
+
+      const IMG_PLACEHOLDER_NOTICIA ='https://lh3.googleusercontent.com/aida-public/AB6AXuCnegNE53o1QknLomEAXCAsibRyUfTvd3FpTDfA1Hld5pwnVI8FOjbtTt43xNzCPid61zlkHOJ5b3cxwOdnT73S4iz1lHArs65RwRszWFj4TaQXjFDwS9Q2gAr3_hBZeUpaKYJjwLdWPFwL9w0mwEa56LoXVjJUPPe-GgEraF1pK4E2fmVngR1vIE_0jJHy3c76-U9FJxwVjG6lT8L1BbvvRIyg_BUxrUESXDY-xgJOgpAN8IyjYKQCKDP-DW8zIJfgdlzkaX6fTSg';
 
       let noticiasGlobal = [];
 
@@ -626,8 +724,15 @@
           const inicio = paginaHistorias * HISTORIAS_POR_PAGINA;
           const grupo = historiasGlobal.slice(inicio, inicio + HISTORIAS_POR_PAGINA);
 
+          // H18 (auditoria de seguridad): esta es una página PÚBLICA sin autenticación. El
+          // título/contenido de una Historia de Éxito puede haberse originado en el botón
+          // "Atender" de Perfil, precargado a partir del mensaje libre de una solicitud
+          // enviada por cualquier visitante anónimo (ver manejarHandoffSolicitud en
+          // publicaciones.html) — si se publicó sin editar el borrador, el texto llega hasta
+          // aquí. Sin escapar, cualquier persona que visite esta página ejecutaría ese HTML/JS.
           cont.innerHTML = grupo.map(h => {
-              const nombreEdad = h.edad ? `${h.protagonista}, ${h.edad} años` : h.protagonista;
+              const protagonista = escapeHtml(h.protagonista);
+              const nombreEdad = h.edad ? `${protagonista}, ${escapeHtml(h.edad)} años` : protagonista;
               return `
             <div class="bg-white rounded-3xl p-8 shadow-[0_10px_30px_rgba(23,28,31,0.05)] border border-slate-100">
               <div class="flex items-center gap-3 mb-5">
@@ -636,16 +741,16 @@
                 </div>
                 <div>
                   <p class="font-bold text-slate-800 text-sm">${nombreEdad}</p>
-                  ${h.titulo ? `<p class="text-xs text-secondary font-bold">${h.titulo}</p>` : ''}
+                  ${h.titulo ? `<p class="text-xs text-secondary font-bold">${escapeHtml(h.titulo)}</p>` : ''}
                 </div>
               </div>
               <div class="bg-red-50 rounded-xl p-4 mb-3">
                 <p class="text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Antes</p>
-                <p class="text-on-surface-variant text-sm leading-relaxed">"${h.contenido_preayuda}"</p>
+                <p class="text-on-surface-variant text-sm leading-relaxed">"${escapeHtml(h.contenido_preayuda)}"</p>
               </div>
               <div class="bg-green-50 rounded-xl p-4">
                 <p class="text-[10px] font-bold text-green-600 uppercase tracking-wide mb-1">Después</p>
-                <p class="text-on-surface-variant text-sm leading-relaxed">"${h.contenido_postayuda}"</p>
+                <p class="text-on-surface-variant text-sm leading-relaxed">"${escapeHtml(h.contenido_postayuda)}"</p>
               </div>
               <p class="text-[10px] text-slate-400 mt-4">✓ Consentimiento ético obtenido</p>
             </div>`;
