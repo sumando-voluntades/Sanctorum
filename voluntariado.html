@@ -496,28 +496,9 @@
     // formulario PUBLICO de autorregistro (nombre, correo, especialidad, material donado...),
     // sin ningun escape. Un atacante anonimo podia autorregistrarse con un "nombre" que
     // contuviera HTML/JS y ejecutar codigo en la sesion del Admin/Coordinador que abriera este
-    // panel (robando, por ejemplo, el token de localStorage). escapeHtml() es para texto normal
-    // insertado en innerHTML; escapeAttrJs() es para valores interpolados dentro de un atributo
-    // onclick="fn('...')" — ahi escapar solo con entidades HTML NO basta, porque el navegador
-    // decodifica las entidades del atributo antes de ejecutar el JS, así que una comilla simple
-    // codificada como &#39; se vuelve comilla real de nuevo justo antes de correr como código.
-    function escapeHtml(valor) {
-        return String(valor ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
-    function escapeAttrJs(valor) {
-        return String(valor ?? '')
-            .replace(/\\/g, '\\\\')
-            .replace(/'/g, "\\'")
-            .replace(/&/g, '&amp;')
-            .replace(/"/g, '&quot;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-    }
+    // panel (robando, por ejemplo, el token de localStorage). escapeHtml()/escapeAttrJs() ahora
+    // viven en js/comun.js (generalizadas para toda la app, no solo esta página — ver el
+    // comentario ahí) en vez de copiadas aquí.
     let voluntariosGlobales = [];
 
     // --- MANEJO DE MODALES ---
