@@ -254,13 +254,17 @@
                 día en nuestros centros de apoyo.
               </p>
             </div>
-            <a
-              href="mailto:sumandovoluntadesensanctorum@gmail.com?subject=Quiero%20agendar%20una%20entrega%20de%20donaci%C3%B3n%20en%20especie"
+            <!-- Antes esto era un enlace mailto: sin ningún registro en la plataforma
+                 (RF pendiente); ahora abre un formulario real que se guarda como
+                 Solicitud Web (tipo "Donación en Especie") y avisa a Admin/Coordinador. -->
+            <button
+              type="button"
+              onclick="abrirModalAgendarDonacion()"
               class="bg-white text-secondary font-bold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all flex items-center gap-2"
             >
               <span class="material-symbols-outlined">calendar_today</span>
               Agendar Entrega
-            </a>
+            </button>
           </div>
           <div class="flex justify-end gap-2 mb-4">
             <button onclick="moverSliderNecesidades(-1)" class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-all">
@@ -332,6 +336,86 @@
     </main>
     <div id="footer-mount"></div>
 
+    <!-- Formulario real de "Agendar Entrega de Donación en Especie" (antes era un
+         enlace mailto:). Envía a POST /api/solicitudes con tipo_solicitud
+         "Donación en Especie"; el backend avisa a Admin/Coordinador y la solicitud
+         queda visible para revisión en su Perfil, igual que la validación de
+         documentos profesionales. -->
+    <div id="modalAgendarDonacion" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="p-8">
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <h3 class="text-2xl font-bold text-secondary">Agendar Entrega</h3>
+              <p class="text-slate-500 text-sm mt-1">Cuéntanos qué quieres donar y cuándo puedes traerlo; te confirmaremos por correo.</p>
+            </div>
+            <button type="button" onclick="cerrarModalAgendarDonacion()" class="text-slate-400 hover:text-slate-600 p-1">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <form id="formAgendarDonacion" class="space-y-4">
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-600 px-4">Nombre Completo</label>
+              <input id="don_nombre" required type="text" placeholder="Ej. Ana García"
+                class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="text-sm font-semibold text-slate-600 px-4">Correo Electrónico</label>
+                <input id="don_correo" required type="email" placeholder="tu@correo.com"
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-semibold text-slate-600 px-4">Teléfono (opcional)</label>
+                <input id="don_telefono" type="tel" placeholder="+52 000 000 0000"
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="text-sm font-semibold text-slate-600 px-4">¿Qué vas a donar?</label>
+                <input id="don_articulo" required type="text" placeholder="Ej. Ropa de invierno, útiles escolares..."
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-semibold text-slate-600 px-4">Cantidad aproximada (opcional)</label>
+                <input id="don_cantidad" type="text" placeholder="Ej. 3 bolsas grandes"
+                  class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-600 px-4">Fecha propuesta de entrega (opcional)</label>
+              <input id="don_fecha" type="date"
+                class="w-full bg-surface-container-low border-none rounded-full px-6 py-3 focus:ring-2 focus:ring-secondary transition-all" />
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-600 px-4">Comentarios adicionales (opcional)</label>
+              <textarea id="don_comentarios" rows="3" placeholder="Cualquier detalle que nos ayude a coordinar la entrega..."
+                class="w-full bg-surface-container-low border-none rounded-2xl px-6 py-3 focus:ring-2 focus:ring-secondary transition-all"></textarea>
+            </div>
+            <button type="submit"
+              class="w-full bg-gradient-to-r from-primary to-primary-container text-white py-4 rounded-full font-bold text-lg hover:shadow-lg transition-all active:scale-95">
+              Enviar Solicitud
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal genérico de resultado (éxito/error) — misma estructura y funciones
+         compartidas (mostrarModalSolicitud/cerrarModalSolicitud, en js/comun.js) que
+         usa solicitud_apoyo_oficial.html. -->
+    <div id="modalSolicitud" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-all duration-300">
+      <div class="bg-white p-8 rounded-3xl max-w-md w-full mx-4 text-center shadow-2xl">
+        <div id="modalIcono" class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full text-white font-bold text-3xl"></div>
+        <h3 id="modalTitulo" class="text-2xl font-bold mb-2 text-slate-800"></h3>
+        <p id="modalMensaje" class="text-slate-500 mb-6"></p>
+        <button onclick="cerrarModalSolicitud()" class="w-full py-3 bg-gradient-to-r from-[#8a5100] to-[#f39200] text-white rounded-full font-bold shadow-lg hover:scale-[1.02] transition-all">
+          Entendido
+        </button>
+      </div>
+    </div>
+
     <script src="js/comun.js"></script>
     <script src="js/incluir.js"></script>
     <script>
@@ -379,6 +463,49 @@
               copiarTextoConFallback(window.location.href, 'Enlace copiado al portapapeles. ¡Compártelo con quien quieras!');
           }
       }
+
+      // ---------- FORMULARIO: AGENDAR ENTREGA DE DONACIÓN EN ESPECIE ----------
+      // Antes era un enlace mailto: sin ningún registro; ahora este modal envía una
+      // Solicitud Web real (tipo_solicitud = 'Donación en Especie') que Admin/Coordinador
+      // revisan desde su Perfil, igual que la validación de documentos profesionales.
+      function abrirModalAgendarDonacion() {
+          document.getElementById('modalAgendarDonacion').classList.remove('hidden');
+          document.getElementById('modalAgendarDonacion').classList.add('flex');
+      }
+      function cerrarModalAgendarDonacion() {
+          document.getElementById('modalAgendarDonacion').classList.add('hidden');
+          document.getElementById('modalAgendarDonacion').classList.remove('flex');
+      }
+
+      document.getElementById('formAgendarDonacion').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          // Solicitudes_Web solo tiene una columna de mensaje libre (no columnas propias
+          // para artículo/cantidad/fecha), así que armamos un mensaje legible con todo
+          // lo que el formulario pidió — el staff lo ve completo al revisar la solicitud.
+          const articulo = document.getElementById('don_articulo').value;
+          const cantidad = document.getElementById('don_cantidad').value;
+          const fecha = document.getElementById('don_fecha').value;
+          const comentarios = document.getElementById('don_comentarios').value;
+          let mensaje = `Artículo(s) a donar: ${articulo}`;
+          if (cantidad) mensaje += `\nCantidad aproximada: ${cantidad}`;
+          if (fecha) mensaje += `\nFecha propuesta de entrega: ${fecha}`;
+          if (comentarios) mensaje += `\nComentarios: ${comentarios}`;
+
+          const data = {
+              nombre_contacto: document.getElementById('don_nombre').value,
+              correo: document.getElementById('don_correo').value,
+              telefono: document.getElementById('don_telefono').value,
+              tipo_solicitud: 'Donación en Especie',
+              mensaje
+          };
+          await enviarSolicitudWeb(data, 'formAgendarDonacion', {
+              onExito: () => {
+                  cerrarModalAgendarDonacion();
+                  mostrarModalSolicitud('¡Solicitud Enviada!', 'Registramos tu propuesta de entrega. Nuestro equipo te contactará para confirmar fecha y lugar.', '#4CAF50', '✓');
+              },
+              onError: (mensajeError) => mostrarModalSolicitud('Error', mensajeError, '#F44336', '✕')
+          });
+      });
 
       // ---------- FORMULARIO PÚBLICO DE VOLUNTARIADO (RF-05) ----------
       document.getElementById('formVoluntariadoPublico').addEventListener('submit', async (e) => {
