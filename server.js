@@ -22,14 +22,10 @@ const app = express();
 // asi que el frontend estatico en desarrollo se sirve en el puerto 5500 (Live Server de VS
 // Code) — NO en 3000, que esta ocupado por este mismo backend. Si sirves el frontend con otra
 // herramienta/puerto, agrega aqui ese origen exacto.
-// TODO: cuando el frontend pase a produccion en Vercel, agregar aqui la URL final
 // (ej. 'https://sanctorum.vercel.app') — y quitar los origenes de localhost si ya no se
 // necesitan para desarrollo.
 const ORIGENES_PERMITIDOS = [
-    'http://localhost:5500',
-    'http://127.0.0.1:5500',
-    'http://localhost:3000',
-    'https://sumando-voluntades.onrender.com'
+    'https://sumandovoluntadesensanctorum.org'
 ];
 const opcionesCors = {
     origin(origin, callback) {
