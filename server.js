@@ -28,6 +28,8 @@ const app = express();
 const ORIGENES_PERMITIDOS = [
     'http://localhost:5500',
     'http://127.0.0.1:5500',
+    'http://localhost:3000',
+    'https://sumando-voluntades.onrender.com'
 ];
 const opcionesCors = {
     origin(origin, callback) {
@@ -42,6 +44,7 @@ app.use(express.json());
 
 // Servir archivos estáticos desde /public y permitir URLs sin extensión
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
+app.use('/partials', express.static(path.join(__dirname, 'public', 'partials')));
 
 // ==========================================
 // CABECERAS DE SEGURIDAD (fallback sin helmet)
@@ -914,8 +917,6 @@ app.get('/api/config/cloudinary', (req, res) => {
         upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET || null
     });
 });
-
-app.listen(process.env.PORT || 3000, () => console.log('Servidor corriendo en puerto 3000'));
 
 // ==========================================
 // MÓDULO DE INVENTARIO
@@ -2993,11 +2994,14 @@ app.get('/api/estadisticas_psicologia', async (req, res) => {
 // FALLBACK STATIC / SPA Y MANEJO DE ERRORES
 // ==========================================
 app.use((req, res, next) => {
+    // Si es una petición a la API y llegó hasta aquí, responder 404 en JSON y no mandar HTML
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ success: false, message: 'Endpoint no encontrado.' });
+    }
+
     if (req.method !== 'GET') return next();
 
-    // 1. Busca en public/
     const publicFile = path.join(__dirname, 'public', `${req.path}.html`);
-    // 2. Busca en public/admin/
     const adminFile = path.join(__dirname, 'public', 'admin', `${req.path}.html`);
 
     res.sendFile(publicFile, (err) => {
@@ -3015,4 +3019,10 @@ app.use((err, req, res, next) => {
     }
     console.error('Error no manejado:', err);
     res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+});
+
+// Arrancar el servidor al final de todas las definiciones de rutas
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
