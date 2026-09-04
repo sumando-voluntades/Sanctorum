@@ -452,8 +452,8 @@
       </div>
     </div>
 
-    <script src="js/comun.js"></script>
-    <script src="js/incluir.js"></script>
+    <script src="/js/comun.js"></script>
+    <script src="/js/incluir.js"></script>
     <script>
       // ---------- FORMULARIO: COMPARTIR HISTORIA DE ÉXITO ----------
       // Antes era un enlace mailto: sin ningún registro; ahora este modal envía una
@@ -512,7 +512,7 @@
       // eventos anteriores, historias de éxito y calendario de comunidad).
       document.addEventListener("DOMContentLoaded", async () => {
         await incluirParcial("#header-mount", "partials/navbar_publico.html");
-        incluirParcial("#footer-mount", "partials/footer_publico.html");
+        incluirParcial("#footer-mount", "/partials/footer_publico.html");
         marcarLinkActivoPublico("#header-mount [data-pagina]");
         inicializarMenuMovil();
 

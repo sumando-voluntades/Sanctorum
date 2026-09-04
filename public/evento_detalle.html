@@ -172,8 +172,8 @@
 
     <div id="footer-mount"></div>
 
-    <script src="js/comun.js"></script>
-    <script src="js/incluir.js"></script>
+    <script src="/js/comun.js"></script>
+    <script src="/js/incluir.js"></script>
     <script>
       // ---------- VISOR DE IMÁGENES ESTILO "HISTORIA" ----------
       let storyImagenes = [];
@@ -282,7 +282,7 @@
       // parámetros de la URL.
       document.addEventListener("DOMContentLoaded", async () => {
         await incluirParcial("#header-mount", "partials/navbar_publico.html");
-        incluirParcial("#footer-mount", "partials/footer_publico.html");
+        incluirParcial("#footer-mount", "/partials/footer_publico.html");
         marcarLinkActivoPublico("#header-mount [data-pagina]");
         inicializarMenuMovil();
 

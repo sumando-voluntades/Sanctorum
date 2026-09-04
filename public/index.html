@@ -398,67 +398,59 @@
         </div>
       </section>
       <!-- Contact Section -->
+      <!-- Contact Section -->
       <section class="max-w-7xl mx-auto px-8 py-24">
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-on-surface">
             Visítanos o Contáctanos
           </h2>
           <p class="text-on-surface-variant mt-4">
-            Estamos aquí para escucharte y trabajar juntos.
+            Estamos aquí para escucharte y trabajar juntos por nuestra comunidad.
           </p>
         </div>
-        <div class="grid md:grid-cols-2 gap-8">
+        <div class="max-w-2xl mx-auto">
           <div
-            class="bg-white p-8 rounded-xl flex items-start gap-6 shadow-sm border border-slate-100"
+            class="bg-white p-10 rounded-3xl flex flex-col sm:flex-row items-center sm:items-start gap-8 shadow-sm border border-slate-100 text-center sm:text-left"
           >
-            <div class="bg-primary/10 p-4 rounded-xl">
-              <span class="material-symbols-outlined text-primary"
-                >location_on</span
-              >
+            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-primary text-3xl">location_on</span>
             </div>
-            <div>
-              <h4 class="text-xl font-bold mb-2">Sede Sanctórum</h4>
-              <p class="text-on-surface-variant mb-4">
-                Americas Unidas #32, Sanctórum
-              </p>
+            <div class="space-y-3">
+              <h4 class="text-2xl font-bold text-slate-800">Sede Oficial Sanctórum</h4>
               <a
-                class="text-primary font-bold flex items-center gap-2"
-                href="tel:2221526244"
-              >
-                <span class="material-symbols-outlined text-sm">call</span>
-                222 152 6244
-              </a>
-            </div>
-          </div>
-          <div
-            class="bg-white p-8 rounded-xl flex items-start gap-6 shadow-sm border border-slate-100"
-          >
-            <div class="bg-secondary/10 p-4 rounded-xl">
-              <span class="material-symbols-outlined text-secondary"
-                >location_on</span
-              >
-            </div>
-            <div>
-              <h4 class="text-xl font-bold mb-2">Sede Alterna</h4>
-              <p class="text-on-surface-variant mb-4">
-                Av. México #8, Sanctórum
-              </p>
-              <a
-                class="text-secondary font-bold flex items-center gap-2"
-                href="tel:4494598775"
-              >
-                <span class="material-symbols-outlined text-sm">call</span>
-                449 459 8775
-              </a>
+  href="https://www.google.com/maps/search/?api=1&query=Avenida+Cholula+14+B,+Cuautlancingo,+Puebla,+72730"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="text-on-surface-variant text-base leading-relaxed hover:text-primary transition-colors flex items-center gap-1 group"
+>
+  <span>Avenida Cholula #14 B, Cuautlancingo, México, C.P. 72730</span>
+  <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+</a>
+              <div class="pt-2 flex flex-wrap gap-6 justify-center sm:justify-start">
+                <a
+                  class="text-primary font-bold flex items-center gap-2 hover:underline"
+                  href="tel:2223374322"
+                >
+                  <span class="material-symbols-outlined text-base">call</span>
+                  222 337 4322
+                </a>
+                <a
+                  class="text-secondary font-bold flex items-center gap-2 hover:underline"
+                  href="mailto:sumandovoluntadesensanctorum@gmail.com"
+                >
+                  <span class="material-symbols-outlined text-base">mail</span>
+                  sumandovoluntadesensanctorum@gmail.com
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </section>
     </main>
-    <div id="footer-mount"></div>
+    <div id="footer-mount" style="background-color: #0b1120 !important; width: 100%; display: block; margin-top: 4rem;"></div>
 
-    <script src="js/comun.js"></script>
-    <script src="js/incluir.js"></script>
+    <script src="/js/comun.js"></script>
+    <script src="/js/incluir.js"></script>
     <script>
       // Al cargar la página: inserta navbar/footer públicos, marca el link
       // activo, habilita el menú móvil y dispara en paralelo la carga de
@@ -466,7 +458,7 @@
       // próximo evento, carrusel de proyectos y estadísticas de psicología).
       document.addEventListener('DOMContentLoaded', async () => {
           await incluirParcial('#header-mount', 'partials/navbar_publico.html');
-          incluirParcial('#footer-mount', 'partials/footer_publico.html');
+          incluirParcial('#footer-mount', '/partials/footer_publico.html');
           marcarLinkActivoPublico('#header-mount [data-pagina]');
           inicializarMenuMovil();
 

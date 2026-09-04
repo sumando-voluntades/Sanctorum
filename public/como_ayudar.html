@@ -85,7 +85,7 @@
                 alt="Comunidad Unida"
                 class="w-full h-[500px] object-cover"
                 data-alt="A warm, sun-drenched close-up of multiple hands of different ages and ethnicities stacked together in a circle, symbolizing unity and community support"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwef5UogrDqnjfF5sPccn3cM78jUYSnJqPvD1FRbfKivPdmtP7nlz3wWzqz3Nce1fSJrNMrZO2bMCDNAgCKyUPo4GucJn6keklmdFR1nj0BHmEobrwmepCP2oFqSySFDF7TgFjo-RT9tEPuT9N2ZTDGPCdsHovWEzn_lliqkyUXh81A2WiOXPP9ig3yxln3FoV0aSwhlbM3K4eMEOy4elgtx6-uJ_9zwZtWq37rV5ZYy3FqTzPE_N3ukClE0vMiLTu1ACWOaasFno"
+                src="https://res.cloudinary.com/nnagzlvt/image/upload/v1788048145/ij0alnuqrgxumhirvd3t.jpg"
               />
             </div>
             <div
@@ -456,8 +456,8 @@
       </div>
     </div>
 
-    <script src="js/comun.js"></script>
-    <script src="js/incluir.js"></script>
+    <script src="/js/comun.js"></script>
+    <script src="/js/incluir.js"></script>
     <script>
       // ---------- DONACIÓN MONETARIA (CLABE / Compartir) ----------
       // Blindada por completo: ninguna rama puede lanzar una excepción sin atrapar.
@@ -670,7 +670,7 @@
       // activo, habilita el menú móvil y carga las necesidades de donación.
       document.addEventListener("DOMContentLoaded", async () => {
         await incluirParcial("#header-mount", "partials/navbar_publico.html");
-        incluirParcial("#footer-mount", "partials/footer_publico.html");
+        incluirParcial("#footer-mount", "/partials/footer_publico.html");
         marcarLinkActivoPublico("#header-mount [data-pagina]");
         inicializarMenuMovil();
 

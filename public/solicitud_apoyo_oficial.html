@@ -331,8 +331,8 @@
       </div>
     </div>
 
-    <script src="js/comun.js"></script>
-    <script src="js/incluir.js"></script>
+    <script src="/js/comun.js"></script>
+    <script src="/js/incluir.js"></script>
     <script>
       // ---------- FORMULARIO: ASISTENCIA PSICOLÓGICA ----------
       // enviarSolicitudWeb() y mostrarModalSolicitud()/cerrarModalSolicitud() ahora viven
@@ -373,7 +373,7 @@
       // activo, habilita el menú móvil y carga los próximos eventos públicos.
       document.addEventListener("DOMContentLoaded", async () => {
         await incluirParcial("#header-mount", "partials/navbar_publico.html");
-        incluirParcial("#footer-mount", "partials/footer_publico.html");
+        incluirParcial("#footer-mount", "/partials/footer_publico.html");
         marcarLinkActivoPublico("#header-mount [data-pagina]");
         inicializarMenuMovil();
 
