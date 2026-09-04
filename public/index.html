@@ -364,30 +364,36 @@
           </div>
           <div
             id="donacion-monetaria"
-            class="bg-gradient-to-br from-slate-900 to-slate-800 p-12 rounded-xl text-white scroll-mt-24"
+            class="bg-gradient-to-br from-slate-900 to-slate-800 p-8 md:p-12 rounded-xl text-white scroll-mt-24 flex flex-col justify-between"
           >
-            <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
-              <span class="material-symbols-outlined text-primary-container"
-                >account_balance</span
-              >
-              Donación Monetaria
-            </h3>
-            <div class="bg-white/10 p-6 rounded-xl mb-8">
-              <p class="text-white/60 text-sm mb-2">
-                Cuenta CLABE para Transferencia:
+            <div>
+              <h3 class="text-xl font-bold mb-3 flex items-center gap-3 text-primary-container">
+                <span class="material-symbols-outlined">account_balance</span>
+                Aportación Voluntaria de Sostenibilidad
+              </h3>
+              <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                Operamos gracias a las aportaciones de nuestra comunidad. Al contribuir, manifiestas bajo protesta de decir verdad que los fondos provienen de fuentes lícitas (Art. 400 Bis CPF y LFPIORPI).
               </p>
-              <p id="texto_clabe" class="text-xl font-mono font-bold tracking-wider">
-                012 180 00123456789 5
+              <p class="text-[11px] text-slate-400 italic mb-6 leading-normal">
+                (Nota: Con fundamento en los Arts. 79 y 80 de la Ley del ISR, la A.C. no cuenta con estatus de Donataria Autorizada; este apoyo no es deducible).
               </p>
+              <div class="bg-white/10 p-5 rounded-xl mb-6">
+                <p class="text-white/60 text-xs mb-1">
+                  CLABE • Sumando Voluntades en Sanctórum A.C.
+                </p>
+                <p id="texto_clabe" class="text-lg font-mono font-bold tracking-wider text-amber-300">
+                  002 650 7019 0364 2571
+                </p>
+              </div>
             </div>
-            <div class="grid grid-cols-1 gap-4">
-              <button
-                onclick="copiarClabe()"
-                class="bg-primary text-white py-3 rounded-full font-bold text-sm hover:scale-105 transition-all"
-              >
-                Dona
-              </button>
-            </div>
+            <button
+              onclick="copiarClabe()"
+              class="w-full bg-primary text-white py-3.5 rounded-full font-bold text-sm hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+            >
+              <span class="material-symbols-outlined text-base">volunteer_activism</span>
+              Declarar y Contribuir
+            </button>
+          </div>
           </div>
         </div>
       </section>
