@@ -109,6 +109,15 @@ function aplicarRestriccionesNav(rol, especialidad) {
     if (permitidoActual && !permitidoActual.includes(Number(rol))) {
         window.location.replace('agenda');
     }
+
+    // Cargar automáticamente el avatar en el header compartido
+    try {
+        const token = localStorage.getItem('token_sanctorum');
+        if (token) {
+            const payload = decodeJWT(token);
+            cargarAvatarHeader(payload.id);
+        }
+    } catch (e) {}
 }
 
 async function verificarAccesoDocumento(payload) {
@@ -275,5 +284,35 @@ async function marcarSolicitudAtendidaSilenciosa(idSolicitud) {
         });
     } catch (e) {
         console.error('No se pudo marcar automáticamente la solicitud como atendida:', e);
+    }
+}
+
+// ================= CARGA DINÁMICA DEL AVATAR EN EL HEADER =================
+async function cargarAvatarHeader(userId) {
+    if (!userId) return;
+
+    // 1. Usar caché en sesión para evitar peticiones redundantes
+    const cacheKey = `sanctorum_avatar_${userId}`;
+    const fotoCache = sessionStorage.getItem(cacheKey);
+    const wrap = document.getElementById('nav_user_avatar_wrap');
+
+    if (fotoCache && wrap) {
+        wrap.innerHTML = `<img src="${fotoCache}" class="w-full h-full object-cover" alt="Foto de perfil">`;
+        return;
+    }
+
+    // 2. Si no está en caché, consultarla a la API
+    try {
+        const res = await fetch(`${API_URL}/api/usuarios/${userId}`, { headers: authHeaders() });
+        const json = await res.json();
+        if (json.success && json.data && json.data.foto_perfil_url) {
+            sessionStorage.setItem(cacheKey, json.data.foto_perfil_url);
+            const avatarWrap = document.getElementById('nav_user_avatar_wrap');
+            if (avatarWrap) {
+                avatarWrap.innerHTML = `<img src="${json.data.foto_perfil_url}" class="w-full h-full object-cover" alt="Foto de perfil">`;
+            }
+        }
+    } catch (e) {
+        console.error('No se pudo cargar la foto del header:', e);
     }
 }
