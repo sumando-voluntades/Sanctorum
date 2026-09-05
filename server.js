@@ -25,7 +25,8 @@ const app = express();
 // (ej. 'https://sanctorum.vercel.app') — y quitar los origenes de localhost si ya no se
 // necesitan para desarrollo.
 const ORIGENES_PERMITIDOS = [
-    'https://sumandovoluntadesensanctorum.org'
+    'https://sumandovoluntadesensanctorum.org',
+    'http://localhost:3000'
 ];
 const opcionesCors = {
     origin(origin, callback) {
@@ -203,16 +204,95 @@ async function resolverIdInsumoParaEvento(cliente, item) {
 // Plantilla HTML compartida por todos los correos salientes (login, recuperación, aprobación,
 // avisos de documentos, solicitudes, etc.): envuelve el contenido específico de cada correo
 // en el mismo encabezado/pie con la identidad visual de Sanctorum A.C.
-const emailTemplate = (titulo, contenido) => `
-<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e4e9ed; border-radius: 12px; overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #b50062 0%, #e2007c 100%); padding: 30px 20px; text-align: center;">
-        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Sanctorum A.C.</h1>
-    </div>
-    <div style="padding: 40px 30px; color: #544434; line-height: 1.6;">
-        <h2 style="color: #8a5100; margin-top: 0;">${titulo}</h2>
-        ${contenido}
-    </div>
-</div>
+// Plantilla HTML visual de alta compatibilidad para todos los correos salientes
+const emailTemplate = (titulo, contenido, subtitulo = "Construyendo comunidad paso a paso") => `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${titulo}</title>
+</head>
+<body style="margin: 0; padding: 24px 12px; background-color: #020617; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-font-smoothing: antialiased; color: #1e293b;">
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td align="center">
+        <!-- Tarjeta Principal -->
+        <table role="presentation" style="max-width: 480px; width: 100%; background-color: #ffffff; border-radius: 28px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1);" border="0" cellspacing="0" cellpadding="0">
+          
+          <!-- Barra Superior Degradada Institucional -->
+          <tr>
+            <td style="height: 8px; width: 100%; background: linear-gradient(90deg, #e6007e 0%, #f39200 50%, #43b02a 75%, #0072ce 100%);"></td>
+          </tr>
+
+          <!-- Cabecera con Logo Institucional -->
+          <tr>
+            <td align="center" style="padding: 32px 24px 16px 24px; background: linear-gradient(180deg, #fdf2f7 0%, #fff8f0 40%, #ffffff 100%); border-bottom: 1px solid #f1f5f9;">
+              <img src="https://sumandovoluntadesensanctorum.org/assets/Logo.png" alt="Sumando Voluntades en Sanctórum A.C." style="max-width: 190px; width: 100%; height: auto; display: block; margin: 0 auto 12px auto;" />
+            </td>
+          </tr>
+
+          <!-- Título y Subtítulo de la Notificación -->
+          <tr>
+            <td align="center" style="padding: 24px 28px 8px 28px;">
+              <h2 style="margin: 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.25;">
+                ${titulo}
+              </h2>
+              <p style="margin: 6px 0 0 0; font-size: 11px; font-weight: 700; color: #f39200; text-transform: uppercase; letter-spacing: 1px;">
+                ${subtitulo}
+              </p>
+            </td>
+          </tr>
+
+          <!-- Contenido Dinámico del Mensaje -->
+          <tr>
+            <td style="padding: 16px 28px 24px 28px; font-size: 14px; line-height: 1.6; color: #334155;">
+              ${contenido}
+            </td>
+          </tr>
+
+          <!-- Botón de Acción Principal al Sitio -->
+          <tr>
+            <td align="center" style="padding: 0 28px 28px 28px;">
+              <a href="https://sumandovoluntadesensanctorum.org" target="_blank" style="display: block; width: 100%; max-width: 320px; box-sizing: border-box; background: linear-gradient(90deg, #e6007e 0%, #b50062 100%); color: #ffffff; text-decoration: none; padding: 14px 24px; border-radius: 9999px; font-weight: 700; font-size: 13px; text-align: center; box-shadow: 0 4px 14px rgba(230, 0, 126, 0.3);">
+                Conocer más sobre nuestro impacto →
+              </a>
+            </td>
+          </tr>
+
+          <!-- Lema y Firma Oficial -->
+          <tr>
+            <td align="center" style="padding: 20px 28px; border-top: 1px solid #f1f5f9; background-color: #fafaf9;">
+              <p style="margin: 0; font-size: 14px; font-weight: 700; font-style: italic; color: #b50062;">
+                "Sumando Voluntades en Sanctórum"
+              </p>
+              <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 600; color: #64748b;">
+                Comité Directivo & Equipo Comunitario
+              </p>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #94a3b8;">
+                Avenida Cholula #14 B, Cuautlancingo, México, C.P. 72730
+              </p>
+            </td>
+          </tr>
+
+          <!-- Pie Institucional -->
+          <tr>
+            <td align="center" style="padding: 20px 24px; background-color: #0b1120; color: #94a3b8; font-size: 11px; line-height: 1.5;">
+              <p style="margin: 0 0 8px 0; color: #cbd5e1;">
+                Notificación oficial emitida por <strong style="color: #ffffff;">Sumando Voluntades en Sanctórum A.C.</strong>
+              </p>
+              <p style="margin: 0; font-size: 10px; color: #64748b;">
+                © 2026 Sumando Voluntades Sanctórum A.C. · Todos los derechos reservados.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
 `;
 
 // ==========================================
@@ -244,7 +324,10 @@ app.post('/api/auth/login', async (req, res) => {
 
         const token = jwt.sign({ id: usuario.id_usuario, rol: usuario.id_rol, nombre: usuario.nombre_completo, correo: usuario.correo, especialidad: usuario.especialidad }, process.env.JWT_SECRET, { expiresIn: '8h' });
         res.json({ success: true, token, usuario: { nombre: usuario.nombre_completo, rol: usuario.id_rol } });
-    } catch (err) { res.status(500).json({ success: false, message: 'Error de servidor.' }); }
+    } catch (err) {
+        console.error(">>> ERROR EXACTO EN LOGIN:", err);
+        res.status(500).json({ success: false, message: err.message || 'Error de servidor.' });
+    }
 });
 
 // ==========================================
@@ -425,18 +508,45 @@ app.post('/api/usuarios', async (req, res) => {
         );
 
         // NUEVO: Correo automático avisando que su solicitud está en revisión
+        // Notificación de recepción con tarjeta de estado
         const contenidoRegistro = `
-            <p>Hola <b>${nombre_completo}</b>,</p>
-            <p>Hemos recibido tu solicitud para formar parte de Sanctorum A.C. Actualmente tu perfil se encuentra <b>en revisión</b>.</p>
-            <p>Nos pondremos en contacto contigo muy pronto para agendar una entrevista o darte seguimiento.</p>
-            <p style="font-style: italic; color: #877362; text-align: center;">"Sumando Voluntades"</p>
+            <p style="margin-top: 0; font-size: 15px;">Hola <strong style="color: #b50062;">${escapeHtmlServidor(nombre_completo)}</strong>,</p>
+            <p>Hemos recibido con entusiasmo tu solicitud para formar parte de <strong>Sumando Voluntades Sanctórum</strong>. Nos alegra profundamente contar con personas comprometidas y dispuestas a aportar su energía a nuestras causas sociales.</p>
+            
+            <!-- Tarjeta de Estado de Solicitud -->
+            <div style="margin: 20px 0; padding: 16px; border-radius: 16px; background-color: #fffbeb; border: 1px solid #fde68a;">
+              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td width="42" valign="top">
+                    <div style="width: 36px; height: 36px; background-color: #f59e0b; border-radius: 10px; text-align: center; line-height: 36px; color: #ffffff; font-size: 18px;">
+                      ⏱
+                    </div>
+                  </td>
+                  <td style="padding-left: 12px;" valign="top">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                      <span style="font-size: 11px; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Estatus de Solicitud</span>
+                      <span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; background-color: #fde68a; color: #78350f; font-size: 10px; font-weight: 700;">En Revisión</span>
+                    </div>
+                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #78350f; line-height: 1.4;">
+                      Actualmente tu perfil y documentación se encuentran en evaluación por nuestro equipo de coordinación.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <p style="margin-bottom: 12px;">Nos pondremos en contacto contigo muy pronto a través de este medio o vía telefónica para darte seguimiento personalizado.</p>
+            
+            <div style="padding: 12px 16px; border-radius: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; font-size: 12px; color: #475569;">
+              📅 Tiempo estimado de respuesta: <strong style="color: #0f172a;">24 a 48 horas hábiles</strong>.
+            </div>
         `;
 
         await transporter.sendMail({
-            from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
+            from: `"Sumando Voluntades Sanctórum" <${process.env.EMAIL_USER}>`,
             to: correo,
-            subject: 'Solicitud Recibida - Sanctorum A.C.',
-            html: emailTemplate('¡Gracias por tu interés!', contenidoRegistro)
+            subject: 'Solicitud Recibida - Sumando Voluntades Sanctórum',
+            html: emailTemplate('¡Gracias por tu interés!', contenidoRegistro, 'Construyendo comunidad paso a paso')
         });
 
         res.status(201).json({ success: true });
