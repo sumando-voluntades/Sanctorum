@@ -15,7 +15,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/output.css" />
-    </script>
     <style>
       .material-symbols-outlined {
         font-variation-settings:
@@ -44,7 +43,6 @@
       <div id="header-mount"></div>
 
       <div class="p-8 flex-1 w-full overflow-hidden">
-        <!-- ENCABEZADO -->
         <div
           class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10"
         >
@@ -66,43 +64,71 @@
           </button>
         </div>
 
-        <!-- BARRA DE FILTROS -->
+        <!-- BARRA INTEGRADA DE BÚSQUEDA Y FILTROS AVANZADOS -->
         <div
-          class="flex flex-wrap gap-4 mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 items-center w-full"
+          class="flex flex-wrap gap-3 mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 items-center w-full"
         >
+          <!-- Buscador directo en la vista -->
+          <div class="relative flex-1 min-w-[240px]">
+            <span
+              class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"
+              >search</span
+            >
+            <input
+              id="input_busqueda_expedientes"
+              type="text"
+              oninput="aplicarFiltros()"
+              placeholder="Buscar en todos los campos (ID, nombre, tutor, escuela, especialista)..."
+              class="w-full pl-10 pr-4 py-2.5 bg-[#f0f4f8] border-none rounded-full text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-pink-500/20"
+            />
+          </div>
+
           <span
-            class="text-sm font-bold text-slate-400 px-2 uppercase tracking-widest text-[10px]"
-            >Filtrar por:</span
+            class="text-sm font-bold text-slate-400 px-1 uppercase tracking-widest text-[10px]"
+            >Filtros:</span
           >
+
+          <!-- Filtro por Escuela -->
+          <select
+            id="filtro_escuela_tabla"
+            onchange="aplicarFiltros()"
+            class="appearance-none bg-[#f0f4f8] border-none rounded-full px-4 py-2.5 text-xs font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer max-w-[200px] truncate"
+          >
+            <option value="Todas">Cualquier Escuela</option>
+          </select>
+
+          <!-- Filtro por Especialista -->
           <select
             id="filtro_especialista"
             onchange="aplicarFiltros()"
-            class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer"
+            class="appearance-none bg-[#f0f4f8] border-none rounded-full px-4 py-2.5 text-xs font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer max-w-[200px] truncate"
           >
             <option value="Todos">Cualquier Especialista</option>
-            <!-- Llenado dinámicamente -->
           </select>
+
+          <!-- Filtro por Estatus -->
           <select
             id="filtro_estatus"
             onchange="aplicarFiltros()"
-            class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer"
+            class="appearance-none bg-[#f0f4f8] border-none rounded-full px-4 py-2.5 text-xs font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer"
           >
             <option value="Todos">Cualquier Estatus</option>
             <option value="ACTIVO">Activos</option>
             <option value="EN PAUSA">En Pausa</option>
             <option value="ALTA">Alta Clínica</option>
           </select>
+
           <button
             onclick="limpiarFiltros()"
-            class="ml-auto p-2.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
+            class="p-2.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors shrink-0"
+            title="Restablecer filtros"
           >
-            <span class="material-symbols-outlined text-slate-600"
+            <span class="material-symbols-outlined text-slate-600 text-sm"
               >refresh</span
             >
           </button>
         </div>
 
-        <!-- TABLA DE EXPEDIENTES -->
         <div
           class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden w-full"
         >
@@ -110,36 +136,57 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr
-                  class="bg-slate-50 text-slate-400 text-xs uppercase tracking-widest border-b border-slate-100"
+                  class="bg-slate-50 text-slate-400 text-xs uppercase tracking-widest border-b border-slate-100 select-none"
                 >
-                  <th class="px-6 py-5 font-bold whitespace-nowrap">ID</th>
-                  <th class="px-6 py-5 font-bold whitespace-nowrap">
-                    Nombre del Beneficiario
+                  <th class="px-4 py-4 font-bold text-center w-24">Acción</th>
+                  <th
+                    onclick="ordenarExpedientes('id')"
+                    class="px-3 py-4 font-bold text-center cursor-pointer hover:text-secondary transition-colors"
+                  >
+                    ID <span id="sort_id" class="text-[10px]">▼</span>
                   </th>
-                  <th class="px-6 py-5 font-bold whitespace-nowrap">
+                  <th
+                    onclick="ordenarExpedientes('paciente')"
+                    class="px-4 py-4 font-bold cursor-pointer hover:text-secondary transition-colors"
+                  >
+                    Beneficiario
+                    <span id="sort_paciente" class="text-[10px]"></span>
+                  </th>
+                  <th
+                    onclick="ordenarExpedientes('tutor')"
+                    class="px-4 py-4 font-bold cursor-pointer hover:text-secondary transition-colors"
+                  >
                     Tutor Responsable
+                    <span id="sort_tutor" class="text-[10px]"></span>
                   </th>
-                  <th class="px-6 py-5 font-bold whitespace-nowrap">
-                    Escuela de Procedencia
+                  <th
+                    onclick="ordenarExpedientes('escuela')"
+                    class="px-4 py-4 font-bold cursor-pointer hover:text-secondary transition-colors"
+                  >
+                    Escuela <span id="sort_escuela" class="text-[10px]"></span>
                   </th>
-                  <th class="px-6 py-5 font-bold whitespace-nowrap">
-                    Especialista Asignado
+                  <th
+                    onclick="ordenarExpedientes('especialista')"
+                    class="px-4 py-4 font-bold cursor-pointer hover:text-secondary transition-colors"
+                  >
+                    Especialista
+                    <span id="sort_especialista" class="text-[10px]"></span>
                   </th>
-                  <th class="px-6 py-5 font-bold whitespace-nowrap text-center">
-                    Estatus
-                  </th>
-                  <th class="px-6 py-5 font-bold whitespace-nowrap text-center">
-                    Acciones
+                  <th
+                    onclick="ordenarExpedientes('estatus')"
+                    class="px-3 py-4 font-bold text-center cursor-pointer hover:text-secondary transition-colors"
+                  >
+                    Estatus <span id="sort_estatus" class="text-[10px]"></span>
                   </th>
                 </tr>
               </thead>
-              <tbody id="lista_expedientes" class="divide-y divide-slate-50">
-                <!-- Filas inyectadas por JS -->
-              </tbody>
+              <tbody
+                id="lista_expedientes"
+                class="divide-y divide-slate-50"
+              ></tbody>
             </table>
           </div>
 
-          <!-- PAGINACIÓN -->
           <div
             class="p-6 border-t border-slate-100 flex items-center justify-between bg-white flex-wrap gap-4"
           >
@@ -152,16 +199,13 @@
             <div
               id="controles_paginacion_expedientes"
               class="flex items-center gap-2"
-            >
-              <!-- Inyectado por JS -->
-            </div>
+            ></div>
           </div>
         </div>
       </div>
       <div id="footer-mount"></div>
     </main>
 
-    <!-- ================= MODAL: NUEVO EXPEDIENTE ================= -->
     <div
       id="modalNuevo"
       class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0 py-10"
@@ -197,7 +241,8 @@
               <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1"
                   >Nombre Completo</label
-                ><input
+                >
+                <input
                   id="nom_paciente"
                   type="text"
                   required
@@ -207,7 +252,8 @@
               <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1"
                   >Fecha de Nacimiento</label
-                ><input
+                >
+                <input
                   id="f_nacimiento"
                   type="date"
                   required
@@ -231,7 +277,8 @@
               <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1"
                   >Colonia (Puebla)</label
-                ><input
+                >
+                <input
                   id="input_colonia"
                   type="text"
                   class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30"
@@ -266,7 +313,8 @@
               <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1"
                   >Nombre del Tutor</label
-                ><input
+                >
+                <input
                   id="nom_tutor"
                   type="text"
                   required
@@ -276,7 +324,8 @@
               <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1"
                   >Teléfono de Contacto</label
-                ><input
+                >
+                <input
                   id="tel_tutor"
                   type="tel"
                   required
@@ -286,7 +335,8 @@
               <div class="md:col-span-2">
                 <label class="block text-sm font-bold text-slate-700 mb-1"
                   >Correo del Tutor</label
-                ><input
+                >
+                <input
                   id="correo_tutor"
                   type="email"
                   class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-primary/30"
@@ -331,7 +381,6 @@
       </div>
     </div>
 
-    <!-- ================= MODAL: DETALLE / NOTAS CLÍNICAS (RF-01) ================= -->
     <div
       id="modalDetalle"
       class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0 py-10"
@@ -360,7 +409,6 @@
         </div>
 
         <div class="p-8 bg-white overflow-y-auto max-h-[75vh]">
-          <!-- Cabecera del Paciente -->
           <div
             class="flex items-center gap-6 mb-8 bg-slate-50 p-6 rounded-2xl border border-slate-100"
           >
@@ -385,11 +433,6 @@
                 Estatus
               </p>
               <div class="text-right">
-                <p
-                  class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1"
-                >
-                  Estatus
-                </p>
                 <select
                   id="det_estatus"
                   onchange="cambiarEstatusExpediente(this.value)"
@@ -403,7 +446,6 @@
             </div>
           </div>
 
-          <!-- Pestañas de Navegación -->
           <div class="border-b border-slate-200 mb-6 flex gap-6">
             <button
               id="tabBtn_notas"
@@ -428,7 +470,6 @@
             </button>
           </div>
 
-          <!-- CONTENIDO: NOTAS -->
           <div id="tab_notas" class="tab-content block">
             <div
               class="bg-rose-50 border border-rose-100 rounded-xl p-4 mb-6 flex gap-3"
@@ -451,7 +492,6 @@
                 class="block text-sm font-bold text-slate-700 mb-3 border-b pb-2"
                 >Registrar Avance de Sesión</label
               >
-
               <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
                 <select
                   id="nota_tipo"
@@ -462,7 +502,6 @@
                   <option value="Intervención">Intervención en Crisis</option>
                   <option value="Cierre">Cierre</option>
                 </select>
-
                 <select
                   id="nota_modalidad"
                   class="w-full bg-[#f0f4f8] border-none rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-medium text-slate-600"
@@ -470,7 +509,6 @@
                   <option value="Presencial">Presencial</option>
                   <option value="Virtual">Virtual</option>
                 </select>
-
                 <select
                   id="nota_asistencia"
                   class="w-full bg-[#f0f4f8] border-none rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-medium text-slate-600"
@@ -479,7 +517,6 @@
                   <option value="Canceló con aviso">Canceló con aviso</option>
                   <option value="Faltó sin aviso">Faltó sin aviso</option>
                 </select>
-
                 <select
                   id="nota_riesgo"
                   class="w-full bg-green-50 border-none text-green-700 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold transition-colors"
@@ -490,14 +527,12 @@
                   <option value="Alto">Riesgo Alto (Rojo)</option>
                 </select>
               </div>
-
               <textarea
                 id="texto_nueva_nota"
                 rows="3"
                 class="w-full bg-[#f0f4f8] border-none rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
                 placeholder="Redacta los detalles y observaciones clínicas..."
               ></textarea>
-
               <div class="flex justify-end mt-3">
                 <button
                   type="button"
@@ -512,12 +547,9 @@
             <div
               id="contenedor_notas"
               class="space-y-4 border-l-2 border-slate-100 ml-3 pl-6"
-            >
-              <!-- Inyectado por JS -->
-            </div>
+            ></div>
           </div>
 
-          <!-- CONTENIDO: DATOS GENERALES -->
           <div id="tab_datos" class="tab-content hidden space-y-4">
             <div
               class="bg-slate-50 p-5 rounded-2xl border border-slate-100 mb-4"
@@ -580,7 +612,8 @@
                   <label
                     class="block text-slate-400 font-bold text-xs uppercase mb-1"
                     >Nombre completo</label
-                  ><input
+                  >
+                  <input
                     id="edit_ben_nombre"
                     type="text"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"
@@ -590,7 +623,8 @@
                   <label
                     class="block text-slate-400 font-bold text-xs uppercase mb-1"
                     >Fecha de Nacimiento</label
-                  ><input
+                  >
+                  <input
                     id="edit_ben_fecha_nac"
                     type="date"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"
@@ -600,7 +634,8 @@
                   <label
                     class="block text-slate-400 font-bold text-xs uppercase mb-1"
                     >Escuela</label
-                  ><input
+                  >
+                  <input
                     id="edit_ben_escuela"
                     type="text"
                     placeholder="Nombre de la escuela"
@@ -626,7 +661,8 @@
                   <label
                     class="block text-slate-400 font-bold text-xs uppercase mb-1"
                     >Colonia</label
-                  ><input
+                  >
+                  <input
                     id="edit_ben_colonia"
                     type="text"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"
@@ -716,7 +752,8 @@
                   <label
                     class="block text-slate-400 font-bold text-xs uppercase mb-1"
                     >Nombre del Tutor</label
-                  ><input
+                  >
+                  <input
                     id="edit_tutor_nombre"
                     type="text"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"
@@ -726,7 +763,8 @@
                   <label
                     class="block text-slate-400 font-bold text-xs uppercase mb-1"
                     >Teléfono</label
-                  ><input
+                  >
+                  <input
                     id="edit_tutor_telefono"
                     type="tel"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"
@@ -736,7 +774,8 @@
                   <label
                     class="block text-slate-400 font-bold text-xs uppercase mb-1"
                     >Correo</label
-                  ><input
+                  >
+                  <input
                     id="edit_tutor_correo"
                     type="email"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none"
@@ -762,7 +801,6 @@
             </div>
           </div>
 
-          <!-- CONTENIDO: DOCUMENTOS -->
           <div id="tab_docs" class="tab-content hidden">
             <div
               class="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center bg-slate-50 mb-6 hover:bg-slate-100 transition-colors"
@@ -791,9 +829,7 @@
               </button>
             </div>
             <h4 class="font-bold text-slate-800 mb-4">Archivos Guardados</h4>
-            <div id="contenedor_documentos" class="space-y-3">
-              <!-- Inyectado por JS -->
-            </div>
+            <div id="contenedor_documentos" class="space-y-3"></div>
           </div>
         </div>
       </div>
@@ -803,9 +839,6 @@
     <script src="js/notificaciones.js"></script>
     <script src="/js/incluir.js"></script>
     <script>
-      // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
-      // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
-      // pedirla de nuevo en cada subida.
       let _cloudinaryConfigCache = null;
       async function obtenerConfigCloudinary() {
         if (_cloudinaryConfigCache) return _cloudinaryConfigCache;
@@ -825,22 +858,78 @@
       let usuarioActual = null;
       window.expedientesDB = [];
       let paginaExpedientesActual = 1;
+      let columnaOrdenActual = "id";
+      let ordenAscendente = false;
 
-      // Punto de entrada: monta los parciales, valida la sesión y, si es válida, arranca la
-      // carga de catálogos y expedientes.
+      function ordenarExpedientes(columna) {
+        if (columnaOrdenActual === columna) {
+          ordenAscendente = !ordenAscendente;
+        } else {
+          columnaOrdenActual = columna;
+          ordenAscendente = true;
+        }
+
+        [
+          "id",
+          "paciente",
+          "tutor",
+          "escuela",
+          "especialista",
+          "estatus",
+        ].forEach((col) => {
+          const span = document.getElementById(`sort_${col}`);
+          if (span) {
+            if (col === columnaOrdenActual) {
+              span.innerText = ordenAscendente ? "▲" : "▼";
+            } else {
+              span.innerText = "";
+            }
+          }
+        });
+
+        const fuente =
+          window.expedientesFiltradosActuales || window.expedientesDB;
+        fuente.sort((a, b) => {
+          let valA = a[columna];
+          let valB = b[columna];
+
+          if (columna === "id") {
+            return ordenAscendente
+              ? Number(valA) - Number(valB)
+              : Number(valB) - Number(valA);
+          }
+
+          valA = (valA || "").toString().toLowerCase();
+          valB = (valB || "").toString().toLowerCase();
+
+          if (valA < valB) return ordenAscendente ? -1 : 1;
+          if (valA > valB) return ordenAscendente ? 1 : -1;
+          return 0;
+        });
+
+        paginaExpedientesActual = 1;
+        renderExpedientes(fuente);
+      }
+
       document.addEventListener("DOMContentLoaded", async () => {
         await incluirParcial("#sidebar-mount", "partials/navbar_admin.html");
         await incluirParcial("#header-mount", "partials/header_admin.html");
         incluirParcial("#footer-mount", "partials/footer_admin.html");
         marcarLinkActivoAdmin("#sidebar-mount [data-pagina]");
 
-        document.getElementById("buscador_principal").placeholder =
-          "Buscar por ID, paciente o tutor...";
-        document
-          .getElementById("buscador_principal")
-          .addEventListener("input", () => aplicarFiltros());
+        // Sincronizar el buscador global del header con la tabla de expedientes
+        const buscadorPrincipal = document.getElementById("buscador_principal");
+        if (buscadorPrincipal) {
+          buscadorPrincipal.placeholder = "Buscar por ID, paciente o tutor...";
+          buscadorPrincipal.addEventListener("input", (e) => {
+            const inputLocal = document.getElementById(
+              "input_busqueda_expedientes",
+            );
+            if (inputLocal) inputLocal.value = e.target.value;
+            aplicarFiltros();
+          });
+        }
 
-        // Carga de credenciales visuales
         const token = localStorage.getItem("token_sanctorum");
         if (!token) {
           window.location.replace("login");
@@ -861,20 +950,10 @@
           return;
         }
 
-        // Se espera a que carguen los catálogos (especialistas y escuelas) antes de
-        // revisar un posible traspaso de solicitud: abrirModalNuevoExpediente() (llamado
-        // desde manejarHandoffSolicitud) necesita el <select> de especialistas ya lleno.
         await cargarDatosIniciales();
         manejarHandoffSolicitud();
       });
 
-      // Si se llegó aquí desde el botón "Atender" de una solicitud de "Ayuda Psicológica"
-      // en Perfil (ver atenderSolicitud() en perfil.html — solo llega hasta acá si quien
-      // atiende es Admin o Psicólogo): abre el modal de nuevo expediente precargado con los
-      // datos de contacto. El remitente queda como paciente y como tutor por defecto — el
-      // staff corrige si en realidad son personas distintas. El motivo de la solicitud no
-      // tiene un campo propio en este formulario, así que se agrega como la primera Nota de
-      // Evolución en cuanto el expediente se crea (ver guardarExpediente).
       let solicitudHandoffPendiente = null;
       function manejarHandoffSolicitud() {
         const datos = leerYLimpiarHandoffSolicitud();
@@ -887,9 +966,6 @@
         solicitudHandoffPendiente = datos;
       }
 
-      // ================= CARGA DE DATOS PRINCIPALES =================
-      // Trae los catálogos (especialistas y escuelas) para llenar los <select> del modal de
-      // "Nuevo Expediente" y el filtro de especialista, y al final dispara cargarExpedientes().
       async function cargarDatosIniciales() {
         try {
           const resCat = await fetch(`${API_URL}/api/catalogos_expedientes`);
@@ -901,8 +977,10 @@
             const filtroEspecialista = document.getElementById(
               "filtro_especialista",
             );
+            const filtroEscuela = document.getElementById(
+              "filtro_escuela_tabla",
+            );
 
-            // Especialistas (Psicólogos)
             selEspecialista.innerHTML =
               '<option value="">Selecciona un psicólogo</option>';
             filtroEspecialista.innerHTML =
@@ -913,7 +991,6 @@
               filtroEspecialista.innerHTML += `<option value="${esp.nombre_completo}">${esp.nombre_completo}</option>`;
             });
 
-            // Si quien abre el modal es un psicólogo, se preselecciona a sí mismo por defecto.
             if (
               usuarioActual &&
               usuarioActual.rol === 2 &&
@@ -922,11 +999,18 @@
               selEspecialista.value = usuarioActual.id;
             }
 
-            // Escuelas
             selEscuela.innerHTML =
               '<option value="">Selecciona una escuela...</option><option value="0">Ninguna / No aplica</option>';
+            if (filtroEscuela) {
+              filtroEscuela.innerHTML =
+                '<option value="Todas">Cualquier Escuela</option>';
+            }
+
             cat.escuelas.forEach((esc) => {
               selEscuela.innerHTML += `<option value="${esc.id_escuela}">${esc.nombre_escuela}</option>`;
+              if (filtroEscuela) {
+                filtroEscuela.innerHTML += `<option value="${esc.nombre_escuela}">${esc.nombre_escuela}</option>`;
+              }
             });
             selEscuela.innerHTML +=
               '<option value="otra" class="font-bold text-primary">Otra escuela (Escribir...)</option>';
@@ -938,27 +1022,22 @@
         }
       }
 
-      // Trae la lista completa de expedientes del backend, la guarda en window.expedientesDB
-      // (fuente de verdad para los filtros locales) y la pinta en la tabla.
       async function cargarExpedientes() {
         try {
           const res = await fetch(`${API_URL}/api/expedientes`, {
             headers: authHeaders(),
           });
           const data = await res.json();
-
           if (data.success) {
             window.expedientesDB = data.data;
-            renderExpedientes(data.data);
+            window.expedientesFiltradosActuales = data.data;
+            ordenarExpedientes(columnaOrdenActual);
           }
         } catch (error) {
           console.error("Error al cargar los expedientes:", error);
         }
       }
 
-      // ================= FUNCIONES AUXILIARES =================
-      // Calcula la edad en años a partir de una fecha de nacimiento, ajustando si el
-      // cumpleaños de este año todavía no ha ocurrido.
       function calcularEdad(fechaString) {
         if (!fechaString) return "N/A";
         const hoy = new Date();
@@ -969,8 +1048,6 @@
         return edad + " años";
       }
 
-      // Recolorea el <select> de nivel de riesgo (verde/amarillo/rojo) según la opción
-      // elegida, para que el color sea una señal visual inmediata al capturar la nota.
       function cambiarColorRiesgo(select) {
         select.className =
           "w-full border-none rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold transition-colors";
@@ -981,9 +1058,6 @@
         else select.classList.add("bg-red-50", "text-red-700");
       }
 
-      // ================= FUNCIONES DE LA TABLA =================
-      // Dibuja los botones de paginación (anterior, hasta 5 números, siguiente) de la tabla
-      // de expedientes, deshabilitando los extremos cuando no hay a dónde avanzar/retroceder.
       function renderControlesPaginacionExpedientes(totalPaginas) {
         const cont = document.getElementById(
           "controles_paginacion_expedientes",
@@ -995,7 +1069,6 @@
 
         let botones = `<button onclick="irAPaginaExpedientes(${paginaExpedientesActual - 1})" ${paginaExpedientesActual === 1 ? "disabled" : ""} class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"><span class="material-symbols-outlined text-sm">chevron_left</span></button>`;
 
-        // Mostramos como máximo 5 números de página para no saturar la barra.
         let inicio = Math.max(1, paginaExpedientesActual - 2);
         let fin = Math.min(totalPaginas, inicio + 4);
         inicio = Math.max(1, fin - 4);
@@ -1010,8 +1083,6 @@
         cont.innerHTML = botones;
       }
 
-      // Cambia de página y vuelve a pintar la tabla usando la lista filtrada actual (o la
-      // completa si no hay filtro activo).
       function irAPaginaExpedientes(pagina) {
         paginaExpedientesActual = pagina;
         renderExpedientes(
@@ -1019,9 +1090,6 @@
         );
       }
 
-      // Pinta la tabla de expedientes para la lista dada, aplicando la paginación local (10
-      // por página) y armando el botón de "editar" con todos los datos del expediente
-      // incrustados en el onclick para no tener que volver a pedirlos al abrir el detalle.
       function renderExpedientes(lista) {
         const tbody = document.getElementById("lista_expedientes");
         tbody.innerHTML = "";
@@ -1038,7 +1106,6 @@
           return;
         }
 
-        // ---- Paginación: 10 registros por página ----
         const POR_PAGINA = 10;
         const totalPaginas = Math.ceil(total / POR_PAGINA);
         if (paginaExpedientesActual > totalPaginas)
@@ -1067,7 +1134,6 @@
             partes.length > 1
               ? (partes[0][0] + partes[1][0]).toUpperCase()
               : (exp.especialista || "NA").substring(0, 2).toUpperCase();
-
           const edad = exp.fecha_nacimiento
             ? calcularEdad(exp.fecha_nacimiento)
             : "N/A";
@@ -1079,12 +1145,18 @@
           const escuelaRaw = exp.escuela === "N/A" ? "" : exp.escuela;
 
           tbody.innerHTML += `
-                <tr class="hover:bg-slate-50/80 transition-colors group">
-                    <td class="px-6 py-4 font-bold text-slate-500 text-sm whitespace-nowrap">${exp.id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="px-4 py-3 text-center whitespace-nowrap">
+                        <button onclick="abrirModalDetalle('${exp.id}', \`${exp.paciente}\`, \`${exp.escuela}\`, '${exp.estatus}', \`${exp.tutor}\`, '${fechaIngresoFormateada}', \`${exp.especialista}\`, '${genero}', '${edad}', \`${colonia}\`, \`${exp.telefono_tutor || ""}\`, \`${exp.correo_tutor || ""}\`, '${fechaNacRaw}', \`${escuelaRaw}\`, ${exp.id_especialista || "null"})" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-secondary bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-full transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-[16px]">edit_document</span>
+                            <span>Abrir</span>
+                        </button>
+                    </td>
+                    <td class="px-3 py-3 font-bold text-slate-500 text-sm text-center">${exp.id}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-teal-800 flex items-center justify-center text-white border-2 border-white shadow-sm shrink-0">
-                                <span class="material-symbols-outlined text-[20px]">medical_mask</span>
+                            <div class="w-9 h-9 rounded-full bg-teal-800 flex items-center justify-center text-white shrink-0">
+                                <span class="material-symbols-outlined text-[18px]">medical_mask</span>
                             </div>
                             <div>
                                 <p class="font-bold text-slate-800 text-sm leading-tight">${exp.paciente}</p>
@@ -1092,66 +1164,85 @@
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm font-medium text-slate-600 whitespace-nowrap">${exp.tutor}</td>
-                    <td class="px-6 py-4 text-sm font-medium text-slate-500 whitespace-nowrap">${exp.escuela}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-3 text-sm font-medium text-slate-600">${exp.tutor}</td>
+                    <td class="px-4 py-3 text-sm font-medium text-slate-500">${exp.escuela}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
                         <div class="flex items-center gap-2">
                             <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold flex items-center justify-center shrink-0 border border-blue-200">${iniciales_esp}</div>
                             <span class="text-sm font-bold text-slate-700">${exp.especialista}</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                    <td class="px-3 py-3 text-center whitespace-nowrap">
                         <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${badgeClass}">${exp.estatus}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                        <button onclick="abrirModalDetalle('${exp.id}', \`${exp.paciente}\`, \`${exp.escuela}\`, '${exp.estatus}', \`${exp.tutor}\`, '${fechaIngresoFormateada}', \`${exp.especialista}\`, '${genero}', '${edad}', \`${colonia}\`, \`${exp.telefono_tutor || ""}\`, \`${exp.correo_tutor || ""}\`, '${fechaNacRaw}', \`${escuelaRaw}\`, ${exp.id_especialista || "null"})" class="text-slate-400 hover:text-secondary bg-white hover:bg-pink-50 p-2 rounded-full border border-transparent hover:border-pink-100 transition-all shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100">
-                            <span class="material-symbols-outlined text-[20px]">edit_document</span>
-                        </button>
                     </td>
                 </tr>
             `;
         });
       }
 
-      // Filtra window.expedientesDB por texto libre (id, paciente, tutor), especialista y
-      // estatus; guarda el resultado en window.expedientesFiltradosActuales para que la
-      // paginación pueda reutilizarlo sin recalcular el filtro en cada cambio de página.
+      // Filtrado global multidimensional por todos los campos
       function aplicarFiltros() {
-        const texto = document
-          .getElementById("buscador_principal")
-          .value.toLowerCase();
+        const inputLocal = document.getElementById(
+          "input_busqueda_expedientes",
+        );
+        const inputHeader = document.getElementById("buscador_principal");
+        const texto = (
+          (inputLocal ? inputLocal.value : "") ||
+          (inputHeader ? inputHeader.value : "")
+        )
+          .toLowerCase()
+          .trim();
+
         const fEsp = document.getElementById("filtro_especialista").value;
         const fEst = document.getElementById("filtro_estatus").value;
+        const fEsc = document.getElementById("filtro_escuela_tabla")
+          ? document.getElementById("filtro_escuela_tabla").value
+          : "Todas";
 
         const filtrados = window.expedientesDB.filter((exp) => {
+          // Búsqueda libre multidimensional en todos los campos disponibles
           const matchesText =
             !texto ||
-            exp.paciente.toLowerCase().includes(texto) ||
-            exp.tutor.toLowerCase().includes(texto) ||
-            exp.id.toString().includes(texto);
+            exp.id.toString().toLowerCase().includes(texto) ||
+            (exp.paciente || "").toLowerCase().includes(texto) ||
+            (exp.tutor || "").toLowerCase().includes(texto) ||
+            (exp.escuela || "").toLowerCase().includes(texto) ||
+            (exp.especialista || "").toLowerCase().includes(texto) ||
+            (exp.colonia_puebla || "").toLowerCase().includes(texto) ||
+            (exp.telefono_tutor || "").toLowerCase().includes(texto) ||
+            (exp.correo_tutor || "").toLowerCase().includes(texto) ||
+            (exp.estatus || "").toLowerCase().includes(texto);
+
           const matchesEsp = fEsp === "Todos" || exp.especialista === fEsp;
           const matchesEst = fEst === "Todos" || exp.estatus === fEst;
-          return matchesText && matchesEsp && matchesEst;
+          const matchesEsc = fEsc === "Todas" || exp.escuela === fEsc;
+
+          return matchesText && matchesEsp && matchesEst && matchesEsc;
         });
+
         window.expedientesFiltradosActuales = filtrados;
         paginaExpedientesActual = 1;
-        renderExpedientes(filtrados);
+        ordenarExpedientes(columnaOrdenActual);
       }
 
-      // Resetea buscador y selects de filtro a sus valores por defecto y vuelve a mostrar
-      // todos los expedientes.
       function limpiarFiltros() {
-        document.getElementById("buscador_principal").value = "";
+        const inputLocal = document.getElementById(
+          "input_busqueda_expedientes",
+        );
+        const inputHeader = document.getElementById("buscador_principal");
+        if (inputLocal) inputLocal.value = "";
+        if (inputHeader) inputHeader.value = "";
+
         document.getElementById("filtro_especialista").value = "Todos";
         document.getElementById("filtro_estatus").value = "Todos";
+        const fEsc = document.getElementById("filtro_escuela_tabla");
+        if (fEsc) fEsc.value = "Todas";
+
         window.expedientesFiltradosActuales = window.expedientesDB;
         paginaExpedientesActual = 1;
-        renderExpedientes(window.expedientesDB);
+        ordenarExpedientes(columnaOrdenActual);
       }
 
-      // ================= NUEVO EXPEDIENTE =================
-      // Muestra/oculta el input de texto libre para capturar el nombre de una escuela nueva
-      // cuando el usuario elige la opción "Otra escuela" en el <select> de escuelas.
       function toggleNuevaEscuela() {
         const select = document.getElementById("sel_escuela");
         const input = document.getElementById("input_nueva_escuela");
@@ -1168,8 +1259,6 @@
       function abrirModalNuevoExpediente() {
         document.getElementById("formNuevoExpediente").reset();
         toggleNuevaEscuela();
-        // El reset() del form borra cualquier selección previa, así que reaplicamos
-        // la preselección del psicólogo logueado (si aplica) después de resetear.
         if (
           usuarioActual &&
           usuarioActual.rol === 2 &&
@@ -1186,7 +1275,6 @@
         }, 10);
       }
 
-      // Cierra el modal de nuevo expediente con la animación de fade/scale.
       function cerrarModalNuevo() {
         document.getElementById("modalNuevo").classList.add("opacity-0");
         document.getElementById("modalNuevoContent").classList.add("scale-95");
@@ -1195,12 +1283,9 @@
         }, 300);
       }
 
-      // Envía el formulario de "Nuevo Expediente" (submit del form). Si se eligió "otra"
-      // escuela, manda el texto libre en escuela_nueva para que el backend la dé de alta.
       async function guardarExpediente(e) {
         e.preventDefault();
         const valEscuela = document.getElementById("sel_escuela").value;
-
         const payload = {
           nombre: document.getElementById("nom_paciente").value,
           fecha_nacimiento: document.getElementById("f_nacimiento").value,
@@ -1232,15 +1317,7 @@
           const data = await res.json();
           if (data.success) {
             cerrarModalNuevo();
-            cargarDatosIniciales(); // Recarga catálogos (por si hay escuela nueva) y expedientes
-
-            // Si este expediente vino del botón "Atender" de una solicitud de Ayuda
-            // Psicológica (ver manejarHandoffSolicitud arriba): el motivo original no
-            // tiene dónde ir en este formulario, así que se agrega como la primera
-            // Nota de Evolución del expediente recién creado (data.id_beneficiario —
-            // ver el RETURNING agregado en POST /api/expedientes). Recién hasta aquí,
-            // con el expediente Y la nota ya guardados, se marca la solicitud como
-            // Atendida — nunca antes de que la gestión real haya quedado hecha.
+            cargarDatosIniciales();
             if (solicitudHandoffPendiente) {
               const datosHandoff = solicitudHandoffPendiente;
               solicitudHandoffPendiente = null;
@@ -1282,11 +1359,6 @@
         }
       }
 
-      // ================= MODAL DETALLE, TABS Y NOTAS =================
-      // Abre el modal de detalle del expediente con los datos ya recibidos como argumentos
-      // (vienen incrustados en el botón de la fila, ver renderExpedientes), guarda el
-      // estado del expediente actual en variables globales, resetea el formulario de nueva
-      // nota y dispara la carga de notas y documentos desde el servidor.
       function abrirModalDetalle(
         id,
         nombre,
@@ -1311,8 +1383,6 @@
         document.getElementById("det_id").innerText = "ID: " + id;
         document.getElementById("det_nombre").innerText = nombre;
         document.getElementById("det_escuela").innerText = escuela;
-
-        // Inyectar Datos Generales
         document.getElementById("dg_ingreso").innerText = ingreso;
         document.getElementById("dg_especialista").innerText = especialista;
         document.getElementById("dg_tutor").innerText = tutor;
@@ -1329,21 +1399,14 @@
         document.getElementById("dg_genero").innerText = genero || "-";
         document.getElementById("dg_edad").innerText = edad || "-";
         document.getElementById("dg_colonia").innerText = colonia || "-";
-
-        // El select de estatus refleja el valor actual
         document.getElementById("det_estatus").value = estatus;
-
-        // Reiniciar Interfaz
         cambiarTab("notas");
         document.getElementById("texto_nueva_nota").value = "";
-
         const selectRiesgo = document.getElementById("nota_riesgo");
         selectRiesgo.value = "Bajo";
         cambiarColorRiesgo(selectRiesgo);
-
         cargarNotas(id);
         cargarDocumentos(id);
-
         document.getElementById("modalDetalle").classList.remove("hidden");
         setTimeout(() => {
           document.getElementById("modalDetalle").classList.remove("opacity-0");
@@ -1353,7 +1416,6 @@
         }, 10);
       }
 
-      // Cierra el modal de detalle del expediente con la animación de fade/scale.
       function cerrarModalDetalle() {
         document.getElementById("modalDetalle").classList.add("opacity-0");
         document
@@ -1364,8 +1426,6 @@
         }, 300);
       }
 
-      // Cambia entre las pestañas del modal de detalle (notas/datos/docs): oculta todos los
-      // paneles y desactiva todos los botones, luego muestra solo el panel y botón pedidos.
       function cambiarTab(tabName) {
         document.querySelectorAll(".tab-content").forEach((el) => {
           el.classList.add("hidden");
@@ -1375,18 +1435,13 @@
           btn.classList.replace("border-secondary", "border-transparent");
           btn.classList.replace("text-secondary", "text-slate-400");
         });
-
         document.getElementById(`tab_${tabName}`).classList.remove("hidden");
         document.getElementById(`tab_${tabName}`).classList.add("block");
-
         const activeBtn = document.getElementById(`tabBtn_${tabName}`);
         activeBtn.classList.replace("border-transparent", "border-secondary");
         activeBtn.classList.replace("text-slate-400", "text-secondary");
       }
 
-      // ================= NOTAS DE EVOLUCIÓN =================
-      // Trae el historial de notas clínicas del expediente y las pinta como una línea de
-      // tiempo (la más reciente resaltada), con su badge de nivel de riesgo.
       async function cargarNotas(id) {
         const contenedor = document.getElementById("contenedor_notas");
         contenedor.innerHTML =
@@ -1410,7 +1465,6 @@
                 "es-MX",
                 { dateStyle: "medium", timeStyle: "short" },
               );
-
               let badgeRiesgo =
                 '<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px]">Sin Clasificar</span>';
               if (nota.nivel_riesgo === "Bajo")
@@ -1422,7 +1476,6 @@
               else if (nota.nivel_riesgo === "Alto")
                 badgeRiesgo =
                   '<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-[10px]">Riesgo Alto</span>';
-
               contenedor.innerHTML += `
                     <div class="relative">
                       <span class="absolute -left-[31px] top-1 w-3 h-3 ${colorMarker} rounded-full ring-4 ring-white"></span>
@@ -1439,11 +1492,6 @@
                                   <span class="text-[10px] text-slate-500 font-bold">${escapeHtml(nota.tipo_sesion || "")} • ${escapeHtml(nota.modalidad || "")} • ${escapeHtml(nota.asistencia || "")}</span>
                               </div>
                           </div>
-                          <!-- H18 (auditoria de seguridad): el botón "Atender" de Perfil puede crear
-                               la primera nota de un expediente automáticamente a partir del mensaje
-                               libre de una solicitud pública sin autenticación (ver
-                               manejarHandoffSolicitud arriba) — contenido_nota puede traer HTML/JS
-                               de un remitente anónimo, así que se escapa antes de insertarlo. -->
                           <p class="text-sm text-slate-700 whitespace-pre-line">${escapeHtml(nota.contenido_nota)}</p>
                       </div>
                     </div>`;
@@ -1454,13 +1502,9 @@
         }
       }
 
-      // Guarda una nueva nota de evolución del formulario de captura rápida (tipo de sesión,
-      // modalidad, asistencia, riesgo y texto libre); toma el id del especialista del propio
-      // token JWT en localStorage en vez de un campo del formulario.
       async function guardarNota() {
         const texto = document.getElementById("texto_nueva_nota").value.trim();
         if (!texto) return alert("La nota está vacía.");
-
         const token = localStorage.getItem("token_sanctorum");
         let id_esp = null;
         if (token) {
@@ -1468,7 +1512,6 @@
             id_esp = decodeJWT(token).id;
           } catch (e) {}
         }
-
         const payload = {
           id_especialista: id_esp,
           nota: texto,
@@ -1477,7 +1520,6 @@
           asistencia: document.getElementById("nota_asistencia").value,
           nivel_riesgo: document.getElementById("nota_riesgo").value,
         };
-
         try {
           const res = await fetch(
             `${API_URL}/api/expedientes/${expedienteActualId}/notas`,
@@ -1498,9 +1540,6 @@
         }
       }
 
-      // ================= EDITAR DATOS DEL TUTOR =================
-      // Alterna entre la vista de solo lectura y el formulario de edición del tutor; al
-      // entrar en modo edición precarga los inputs con los valores actualmente mostrados.
       function toggleEditarTutor() {
         const vista = document.getElementById("vista_tutor");
         const edicion = document.getElementById("edicion_tutor");
@@ -1519,7 +1558,6 @@
         }
       }
 
-      // --- Edición de datos del Beneficiario (nombre, fecha de nacimiento, escuela, género, colonia) ---
       function toggleEditarBeneficiario() {
         const vista = document.getElementById("vista_beneficiario");
         const edicion = document.getElementById("edicion_beneficiario");
@@ -1546,8 +1584,6 @@
             coloniaActual === "No especificada" || coloniaActual === "-"
               ? ""
               : coloniaActual;
-
-          // Reasignar especialista: accion administrativa, solo visible para Admin.
           const wrapEsp = document.getElementById("wrap_edit_ben_especialista");
           if (usuarioActual && usuarioActual.rol === 1) {
             const selEsp = document.getElementById("edit_ben_especialista");
@@ -1567,9 +1603,6 @@
         }
       }
 
-      // Guarda los datos generales del beneficiario editados en el formulario. Si quien
-      // edita es Admin y cambió el especialista asignado, hace una segunda llamada aparte
-      // a /especialista, porque el backend trata la reasignación como una acción distinta.
       async function guardarBeneficiario() {
         const payload = {
           nombre: document.getElementById("edit_ben_nombre").value,
@@ -1590,9 +1623,6 @@
             },
           );
           const data = await res.json();
-
-          // Reasignacion de especialista: solo Admin ve el control, y es una llamada
-          // aparte porque el backend la trata como una accion administrativa distinta.
           if (usuarioActual && usuarioActual.rol === 1) {
             const selEsp = document.getElementById("edit_ben_especialista");
             const nuevoIdEspecialista = selEsp.value || null;
@@ -1628,7 +1658,6 @@
               }
             }
           }
-
           if (data.success) {
             document.getElementById("det_nombre").innerText =
               payload.nombre || document.getElementById("det_nombre").innerText;
@@ -1659,7 +1688,6 @@
         }
       }
 
-      // Guarda los datos del tutor (nombre, teléfono, correo) editados en el formulario.
       async function guardarTutor() {
         const payload = {
           tutor: document.getElementById("edit_tutor_nombre").value,
@@ -1694,7 +1722,6 @@
         }
       }
 
-      // Elimina un documento adjunto del expediente tras confirmar.
       function eliminarDocumento(idDoc) {
         if (
           !confirm(
@@ -1717,9 +1744,6 @@
           });
       }
 
-      // ================= DOCUMENTOS Y CLOUDINARY =================
-      // Trae la lista de documentos adjuntos del expediente y la pinta con su ícono
-      // (PDF o imagen, según la extensión de la URL) y botones de descarga/eliminar.
       async function cargarDocumentos(id) {
         const contenedor = document.getElementById("contenedor_documentos");
         contenedor.innerHTML =
@@ -1743,7 +1767,6 @@
               const fechaFormat = new Date(doc.fecha_subida).toLocaleDateString(
                 "es-MX",
               );
-
               contenedor.innerHTML += `
                     <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl">
                         <div class="flex items-center gap-3 overflow-hidden">
@@ -1774,13 +1797,9 @@
       async function subirDocumentoCloudinary(event) {
         const file = event.target.files[0];
         if (!file) return;
-
         const btnText = document.getElementById("btn_upload_text");
         btnText.innerText = "Subiendo...";
         btnText.disabled = true;
-
-        // Config leída del backend (que a su vez la lee de las variables de entorno
-        // CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET).
         const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } =
           await obtenerConfigCloudinary();
         if (!CLOUD_NAME || !UPLOAD_PRESET) {
@@ -1791,15 +1810,10 @@
           btnText.disabled = false;
           return;
         }
-
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", UPLOAD_PRESET);
-
         try {
-          // Los PDF deben subirse como "raw": Cloudinary bloquea por seguridad la entrega
-          // de PDFs cuando se suben/sirven como "image" (que es lo que "auto" elige para
-          // archivos PDF), y esos documentos terminan con un enlace que nunca abre.
           const esPdf =
             file.type === "application/pdf" ||
             file.name.toLowerCase().endsWith(".pdf");
@@ -1811,7 +1825,6 @@
             },
           );
           const uploadData = await uploadRes.json();
-
           if (uploadData.secure_url) {
             const dbRes = await fetch(
               `${API_URL}/api/expedientes/${expedienteActualId}/documentos`,
@@ -1849,7 +1862,6 @@
         }
       }
 
-      // ================= ESTATUS CLÍNICO =================
       async function cambiarEstatusExpediente(nuevoEstatus) {
         try {
           const res = await fetch(
@@ -1862,7 +1874,7 @@
           );
           const data = await res.json();
           if (data.success) {
-            cargarExpedientes(); // Refresca la tabla principal por detrás
+            cargarExpedientes();
           } else {
             alert("Error al actualizar estatus");
           }
