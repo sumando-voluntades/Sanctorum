@@ -68,21 +68,6 @@
         <div
           class="flex flex-wrap gap-3 mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 items-center w-full"
         >
-          <!-- Buscador directo en la vista -->
-          <div class="relative flex-1 min-w-[240px]">
-            <span
-              class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"
-              >search</span
-            >
-            <input
-              id="input_busqueda_expedientes"
-              type="text"
-              oninput="aplicarFiltros()"
-              placeholder="Buscar en todos los campos (ID, nombre, tutor, escuela, especialista)..."
-              class="w-full pl-10 pr-4 py-2.5 bg-[#f0f4f8] border-none rounded-full text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-pink-500/20"
-            />
-          </div>
-
           <span
             class="text-sm font-bold text-slate-400 px-1 uppercase tracking-widest text-[10px]"
             >Filtros:</span
@@ -139,12 +124,6 @@
                   class="bg-slate-50 text-slate-400 text-xs uppercase tracking-widest border-b border-slate-100 select-none"
                 >
                   <th class="px-4 py-4 font-bold text-center w-24">Acción</th>
-                  <th
-                    onclick="ordenarExpedientes('id')"
-                    class="px-3 py-4 font-bold text-center cursor-pointer hover:text-secondary transition-colors"
-                  >
-                    ID <span id="sort_id" class="text-[10px]">▼</span>
-                  </th>
                   <th
                     onclick="ordenarExpedientes('paciente')"
                     class="px-4 py-4 font-bold cursor-pointer hover:text-secondary transition-colors"
@@ -1152,7 +1131,6 @@
                             <span>Abrir</span>
                         </button>
                     </td>
-                    <td class="px-3 py-3 font-bold text-slate-500 text-sm text-center">${exp.id}</td>
                     <td class="px-4 py-3 whitespace-nowrap">
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 rounded-full bg-teal-800 flex items-center justify-center text-white shrink-0">
