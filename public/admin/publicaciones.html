@@ -15,7 +15,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/output.css" />
-    </script>
     <style>
       .material-symbols-outlined {
         font-variation-settings:
@@ -56,6 +55,10 @@
             <p class="text-slate-500 max-w-xl">
               Noticias, avisos y eventos que alimentan la página pública (Inicio
               y Comunidad).
+            </p>
+            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
+              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+              <span>Voluntarios y Especialistas solo ven las publicaciones que ellos mismos crearon; Coordinadores y Administradores ven todas. El contenido se muestra tal cual en la página pública, revisa la redacción antes de publicar.</span>
             </p>
           </div>
           <button
@@ -929,6 +932,7 @@
         try {
           const res = await fetch(
             `${API_URL}/api/publicaciones?incluir_historias=1`,
+            { headers: authHeaders() },
           );
           const json = await res.json();
           if (json.success) {

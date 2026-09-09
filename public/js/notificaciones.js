@@ -49,6 +49,11 @@ async function cargarNotificaciones() {
             notificaciones.unshift({ id: 'solicitudes_pendientes', icono: 'mail', color: 'bg-purple-100 text-purple-600',
                 titulo: 'Solicitudes pendientes', detalle: `${json.data.solicitudes_pendientes} solicitud(es) esperan revisión.` });
         }
+        // Solo llega distinto de 0 para Admin/Coordinador (el backend ya lo filtra por rol).
+        if (json.data.encuestas_por_revisar > 0) {
+            notificaciones.unshift({ id: 'encuestas_por_revisar', icono: 'reviews', color: 'bg-red-100 text-red-600',
+                titulo: 'Encuestas insatisfactorias sin revisar', detalle: `${json.data.encuestas_por_revisar} encuesta(s) con calificación baja esperan revisión en tu Perfil.` });
+        }
         if (json.data.insumos_bajo_stock > 0) {
             notificaciones.unshift({ id: 'bajo_stock', icono: 'inventory_2', color: 'bg-amber-100 text-amber-700',
                 titulo: 'Insumos en bajo stock', detalle: `${json.data.insumos_bajo_stock} insumo(s) necesitan reabastecerse.` });

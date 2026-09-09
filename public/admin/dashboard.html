@@ -16,7 +16,6 @@
     />
     <link rel="stylesheet" href="/css/output.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    </script>
     <style>
       .material-symbols-outlined {
         font-variation-settings:
@@ -56,6 +55,10 @@
             </h2>
             <p id="saludo_admin" class="text-slate-500 max-w-xl">
               Bienvenida de nuevo. Aquí está el impacto de hoy.
+            </p>
+            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
+              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+              <span>Este panel es solo de lectura: resume la actividad de los demás módulos. Usa "Generar Reporte" para exportar un resumen de un rango de fechas.</span>
             </p>
           </div>
           <button
@@ -840,6 +843,20 @@
             nombre_insumo: "Insumo relacionado",
           },
         },
+        satisfaccion: {
+          nombre: "Satisfacción",
+          columnas: {
+            fecha_respuesta: "Fecha de respuesta",
+            beneficiario: "Beneficiario",
+            especialista: "Especialista",
+            calificacion: "Calificación general (1-5)",
+            calificacion_especialista: "Trato del especialista (1-5)",
+            calificacion_puntualidad: "Puntualidad (1-5)",
+            utilidad_sesion: "¿La sesión ayudó?",
+            probabilidad_recomendar: "Probabilidad de recomendar (0-10)",
+            comentarios: "Comentarios",
+          },
+        },
       };
 
       // Convierte las filas crudas del backend en una hoja de Excel (SheetJS) usando los
@@ -872,7 +889,7 @@
         try {
           const tipos =
             tipo === "todo"
-              ? ["voluntarios", "eventos", "beneficiarios", "donativos"]
+              ? ["voluntarios", "eventos", "beneficiarios", "donativos", "satisfaccion"]
               : [tipo];
           const wb = XLSX.utils.book_new();
           let huboDatos = false;
@@ -956,6 +973,7 @@
               <option value="eventos">Eventos y Visitas</option>
               <option value="beneficiarios">Beneficiarios</option>
               <option value="donativos">Donativos</option>
+              <option value="satisfaccion">Satisfacción de Beneficiarios</option>
             </select>
           </div>
           <div class="grid grid-cols-2 gap-4">

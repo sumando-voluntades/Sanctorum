@@ -55,6 +55,10 @@
             <p class="text-slate-500 max-w-xl">
               Registro y seguimiento psicológico confidencial de beneficiarios.
             </p>
+            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
+              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+              <span>Esta información es confidencial: solo Administradores y Especialistas de Psicología pueden verla y editarla. No compartas datos de beneficiarios fuera de este panel.</span>
+            </p>
           </div>
           <button
             onclick="abrirModalNuevoExpediente()"
@@ -1740,11 +1744,55 @@
               return;
             }
             data.data.forEach((doc) => {
-              const isPdf = doc.url_archivo.toLowerCase().endsWith(".pdf");
+              const fechaFormat = doc.fecha_subida
+                ? new Date(doc.fecha_subida).toLocaleDateString("es-MX")
+                : "";
+
+              // Las encuestas de satisfacción respondidas (RF-15) se muestran aquí mismo,
+              // pero no son un archivo descargable: se pintan como una tarjeta de solo
+              // lectura con la calificación y el comentario.
+              if (doc.origen === "encuesta") {
+                const pintarEstrellas = (n) =>
+                  "★".repeat(n || 0) + "☆".repeat(5 - (n || 0));
+                const colorCal =
+                  doc.calificacion <= 2
+                    ? "text-red-500"
+                    : doc.calificacion === 3
+                      ? "text-amber-500"
+                      : "text-green-600";
+                // Las 4 preguntas ampliadas (RF-15 v2) pueden venir vacías si la respuesta
+                // se guardó antes de la migración v2 — se muestran solo las que sí llegaron.
+                const filasExtra = [
+                  doc.calificacion_especialista
+                    ? `<span>Trato del especialista: <b class="text-slate-600">${pintarEstrellas(doc.calificacion_especialista)}</b></span>`
+                    : "",
+                  doc.calificacion_puntualidad
+                    ? `<span>Puntualidad: <b class="text-slate-600">${pintarEstrellas(doc.calificacion_puntualidad)}</b></span>`
+                    : "",
+                  doc.utilidad_sesion
+                    ? `<span>¿Le ayudó?: <b class="text-slate-600">${escapeHtml(doc.utilidad_sesion)}</b></span>`
+                    : "",
+                  doc.probabilidad_recomendar !== null && doc.probabilidad_recomendar !== undefined
+                    ? `<span>Recomendaría (0-10): <b class="text-slate-600">${doc.probabilidad_recomendar}</b></span>`
+                    : "",
+                ].filter(Boolean);
+                contenedor.innerHTML += `
+                    <div class="flex items-start gap-3 p-3 bg-white border border-slate-200 rounded-xl">
+                        <div class="w-10 h-10 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">reviews</span>
+                        </div>
+                        <div class="truncate flex-1">
+                            <p class="text-sm font-bold text-slate-700">Encuesta de Satisfacción <span class="${colorCal}">${pintarEstrellas(doc.calificacion)}</span></p>
+                            ${filasExtra.length ? `<div class="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-slate-400 mt-1">${filasExtra.join("")}</div>` : ""}
+                            ${doc.comentarios ? `<p class="text-xs text-slate-500 mt-1">${escapeHtml(doc.comentarios)}</p>` : ""}
+                            <p class="text-[10px] text-slate-400 mt-1">Respondida el ${fechaFormat}</p>
+                        </div>
+                    </div>`;
+                return;
+              }
+
+              const isPdf = (doc.url_archivo || "").toLowerCase().endsWith(".pdf");
               const icon = isPdf ? "picture_as_pdf" : "image";
-              const fechaFormat = new Date(doc.fecha_subida).toLocaleDateString(
-                "es-MX",
-              );
               contenedor.innerHTML += `
                     <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl">
                         <div class="flex items-center gap-3 overflow-hidden">

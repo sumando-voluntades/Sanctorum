@@ -16,7 +16,6 @@
     />
     <link rel="stylesheet" href="/css/output.css" />
     
-    </script>
     <style>
       .material-symbols-outlined {
         font-variation-settings:
@@ -57,6 +56,10 @@
             <p class="text-slate-500 max-w-xl">
               Registro de qué se hizo, qué se utilizó y cuántas personas
               asistieron a cada actividad realizada.
+            </p>
+            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
+              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+              <span>Registra asistentes y materiales reales: los materiales indicados aquí descuentan inventario. Solo ves los reportes que tú generaste; Coordinadores y Administradores ven todos.</span>
             </p>
           </div>
           <button
@@ -410,7 +413,9 @@
       // Trae todos los reportes de evento y los guarda en reportesGlobal antes de pintarlos.
       async function cargarReportes() {
         try {
-          const res = await fetch(`${API_URL}/api/reportes_evento`);
+          const res = await fetch(`${API_URL}/api/reportes_evento`, {
+            headers: authHeaders(),
+          });
           const json = await res.json();
           if (json.success) {
             reportesGlobal = json.data;

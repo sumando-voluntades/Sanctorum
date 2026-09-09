@@ -15,7 +15,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/output.css" />
-    </script>
     <style>
       .material-symbols-outlined {
         font-variation-settings:
@@ -56,6 +55,10 @@
             <p class="text-slate-500 max-w-xl">
               Eventos, reuniones escolares y citas clínicas — todo en un solo
               lugar.
+            </p>
+            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
+              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+              <span>Al agendar una cita clínica, verifica que el especialista y el beneficiario sean los correctos: un Especialista solo puede agendarse a sí mismo y solo ve a los beneficiarios que tiene asignados a su cargo.</span>
             </p>
           </div>
           <button
@@ -1086,6 +1089,14 @@
             json.beneficiarios.forEach((b) => {
               selBen.innerHTML += `<option value="${b.id_beneficiario}">${b.nombre_completo}</option>`;
             });
+
+            // Un psicólogo solo puede agendarse a sí mismo: el select de especialista se
+            // bloquea con su propio nombre fijo (el backend ya filtró los beneficiarios de
+            // arriba a solo los suyos, y vuelve a validar todo esto también del lado servidor).
+            if (esUsuarioPsicologo) {
+              selPsi.value = userIdActual;
+              selPsi.disabled = true;
+            }
           }
         } catch (e) {
           console.error("Error catálogos", e);
@@ -1818,7 +1829,7 @@
                         ev.categoria === "evento"
                           ? ev.ya_asignado
                             ? `<span class="flex-1 md:flex-none text-xs font-bold text-green-700 bg-green-50 px-4 py-2.5 rounded-lg text-center border border-green-100">Ya estás en el equipo</span>`
-                            : `<button onclick="unirseAEvento(${ev.id})" class="flex-1 md:flex-none text-xs font-bold text-purple-700 hover:text-white bg-purple-50 hover:bg-purple-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Unirse</button>`
+                            : `<button onclick="unirseAEvento(${ev.id}, this)" class="flex-1 md:flex-none text-xs font-bold text-purple-700 hover:text-white bg-purple-50 hover:bg-purple-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Unirse</button>`
                           : ""
                       }
                       ${ev.categoria === "visita" && ev.estatus !== "Realizado" ? `<button onclick="completarVisita(${ev.id})" class="flex-1 md:flex-none text-xs font-bold text-teal-700 hover:text-white bg-teal-50 hover:bg-teal-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Marcar Realizada</button>` : ""}
@@ -1834,7 +1845,16 @@
 
       // Permite que el usuario actual se agregue como voluntario/staff a un evento
       // operativo existente, sin pasar por el modal de edición completo.
-      async function unirseAEvento(idEvento) {
+      async function unirseAEvento(idEvento, btn) {
+        // Feedback inmediato: sin esto, el clic no mostraba ningún cambio hasta que
+        // terminaba de recargarse toda la vista (POST + 3 recargas), lo que se sentía
+        // como un retraso o un clic que "no hizo nada".
+        const textoOriginal = btn ? btn.innerText : "";
+        if (btn) {
+          btn.disabled = true;
+          btn.innerText = "Uniendo...";
+          btn.classList.add("opacity-60", "cursor-not-allowed");
+        }
         try {
           const res = await fetch(
             `${API_URL}/api/agenda/evento/${idEvento}/unirse`,
@@ -1845,10 +1865,20 @@
             recargarVistaActual();
           } else {
             alert(data.message || "No se pudo registrar tu participación.");
+            if (btn) {
+              btn.disabled = false;
+              btn.innerText = textoOriginal;
+              btn.classList.remove("opacity-60", "cursor-not-allowed");
+            }
           }
         } catch (e) {
           console.error(e);
           alert("Error de conexión.");
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = textoOriginal;
+            btn.classList.remove("opacity-60", "cursor-not-allowed");
+          }
         }
       }
 

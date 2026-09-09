@@ -152,6 +152,91 @@ const transporter = nodemailer.createTransport({
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
+// Envía un correo sin bloquear la respuesta al cliente. El SMTP de Gmail puede tardar
+// varios segundos en responder; si cada ruta esperara (`await`) ese envío antes de
+// contestar, el botón que disparó la acción se sentiría "trabado" ese mismo tiempo aunque
+// la acción real (guardar en la base de datos) ya haya terminado. El correo es una
+// notificación secundaria: se dispara en segundo plano y cualquier falla solo se registra
+// en consola, nunca hace fallar la petición original.
+function enviarCorreoAsync(opciones, contexto) {
+    transporter.sendMail(opciones).catch(err => {
+        console.error(`No se pudo enviar el correo (${contexto || 'sin contexto'}):`, err);
+    });
+}
+
+// ==========================================
+// ENCUESTA DE SATISFACCIÓN POST-CONSULTA (RF-15)
+// Requiere la tabla Encuestas_Satisfaccion — ver migracion_encuestas_satisfaccion.sql.
+// Se dispara desde POST /api/expedientes/:id/notas cuando asistencia === 'Asistió'.
+// ==========================================
+
+// Crea el registro de la encuesta (con un token de un solo uso) y le manda al tutor el
+// enlace por correo. No bloquea nada: si el beneficiario no tiene correo de tutor
+// registrado, o si la tabla todavía no existe (falta correr la migración), no hace nada —
+// nunca debe hacer fallar el guardado de la nota clínica que la dispara.
+async function enviarEncuestaSatisfaccion(idBeneficiario, idEspecialista) {
+    const benRes = await pool.query('SELECT nombre_completo, nombre_tutor, correo_tutor FROM Beneficiarios WHERE id_beneficiario = $1', [idBeneficiario]);
+    const ben = benRes.rows[0];
+    if (!ben || !ben.correo_tutor) return;
+
+    const token = crypto.randomBytes(24).toString('hex');
+    await pool.query(
+        'INSERT INTO Encuestas_Satisfaccion (id_beneficiario, id_especialista, token) VALUES ($1, $2, $3)',
+        [idBeneficiario, idEspecialista || null, token]
+    );
+
+    // Mismo dominio de producción provisional que usa el resto de los correos del sistema
+    // (ver Variables_de_Entorno_y_Checklist_Despliegue.docx, sección de CORS) — actualizar
+    // aquí también el día que se confirme el dominio final.
+    const enlace = `https://sanctorum-sitio.vercel.app/encuesta_satisfaccion?token=${token}`;
+    const contenido = `
+        <p>Hola <b>${ben.nombre_tutor || 'tutor(a)'}</b>,</p>
+        <p>Nos gustaría conocer tu opinión sobre la sesión de <b>${ben.nombre_completo}</b>. Tu respuesta nos ayuda a mejorar el servicio — toma menos de un minuto.</p>
+        <div style="text-align:center;margin:25px 0;">
+            <a href="${enlace}" style="background-color:#b50062;color:#ffffff;padding:14px 28px;text-decoration:none;border-radius:30px;font-weight:bold;display:inline-block;">Responder encuesta</a>
+        </div>
+        <p style="font-style:italic;color:#877362;text-align:center;">"Sumando Voluntades"</p>
+    `;
+    enviarCorreoAsync({
+        from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
+        to: ben.correo_tutor,
+        subject: 'Cuéntanos cómo te fue - Sanctorum A.C.',
+        html: emailTemplate('Encuesta de Satisfacción', contenido)
+    }, 'encuesta de satisfacción');
+}
+
+// Avisa a Coordinadores y Administradores cuando llega una calificación insatisfactoria
+// (1 o 2 de 5), para que puedan darle seguimiento al caso.
+async function avisarEncuestaInsatisfactoria(idBeneficiario, calificacion, comentarios, detalle = {}) {
+    const benRes = await pool.query('SELECT nombre_completo FROM Beneficiarios WHERE id_beneficiario = $1', [idBeneficiario]);
+    const nombreBen = benRes.rows[0]?.nombre_completo || 'un beneficiario';
+    const staffRes = await pool.query("SELECT correo FROM Usuarios WHERE id_rol IN (1, 3) AND correo IS NOT NULL AND COALESCE(estatus,'Activo') != 'Inactivo'");
+    const correos = staffRes.rows.map(r => r.correo).filter(Boolean);
+    if (correos.length === 0) return;
+
+    const { calificacionEspecialista, calificacionPuntualidad, utilidadSesion, probabilidadRecomendar } = detalle;
+    const filasDetalle = [
+        calificacionEspecialista ? `<li>Trato del especialista: <b>${calificacionEspecialista} de 5</b></li>` : '',
+        calificacionPuntualidad ? `<li>Puntualidad: <b>${calificacionPuntualidad} de 5</b></li>` : '',
+        utilidadSesion ? `<li>¿La sesión le ayudó?: <b>${escapeHtmlServidor(utilidadSesion)}</b></li>` : '',
+        (probabilidadRecomendar !== undefined && probabilidadRecomendar !== null) ? `<li>Probabilidad de recomendar: <b>${probabilidadRecomendar} de 10</b></li>` : '',
+    ].filter(Boolean).join('');
+
+    const contenido = `
+        <p>Hola,</p>
+        <p>Se recibió una calificación insatisfactoria (<b>${calificacion} de 5</b>) en la encuesta de satisfacción de <b>${escapeHtmlServidor(nombreBen)}</b>.</p>
+        ${filasDetalle ? `<ul>${filasDetalle}</ul>` : ''}
+        ${comentarios ? `<p><b>Comentarios:</b> ${escapeHtmlServidor(comentarios)}</p>` : ''}
+        <p>Entra a tu perfil dentro de la plataforma (sección "Encuestas por revisar") o al expediente del beneficiario para darle seguimiento.</p>
+    `;
+    enviarCorreoAsync({
+        from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
+        to: correos.join(','),
+        subject: 'Alerta: encuesta de satisfacción insatisfactoria - Sanctorum A.C.',
+        html: emailTemplate('Encuesta con calificación baja', contenido)
+    }, 'alerta de encuesta insatisfactoria');
+}
+
 // Si en "Material a utilizar" se escogió "Otro: escribir...", se da de alta un Insumo nuevo
 // (con el stock inicial igual a lo que se va a usar, para que quede en 0 tras el consumo) en
 // vez de fallar por no existir en el catálogo. Si ya viene un id de insumo real, se usa tal cual.
@@ -348,6 +433,20 @@ function verificarToken(req, res, next) {
     });
 }
 
+// Igual que verificarToken, pero para rutas públicas que cambian de comportamiento si quien
+// pregunta ya está identificado (ej. /api/publicaciones filtrando por autor desde el panel).
+// No bloquea la petición: si no hay token, o es inválido/expiró, simplemente devuelve null.
+function usuarioOpcional(req) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) return null;
+    try {
+        return jwt.verify(token, process.env.JWT_SECRET);
+    } catch (e) {
+        return null;
+    }
+}
+
 // Roles: 1=Admin, 2=Especialista, 3=Coordinador, 4=Voluntario, 5=Donador
 const ROL_ADMIN = 1, ROL_ESPECIALISTA = 2, ROL_COORDINADOR = 3, ROL_VOLUNTARIO = 4;
 
@@ -439,15 +538,15 @@ app.post('/api/auth/recuperar', async (req, res) => {
 
         const contenidoCorreo = `<p>Hola <b>${voluntario.nombre_completo}</b>,</p><p>Tu nueva contraseña temporal es: <span style="background: #ffd9e2; padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 16px;">${tempPassword}</span></p><p>Cámbiala inmediatamente al iniciar sesión.</p>`;
         
-        // Enviamos el correo
-        await transporter.sendMail({ 
-            from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`, 
-            to: correo, 
-            subject: 'Recuperación de Acceso', 
-            html: emailTemplate('Restablecimiento', contenidoCorreo) 
-        });
-
+        // Respondemos primero (el mensaje es siempre el mismo, exista o no la cuenta) y
+        // el correo real se envía después, sin bloquear la respuesta.
         res.json(MENSAJE_RECUPERAR_GENERICO);
+        enviarCorreoAsync({
+            from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
+            to: correo,
+            subject: 'Recuperación de Acceso',
+            html: emailTemplate('Restablecimiento', contenidoCorreo)
+        }, 'recuperar contraseña');
     } catch (err) { 
         console.error("ERROR DE GMAIL AL RECUPERAR:", err); // <-- Esto te dirá el error exacto en tu terminal
         res.status(500).json({ success: false }); 
@@ -542,14 +641,13 @@ app.post('/api/usuarios', async (req, res) => {
             </div>
         `;
 
-        await transporter.sendMail({
+        res.status(201).json({ success: true });
+        enviarCorreoAsync({
             from: `"Sumando Voluntades Sanctórum" <${process.env.EMAIL_USER}>`,
             to: correo,
             subject: 'Solicitud Recibida - Sumando Voluntades Sanctórum',
             html: emailTemplate('¡Gracias por tu interés!', contenidoRegistro, 'Construyendo comunidad paso a paso')
-        });
-
-        res.status(201).json({ success: true });
+        }, 'confirmación de registro de voluntario');
     } catch (error) { 
         console.error("ERROR DE GMAIL AL REGISTRAR:", error); // <-- Te avisará si Google bloquea el envío
         res.status(500).json({ success: false }); 
@@ -623,18 +721,18 @@ app.post('/api/entrevistas', async (req, res) => {
             <p style="font-style: italic; color: #877362; text-align: center; margin-top: 30px;">"Sumando Voluntades"</p>
         `;
 
-        // 4. Enviamos el correo
-        await transporter.sendMail({
+        // 4. Respondemos ya (lo importante — el evento y el estatus del usuario — quedó
+        // guardado) y el correo se envía después, sin bloquear al botón que disparó esto.
+        res.json({ success: true });
+        enviarCorreoAsync({
             from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
             to: correo,
             subject: tituloCorreo + ' - Sanctorum A.C.',
             html: emailTemplate(tituloCorreo, contenidoCorreo)
-        });
-
-        res.json({ success: true });
-    } catch (err) { 
-        console.error("ERROR DE GMAIL AL AGENDAR ENTREVISTA:", err);
-        res.status(500).json({ success: false }); 
+        }, 'entrevista agendada');
+    } catch (err) {
+        console.error("ERROR AL AGENDAR ENTREVISTA:", err);
+        res.status(500).json({ success: false });
     }
 });
 
@@ -674,17 +772,19 @@ app.put('/api/voluntarios/:id/asignar', verificarToken, requiereRol(ROL_ADMIN, R
             </div>
         `;
 
-        await transporter.sendMail({
+        // El perfil ya quedó activado y guardado; respondemos de inmediato para que el
+        // botón "Aprobar" no se quede esperando al envío del correo con las credenciales
+        // (Gmail puede tardar varios segundos). El correo se manda justo después, en segundo plano.
+        res.json({ success: true });
+        enviarCorreoAsync({
             from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
             to: voluntario.correo,
             subject: '¡Felicidades! Eres oficialmente parte de Sanctorum A.C.',
             html: emailTemplate('¡Bienvenido al Equipo!', contenidoCorreo)
-        });
-
-        res.json({ success: true });
-    } catch(err) { 
+        }, 'credenciales de voluntario aprobado');
+    } catch(err) {
         console.error("Error al aprobar:", err);
-        res.status(500).json({ success: false }); 
+        res.status(500).json({ success: false });
     }
 });
 
@@ -904,17 +1004,17 @@ app.put('/api/usuarios/:id/documento_profesional', verificarToken, async (req, r
                 // valor de prueba (ej. Admin@Admin.com), el aviso rebotará aunque el envío
                 // en sí funcione — hay que actualizar ese correo real desde Perfil.
                 console.log(`Aviso de documento pendiente enviado a: ${correos.join(', ')}`);
-                await transporter.sendMail({
+                enviarCorreoAsync({
                     from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
                     to: correos.join(','),
                     subject: 'Documento profesional pendiente de revisión - Sanctorum A.C.',
                     html: emailTemplate('Nuevo documento por revisar', contenidoAviso)
-                });
+                }, 'aviso de documento pendiente');
             } else {
                 console.log('Aviso de documento pendiente: no hay ningún Admin/Coordinador con correo registrado, no se envió nada.');
             }
         } catch (mailErr) {
-            console.error("No se pudo enviar el aviso de documento pendiente:", mailErr);
+            console.error("No se pudo preparar el aviso de documento pendiente:", mailErr);
         }
 
         res.json({ success: true });
@@ -943,14 +1043,14 @@ app.put('/api/usuarios/:id/documento_profesional/revisar', verificarToken, requi
             const contenidoResultado = estatus === 'Aprobado'
                 ? `<p>Hola <b>${u.nombre_completo}</b>,</p><p>Tu documento profesional fue <b>aprobado</b>. Ya tienes acceso completo a la plataforma.</p>`
                 : `<p>Hola <b>${u.nombre_completo}</b>,</p><p>Tu documento profesional fue <b>rechazado</b>. Por favor sube uno nuevo desde tu Perfil.</p>`;
-            await transporter.sendMail({
+            enviarCorreoAsync({
                 from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
                 to: u.correo,
                 subject: 'Resultado de revisión de documento - Sanctorum A.C.',
                 html: emailTemplate('Documento profesional revisado', contenidoResultado)
-            });
+            }, 'resultado de revisión de documento');
         } catch (mailErr) {
-            console.error("No se pudo enviar el resultado de revisión:", mailErr);
+            console.error("No se pudo preparar el resultado de revisión:", mailErr);
         }
 
         res.json({ success: true });
@@ -1301,8 +1401,13 @@ app.get('/api/catalogos_agenda', verificarToken, async (req, res) => {
         const escuelas = await pool.query('SELECT * FROM Escuelas ORDER BY nombre_escuela ASC');
         const insumos = await pool.query('SELECT * FROM Insumos WHERE stock_actual > 0 ORDER BY nombre_insumo ASC');
         const voluntarios = await pool.query("SELECT id_usuario, nombre_completo, especialidad, id_rol FROM Usuarios WHERE estatus != 'Inactivo' ORDER BY nombre_completo ASC");
-        const beneficiarios = await pool.query('SELECT id_beneficiario, nombre_completo FROM Beneficiarios ORDER BY nombre_completo ASC');
-        
+        // Un psicólogo solo debe ver, para agendar, a los beneficiarios que tiene asignados a
+        // su cargo (mismo criterio que /api/agenda/directorio_pacientes). Admin y Coordinador
+        // siguen viendo el catálogo completo.
+        const beneficiarios = esPsicologo(req.usuario)
+            ? await pool.query('SELECT id_beneficiario, nombre_completo FROM Beneficiarios WHERE id_especialista = $1 ORDER BY nombre_completo ASC', [req.usuario.id])
+            : await pool.query('SELECT id_beneficiario, nombre_completo FROM Beneficiarios ORDER BY nombre_completo ASC');
+
         res.json({ success: true, escuelas: escuelas.rows, insumos: insumos.rows, voluntarios: voluntarios.rows, beneficiarios: beneficiarios.rows });
     } catch (error) { console.error("Error catalogos:", error); res.status(500).json({ success: false }); }
 });
@@ -1514,6 +1619,16 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
     if (esPsicologo(req.usuario) && tipo_registro !== 'clinica') {
         return res.status(403).json({ success: false, message: 'Como Psicólogo(a) solo puedes agendar Citas Clínicas.' });
     }
+    // El especialista de una cita clínica agendada por un psicólogo siempre es él mismo —
+    // se ignora cualquier otro id_especialista que venga en el cuerpo — y el beneficiario
+    // debe estar asignado a su cargo (mismo criterio que el catálogo del modal).
+    if (esPsicologo(req.usuario) && tipo_registro === 'clinica' && datos) {
+        datos.id_especialista = req.usuario.id;
+        const asignado = await pool.query('SELECT id_especialista FROM Beneficiarios WHERE id_beneficiario = $1', [datos.id_beneficiario]);
+        if (asignado.rows.length === 0 || asignado.rows[0].id_especialista !== req.usuario.id) {
+            return res.status(403).json({ success: false, message: 'Ese beneficiario no está asignado a tu cargo.' });
+        }
+    }
     // Valida url_imagen antes de abrir la transaccion.
     const chkUrlImagenAgendaPost = validarUrlCloudinaria(datos?.url_imagen, 'url_imagen');
     if (!chkUrlImagenAgendaPost.ok) return res.status(400).json({ success: false, message: chkUrlImagenAgendaPost.mensaje });
@@ -1561,15 +1676,15 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
                         </div>
                         <p style="font-style:italic;color:#877362;text-align:center;">"Sumando Voluntades"</p>
                     `;
-                    await transporter.sendMail({
+                    enviarCorreoAsync({
                         from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
                         to: ben.correo_tutor,
                         subject: 'Cita Clínica Agendada - Sanctorum A.C.',
                         html: emailTemplate('Cita Clínica Confirmada', contenidoCitaCorreo)
-                    });
+                    }, 'cita clínica agendada');
                 }
             } catch (mailErr) {
-                console.error("No se pudo enviar el correo de cita clínica al tutor:", mailErr);
+                console.error("No se pudo preparar el correo de cita clínica al tutor:", mailErr);
             }
         } 
         else if (tipo_registro === 'evento') {
@@ -1633,6 +1748,15 @@ app.put('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
     // RBAC: un Psicólogo únicamente puede modificar Citas Clínicas.
     if (esPsicologo(req.usuario) && tipo_registro !== 'clinica') {
         return res.status(403).json({ success: false, message: 'Como Psicólogo(a) solo puedes modificar Citas Clínicas.' });
+    }
+    // Mismo criterio que al crear: el especialista siempre es él mismo, y el beneficiario
+    // debe seguir asignado a su cargo.
+    if (esPsicologo(req.usuario) && tipo_registro === 'clinica' && datos) {
+        datos.id_especialista = req.usuario.id;
+        const asignado = await pool.query('SELECT id_especialista FROM Beneficiarios WHERE id_beneficiario = $1', [datos.id_beneficiario]);
+        if (asignado.rows.length === 0 || asignado.rows[0].id_especialista !== req.usuario.id) {
+            return res.status(403).json({ success: false, message: 'Ese beneficiario no está asignado a tu cargo.' });
+        }
     }
     // Valida url_imagen antes de abrir la transaccion.
     const chkUrlImagenAgendaPut = validarUrlCloudinaria(datos?.url_imagen, 'url_imagen');
@@ -1867,6 +1991,15 @@ app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, RO
             [req.params.id, id_especialista || null, nota, tipoIntervencion, tipo_sesion || null, modalidad || null, nivel_riesgo || null, asistencia || null]
         );
         res.status(201).json({ success: true });
+
+        // Si el beneficiario asistió a la sesión, se le envía la encuesta de satisfacción
+        // (RF-15). Va después de responder y en segundo plano: nunca debe hacer más lento
+        // ni hacer fallar el guardado de la nota clínica.
+        if (asistencia === 'Asistió') {
+            enviarEncuestaSatisfaccion(req.params.id, id_especialista || req.usuario.id).catch(err => {
+                console.error("No se pudo preparar/enviar la encuesta de satisfacción:", err);
+            });
+        }
     } catch (error) {
         console.error("Error al guardar nota:", error);
         res.status(500).json({ success: false });
@@ -1877,10 +2010,41 @@ app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, RO
 app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT id_doc, nombre_archivo, url_archivo, fecha_subida FROM Expedientes_Documentos WHERE id_beneficiario = $1 ORDER BY fecha_subida DESC',
+            "SELECT id_doc, nombre_archivo, url_archivo, fecha_subida, 'archivo' AS origen, NULL::int AS calificacion, NULL::text AS comentarios FROM Expedientes_Documentos WHERE id_beneficiario = $1",
             [req.params.id]
         );
-        res.json({ success: true, data: result.rows });
+        let data = result.rows;
+
+        // Las encuestas de satisfacción ya respondidas (RF-15) también viven en la sección
+        // de Documentos. Si Encuestas_Satisfaccion todavía no existe (falta correr la
+        // migración), simplemente no se incluyen — nunca debe tumbar el listado real. Se
+        // intenta primero con las columnas de la migración v2 (trato del especialista,
+        // puntualidad, utilidad de la sesión, NPS) y se degrada si aún no existen.
+        try {
+            const enc = await pool.query(
+                `SELECT id_encuesta AS id_doc, 'Encuesta de Satisfacción' AS nombre_archivo, NULL AS url_archivo,
+                        fecha_respuesta AS fecha_subida, 'encuesta' AS origen, calificacion, comentarios,
+                        calificacion_especialista, calificacion_puntualidad, utilidad_sesion, probabilidad_recomendar
+                 FROM Encuestas_Satisfaccion WHERE id_beneficiario = $1 AND respondida = TRUE`,
+                [req.params.id]
+            );
+            data = [...data, ...enc.rows];
+        } catch (encErr) {
+            try {
+                const enc = await pool.query(
+                    `SELECT id_encuesta AS id_doc, 'Encuesta de Satisfacción' AS nombre_archivo, NULL AS url_archivo,
+                            fecha_respuesta AS fecha_subida, 'encuesta' AS origen, calificacion, comentarios
+                     FROM Encuestas_Satisfaccion WHERE id_beneficiario = $1 AND respondida = TRUE`,
+                    [req.params.id]
+                );
+                data = [...data, ...enc.rows];
+            } catch (encErr2) {
+                console.error("No se pudieron incluir encuestas de satisfacción (¿falta la migración?):", encErr2.message);
+            }
+        }
+
+        data.sort((a, b) => new Date(b.fecha_subida) - new Date(a.fecha_subida));
+        res.json({ success: true, data });
     } catch (error) {
         console.error("Error al listar documentos:", error);
         res.status(500).json({ success: false });
@@ -2003,6 +2167,158 @@ async function obtenerColumnaPkSolicitudes() {
     return _columnaPkSolicitudes;
 }
 
+// ==========================================
+// ENCUESTA DE SATISFACCIÓN — endpoints públicos (RF-15)
+// El "token" (generado con crypto.randomBytes en enviarEncuestaSatisfaccion) es la única
+// credencial: no requieren login, igual que el formulario público de solicitudes.
+// ==========================================
+
+// Lista de encuestas insatisfactorias (calificación general 1-2) aún no revisadas, para la
+// sección "Encuestas por revisar" del Perfil de Admin/Coordinador. Si la migración v2 no ha
+// corrido (faltan las columnas revisada/calificacion_especialista, etc.), se responde con una
+// lista vacía en vez de tronar.
+app.get('/api/encuestas/pendientes_revision', (req, res, next) => {
+    console.log('[DIAG pendientes_revision] llegó la petición. Authorization:', req.headers['authorization'] ? 'presente' : 'AUSENTE');
+    next();
+}, verificarToken, (req, res, next) => {
+    console.log('[DIAG pendientes_revision] verificarToken OK. usuario:', JSON.stringify(req.usuario));
+    next();
+}, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
+    console.log('[DIAG pendientes_revision] requiereRol OK, ejecutando query...');
+    try {
+        const result = await pool.query(`
+            SELECT en.id_encuesta, en.calificacion, en.calificacion_especialista, en.calificacion_puntualidad,
+                   en.utilidad_sesion, en.probabilidad_recomendar, en.comentarios, en.fecha_respuesta,
+                   b.nombre_completo AS beneficiario, COALESCE(u.nombre_completo, 'N/A') AS especialista
+            FROM Encuestas_Satisfaccion en
+            JOIN Beneficiarios b ON en.id_beneficiario = b.id_beneficiario
+            LEFT JOIN Usuarios u ON en.id_especialista = u.id_usuario
+            WHERE en.respondida = TRUE AND en.calificacion <= 2 AND COALESCE(en.revisada, FALSE) = FALSE
+            ORDER BY en.fecha_respuesta DESC
+        `);
+        console.log('[DIAG pendientes_revision] query OK, filas:', result.rows.length);
+        res.json({ success: true, data: result.rows });
+    } catch (error) {
+        console.error('[DIAG pendientes_revision] ERROR EN QUERY:', error.message);
+        res.json({ success: true, data: [] });
+    }
+});
+
+// 1. Consultar (para precargar el formulario / bloquear un enlace ya usado).
+app.get('/api/encuestas/:token', async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT e.respondida, b.nombre_completo AS beneficiario
+             FROM Encuestas_Satisfaccion e JOIN Beneficiarios b ON e.id_beneficiario = b.id_beneficiario
+             WHERE e.token = $1`,
+            [req.params.token]
+        );
+        if (result.rows.length === 0) return res.status(404).json({ success: false, message: 'Enlace no válido.' });
+        const fila = result.rows[0];
+        res.json({ success: true, respondida: fila.respondida, beneficiario: (fila.beneficiario || '').split(' ')[0] });
+    } catch (error) {
+        console.error("Error al consultar encuesta de satisfacción:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+    }
+});
+
+// 2. Responder. Calificación de 1 a 5; una calificación de 1 o 2 dispara el aviso a
+// Coordinadores/Administradores. Un token ya respondido no se puede volver a usar.
+// Preguntas ampliadas (RF-15 v2): además de la calificación general y los comentarios,
+// la encuesta pide trato del especialista, puntualidad, utilidad percibida de la sesión y
+// probabilidad de recomendar (NPS 0-10) — para que el resultado se pueda analizar con más
+// detalle en Reportes, no solo como un número suelto. Las 4 preguntas nuevas son columnas
+// opcionales a nivel de base de datos (por si la migración v2 aún no corrió), pero el
+// frontend las pide todas para maximizar qué tan completa queda cada respuesta.
+app.post('/api/encuestas/:token', async (req, res) => {
+    const { comentarios, utilidad_sesion } = req.body;
+    const calNum = parseInt(req.body.calificacion, 10);
+    const calEspecialista = parseInt(req.body.calificacion_especialista, 10);
+    const calPuntualidad = parseInt(req.body.calificacion_puntualidad, 10);
+    const npsNum = parseInt(req.body.probabilidad_recomendar, 10);
+
+    if (isNaN(calNum) || calNum < 1 || calNum > 5) {
+        return res.status(400).json({ success: false, message: 'Selecciona una calificación general de 1 a 5.' });
+    }
+    if (isNaN(calEspecialista) || calEspecialista < 1 || calEspecialista > 5) {
+        return res.status(400).json({ success: false, message: 'Selecciona una calificación de 1 a 5 para el trato del especialista.' });
+    }
+    if (isNaN(calPuntualidad) || calPuntualidad < 1 || calPuntualidad > 5) {
+        return res.status(400).json({ success: false, message: 'Selecciona una calificación de 1 a 5 para la puntualidad.' });
+    }
+    if (!['Si', 'Parcialmente', 'No'].includes(utilidad_sesion)) {
+        return res.status(400).json({ success: false, message: 'Indica si la sesión te ayudó.' });
+    }
+    if (isNaN(npsNum) || npsNum < 0 || npsNum > 10) {
+        return res.status(400).json({ success: false, message: 'Selecciona qué tan probable es que recomiendes el servicio, de 0 a 10.' });
+    }
+
+    try {
+        const actual = await pool.query('SELECT respondida, id_beneficiario FROM Encuestas_Satisfaccion WHERE token = $1', [req.params.token]);
+        if (actual.rows.length === 0) return res.status(404).json({ success: false, message: 'Enlace no válido.' });
+        if (actual.rows[0].respondida) return res.status(409).json({ success: false, message: 'Esta encuesta ya fue respondida. ¡Gracias!' });
+
+        await pool.query(
+            `UPDATE Encuestas_Satisfaccion
+             SET calificacion = $1, comentarios = $2, respondida = TRUE, fecha_respuesta = CURRENT_TIMESTAMP,
+                 calificacion_especialista = $3, calificacion_puntualidad = $4, utilidad_sesion = $5, probabilidad_recomendar = $6
+             WHERE token = $7`,
+            [calNum, (comentarios || '').slice(0, 2000), calEspecialista, calPuntualidad, utilidad_sesion, npsNum, req.params.token]
+        );
+        res.json({ success: true, message: '¡Gracias por tu respuesta!' });
+
+        if (calNum <= 2) {
+            avisarEncuestaInsatisfactoria(actual.rows[0].id_beneficiario, calNum, comentarios, {
+                calificacionEspecialista: calEspecialista,
+                calificacionPuntualidad: calPuntualidad,
+                utilidadSesion: utilidad_sesion,
+                probabilidadRecomendar: npsNum,
+            }).catch(err => {
+                console.error("No se pudo preparar el aviso de encuesta insatisfactoria:", err);
+            });
+        }
+    } catch (error) {
+        // Si la migración v2 (columnas nuevas) todavía no corrió, el UPDATE de arriba falla
+        // por columna inexistente — degradamos guardando solo lo que la tabla original soporta,
+        // en vez de perder la respuesta por completo.
+        if (error.code === '42703') {
+            try {
+                const actual2 = await pool.query('SELECT id_beneficiario FROM Encuestas_Satisfaccion WHERE token = $1', [req.params.token]);
+                await pool.query(
+                    `UPDATE Encuestas_Satisfaccion SET calificacion = $1, comentarios = $2, respondida = TRUE, fecha_respuesta = CURRENT_TIMESTAMP WHERE token = $3`,
+                    [calNum, (comentarios || '').slice(0, 2000), req.params.token]
+                );
+                if (!res.headersSent) res.json({ success: true, message: '¡Gracias por tu respuesta!' });
+                if (calNum <= 2 && actual2.rows[0]) {
+                    avisarEncuestaInsatisfactoria(actual2.rows[0].id_beneficiario, calNum, comentarios).catch(() => {});
+                }
+                return;
+            } catch (error2) {
+                console.error("Error al guardar respuesta de encuesta (fallback sin columnas nuevas):", error2);
+            }
+        }
+        console.error("Error al guardar respuesta de encuesta de satisfacción:", error);
+        if (!res.headersSent) res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+    }
+});
+
+// Marca una encuesta insatisfactoria como revisada (deja de aparecer en Perfil y en la
+// campana de notificaciones). Guarda quién y cuándo la revisó.
+app.put('/api/encuestas/:id/revisar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
+    try {
+        const result = await pool.query(
+            `UPDATE Encuestas_Satisfaccion SET revisada = TRUE, fecha_revision = CURRENT_TIMESTAMP, id_usuario_revisor = $1
+             WHERE id_encuesta = $2 RETURNING id_encuesta`,
+            [req.usuario.id, req.params.id]
+        );
+        if (result.rows.length === 0) return res.status(404).json({ success: false, message: 'Encuesta no encontrada.' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error al marcar encuesta como revisada:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+    }
+});
+
 app.post('/api/solicitudes', async (req, res) => {
     const { nombre_contacto, telefono, correo, tipo_solicitud, mensaje } = req.body;
     if (!nombre_contacto || !correo || !tipo_solicitud || !mensaje) {
@@ -2020,22 +2336,25 @@ app.post('/api/solicitudes', async (req, res) => {
             [nombre_contacto, telefono || null, correo, tipo_solicitud, mensaje]
         );
 
-        // Correo de confirmación automático (no bloquea la respuesta si falla)
-        try {
-            const contenido = `
-                <p>Hola <b>${escapeHtmlServidor(nombre_contacto)}</b>,</p>
-                <p>Hemos recibido tu solicitud de <b>${escapeHtmlServidor(tipo_solicitud)}</b>. Nuestro equipo la revisará y se pondrá en contacto contigo muy pronto.</p>
-                <p style="font-style: italic; color: #877362; text-align: center;">"Sumando Voluntades"</p>
-            `;
-            await transporter.sendMail({
-                from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
-                to: correo,
-                subject: 'Hemos recibido tu solicitud - Sanctorum A.C.',
-                html: emailTemplate('Solicitud Recibida', contenido)
-            });
-        } catch (mailErr) {
-            console.error("No se pudo enviar el correo de confirmación de solicitud:", mailErr);
-        }
+        // La solicitud ya quedó guardada — respondemos de inmediato. Este endpoint lo usa
+        // enviarSolicitudWeb() desde varios formularios públicos del sitio, así que esperar
+        // aquí a que salgan dos correos por SMTP (confirmación + aviso al staff) es lo que
+        // hacía sentir "trabados" esos botones. Ambos correos se disparan después, en
+        // segundo plano, sin bloquear la respuesta.
+        res.status(201).json({ success: true, message: 'Solicitud enviada correctamente.' });
+
+        // Correo de confirmación automático al remitente.
+        const contenido = `
+            <p>Hola <b>${escapeHtmlServidor(nombre_contacto)}</b>,</p>
+            <p>Hemos recibido tu solicitud de <b>${escapeHtmlServidor(tipo_solicitud)}</b>. Nuestro equipo la revisará y se pondrá en contacto contigo muy pronto.</p>
+            <p style="font-style: italic; color: #877362; text-align: center;">"Sumando Voluntades"</p>
+        `;
+        enviarCorreoAsync({
+            from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
+            to: correo,
+            subject: 'Hemos recibido tu solicitud - Sanctorum A.C.',
+            html: emailTemplate('Solicitud Recibida', contenido)
+        }, 'confirmación de solicitud web');
 
         // Aviso al staff correspondiente: "Compartir Historia de Éxito" también le
         // interesa a los Psicólogos (son quienes validan y publican la historia), pero
@@ -2066,20 +2385,18 @@ app.post('/api/solicitudes', async (req, res) => {
                     <p><b>Mensaje:</b> ${escapeHtmlServidor(mensaje)}</p>
                     <p>Entra a tu Perfil dentro de la plataforma para darle seguimiento.</p>
                 `;
-                await transporter.sendMail({
+                enviarCorreoAsync({
                     from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
                     to: correosStaff.join(','),
                     subject: `Nueva solicitud: ${tipo_solicitud} - Sanctorum A.C.`,
                     html: emailTemplate('Nueva solicitud recibida', contenidoAvisoStaff)
-                });
+                }, 'aviso de nueva solicitud al staff');
             } else {
                 console.log(`Aviso de nueva solicitud (${tipo_solicitud}): no hay staff con correo registrado para este tipo, no se envió nada.`);
             }
         } catch (mailErr) {
-            console.error("No se pudo enviar el aviso de nueva solicitud al staff:", mailErr);
+            console.error("No se pudo preparar el aviso de nueva solicitud al staff:", mailErr);
         }
-
-        res.status(201).json({ success: true, message: 'Solicitud enviada correctamente.' });
     } catch (error) {
         console.error("Error al registrar solicitud web:", error);
         res.status(500).json({ success: false });
@@ -2219,6 +2536,44 @@ app.get('/api/reportes/exportar', verificarToken, requiereRol(ROL_ADMIN, ROL_COO
             `, f.params);
             return res.json({ success: true, data: result.rows });
         }
+        if (tipo === 'satisfaccion') {
+            const f = construirFiltroFecha('en.fecha_respuesta');
+            // Primero se intenta con las columnas de la migración v2 (trato del especialista,
+            // puntualidad, utilidad de la sesión, NPS); si esas columnas no existen todavía,
+            // se degrada a solo calificación general + comentarios en vez de fallar.
+            try {
+                const result = await pool.query(`
+                    SELECT en.fecha_respuesta, b.nombre_completo AS beneficiario,
+                           COALESCE(u.nombre_completo, 'N/A') AS especialista, en.calificacion,
+                           en.calificacion_especialista, en.calificacion_puntualidad,
+                           en.utilidad_sesion, en.probabilidad_recomendar, en.comentarios
+                    FROM Encuestas_Satisfaccion en
+                    JOIN Beneficiarios b ON en.id_beneficiario = b.id_beneficiario
+                    LEFT JOIN Usuarios u ON en.id_especialista = u.id_usuario
+                    WHERE en.respondida = TRUE ${f.clausula}
+                    ORDER BY en.fecha_respuesta DESC
+                `, f.params);
+                return res.json({ success: true, data: result.rows });
+            } catch (encErr) {
+                try {
+                    const result = await pool.query(`
+                        SELECT en.fecha_respuesta, b.nombre_completo AS beneficiario,
+                               COALESCE(u.nombre_completo, 'N/A') AS especialista, en.calificacion, en.comentarios
+                        FROM Encuestas_Satisfaccion en
+                        JOIN Beneficiarios b ON en.id_beneficiario = b.id_beneficiario
+                        LEFT JOIN Usuarios u ON en.id_especialista = u.id_usuario
+                        WHERE en.respondida = TRUE ${f.clausula}
+                        ORDER BY en.fecha_respuesta DESC
+                    `, f.params);
+                    return res.json({ success: true, data: result.rows });
+                } catch (encErr2) {
+                    // La tabla todavía no existe (falta correr la migración) — reportamos vacío
+                    // en vez de tumbar el reporte completo.
+                    console.error("No se pudo incluir satisfacción en el reporte (¿falta la migración?):", encErr2.message);
+                    return res.json({ success: true, data: [] });
+                }
+            }
+        }
         return res.status(400).json({ success: false, message: 'Tipo de reporte inválido.' });
     } catch (error) {
         console.error("Error al generar reporte de exportación:", error);
@@ -2252,6 +2607,22 @@ app.get('/api/dashboard/resumen', async (req, res) => {
             pool.query("SELECT COALESCE(SUM(monto),0) AS total FROM Donaciones WHERE date_trunc('month', fecha_donacion) = date_trunc('month', CURRENT_DATE)")
         ]);
 
+        // Encuestas de satisfacción insatisfactorias (calificación 1-2) sin revisar todavía —
+        // solo le interesa a Admin/Coordinador; para cualquier otro rol (o visitante anónimo)
+        // se manda 0 para que no aparezca en su campana de notificaciones. Va en try/catch
+        // aparte porque depende de columnas de la migración v2 que puede no haber corrido.
+        let encuestasPorRevisar = 0;
+        if (usuario && (usuario.rol === ROL_ADMIN || usuario.rol === ROL_COORDINADOR)) {
+            try {
+                const r = await pool.query(
+                    "SELECT COUNT(*) FROM Encuestas_Satisfaccion WHERE respondida = TRUE AND calificacion <= 2 AND COALESCE(revisada, FALSE) = FALSE"
+                );
+                encuestasPorRevisar = parseInt(r.rows[0].count, 10);
+            } catch (encErr) {
+                console.error("No se pudo calcular encuestas por revisar (¿falta la migración?):", encErr.message);
+            }
+        }
+
         const actividad = esCoordinadorPropio
             ? await pool.query(`
                 (SELECT 'Visita agendada' AS titulo, esc.nombre_escuela AS detalle, av.fecha_cita AS fecha
@@ -2281,7 +2652,8 @@ app.get('/api/dashboard/resumen', async (req, res) => {
                 solicitudes_pendientes: parseInt(solicitudes.rows[0].count, 10),
                 donaciones_mes: parseFloat(donacionesMes.rows[0].total),
                 actividad_reciente: actividad.rows,
-                vista_filtrada_coordinador: !!esCoordinadorPropio
+                vista_filtrada_coordinador: !!esCoordinadorPropio,
+                encuestas_por_revisar: encuestasPorRevisar
             }
         });
     } catch (error) {
@@ -2655,6 +3027,11 @@ app.get('/api/eventos/:id', async (req, res) => {
 //    panel de administración) también trae las Historias de Éxito para gestionarlas juntas.
 app.get('/api/publicaciones', async (req, res) => {
     const { tipo, categoria, limite, incluir_historias } = req.query;
+    // incluir_historias=1 solo lo manda el panel de administración (la página pública jamás lo
+    // envía). En ese caso, si quien pregunta está identificado y es Voluntario o Especialista,
+    // limitamos el listado a lo que él mismo creó — Coordinador/Admin y la vista pública ven todo.
+    const usuarioReq = incluir_historias ? usuarioOpcional(req) : null;
+    const soloPropias = usuarioReq && (Number(usuarioReq.rol) === ROL_VOLUNTARIO || Number(usuarioReq.rol) === ROL_ESPECIALISTA);
     try {
         let query = "SELECT *, 'publicacion' AS origen FROM Publicaciones";
         const condiciones = [];
@@ -2663,6 +3040,7 @@ app.get('/api/publicaciones', async (req, res) => {
         // Una publicación puede tener varias categorías guardadas como "Infancia, Muralismo",
         // así que el filtro busca coincidencia parcial en vez de una igualdad exacta.
         if (categoria) { params.push(`%${categoria}%`); condiciones.push(`categoria ILIKE $${params.length}`); }
+        if (soloPropias) { params.push(usuarioReq.id); condiciones.push(`id_autor = $${params.length}`); }
         if (condiciones.length > 0) query += ' WHERE ' + condiciones.join(' AND ');
         query += ' ORDER BY fecha_post DESC';
         if (limite) {
@@ -2673,16 +3051,18 @@ app.get('/api/publicaciones', async (req, res) => {
         let data = result.rows;
 
         if (incluir_historias) {
-            const hist = await pool.query(`
+            const histParams = [];
+            let histQuery = `
                 SELECT h.id_historia AS id_publicacion, h.titulo, h.contenido_postayuda AS contenido,
                        NULL::text AS url_imagen, 'Historia de Éxito' AS tipo, NULL::text AS categoria,
                        h.fecha_creacion AS fecha_post, h.url_documento_consentimiento,
                        NULL::int AS id_evento_relacionado, h.id_autor, NULL::int AS id_editor,
                        h.id_beneficiario, h.contenido_preayuda, h.contenido_postayuda, h.consentimiento,
                        'historia' AS origen
-                FROM Historias_Exito h
-                ORDER BY h.fecha_creacion DESC
-            `);
+                FROM Historias_Exito h`;
+            if (soloPropias) { histParams.push(usuarioReq.id); histQuery += ` WHERE h.id_autor = $${histParams.length}`; }
+            histQuery += ' ORDER BY h.fecha_creacion DESC';
+            const hist = await pool.query(histQuery, histParams);
             data = [...data, ...hist.rows].sort((a, b) => new Date(b.fecha_post) - new Date(a.fecha_post));
         }
         res.json({ success: true, data });
@@ -2936,8 +3316,14 @@ app.get('/api/eventos/:id/insumos_consumidos', async (req, res) => {
 
 // Lista todos los reportes de evento con el título/fecha del evento, el nombre de quien
 // reportó, y el equipo de participantes (Participacion) como JSON agregado.
-app.get('/api/reportes_evento', async (req, res) => {
+app.get('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
+    // Voluntario/Especialista solo ven los reportes que ellos mismos generaron;
+    // Coordinador/Admin ven todos.
+    const soloPropios = req.usuario.rol !== ROL_ADMIN && req.usuario.rol !== ROL_COORDINADOR;
     try {
+        const params = [];
+        let filtro = '';
+        if (soloPropios) { params.push(req.usuario.id); filtro = `WHERE r.id_usuario = $${params.length}`; }
         const result = await pool.query(`
             SELECT r.*, e.titulo_evento, e.fecha_realizacion, u.nombre_completo AS autor,
                    COALESCE((
@@ -2948,8 +3334,9 @@ app.get('/api/reportes_evento', async (req, res) => {
             FROM Reportes_Evento r
             JOIN Eventos e ON r.id_evento = e.id_evento
             LEFT JOIN Usuarios u ON r.id_usuario = u.id_usuario
+            ${filtro}
             ORDER BY r.fecha_reporte DESC
-        `);
+        `, params);
         res.json({ success: true, data: result.rows });
     } catch (error) {
         console.error("Error al listar reportes de evento:", error);

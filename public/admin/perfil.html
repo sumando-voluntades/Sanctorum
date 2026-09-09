@@ -15,7 +15,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/output.css" />
-    </script>
     <style>
       .material-symbols-outlined {
         font-variation-settings:
@@ -44,15 +43,43 @@
       <div id="header-mount"></div>
 
       <!-- CONTENIDO DEL PERFIL -->
-      <div class="p-12 max-w-3xl mx-auto w-full">
+      <div class="p-6 sm:p-8 md:p-12 max-w-3xl mx-auto w-full">
         <h2
           class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2"
         >
           Configuración de Perfil
         </h2>
-        <p class="text-slate-500 mb-10">
+        <p class="text-slate-500 mb-2">
           Administra tu información personal y la seguridad de tu cuenta.
         </p>
+        <p class="flex items-start gap-1.5 text-xs text-slate-400 mb-10">
+          <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+          <span>Aquí solo puedes editar tu propia cuenta. Si necesitas corregir el perfil de otro usuario, pide a un Administrador que lo haga desde Gestión de Voluntariado.</span>
+        </p>
+
+        <!-- TARJETA: ENCUESTAS DE SATISFACCIÓN POR REVISAR (solo Admin/Coordinador) -->
+        <div
+          id="tarjeta_encuestas_revisar"
+          class="hidden bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8"
+        >
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <span class="material-symbols-outlined text-red-500">warning</span>
+              Encuestas por Revisar
+            </h3>
+            <span
+              id="badge_encuestas_revisar"
+              class="px-2.5 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full"
+              >0</span
+            >
+          </div>
+          <p class="text-xs text-slate-400 mb-5">
+            Respuestas con calificación general de 1 o 2 estrellas. Márcalas como revisadas una vez que le des seguimiento al caso.
+          </p>
+          <div id="lista_encuestas_revisar" class="space-y-3">
+            <p class="text-sm text-slate-400 italic">Cargando...</p>
+          </div>
+        </div>
 
         <!-- TARJETA PRINCIPAL: DATOS + FOTO -->
         <div
@@ -574,7 +601,95 @@
 
         cargarPerfil();
         cargarNotificaciones();
+        if (usuarioActual.rol === 1 || usuarioActual.rol === 3) {
+          document.getElementById("tarjeta_encuestas_revisar").classList.remove("hidden");
+          cargarEncuestasPorRevisar();
+        }
       });
+
+      // ---------- ENCUESTAS DE SATISFACCIÓN POR REVISAR (solo Admin/Coordinador) ----------
+      async function cargarEncuestasPorRevisar() {
+        const cont = document.getElementById("lista_encuestas_revisar");
+        try {
+          const res = await fetch(`${API_URL}/api/encuestas/pendientes_revision`, {
+            headers: authHeaders(),
+          });
+          const json = await res.json();
+          if (!json.success) {
+            cont.innerHTML = '<p class="text-sm text-slate-400 italic">No se pudieron cargar.</p>';
+            return;
+          }
+          document.getElementById("badge_encuestas_revisar").innerText = json.data.length;
+          if (json.data.length === 0) {
+            cont.innerHTML = '<p class="text-sm text-slate-400 italic">No hay encuestas pendientes de revisar. 🎉</p>';
+            return;
+          }
+          cont.innerHTML = json.data
+            .map((enc) => {
+              const fecha = enc.fecha_respuesta
+                ? new Date(enc.fecha_respuesta).toLocaleDateString("es-MX")
+                : "";
+              const estrellas = "★".repeat(enc.calificacion) + "☆".repeat(5 - enc.calificacion);
+              const detalle = [
+                enc.calificacion_especialista ? `Trato del especialista: ${enc.calificacion_especialista}/5` : "",
+                enc.calificacion_puntualidad ? `Puntualidad: ${enc.calificacion_puntualidad}/5` : "",
+                enc.utilidad_sesion ? `¿Le ayudó?: ${escapeHtml(enc.utilidad_sesion)}` : "",
+                enc.probabilidad_recomendar !== null && enc.probabilidad_recomendar !== undefined
+                  ? `Recomendaría (0-10): ${enc.probabilidad_recomendar}`
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" · ");
+              return `
+                <div class="p-4 bg-red-50/50 border border-red-100 rounded-2xl">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="text-sm font-bold text-slate-800">
+                        ${escapeHtml(enc.beneficiario)} <span class="text-red-500">${estrellas}</span>
+                      </p>
+                      <p class="text-[11px] text-slate-400 mt-0.5">Especialista: ${escapeHtml(enc.especialista)} · ${fecha}</p>
+                      ${detalle ? `<p class="text-[11px] text-slate-500 mt-1">${detalle}</p>` : ""}
+                      ${enc.comentarios ? `<p class="text-xs text-slate-600 italic mt-1.5">"${escapeHtml(enc.comentarios)}"</p>` : ""}
+                    </div>
+                    <button
+                      onclick="marcarEncuestaRevisada(${enc.id_encuesta}, this)"
+                      class="shrink-0 px-3 py-1.5 bg-white border border-slate-200 hover:border-primary hover:text-primary text-slate-500 text-xs font-bold rounded-full transition-colors"
+                    >
+                      Marcar revisada
+                    </button>
+                  </div>
+                </div>`;
+            })
+            .join("");
+        } catch (e) {
+          console.error(e);
+          cont.innerHTML = '<p class="text-sm text-slate-400 italic">No se pudieron cargar.</p>';
+        }
+      }
+
+      async function marcarEncuestaRevisada(idEncuesta, btn) {
+        btn.disabled = true;
+        btn.innerText = "Guardando...";
+        try {
+          const res = await fetch(`${API_URL}/api/encuestas/${idEncuesta}/revisar`, {
+            method: "PUT",
+            headers: authHeaders(),
+          });
+          const json = await res.json();
+          if (json.success) {
+            cargarEncuestasPorRevisar();
+          } else {
+            alert(json.message || "No se pudo marcar como revisada.");
+            btn.disabled = false;
+            btn.innerText = "Marcar revisada";
+          }
+        } catch (e) {
+          console.error(e);
+          alert("Error de conexión.");
+          btn.disabled = false;
+          btn.innerText = "Marcar revisada";
+        }
+      }
 
       // 2. CARGAR PERFIL REAL DESDE LA BASE DE DATOS (no solo lo que trae el token)
       async function cargarPerfil() {

@@ -1,0 +1,379 @@
+<!doctype html>
+<html class="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Encuesta de Satisfacción - Sanctorum A.C.</title>
+    <link rel="icon" type="image/png" href="/assets/favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/output.css" />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .estrella {
+        font-size: 34px;
+        line-height: 1;
+        cursor: pointer;
+        color: #e2e8f0;
+        transition: color 0.15s;
+        font-variation-settings: "FILL" 0;
+      }
+      .estrella.activa,
+      .estrella.hover-activa {
+        color: #f39200;
+        font-variation-settings: "FILL" 1;
+      }
+      .opcion-utilidad {
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .opcion-utilidad.activa {
+        background: #b5006233;
+        border-color: #b50062;
+        color: #b50062;
+        font-weight: 700;
+      }
+      .pastilla-nps {
+        cursor: pointer;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .pastilla-nps.activa {
+        background: linear-gradient(90deg, #b50062, #f39200);
+        border-color: transparent;
+        color: #fff;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-surface text-on-surface min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
+  >
+    <div
+      class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-container/20 rounded-full blur-3xl"
+    ></div>
+    <div
+      class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-secondary-container/20 rounded-full blur-3xl"
+    ></div>
+
+    <div
+      class="w-full max-w-lg bg-white rounded-3xl shadow-[0_20px_50px_rgba(23,28,31,0.06)] p-6 sm:p-10 relative z-10 border border-slate-100 my-8"
+    >
+      <div class="text-center mb-6">
+        <img
+          src="/assets/Logo.png"
+          alt="Logo Sanctorum A.C."
+          class="h-16 mx-auto mb-6 object-contain"
+        />
+        <h1 class="text-2xl font-bold text-primary">Encuesta de Satisfacción</h1>
+        <p id="texto_intro" class="text-slate-500 text-sm mt-2">
+          Cargando...
+        </p>
+      </div>
+
+      <!-- ESTADO: cargando / enlace inválido -->
+      <div id="vista_cargando" class="text-center text-slate-400 text-sm py-6">
+        Un momento...
+      </div>
+
+      <!-- ESTADO: formulario -->
+      <form id="formEncuesta" class="space-y-7 hidden">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-3 text-center"
+            >¿Qué tan satisfecho quedaste con la sesión, en general?</label
+          >
+          <div
+            id="grupo_estrellas_general"
+            class="grupo-estrellas flex flex-wrap items-center justify-center gap-2"
+            data-hidden="calificacion_general_valor"
+          >
+            <span class="material-symbols-outlined estrella" data-valor="1">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="2">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="3">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="4">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="5">star</span>
+          </div>
+          <input type="hidden" id="calificacion_general_valor" value="" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-3 text-center"
+            >¿Cómo calificarías el trato del especialista?</label
+          >
+          <div
+            id="grupo_estrellas_especialista"
+            class="grupo-estrellas flex flex-wrap items-center justify-center gap-2"
+            data-hidden="calificacion_especialista_valor"
+          >
+            <span class="material-symbols-outlined estrella" data-valor="1">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="2">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="3">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="4">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="5">star</span>
+          </div>
+          <input type="hidden" id="calificacion_especialista_valor" value="" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-3 text-center"
+            >¿La cita fue puntual (inició sin demoras)?</label
+          >
+          <div
+            id="grupo_estrellas_puntualidad"
+            class="grupo-estrellas flex flex-wrap items-center justify-center gap-2"
+            data-hidden="calificacion_puntualidad_valor"
+          >
+            <span class="material-symbols-outlined estrella" data-valor="1">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="2">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="3">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="4">star</span>
+            <span class="material-symbols-outlined estrella" data-valor="5">star</span>
+          </div>
+          <input type="hidden" id="calificacion_puntualidad_valor" value="" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-3 text-center"
+            >¿Sentiste que la sesión te ayudó con lo que buscabas?</label
+          >
+          <div id="grupo_utilidad" class="flex flex-wrap items-center justify-center gap-2">
+            <button type="button" class="opcion-utilidad px-4 py-2 rounded-full border border-slate-200 text-sm text-slate-600" data-valor="Si">Sí</button>
+            <button type="button" class="opcion-utilidad px-4 py-2 rounded-full border border-slate-200 text-sm text-slate-600" data-valor="Parcialmente">Parcialmente</button>
+            <button type="button" class="opcion-utilidad px-4 py-2 rounded-full border border-slate-200 text-sm text-slate-600" data-valor="No">No</button>
+          </div>
+          <input type="hidden" id="utilidad_sesion_valor" value="" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1 text-center"
+            >¿Qué tan probable es que recomiendes este servicio a alguien más?</label
+          >
+          <p class="text-center text-[11px] text-slate-400 mb-3">0 = nada probable &nbsp;·&nbsp; 10 = muy probable</p>
+          <div id="grupo_nps" class="flex flex-wrap items-center justify-center gap-1.5">
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="0">0</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="1">1</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="2">2</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="3">3</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="4">4</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="5">5</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="6">6</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="7">7</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="8">8</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="9">9</span>
+            <span class="pastilla-nps w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-xs text-slate-600" data-valor="10">10</span>
+          </div>
+          <input type="hidden" id="probabilidad_recomendar_valor" value="" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2 ml-1"
+            >Observaciones (opcional)</label
+          >
+          <textarea
+            id="comentarios"
+            rows="4"
+            maxlength="2000"
+            placeholder="Cuéntanos qué te gustó o qué podemos mejorar..."
+            class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-2xl outline-none text-sm resize-none focus:ring-2 focus:ring-primary/30"
+          ></textarea>
+        </div>
+        <p id="error_form" class="text-sm text-red-500 text-center hidden"></p>
+        <button
+          type="submit"
+          id="btn_enviar"
+          class="w-full py-4 bg-gradient-to-r from-primary to-[#f39200] text-white font-bold rounded-full shadow-lg hover:scale-[1.02] active:scale-95 transition-all"
+        >
+          Enviar respuesta
+        </button>
+      </form>
+
+      <!-- ESTADO: gracias / ya respondida / error -->
+      <div id="vista_final" class="hidden text-center py-6">
+        <div
+          id="icono_final"
+          class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <span class="material-symbols-outlined text-3xl">favorite</span>
+        </div>
+        <p id="texto_final" class="text-slate-600 font-medium"></p>
+      </div>
+    </div>
+
+    <script src="/js/comun.js"></script>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+
+      function mostrarFinal(mensaje, esError) {
+        document.getElementById("vista_cargando").classList.add("hidden");
+        document.getElementById("formEncuesta").classList.add("hidden");
+        document.getElementById("vista_final").classList.remove("hidden");
+        document.getElementById("texto_final").innerText = mensaje;
+        const icono = document.getElementById("icono_final");
+        if (esError) {
+          icono.classList.remove("bg-green-100", "text-green-600");
+          icono.classList.add("bg-red-100", "text-red-500");
+          icono.querySelector("span").innerText = "error";
+        }
+      }
+
+      // ---------- Grupos de estrellas (reutilizable: general / especialista / puntualidad) ----------
+      function inicializarGrupoEstrellas(idGrupo) {
+        const grupo = document.getElementById(idGrupo);
+        const hiddenInput = document.getElementById(grupo.dataset.hidden);
+        let seleccionada = 0;
+
+        function pintar(valor) {
+          grupo.querySelectorAll(".estrella").forEach((el) => {
+            el.classList.toggle("activa", Number(el.dataset.valor) <= valor);
+          });
+        }
+
+        grupo.querySelectorAll(".estrella").forEach((el) => {
+          el.addEventListener("click", () => {
+            seleccionada = Number(el.dataset.valor);
+            hiddenInput.value = seleccionada;
+            pintar(seleccionada);
+          });
+          el.addEventListener("mouseenter", () => pintar(Number(el.dataset.valor)));
+        });
+        grupo.addEventListener("mouseleave", () => pintar(seleccionada));
+      }
+      ["grupo_estrellas_general", "grupo_estrellas_especialista", "grupo_estrellas_puntualidad"].forEach(
+        inicializarGrupoEstrellas,
+      );
+
+      // ---------- Utilidad de la sesión (Sí / Parcialmente / No) ----------
+      document.querySelectorAll("#grupo_utilidad .opcion-utilidad").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#grupo_utilidad .opcion-utilidad").forEach((b) => b.classList.remove("activa"));
+          btn.classList.add("activa");
+          document.getElementById("utilidad_sesion_valor").value = btn.dataset.valor;
+        });
+      });
+
+      // ---------- Probabilidad de recomendar (NPS 0-10) ----------
+      document.querySelectorAll("#grupo_nps .pastilla-nps").forEach((p) => {
+        p.addEventListener("click", () => {
+          document.querySelectorAll("#grupo_nps .pastilla-nps").forEach((x) => x.classList.remove("activa"));
+          p.classList.add("activa");
+          document.getElementById("probabilidad_recomendar_valor").value = p.dataset.valor;
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        if (!token) {
+          mostrarFinal("Este enlace no es válido.", true);
+          return;
+        }
+        try {
+          const res = await fetch(`${API_URL}/api/encuestas/${token}`);
+          const json = await res.json();
+          if (!json.success) {
+            mostrarFinal(json.message || "Este enlace no es válido.", true);
+            return;
+          }
+          if (json.respondida) {
+            mostrarFinal("Esta encuesta ya fue respondida. ¡Gracias por tu tiempo!");
+            return;
+          }
+          document.getElementById("texto_intro").innerText = json.beneficiario
+            ? `Nos encantaría saber cómo te fue en la sesión de ${json.beneficiario}.`
+            : "Nos encantaría conocer tu opinión sobre la sesión.";
+          document.getElementById("vista_cargando").classList.add("hidden");
+          document.getElementById("formEncuesta").classList.remove("hidden");
+        } catch (e) {
+          console.error(e);
+          mostrarFinal("No se pudo cargar la encuesta. Intenta de nuevo más tarde.", true);
+        }
+      });
+
+      document
+        .getElementById("formEncuesta")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const errorEl = document.getElementById("error_form");
+          errorEl.classList.add("hidden");
+
+          const calificacion = document.getElementById("calificacion_general_valor").value;
+          const calificacion_especialista = document.getElementById("calificacion_especialista_valor").value;
+          const calificacion_puntualidad = document.getElementById("calificacion_puntualidad_valor").value;
+          const utilidad_sesion = document.getElementById("utilidad_sesion_valor").value;
+          const probabilidad_recomendar = document.getElementById("probabilidad_recomendar_valor").value;
+
+          if (!calificacion) {
+            errorEl.innerText = "Selecciona una calificación general.";
+            errorEl.classList.remove("hidden");
+            return;
+          }
+          if (!calificacion_especialista) {
+            errorEl.innerText = "Selecciona una calificación para el trato del especialista.";
+            errorEl.classList.remove("hidden");
+            return;
+          }
+          if (!calificacion_puntualidad) {
+            errorEl.innerText = "Selecciona una calificación para la puntualidad.";
+            errorEl.classList.remove("hidden");
+            return;
+          }
+          if (!utilidad_sesion) {
+            errorEl.innerText = "Indica si la sesión te ayudó.";
+            errorEl.classList.remove("hidden");
+            return;
+          }
+          if (probabilidad_recomendar === "") {
+            errorEl.innerText = "Selecciona qué tan probable es que recomiendes el servicio.";
+            errorEl.classList.remove("hidden");
+            return;
+          }
+
+          const btn = document.getElementById("btn_enviar");
+          btn.disabled = true;
+          btn.innerText = "Enviando...";
+          try {
+            const res = await fetch(`${API_URL}/api/encuestas/${token}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                calificacion,
+                calificacion_especialista,
+                calificacion_puntualidad,
+                utilidad_sesion,
+                probabilidad_recomendar,
+                comentarios: document.getElementById("comentarios").value,
+              }),
+            });
+            const json = await res.json();
+            if (json.success) {
+              mostrarFinal("¡Gracias por tu respuesta! Nos ayuda mucho a mejorar.");
+            } else {
+              errorEl.innerText = json.message || "No se pudo enviar tu respuesta.";
+              errorEl.classList.remove("hidden");
+              btn.disabled = false;
+              btn.innerText = "Enviar respuesta";
+            }
+          } catch (err) {
+            console.error(err);
+            errorEl.innerText = "Error de conexión. Intenta de nuevo.";
+            errorEl.classList.remove("hidden");
+            btn.disabled = false;
+            btn.innerText = "Enviar respuesta";
+          }
+        });
+    </script>
+  </body>
+</html>
