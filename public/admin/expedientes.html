@@ -364,6 +364,42 @@
       </div>
     </div>
 
+    <!-- MODAL: VER ENCUESTA COMPLETA (solo lectura) — mismo diseño que perfil.html, para el
+         botón "Ver completa" de una encuesta ya guardada en "Archivos Guardados". Este modal
+         siempre se abre CON modalDetalle (Expediente Clínico) todavía abierto detrás: como
+         ambos son z-50, el orden en el DOM decidía cuál se veía encima (modalDetalle, por ir
+         después, ganaba) y este quedaba tapado. Se sube a z-[60] para que siempre se muestre
+         al frente sin importar el orden, y se le quita su propio fondo oscuro/blur (ya lo
+         pone modalDetalle detrás) para no encimar dos capas de blur -- eso era lo que se veía
+         como un "degradado blanco" lavado sobre el encabezado. -->
+    <div
+      id="modalVerEncuestaExp"
+      class="fixed inset-0 z-[60] flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300"
+    >
+      <div
+        class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[85vh] flex flex-col"
+        id="modalVerEncuestaExpContent"
+      >
+        <div
+          class="bg-gradient-to-r from-red-500 to-[#f39200] px-8 py-6 text-white flex justify-between items-center"
+        >
+          <div>
+            <h3 class="text-2xl font-bold font-plus">
+              Encuesta de Satisfacción
+            </h3>
+            <p id="veexp_meta" class="text-white/80 text-sm mt-1"></p>
+          </div>
+          <button
+            onclick="cerrarModalVerEncuestaExp()"
+            class="text-white/80 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-3xl">close</span>
+          </button>
+        </div>
+        <div id="veexp_cuerpo" class="p-8 overflow-y-auto space-y-4"></div>
+      </div>
+    </div>
+
     <div
       id="modalDetalle"
       class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0 py-10"
@@ -516,6 +552,10 @@
                 class="w-full bg-[#f0f4f8] border-none rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
                 placeholder="Redacta los detalles y observaciones clínicas..."
               ></textarea>
+              <p class="flex items-start gap-1.5 text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded-lg p-2.5 mt-2">
+                <span class="material-symbols-outlined text-[14px] mt-0.5">shield</span>
+                <span>No registres aquí información comprometedora ni el detalle textual de lo que el paciente compartió en sesión. Anota solo datos generales de seguimiento (tema abordado, avance, acuerdos, riesgo) — protege la confidencialidad de la relación paciente-especialista.</span>
+              </p>
               <div class="flex justify-end mt-3">
                 <button
                   type="button"
@@ -1726,8 +1766,14 @@
           });
       }
 
+      // Guarda en memoria (por id_doc = id_encuesta) las encuestas de satisfacción ya
+      // cargadas en "Archivos Guardados", para que verEncuestaCompletaExp() no tenga que
+      // volver a pedirlas al backend.
+      let encuestasExpedienteGlobal = {};
+
       async function cargarDocumentos(id) {
         const contenedor = document.getElementById("contenedor_documentos");
+        encuestasExpedienteGlobal = {};
         contenedor.innerHTML =
           '<p class="text-sm text-slate-400">Cargando...</p>';
         try {
@@ -1776,6 +1822,9 @@
                     ? `<span>Recomendaría (0-10): <b class="text-slate-600">${doc.probabilidad_recomendar}</b></span>`
                     : "",
                 ].filter(Boolean);
+                // Se guarda en memoria (por id_doc = id_encuesta) para que el botón "Ver
+                // completa" no tenga que volver a pedirla al backend.
+                encuestasExpedienteGlobal[doc.id_doc] = doc;
                 contenedor.innerHTML += `
                     <div class="flex items-start gap-3 p-3 bg-white border border-slate-200 rounded-xl">
                         <div class="w-10 h-10 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center shrink-0">
@@ -1787,6 +1836,12 @@
                             ${doc.comentarios ? `<p class="text-xs text-slate-500 mt-1">${escapeHtml(doc.comentarios)}</p>` : ""}
                             <p class="text-[10px] text-slate-400 mt-1">Respondida el ${fechaFormat}</p>
                         </div>
+                        <button
+                          onclick="verEncuestaCompletaExp(${doc.id_doc})"
+                          class="shrink-0 px-3 py-1.5 bg-white border border-slate-200 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700 active:scale-95 text-slate-500 text-xs font-bold rounded-full transition-all"
+                        >
+                          Ver completa
+                        </button>
                     </div>`;
                 return;
               }
@@ -1818,6 +1873,100 @@
         } catch (e) {
           console.error(e);
         }
+      }
+
+      // Abre el modal de solo lectura con TODOS los campos de una encuesta de satisfacción
+      // guardada en "Archivos Guardados" (mismo botón/diseño que en Perfil > Encuestas por
+      // revisar). No pide nada al backend — usa el mismo objeto que ya se cargó al pintar
+      // la tarjeta de esa encuesta.
+      function verEncuestaCompletaExp(idDoc) {
+        const enc = encuestasExpedienteGlobal[idDoc];
+        if (!enc) return;
+        const fecha = enc.fecha_subida
+          ? new Date(enc.fecha_subida).toLocaleDateString("es-MX")
+          : "Sin fecha";
+        document.getElementById("veexp_meta").innerText =
+          `${document.getElementById("det_nombre").innerText} · Especialista: ${enc.especialista || "N/A"} · ${fecha}`;
+        document.getElementById("veexp_cuerpo").innerHTML =
+          construirHtmlEncuestaDetalle(enc);
+
+        document.getElementById("modalVerEncuestaExp").classList.remove("hidden");
+        setTimeout(() => {
+          document.getElementById("modalVerEncuestaExp").classList.remove("opacity-0");
+          document
+            .getElementById("modalVerEncuestaExpContent")
+            .classList.remove("scale-95");
+        }, 10);
+      }
+
+      function cerrarModalVerEncuestaExp() {
+        document.getElementById("modalVerEncuestaExp").classList.add("opacity-0");
+        document
+          .getElementById("modalVerEncuestaExpContent")
+          .classList.add("scale-95");
+        setTimeout(() => {
+          document.getElementById("modalVerEncuestaExp").classList.add("hidden");
+        }, 300);
+      }
+
+      // Construye el cuerpo visual (tarjetas con ícono) del detalle de una encuesta de
+      // satisfacción, mostrando SIEMPRE los 6 campos posibles -- con "Sin dato registrado"
+      // cuando el campo no se llenó -- en vez de ocultar la fila. Copia exacta de la misma
+      // función en perfil.html (ver construirHtmlEncuestaDetalle ahí); se duplica porque son
+      // páginas HTML independientes sin un módulo JS compartido.
+      function construirHtmlEncuestaDetalle(enc) {
+        const sinDato =
+          '<span class="text-slate-400 font-normal italic">Sin dato registrado</span>';
+        const estrellas = (n) =>
+          n
+            ? `<span class="text-amber-500 tracking-wide">${"★".repeat(n)}${"☆".repeat(5 - n)}</span> <span class="text-slate-400 font-normal text-xs">(${n}/5)</span>`
+            : sinDato;
+        const calGeneral = enc.calificacion || 0;
+        const colorGeneral =
+          calGeneral <= 2
+            ? "bg-red-50 border-red-100 text-red-600"
+            : calGeneral === 3
+              ? "bg-amber-50 border-amber-100 text-amber-600"
+              : "bg-emerald-50 border-emerald-100 text-emerald-600";
+
+        const campo = (icon, iconBg, etiqueta, valorHtml) => `
+          <div class="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <div class="w-9 h-9 rounded-full ${iconBg} flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px]">${icon}</span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">${etiqueta}</p>
+              <p class="text-sm font-bold text-slate-800 mt-0.5">${valorHtml}</p>
+            </div>
+          </div>`;
+
+        let nps = sinDato;
+        if (enc.probabilidad_recomendar !== null && enc.probabilidad_recomendar !== undefined) {
+          const n = enc.probabilidad_recomendar;
+          const colorNps = n >= 8 ? "text-emerald-600" : n >= 6 ? "text-amber-600" : "text-red-600";
+          nps = `<span class="${colorNps} font-bold">${n}/10</span>`;
+        }
+
+        return `
+          <div class="p-5 rounded-2xl border ${colorGeneral} flex items-center justify-between gap-3">
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wide opacity-70">Calificación general</p>
+              <p class="text-2xl font-bold font-plus mt-0.5 tracking-wide">${"★".repeat(calGeneral)}${"☆".repeat(5 - calGeneral)}</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl opacity-40">reviews</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            ${campo("support_agent", "bg-blue-100 text-blue-600", "Trato del especialista", estrellas(enc.calificacion_especialista))}
+            ${campo("schedule", "bg-indigo-100 text-indigo-600", "Puntualidad", estrellas(enc.calificacion_puntualidad))}
+            ${campo("psychology", "bg-purple-100 text-purple-600", "¿La sesión le ayudó?", enc.utilidad_sesion ? escapeHtml(enc.utilidad_sesion) : sinDato)}
+            ${campo("trending_up", "bg-teal-100 text-teal-600", "Probabilidad de recomendar", nps)}
+          </div>
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">format_quote</span> Comentarios
+            </p>
+            <p class="text-sm text-slate-700 whitespace-pre-line">${enc.comentarios ? escapeHtml(enc.comentarios) : '<span class="text-slate-400 italic">Sin comentarios.</span>'}</p>
+          </div>`;
       }
 
       async function subirDocumentoCloudinary(event) {

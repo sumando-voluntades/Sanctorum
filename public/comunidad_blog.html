@@ -84,9 +84,9 @@
           <!-- ============ SIDEBAR: FILTRAR CONTENIDO ============ -->
           <aside class="lg:col-span-1">
             <div
-              class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 lg:sticky lg:top-28"
+              class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 lg:sticky lg:top-28 flex flex-col max-h-[80vh] lg:max-h-[calc(100vh-9rem)]"
             >
-              <div class="flex items-center justify-between mb-5">
+              <div class="flex items-center justify-between mb-5 shrink-0">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2">
                   <span class="material-symbols-outlined text-secondary text-lg"
                     >filter_list</span
@@ -101,7 +101,7 @@
                 </button>
               </div>
 
-              <div class="relative mb-6">
+              <div class="relative mb-6 shrink-0">
                 <span
                   class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg"
                   >search</span
@@ -116,11 +116,18 @@
               </div>
 
               <p
-                class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3"
+                class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3 shrink-0"
               >
                 Categorías
               </p>
-              <div id="contenedor_filtros" class="space-y-1 mb-2">
+              <!-- Con muchas categorías (ej. 100), esta lista ya no empuja el tamaño de la
+                   tarjeta hacia abajo indefinidamente: se limita a la altura disponible
+                   (aprox. lo que ocupa "Artículos Recientes" al lado) y a partir de ahí
+                   aparece su propio desplazador vertical. -->
+              <div
+                id="contenedor_filtros"
+                class="space-y-1 mb-2 flex-1 min-h-0 overflow-y-auto pr-1"
+              >
                 <p class="text-xs text-slate-400">Cargando categorías...</p>
               </div>
             </div>
@@ -504,6 +511,28 @@
       const IMG_PLACEHOLDER_NOTICIA =
         "https://lh3.googleusercontent.com/aida-public/AB6AXuCnegNE53o1QknLomEAXCAsibRyUfTvd3FpTDfA1Hld5pwnVI8FOjbtTt43xNzCPid61zlkHOJ5b3cxwOdnT73S4iz1lHArs65RwRszWFj4TaQXjFDwS9Q2gAr3_hBZeUpaKYJjwLdWPFwL9w0mwEa56LoXVjJUPPe-GgEraF1pK4E2fmVngR1vIE_0jJHy3c76-U9FJxwVjG6lT8L1BbvvRIyg_BUxrUESXDY-xgJOgpAN8IyjYKQCKDP-DW8zIJfgdlzkaX6fTSg";
 
+      // Cloudinary genera automáticamente una miniatura (primer fotograma) de cualquier
+      // video subido si se pide la misma URL cambiando la extensión por ".jpg". Se usa como
+      // portada de una publicación que trae video pero no fotografía propia, antes de caer
+      // en el placeholder genérico.
+      function posterDeVideo(urlVideo) {
+        if (!urlVideo) return "";
+        return urlVideo.replace(/\.[a-z0-9]+(\?.*)?$/i, ".jpg$1");
+      }
+
+      // Quita hashtags y saltos de línea del contenido para armar el pequeño extracto que
+      // se ve en la tarjeta (el recorte visual final lo hace "line-clamp" por CSS, esto solo
+      // evita que el extracto arranque o se llene de "#Etiquetas" sueltas). Primero quita
+      // etiquetas HTML (ver quitarEtiquetasHtml en comun.js): el contenido puede venir con
+      // formato del editor de texto del panel de admin, y el extracto siempre debe ser texto
+      // plano -- si no, se verían literalmente "<p>", "<strong>", etc. en la tarjeta.
+      function extractoSinHashtags(texto) {
+        return quitarEtiquetasHtml(texto)
+          .replace(/#[\p{L}0-9_]+/gu, "")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
       let noticiasGlobal = [];
 
       // Al cargar la página: inserta navbar/footer públicos, marca el link
@@ -609,6 +638,21 @@
         }
       }
 
+      // Una publicación puede tener VARIAS categorías guardadas juntas como
+      // "Adolescencia, Cultura de Paz, Muralismo" (ver el selector de categorías en el panel
+      // de administración). Antes el sidebar tomaba ese texto completo como si fuera una sola
+      // categoría, y por eso aparecían combinaciones raras que no existen como tal en el
+      // catálogo de Categorías. Esta función las separa en categorías individuales para que el
+      // conteo y el filtro trabajen con nombres reales. Si la noticia no tiene categoría
+      // asignada, cae a su tipo (o "Comunidad") como categoría única, igual que antes.
+      function categoriasDeNoticia(n) {
+        const partes = (n.categoria || "")
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean);
+        return partes.length > 0 ? partes : [n.tipo || "Comunidad"];
+      }
+
       // Construye la lista de categorías del sidebar dinámicamente (con conteo real),
       // en vez de una lista fija hardcodeada — así si mañana agregan una categoría nueva
       // desde Publicaciones, aparece aquí automáticamente sin tocar el HTML.
@@ -617,8 +661,9 @@
         const cont = document.getElementById("contenedor_filtros");
         const conteos = {};
         noticiasGlobal.forEach((n) => {
-          const cat = n.categoria || n.tipo || "Comunidad";
-          conteos[cat] = (conteos[cat] || 0) + 1;
+          categoriasDeNoticia(n).forEach((cat) => {
+            conteos[cat] = (conteos[cat] || 0) + 1;
+          });
         });
         const categorias = Object.keys(conteos).sort();
 
@@ -695,7 +740,10 @@
               month: "short",
               year: "numeric",
             });
-            const img = n.url_imagen || IMG_PLACEHOLDER_NOTICIA;
+            const img =
+              n.url_imagen ||
+              posterDeVideo(n.url_video) ||
+              IMG_PLACEHOLDER_NOTICIA;
             const categoria = n.categoria || n.tipo || "Comunidad";
             return `
                 <a href="evento_detalle?id=${n.id_publicacion}"
@@ -708,7 +756,8 @@
                   </div>
                   <div class="p-5">
                     <h3 class="text-base font-bold mb-2 leading-snug line-clamp-2">${n.titulo}</h3>
-                    <p class="text-on-surface/60 text-xs mb-3">${fecha} · ${n.autor || "Equipo Sanctórum"}</p>
+                    <p class="text-on-surface/60 text-xs mb-2">${fecha} · ${n.autor || "Equipo Sanctórum"}</p>
+                    <p class="text-on-surface/70 text-sm mb-3 line-clamp-3">${escapeHtml(extractoSinHashtags(n.contenido))}</p>
                     <span class="text-secondary font-bold text-sm flex items-center gap-1">
                       Leer más
                       <span class="material-symbols-outlined text-lg">chevron_right</span>
@@ -778,10 +827,8 @@
         let filtradas =
           categoriaActivaNoticias === "Todos"
             ? noticiasGlobal
-            : noticiasGlobal.filter(
-                (n) =>
-                  (n.categoria || n.tipo || "Comunidad") ===
-                  categoriaActivaNoticias,
+            : noticiasGlobal.filter((n) =>
+                categoriasDeNoticia(n).includes(categoriaActivaNoticias),
               );
         if (texto) {
           filtradas = filtradas.filter(

@@ -15,6 +15,13 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/output.css" />
+    <!-- Editor de texto enriquecido para el campo "Contenido" de Publicaciones (ver
+         inicializarEditorContenido más abajo). Solo se usa aquí, en el panel de admin -- la
+         página pública NO necesita Quill, solo muestra el HTML que este editor genera. -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css"
+    />
     <style>
       .material-symbols-outlined {
         font-variation-settings:
@@ -33,6 +40,81 @@
           background: #fff;
           z-index: 50;
         }
+      }
+
+      /* Editor de contenido (Quill) y su vista previa: el toolbar de Quill trae su propio look
+         "cuadriculado" por defecto que no combina con el resto del panel, así que se le quitan
+         los bordes y se le da la misma pinta redondeada que los demás campos del formulario. */
+      #pub_contenido_editor_wrap .ql-toolbar {
+        border: none;
+        border-bottom: 1px solid #e2e8f0;
+        border-radius: 0.75rem 0.75rem 0 0;
+        background: #fff;
+      }
+      #pub_contenido_editor_wrap .ql-container {
+        border: none;
+        border-radius: 0 0 0.75rem 0.75rem;
+        font-family: inherit;
+        font-size: 0.95rem;
+      }
+      #pub_contenido_editor {
+        min-height: 140px;
+      }
+      /* Etiquetas en español para el selector de encabezados del toolbar (Quill trae "Heading 1"/
+         "Heading 2"/"Normal" en inglés por defecto). Debe ser un espejo de las mismas reglas en
+         admin/agenda.html. */
+      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
+      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-item[data-value="2"]::before {
+        content: "Título";
+      }
+      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
+      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-item[data-value="3"]::before {
+        content: "Subtítulo";
+      }
+      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-label:not([data-value])::before,
+      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-item:not([data-value])::before {
+        content: "Párrafo";
+      }
+      /* La vista previa debe verse EXACTAMENTE como se va a ver en la página pública -- estas
+         reglas deben ser un espejo de las de #det_contenido_texto en evento_detalle.html. */
+      #pub_contenido_preview p {
+        margin: 0 0 0.9em;
+      }
+      #pub_contenido_preview p:last-child {
+        margin-bottom: 0;
+      }
+      #pub_contenido_preview ul,
+      #pub_contenido_preview ol {
+        margin: 0 0 0.9em 1.25em;
+      }
+      #pub_contenido_preview ul {
+        list-style: disc;
+      }
+      #pub_contenido_preview ol {
+        list-style: decimal;
+      }
+      #pub_contenido_preview a {
+        color: #be185d;
+        text-decoration: underline;
+      }
+      #pub_contenido_preview h2,
+      #pub_contenido_preview h3 {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-weight: 700;
+        color: #171c1f;
+        line-height: 1.3;
+      }
+      #pub_contenido_preview h2 {
+        font-size: 1.4rem;
+        margin: 1.2em 0 0.5em;
+      }
+      #pub_contenido_preview h3 {
+        font-size: 1.15rem;
+        margin: 1em 0 0.4em;
+      }
+      #pub_contenido_preview h2:first-child,
+      #pub_contenido_preview h3:first-child {
+        margin-top: 0;
       }
     </style>
   </head>
@@ -91,12 +173,9 @@
             onchange="aplicarFiltrosPublicaciones()"
             class="appearance-none bg-[#f0f4f8] border-none rounded-full px-5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-pink-500 text-slate-600 cursor-pointer"
           >
+            <!-- Se repuebla dinámicamente desde el catálogo de Categorías al cargar
+                 (ver actualizarSelectFiltroCategoria), ya no son 5 opciones fijas. -->
             <option value="Todas">Cualquier Categoría</option>
-            <option value="Infancia">Infancia</option>
-            <option value="Adolescencia">Adolescencia</option>
-            <option value="Consejos para padres">Consejos para padres</option>
-            <option value="Cultura de Paz">Cultura de Paz</option>
-            <option value="Muralismo">Muralismo</option>
           </select>
           <button
             onclick="limpiarFiltrosPublicaciones()"
@@ -156,6 +235,11 @@
             class="space-y-5"
           >
             <input type="hidden" id="pub_id" value="" />
+            <!-- pub_origen queda fijo, desde que se abre el modal, en la tabla donde vivía el
+                 registro ANTES de guardar (nunca se toca aunque el usuario cambie el Tipo
+                 libremente). guardarPublicacion() lo manda como "origen_original": si el tipo
+                 recién elegido implica una tabla distinta, el backend mueve el registro entre
+                 Publicaciones y Historias_Exito en vez de un simple UPDATE. -->
             <input type="hidden" id="pub_origen" value="publicacion" />
 
             <div>
@@ -321,75 +405,63 @@
 
             <div id="bloque_campos_normales" class="space-y-5">
               <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1"
-                  >Categoría
-                  <span class="font-normal text-slate-400 normal-case"
-                    >(puedes elegir varias)</span
-                  ></label
-                >
-                <div id="pub_categorias_checks" class="flex flex-wrap gap-2">
-                  <label
-                    class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"
-                    ><input
-                      type="checkbox"
-                      class="pub_categoria_check accent-secondary"
-                      value="Infancia"
-                    />
-                    Infancia</label
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-sm font-bold text-slate-700"
+                    >Categoría
+                    <span class="font-normal text-slate-400 normal-case"
+                      >(puedes elegir varias)</span
+                    ></label
                   >
-                  <label
-                    class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"
-                    ><input
-                      type="checkbox"
-                      class="pub_categoria_check accent-secondary"
-                      value="Adolescencia"
-                    />
-                    Adolescencia</label
-                  >
-                  <label
-                    class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"
-                    ><input
-                      type="checkbox"
-                      class="pub_categoria_check accent-secondary"
-                      value="Consejos para padres"
-                    />
-                    Consejos para padres</label
-                  >
-                  <label
-                    class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"
-                    ><input
-                      type="checkbox"
-                      class="pub_categoria_check accent-secondary"
-                      value="Cultura de Paz"
-                    />
-                    Cultura de Paz</label
-                  >
-                  <label
-                    class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"
-                    ><input
-                      type="checkbox"
-                      class="pub_categoria_check accent-secondary"
-                      value="Muralismo"
-                    />
-                    Muralismo (Impacto Visual)</label
-                  >
-                  <label
-                    class="flex items-center gap-1.5 text-xs font-bold bg-[#f0f4f8] px-3 py-2 rounded-full cursor-pointer"
-                    ><input
-                      type="checkbox"
-                      id="pub_categoria_otro_check"
-                      class="accent-secondary"
-                      onchange="toggleCategoriaOtraPub()"
-                    />
-                    Otro: escribir...</label
-                  >
+                  <div class="flex items-center gap-3">
+                    <span
+                      id="contador_categorias"
+                      class="text-xs text-slate-400"
+                    ></span>
+                    <!-- Controles de paginación: mismo patrón que "Artículos Recientes" en
+                         comunidad_blog.html -- aquí se pagina de 10 en 10 en vez de deslizar,
+                         porque las categorías se ven en cuadrícula (varias filas), no en tira
+                         horizontal. -->
+                    <div id="paginacion_categorias" class="flex gap-1.5"></div>
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  id="pub_categoria_otro"
-                  placeholder="Escribe la(s) categoría(s) — sepáralas con coma si son varias"
-                  class="hidden mt-2 w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none"
-                />
+                <!-- Cuadrícula de chips de categoría (mismo patrón que "Artículos Recientes"):
+                     se muestran de 10 en 10 y el resto se alcanza con los botones de arriba. Los
+                     chips se generan dinámicamente desde el catálogo en categoriasCatalogoGlobal
+                     (ver cargarCategoriasCatalogo/renderChipsCategorias), ya no son 5 checkboxes
+                     fijos. -->
+                <div
+                  id="pub_categorias_checks"
+                  class="flex flex-wrap gap-2"
+                >
+                  <p class="text-sm text-slate-400 italic">Cargando categorías...</p>
+                </div>
+
+                <!-- Mini-buscador estilo Google: sugiere categorías ya existentes según lo que
+                     se escribe, o permite registrar una nueva sobre la marcha (queda disponible
+                     de inmediato para reutilizarse en otras publicaciones). -->
+                <div class="relative mt-3 max-w-xs">
+                  <div
+                    class="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2.5 focus-within:ring-2 focus-within:ring-secondary/30"
+                  >
+                    <span class="material-symbols-outlined text-slate-400 text-[18px]"
+                      >search</span
+                    >
+                    <input
+                      type="text"
+                      id="pub_categoria_buscador"
+                      placeholder="Buscar o agregar categoría..."
+                      class="flex-1 border-none outline-none text-sm bg-transparent"
+                      oninput="filtrarSugerenciasCategoria()"
+                      onfocus="filtrarSugerenciasCategoria()"
+                      onblur="setTimeout(() => document.getElementById('pub_categoria_sugerencias').classList.add('hidden'), 150)"
+                      onkeydown="if(event.key==='Enter'){event.preventDefault(); agregarCategoriaDesdeBuscador();}"
+                    />
+                  </div>
+                  <div
+                    id="pub_categoria_sugerencias"
+                    class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden max-h-48 overflow-y-auto"
+                  ></div>
+                </div>
               </div>
 
               <div>
@@ -405,15 +477,56 @@
               </div>
 
               <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1"
-                  >Contenido</label
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-sm font-bold text-slate-700"
+                    >Contenido</label
+                  >
+                  <span class="text-xs text-slate-400"
+                    >Los "Enters" se respetan tal cual en la página pública</span
+                  >
+                </div>
+                <!-- Editor de texto enriquecido (Quill, ver <head> y inicializarEditorContenido
+                     más abajo). Solo negritas/cursiva/subrayado/listas/enlaces a propósito --
+                     ver el comentario junto a TOOLBAR_CONTENIDO. Guarda su HTML en el
+                     <textarea id="pub_contenido"> oculto de abajo, que sigue siendo el campo
+                     que en verdad lee/escribe el resto del código (guardarPublicacion,
+                     abrirModalEditarPub, etc.), así no hubo que tocarlo. -->
+                <div
+                  id="pub_contenido_editor_wrap"
+                  class="bg-[#f0f4f8] rounded-xl overflow-hidden"
                 >
-                <textarea
-                  id="pub_contenido"
-                  rows="6"
-                  class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30 resize-none"
-                  placeholder="Redacta el cuerpo completo de la publicación..."
-                ></textarea>
+                  <div id="pub_contenido_editor"></div>
+                </div>
+                <textarea id="pub_contenido" class="hidden"></textarea>
+
+                <!-- Vista previa en vivo: replica EXACTAMENTE el bloque de contenido de
+                     evento_detalle.html (SIN caja/fondo, ver #pub_contenido_preview más abajo
+                     en <style>) para que el staff vea, mientras redacta, cómo se va a ver la
+                     publicación en la página pública -- sin tener que guardar y entrar al sitio
+                     a revisar. Si ese bloque cambia alguna vez en evento_detalle.html, hay que
+                     replicar el cambio aquí también para que la vista previa no mienta. El
+                     borde punteado es solo del panel de admin (para delimitar dónde empieza la
+                     vista previa dentro del formulario) -- no existe en la página pública. -->
+                <div class="mt-3">
+                  <p
+                    class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 flex items-center gap-1"
+                  >
+                    <span class="material-symbols-outlined text-sm"
+                      >visibility</span
+                    >
+                    Así se verá en la página pública
+                  </p>
+                  <div class="p-4 border border-dashed border-slate-200 rounded-xl">
+                    <div
+                      id="pub_contenido_preview"
+                      class="text-gray-800 text-base leading-relaxed"
+                    >
+                      <span class="text-gray-400 italic"
+                        >La vista previa aparecerá aquí mientras escribes...</span
+                      >
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -453,8 +566,59 @@
                 </div>
               </div>
 
+              <!-- ================= VIDEO (opcional) ================= -->
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1"
+                  >Video
+                  <span class="font-normal text-slate-400 normal-case"
+                    >(opcional)</span
+                  ></label
+                >
+                <div
+                  class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center bg-slate-50 hover:bg-slate-100 transition-colors"
+                >
+                  <div id="pub_video_preview_wrap" class="hidden mb-4">
+                    <video
+                      id="pub_video_preview"
+                      controls
+                      class="max-h-40 mx-auto rounded-xl"
+                    ></video>
+                  </div>
+                  <input
+                    type="file"
+                    id="input_video_publicacion"
+                    class="hidden"
+                    accept="video/mp4,video/webm,video/quicktime,video/x-m4v"
+                    onchange="subirVideoPublicacion(event)"
+                  />
+                  <button
+                    type="button"
+                    onclick="
+                      document.getElementById('input_video_publicacion').click()
+                    "
+                    id="btn_subir_video_pub"
+                    class="px-6 py-2 bg-white border-2 border-slate-800 text-slate-800 font-bold rounded-full text-sm hover:bg-slate-50 transition-all"
+                  >
+                    <span
+                      class="material-symbols-outlined align-middle text-[16px] mr-1"
+                      >videocam</span
+                    >
+                    Seleccionar Video
+                  </button>
+                  <button
+                    type="button"
+                    id="btn_quitar_video_pub"
+                    onclick="quitarVideoPublicacion()"
+                    class="hidden ml-2 px-4 py-2 text-red-500 font-bold rounded-full text-sm hover:bg-red-50 transition-all"
+                  >
+                    Quitar video
+                  </button>
+                  <input type="hidden" id="pub_url_video" value="" />
+                </div>
+              </div>
+
               <!-- ================= GALERÍA ADICIONAL (varias fotos → historia en el detalle público) ================= -->
-              <div id="bloque_galeria_adicional" class="hidden">
+              <div id="bloque_galeria_adicional">
                 <label class="block text-sm font-bold text-slate-700 mb-1"
                   >Fotos adicionales</label
                 >
@@ -605,6 +769,12 @@
     <script src="/js/comun.js"></script>
     <script src="js/notificaciones.js"></script>
     <script src="/js/incluir.js"></script>
+    <!-- DOMPurify: sanea el HTML del editor de "Contenido" antes de inyectarlo en la vista
+         previa (ver sanitizarContenidoEnriquecido en comun.js). La página pública usa la misma
+         librería para lo mismo -- ver evento_detalle.html. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+    <!-- Quill: editor de texto enriquecido para "Contenido" -- ver inicializarEditorContenido. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script>
       // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
       // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
@@ -635,6 +805,7 @@
       // propios de esta página (esRolVoluntario, puedePublicarHistoriaExito) y arranca la
       // carga de publicaciones y los catálogos que usa el modal (eventos, beneficiarios).
       document.addEventListener("DOMContentLoaded", async () => {
+        inicializarEditorContenido();
         await incluirParcial("#sidebar-mount", "partials/navbar_admin.html");
         await incluirParcial("#header-mount", "partials/header_admin.html");
         incluirParcial("#footer-mount", "partials/footer_admin.html");
@@ -677,6 +848,7 @@
         cargarPublicaciones();
         cargarEventosParaRelacionar();
         cargarBeneficiariosParaHistoria();
+        cargarCategoriasCatalogo();
         manejarHandoffSolicitud();
       });
 
@@ -772,7 +944,11 @@
         document
           .getElementById("bloque_campos_normales")
           .classList.toggle("hidden", esHistoria);
-        document.getElementById("pub_contenido").required = !esHistoria;
+        // "pub_contenido" ya no es un <textarea> visible/enfocable (ahora lo llena el editor
+        // Quill), así que no se puede confiar en el atributo HTML "required" nativo para
+        // bloquear el envío -- un campo requerido oculto puede fallar el submit en silencio
+        // sin avisar nada al usuario. La validación de que no esté vacío se hace a mano en
+        // guardarPublicacion().
         toggleTipoOtraPub();
       }
 
@@ -786,63 +962,296 @@
         document.getElementById("pub_tipo_otro").required = esOtro;
       }
 
-      // Muestra/oculta el input de texto libre de categoría cuando se marca el checkbox "Otro".
-      function toggleCategoriaOtraPub() {
-        const esOtra = document.getElementById(
-          "pub_categoria_otro_check",
-        ).checked;
-        document
-          .getElementById("pub_categoria_otro")
-          .classList.toggle("hidden", !esOtra);
-      }
+      // ================= CATEGORÍAS (catálogo persistente + carrusel + mini-buscador) =================
+      // Antes eran 5 checkboxes fijos + un campo de texto libre "Otro" que nunca se guardaba en
+      // ningún catálogo (por eso una categoría escrita a mano no se podía reutilizar). Ahora se
+      // cargan desde /api/categorias y se seleccionan como chips; el mini-buscador funciona
+      // estilo Google: sugiere del catálogo mientras escribes, y si no existe, la registra
+      // (get-or-create en el servidor) para que quede disponible de inmediato.
+      let categoriasCatalogoGlobal = [];
+      let categoriasSeleccionadasPub = new Set();
+      // Igual que Artículos Recientes en comunidad_blog.html: se pagina de 10 en 10 en vez de
+      // mostrar todo el catálogo junto.
+      const CATEGORIAS_POR_PAGINA = 10;
+      let paginaActualCategorias = 0;
 
-      // Junta las categorías marcadas (checkboxes) + las escritas a mano en "Otro", como una
-      // sola lista separada por comas — así una publicación puede pertenecer a varias categorías.
-      function obtenerCategoriasSeleccionadas() {
-        const marcadas = [
-          ...document.querySelectorAll(".pub_categoria_check:checked"),
-        ].map((c) => c.value);
-        if (document.getElementById("pub_categoria_otro_check").checked) {
-          const libres = document
-            .getElementById("pub_categoria_otro")
-            .value.split(",")
-            .map((s) => s.trim())
-            .filter(Boolean);
-          marcadas.push(...libres);
+      async function cargarCategoriasCatalogo() {
+        try {
+          const res = await fetch(`${API_URL}/api/categorias`);
+          const json = await res.json();
+          if (json.success) {
+            categoriasCatalogoGlobal = json.data;
+            renderChipsCategorias();
+            actualizarSelectFiltroCategoria();
+          }
+        } catch (e) {
+          console.error("Error al cargar categorías:", e);
         }
-        return marcadas;
       }
 
-      // Inversa: recibe "Infancia, Muralismo" (como viene guardado) y marca los checkboxes que
-      // correspondan; lo que no coincide con ninguna categoría conocida cae en "Otro: escribir...".
+      // Reordena el catálogo alfabéticamente (igual que lo entrega el backend) — se vuelve a
+      // aplicar tras agregar una categoría nueva localmente, para que la paginación quede
+      // estable y no dependa de en qué orden se fueron agregando.
+      function ordenarCatalogoCategorias() {
+        categoriasCatalogoGlobal.sort((a, b) =>
+          a.nombre_categoria.localeCompare(b.nombre_categoria, "es"),
+        );
+      }
+
+      // Mueve la paginación a la página donde cae "nombre" dentro del catálogo ya ordenado,
+      // para que una categoría recién agregada/seleccionada quede visible de inmediato.
+      function irAPaginaDeCategoria(nombre) {
+        const idx = categoriasCatalogoGlobal.findIndex(
+          (c) => c.nombre_categoria === nombre,
+        );
+        paginaActualCategorias =
+          idx >= 0 ? Math.floor(idx / CATEGORIAS_POR_PAGINA) : 0;
+      }
+
+      // Repuebla el <select> de filtro por categoría del listado con el catálogo actual,
+      // conservando la selección previa si sigue existiendo.
+      function actualizarSelectFiltroCategoria() {
+        const sel = document.getElementById("filtro_categoria");
+        if (!sel) return;
+        const valorActual = sel.value;
+        sel.innerHTML =
+          '<option value="Todas">Cualquier Categoría</option>' +
+          categoriasCatalogoGlobal
+            .map(
+              (c) =>
+                `<option value="${escapeHtml(c.nombre_categoria)}">${escapeHtml(c.nombre_categoria)}</option>`,
+            )
+            .join("");
+        if ([...sel.options].some((o) => o.value === valorActual)) {
+          sel.value = valorActual;
+        }
+      }
+
+      // Pinta la cuadrícula de chips de categoría dentro del modal (de CATEGORIAS_POR_PAGINA en
+      // CATEGORIAS_POR_PAGINA, igual que Artículos Recientes), marcando como activos los que
+      // están en categoriasSeleccionadasPub, y actualiza el contador "Mostrando X–Y de Z" y los
+      // botones de paginación. Se llama cada vez que cambia la selección, la página o el
+      // catálogo (p.ej. al agregar una categoría nueva desde el mini-buscador).
+      function renderChipsCategorias() {
+        const cont = document.getElementById("pub_categorias_checks");
+        const contador = document.getElementById("contador_categorias");
+        if (!cont) return;
+        if (categoriasCatalogoGlobal.length === 0) {
+          cont.innerHTML =
+            '<p class="text-sm text-slate-400 italic">Aún no hay categorías — agrega la primera con el buscador de abajo.</p>';
+          if (contador) contador.innerText = "";
+          renderPaginacionCategorias(0);
+          return;
+        }
+
+        const totalPaginas = Math.max(
+          1,
+          Math.ceil(categoriasCatalogoGlobal.length / CATEGORIAS_POR_PAGINA),
+        );
+        if (paginaActualCategorias > totalPaginas - 1) {
+          paginaActualCategorias = totalPaginas - 1;
+        }
+        if (paginaActualCategorias < 0) paginaActualCategorias = 0;
+
+        const inicio = paginaActualCategorias * CATEGORIAS_POR_PAGINA;
+        const paginaDeCategorias = categoriasCatalogoGlobal.slice(
+          inicio,
+          inicio + CATEGORIAS_POR_PAGINA,
+        );
+
+        if (contador) {
+          contador.innerText = `Mostrando ${inicio + 1}–${inicio + paginaDeCategorias.length} de ${categoriasCatalogoGlobal.length}`;
+        }
+
+        cont.innerHTML = paginaDeCategorias
+          .map((c) => {
+            const activa = categoriasSeleccionadasPub.has(c.nombre_categoria);
+            return `<button
+              type="button"
+              onclick="toggleCategoriaChip('${escapeAttrJs(c.nombre_categoria)}')"
+              class="whitespace-nowrap text-xs font-bold px-3 py-2 rounded-full border transition-all active:scale-95 ${
+                activa
+                  ? "bg-secondary text-white border-secondary"
+                  : "bg-[#f0f4f8] text-slate-600 border-transparent hover:bg-slate-200"
+              }"
+            >${escapeHtml(c.nombre_categoria)}</button>`;
+          })
+          .join("");
+
+        renderPaginacionCategorias(totalPaginas);
+      }
+
+      // Dibuja los botones de paginación de Categoría (anterior/siguiente), deshabilitando el
+      // que corresponda en la primera/última página — mismo patrón que
+      // renderPaginacionNoticias en comunidad_blog.html. No se muestra nada si cabe todo en
+      // una sola página.
+      function renderPaginacionCategorias(totalPaginas) {
+        const cont = document.getElementById("paginacion_categorias");
+        if (!cont) return;
+        if (totalPaginas <= 1) {
+          cont.innerHTML = "";
+          return;
+        }
+        const enPrimera = paginaActualCategorias === 0;
+        const enUltima = paginaActualCategorias >= totalPaginas - 1;
+        cont.innerHTML = `
+            <button type="button" onclick="cambiarPaginaCategorias(-1)" ${enPrimera ? "disabled" : ""}
+                    class="w-7 h-7 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    aria-label="Categorías anteriores">
+              <span class="material-symbols-outlined text-sm">chevron_left</span>
+            </button>
+            <button type="button" onclick="cambiarPaginaCategorias(1)" ${enUltima ? "disabled" : ""}
+                    class="w-7 h-7 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    aria-label="Siguientes categorías">
+              <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </button>`;
+      }
+
+      // Avanza o retrocede una página en la cuadrícula de Categoría (direccion: -1 o 1).
+      function cambiarPaginaCategorias(direccion) {
+        paginaActualCategorias += direccion;
+        renderChipsCategorias();
+      }
+
+      function toggleCategoriaChip(nombre) {
+        if (categoriasSeleccionadasPub.has(nombre)) {
+          categoriasSeleccionadasPub.delete(nombre);
+        } else {
+          categoriasSeleccionadasPub.add(nombre);
+        }
+        renderChipsCategorias();
+      }
+
+      // Muestra sugerencias del catálogo que coincidan con lo escrito (estilo autocompletado de
+      // Google), excluyendo las ya seleccionadas; si lo escrito no coincide con ninguna
+      // categoría existente, agrega al final la opción de registrarla como nueva.
+      function filtrarSugerenciasCategoria() {
+        const input = document.getElementById("pub_categoria_buscador");
+        const texto = input.value.trim().toLowerCase();
+        const cont = document.getElementById("pub_categoria_sugerencias");
+
+        const coincidencias = categoriasCatalogoGlobal
+          .filter((c) => !categoriasSeleccionadasPub.has(c.nombre_categoria))
+          .filter((c) => !texto || c.nombre_categoria.toLowerCase().includes(texto))
+          .slice(0, 6);
+
+        let filas = coincidencias
+          .map(
+            (c) => `<button
+              type="button"
+              onclick="seleccionarCategoriaSugerida('${escapeAttrJs(c.nombre_categoria)}')"
+              class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+            ><span class="material-symbols-outlined text-slate-400 text-[16px]">sell</span>${escapeHtml(c.nombre_categoria)}</button>`,
+          )
+          .join("");
+
+        const existeExacta = categoriasCatalogoGlobal.some(
+          (c) => c.nombre_categoria.toLowerCase() === texto,
+        );
+        if (texto && !existeExacta) {
+          const textoOriginal = input.value.trim();
+          filas += `<button
+            type="button"
+            onclick="seleccionarCategoriaSugerida('${escapeAttrJs(textoOriginal)}')"
+            class="w-full text-left px-4 py-2 text-sm font-bold text-secondary hover:bg-slate-50 flex items-center gap-2 border-t border-slate-100"
+          ><span class="material-symbols-outlined text-[16px]">add_circle</span>Agregar "${escapeHtml(textoOriginal)}" como nueva categoría</button>`;
+        }
+
+        if (!filas) {
+          cont.classList.add("hidden");
+          cont.innerHTML = "";
+          return;
+        }
+        cont.innerHTML = filas;
+        cont.classList.remove("hidden");
+      }
+
+      // Selecciona una categoría existente, o la registra en el catálogo (get-or-create en el
+      // servidor) cuando no coincide con ninguna — queda disponible de inmediato, sin necesidad
+      // de guardar primero la publicación, igual que el autocompletado de Google.
+      async function seleccionarCategoriaSugerida(nombre) {
+        nombre = (nombre || "").trim();
+        if (!nombre) return;
+        const yaExiste = categoriasCatalogoGlobal.some(
+          (c) => c.nombre_categoria.toLowerCase() === nombre.toLowerCase(),
+        );
+        if (!yaExiste) {
+          try {
+            const res = await fetch(`${API_URL}/api/categorias`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", ...authHeaders() },
+              body: JSON.stringify({ nombre }),
+            });
+            const data = await res.json();
+            if (data.success && data.data) {
+              categoriasCatalogoGlobal.push(data.data);
+              nombre = data.data.nombre_categoria;
+            } else {
+              categoriasCatalogoGlobal.push({ id_categoria: null, nombre_categoria: nombre });
+            }
+            actualizarSelectFiltroCategoria();
+          } catch (e) {
+            console.error("No se pudo registrar la categoría nueva:", e);
+            categoriasCatalogoGlobal.push({ id_categoria: null, nombre_categoria: nombre });
+          }
+        }
+        categoriasSeleccionadasPub.add(nombre);
+        document.getElementById("pub_categoria_buscador").value = "";
+        document.getElementById("pub_categoria_sugerencias").classList.add("hidden");
+        // Reordena y salta a la página donde quedó, para que se vea de inmediato aunque el
+        // catálogo ya tenga más de una página.
+        ordenarCatalogoCategorias();
+        irAPaginaDeCategoria(nombre);
+        renderChipsCategorias();
+      }
+
+      // Atajo para el Enter dentro del buscador: agrega/selecciona lo que esté escrito.
+      function agregarCategoriaDesdeBuscador() {
+        const valor = document.getElementById("pub_categoria_buscador").value.trim();
+        if (valor) seleccionarCategoriaSugerida(valor);
+      }
+
+      // Junta las categorías seleccionadas como una sola lista separada por comas — así una
+      // publicación puede pertenecer a varias categorías.
+      function obtenerCategoriasSeleccionadas() {
+        return [...categoriasSeleccionadasPub];
+      }
+
+      // Inversa: recibe "Infancia, Muralismo" (como viene guardado) y marca esos chips como
+      // seleccionados. Si alguna categoría de una publicación ya guardada no está todavía en el
+      // catálogo cargado (categoría antigua nunca registrada), se agrega igual para que se vea.
       function marcarCategoriasSeleccionadas(categoriaStr) {
-        const conocidas = [
-          "Infancia",
-          "Adolescencia",
-          "Consejos para padres",
-          "Cultura de Paz",
-          "Muralismo",
-        ];
         const partes = (categoriaStr || "")
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean);
-        document.querySelectorAll(".pub_categoria_check").forEach((c) => {
-          c.checked = partes.includes(c.value);
+        categoriasSeleccionadasPub = new Set(partes);
+        partes.forEach((p) => {
+          if (!categoriasCatalogoGlobal.some((c) => c.nombre_categoria === p)) {
+            categoriasCatalogoGlobal.push({ id_categoria: null, nombre_categoria: p });
+          }
         });
-        const libres = partes.filter((p) => !conocidas.includes(p));
-        document.getElementById("pub_categoria_otro_check").checked =
-          libres.length > 0;
-        document.getElementById("pub_categoria_otro").value = libres.join(", ");
-        document
-          .getElementById("pub_categoria_otro")
-          .classList.toggle("hidden", libres.length === 0);
+        ordenarCatalogoCategorias();
+        // Salta a la página de la primera categoría seleccionada, para que se vea de inmediato
+        // qué ya tenía marcado esta publicación al abrir el modal de edición.
+        if (partes.length > 0) irAPaginaDeCategoria(partes[0]);
+        else paginaActualCategorias = 0;
+        renderChipsCategorias();
       }
 
       // Un documento de consentimiento puede ser una foto (jpg/png) o un PDF escaneado —
       // esta comprobación por extensión decide si se puede mostrar como <img> o no.
       function esUrlDeImagen(url) {
         return /\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(url || "");
+      }
+
+      // Cloudinary genera automáticamente una miniatura (primer fotograma) de cualquier
+      // video subido si se pide la misma URL cambiando la extensión por ".jpg" — no hace
+      // falta procesar nada aparte. Se usa como portada de respaldo cuando una publicación
+      // trae video pero no fotografía de portada.
+      function posterDeVideo(urlVideo) {
+        if (!urlVideo) return "";
+        return urlVideo.replace(/\.[a-z0-9]+(\?.*)?$/i, ".jpg$1");
       }
 
       // Actualiza la vista previa del documento de consentimiento dentro del modal
@@ -870,6 +1279,94 @@
           pdfLink.classList.add("flex");
           img.classList.add("hidden");
         }
+      }
+
+      // Refleja en vivo, mientras se escribe, cómo se va a ver el contenido en la página
+      // pública. #pub_contenido ya trae el HTML tal cual lo generó Quill (ver
+      // inicializarEditorContenido/establecerContenidoEditor), así que solo hay que sanearlo
+      // (por si algo pegado trae basura) y pintarlo -- misma función que usa la página pública,
+      // ver sanitizarContenidoEnriquecido en comun.js.
+      function actualizarVistaPreviaContenido() {
+        const html = document.getElementById("pub_contenido").value;
+        const preview = document.getElementById("pub_contenido_preview");
+        if (!html.trim()) {
+          preview.innerHTML =
+            '<span class="text-gray-400 italic">La vista previa aparecerá aquí mientras escribes...</span>';
+          return;
+        }
+        preview.innerHTML = sanitizarContenidoEnriquecido(html);
+      }
+
+      // ================= EDITOR DE TEXTO ENRIQUECIDO (Quill) PARA "CONTENIDO" =================
+      // Formato básico a propósito (títulos/subtítulos, negritas, cursiva, subrayado, listas,
+      // enlaces): cubre lo que se necesita para que un aviso se vea bien sin abrir la puerta a
+      // estilos inconsistentes entre publicaciones (colores/tamaños libres). Los "títulos" y
+      // "subtítulos" del toolbar son h2/h3 (Quill "header": 2 y 3) -- se evita h1 a propósito
+      // para no competir con el título real de la publicación (que ya es un h1 en la página
+      // pública). El HTML que genera se guarda tal cual en Publicaciones.contenido y se sanea
+      // (DOMPurify) antes de mostrarse en la página pública -- ver evento_detalle.html.
+      let quillContenido = null;
+
+      function inicializarEditorContenido() {
+        if (quillContenido || typeof Quill === "undefined") return;
+        quillContenido = new Quill("#pub_contenido_editor", {
+          theme: "snow",
+          placeholder: "Redacta el cuerpo completo de la publicación...",
+          modules: {
+            toolbar: [
+              [{ header: [2, 3, false] }],
+              ["bold", "italic", "underline"],
+              [{ list: "ordered" }, { list: "bullet" }],
+              ["link"],
+              ["clean"],
+            ],
+          },
+        });
+        // Mantiene sincronizado el <textarea id="pub_contenido"> oculto (la fuente de verdad
+        // que en verdad lee/escribe el resto del código) y la vista previa en cada edición.
+        // Cuando el editor queda vacío, Quill deja internamente "<p><br></p>" -- se guarda como
+        // cadena vacía para que la validación de guardarPublicacion() lo detecte bien.
+        quillContenido.on("text-change", () => {
+          const vacio = quillContenido.getText().trim() === "";
+          document.getElementById("pub_contenido").value = vacio
+            ? ""
+            : quillContenido.root.innerHTML;
+          actualizarVistaPreviaContenido();
+        });
+      }
+
+      // Reemplaza el contenido del editor (usado al abrir el modal: vacío para "Nueva
+      // Publicación", o precargado al editar una existente).
+      //
+      // Contempla dos casos para "contenidoCrudo":
+      //  1. Publicaciones guardadas DESPUÉS de agregar este editor: ya traen HTML real de Quill
+      //     (por ejemplo "<p>hola</p>") -- se pegan tal cual.
+      //  2. Publicaciones "clásicas" de antes del editor: texto plano con saltos de línea reales
+      //     (un "\n" por línea, sin ninguna etiqueta). Si se pegaran tal cual, el parser HTML de
+      //     Quill colapsaría esos saltos de línea en un solo párrafo -- el mismo problema que
+      //     tuvimos que arreglar en evento_detalle.html. Para evitarlo, se escapan y se
+      //     convierte cada "\n" a un "<br>" ANTES de pegarlo, así el editor arranca mostrando
+      //     los mismos saltos de línea que ya se veían en la página pública.
+      function establecerContenidoEditor(contenidoCrudo) {
+        if (!quillContenido) return;
+        quillContenido.setText("");
+        const texto = contenidoCrudo || "";
+        if (texto) {
+          // Aunque "texto" venga de una publicación ya guardada (no de un pegado del usuario),
+          // se sanea igual con sanitizarContenidoEnriquecido() antes de dangerouslyPasteHTML --
+          // Quill limpia algo al pegar, pero no con la garantía de una lista blanca real (H6/H18
+          // en Auditoria_de_Seguridad_Hallazgos_y_Correcciones.docx: nunca confiar en HTML crudo
+          // insertado en el DOM, sea cual sea el origen del dato).
+          const html = esContenidoHtml(texto)
+            ? sanitizarContenidoEnriquecido(texto)
+            : escapeHtml(texto).replace(/\n/g, "<br>");
+          quillContenido.clipboard.dangerouslyPasteHTML(html);
+        }
+        const vacio = quillContenido.getText().trim() === "";
+        document.getElementById("pub_contenido").value = vacio
+          ? ""
+          : quillContenido.root.innerHTML;
+        actualizarVistaPreviaContenido();
       }
 
       // Sube el documento de consentimiento (foto o PDF) de una Historia de Éxito a
@@ -1002,7 +1499,7 @@
             // consentimiento como referencia visual — miniatura si es imagen, ícono de PDF si no.
             const img = esHistoriaCard
               ? p.url_documento_consentimiento || ""
-              : p.url_imagen || "";
+              : p.url_imagen || posterDeVideo(p.url_video) || "";
             const imgEsFoto = esHistoriaCard ? esUrlDeImagen(img) : true;
             const badgeTipo =
               p.tipo === "Evento"
@@ -1073,6 +1570,7 @@
       // de historia y de consentimiento) y deja habilitado el <select> de tipo.
       function abrirModalPublicacion() {
         document.getElementById("formPublicacion").reset();
+        establecerContenidoEditor("");
         document.getElementById("pub_id").value = "";
         document.getElementById("pub_origen").value = "publicacion";
         document.getElementById("pub_tipo").disabled = false;
@@ -1086,16 +1584,17 @@
         document
           .getElementById("bloque_generador_redes")
           .classList.add("hidden");
-        document
-          .getElementById("bloque_galeria_adicional")
-          .classList.add("hidden");
         document.getElementById("btn_descargar_redes").classList.add("hidden");
-        document
-          .querySelectorAll(".pub_categoria_check")
-          .forEach((c) => (c.checked = false));
-        document.getElementById("pub_categoria_otro_check").checked = false;
-        document.getElementById("pub_categoria_otro").value = "";
-        document.getElementById("pub_categoria_otro").classList.add("hidden");
+        quitarVideoPublicacion();
+        // La galería adicional ya no requiere guardar primero: se puede agregar fotos desde
+        // "Nueva Publicación" y se suben junto con el alta (ver galeriaPendienteNueva).
+        galeriaPendienteNueva = [];
+        renderGaleriaPendiente();
+        categoriasSeleccionadasPub = new Set();
+        paginaActualCategorias = 0;
+        document.getElementById("pub_categoria_buscador").value = "";
+        document.getElementById("pub_categoria_sugerencias").classList.add("hidden");
+        renderChipsCategorias();
         document.getElementById("pub_tipo_otro").value = "";
         document.getElementById("pub_tipo_otro").classList.add("hidden");
         document
@@ -1123,15 +1622,18 @@
         }, 10);
       }
 
-      // Abre el modal precargado con los datos de la publicación (o historia) a editar,
-      // tomados de publicacionesGlobal. Bloquea el <select> de tipo porque cambiarlo
-      // implicaría mover el registro entre las tablas de publicaciones e historias.
+      // Abre el modal precargado con los datos de la publicación (o historia) a editar, tomados
+      // de publicacionesGlobal. El <select> de tipo ya se puede cambiar libremente: si el nuevo
+      // tipo implica cruzar entre "Publicación normal" y "Historia de Éxito", el backend mueve
+      // el registro entre tablas (ver PUT /api/publicaciones/:id) usando pub_origen_original
+      // (lo que se guarda aquí) para saber de dónde viene.
       function abrirModalEditarPub(id, origen) {
         const pub = publicacionesGlobal.find(
           (p) => p.id_publicacion === id && p.origen === origen,
         );
         if (!pub) return;
         document.getElementById("formPublicacion").reset();
+        establecerContenidoEditor("");
         document.getElementById("pub_id").value = pub.id_publicacion;
         document.getElementById("pub_origen").value = pub.origen;
         document.getElementById("pub_titulo").value = pub.titulo;
@@ -1142,10 +1644,17 @@
           document.getElementById("pub_tipo").value = "Otro";
           document.getElementById("pub_tipo_otro").value = pub.tipo || "";
         }
-        // El tipo no se puede cambiar al editar: cruzar de "Publicación normal" a "Historia de
-        // Éxito" (o viceversa) implicaría mover el registro entre tablas distintas.
-        document.getElementById("pub_tipo").disabled = true;
+        document.getElementById("pub_tipo").disabled = false;
         cambiarTipoPublicacion();
+
+        // Limpia la selección de categorías del modal anterior antes de precargar (una
+        // Historia de Éxito no trae categoría propia; si el usuario cruza el tipo a
+        // Aviso/Evento, debe empezar con la selección en blanco, no con la de otra publicación).
+        categoriasSeleccionadasPub = new Set();
+        paginaActualCategorias = 0;
+        document.getElementById("pub_categoria_buscador").value = "";
+        document.getElementById("pub_categoria_sugerencias").classList.add("hidden");
+        renderChipsCategorias();
 
         if (pub.origen === "historia") {
           document.getElementById("pub_id_beneficiario").value =
@@ -1170,11 +1679,12 @@
           document
             .getElementById("pub_imagen_preview_wrap")
             .classList.add("hidden");
+          quitarVideoPublicacion();
         } else {
           marcarCategoriasSeleccionadas(pub.categoria);
           document.getElementById("pub_evento_relacionado").value =
             pub.id_evento_relacionado || "";
-          document.getElementById("pub_contenido").value = pub.contenido || "";
+          establecerContenidoEditor(pub.contenido || "");
           document.getElementById("pub_url_imagen").value =
             pub.url_imagen || "";
           document
@@ -1196,10 +1706,26 @@
               .getElementById("bloque_generador_redes")
               .classList.add("hidden");
           }
-          // La galería de fotos adicionales solo aplica a publicaciones ya guardadas (necesitan un ID).
-          document
-            .getElementById("bloque_galeria_adicional")
-            .classList.remove("hidden");
+          document.getElementById("pub_url_video").value = pub.url_video || "";
+          if (pub.url_video) {
+            document.getElementById("pub_video_preview").src = pub.url_video;
+            document
+              .getElementById("pub_video_preview_wrap")
+              .classList.remove("hidden");
+            document
+              .getElementById("btn_quitar_video_pub")
+              .classList.remove("hidden");
+          } else {
+            document
+              .getElementById("pub_video_preview_wrap")
+              .classList.add("hidden");
+            document
+              .getElementById("btn_quitar_video_pub")
+              .classList.add("hidden");
+          }
+          // La galería de fotos adicionales ya está guardada -- se trae y se puede seguir
+          // agregando/quitando de inmediato (a diferencia de una publicación nueva, aquí no
+          // hace falta pasar por galeriaPendienteNueva porque ya existe un id).
           cargarGaleriaAdicional(pub.id_publicacion);
         }
 
@@ -1250,18 +1776,70 @@
         }
       }
 
-      // Sube una o varias fotos adicionales a Cloudinary y las va registrando una por una
-      // en /api/galeria; requiere que la publicación ya tenga id (esté guardada).
+      // Guarda las URLs (ya subidas a Cloudinary) de fotos adicionales de una publicación
+      // NUEVA que todavía no tiene id: se registran en /api/galeria recién después de que
+      // guardarPublicacion() cree la publicación y tenga un id real (ver flushGaleriaPendiente).
+      let galeriaPendienteNueva = [];
+
+      // Pinta las fotos adicionales pendientes de una publicación nueva (aún sin guardar),
+      // cada una con un botón para quitarla de la lista -- como todavía no se registró en
+      // /api/galeria, quitarla es solo splice + repintar, sin llamada al servidor.
+      function renderGaleriaPendiente() {
+        const cont = document.getElementById("galeria_adicional_preview");
+        if (!cont) return;
+        if (galeriaPendienteNueva.length === 0) {
+          cont.innerHTML =
+            '<p class="text-xs text-slate-400">Aún no hay fotos adicionales.</p>';
+          return;
+        }
+        cont.innerHTML = galeriaPendienteNueva
+          .map(
+            (url, idx) => `
+              <div class="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 group">
+                  <img src="${url}" class="w-full h-full object-cover" alt="Foto adicional">
+                  <button type="button" onclick="eliminarImagenPendiente(${idx})" class="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+              </div>`,
+          )
+          .join("");
+      }
+
+      function eliminarImagenPendiente(idx) {
+        galeriaPendienteNueva.splice(idx, 1);
+        renderGaleriaPendiente();
+      }
+
+      // Una vez que guardarPublicacion() ya creó la publicación y tiene su id real, registra
+      // en /api/galeria cada foto que se había quedado pendiente y limpia la lista.
+      async function flushGaleriaPendiente(idPub) {
+        if (galeriaPendienteNueva.length === 0) return;
+        for (const url of galeriaPendienteNueva) {
+          try {
+            await fetch(`${API_URL}/api/galeria`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", ...authHeaders() },
+              body: JSON.stringify({
+                tipo_entidad: "noticia",
+                id_entidad: idPub,
+                url_imagen: url,
+              }),
+            });
+          } catch (e) {
+            console.error("No se pudo registrar una foto adicional pendiente:", e);
+          }
+        }
+        galeriaPendienteNueva = [];
+      }
+
+      // Sube una o varias fotos adicionales a Cloudinary. Si la publicación ya tiene id (se
+      // está editando), las registra de una vez en /api/galeria; si es una publicación nueva
+      // que aún no se ha guardado, las deja en galeriaPendienteNueva para registrarlas junto
+      // con el alta (ver flushGaleriaPendiente en guardarPublicacion).
       async function subirImagenesGaleria(event) {
         const files = Array.from(event.target.files || []);
         if (files.length === 0) return;
         const idPub = document.getElementById("pub_id").value;
-        if (!idPub) {
-          alert(
-            "Primero guarda la publicación antes de agregar fotos adicionales.",
-          );
-          return;
-        }
 
         const btn = document.getElementById("btn_subir_galeria");
         const textoOriginal = btn.innerText;
@@ -1287,7 +1865,8 @@
               { method: "POST", body: formData },
             );
             const uploadData = await uploadRes.json();
-            if (uploadData.secure_url) {
+            if (!uploadData.secure_url) continue;
+            if (idPub) {
               await fetch(`${API_URL}/api/galeria`, {
                 method: "POST",
                 headers: {
@@ -1300,9 +1879,12 @@
                   url_imagen: uploadData.secure_url,
                 }),
               });
+            } else {
+              galeriaPendienteNueva.push(uploadData.secure_url);
             }
           }
-          cargarGaleriaAdicional(idPub);
+          if (idPub) cargarGaleriaAdicional(idPub);
+          else renderGaleriaPendiente();
         } catch (e) {
           console.error("Error al subir fotos adicionales:", e);
           alert("Falló la subida de una o más fotos.");
@@ -1395,6 +1977,75 @@
         }
       }
 
+      // ================= SUBIDA DE VIDEO (Cloudinary) =================
+      // Mismo patrón que subirImagenPublicacion: Cloudinary detecta el tipo de archivo
+      // automáticamente ("resource_type=auto"), así que no hace falta ningún endpoint nuevo.
+      async function subirVideoPublicacion(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const btn = document.getElementById("btn_subir_video_pub");
+        const textoOriginal = btn.innerText;
+        btn.innerText = "Subiendo...";
+        btn.disabled = true;
+
+        const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } =
+          await obtenerConfigCloudinary();
+        if (!CLOUD_NAME || !UPLOAD_PRESET) {
+          alert(
+            "Falta configurar CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET en las variables de entorno del servidor.",
+          );
+          btn.innerText = textoOriginal;
+          btn.disabled = false;
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", UPLOAD_PRESET);
+
+        try {
+          const uploadRes = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+            { method: "POST", body: formData },
+          );
+          const uploadData = await uploadRes.json();
+          if (uploadData.secure_url) {
+            document.getElementById("pub_url_video").value =
+              uploadData.secure_url;
+            document.getElementById("pub_video_preview").src =
+              uploadData.secure_url;
+            document
+              .getElementById("pub_video_preview_wrap")
+              .classList.remove("hidden");
+            document
+              .getElementById("btn_quitar_video_pub")
+              .classList.remove("hidden");
+          } else {
+            alert(
+              "No se pudo subir el video. Revisa la configuración de Cloudinary (CLOUD_NAME / UPLOAD_PRESET).",
+            );
+          }
+        } catch (error) {
+          console.error("Error al subir video:", error);
+          alert("Falló la subida del video.");
+        } finally {
+          btn.innerText = textoOriginal;
+          btn.disabled = false;
+          event.target.value = "";
+        }
+      }
+
+      // Limpia el video seleccionado (botón "Quitar video" o al reabrir el modal en otro
+      // contexto). No borra nada en Cloudinary, solo el estado del formulario.
+      function quitarVideoPublicacion() {
+        document.getElementById("pub_url_video").value = "";
+        document.getElementById("pub_video_preview").src = "";
+        document
+          .getElementById("pub_video_preview_wrap")
+          .classList.add("hidden");
+        document.getElementById("btn_quitar_video_pub").classList.add("hidden");
+      }
+
       // ================= GUARDAR (crear/editar) =================
       async function guardarPublicacion(e) {
         e.preventDefault();
@@ -1427,6 +2078,7 @@
             titulo: document.getElementById("pub_titulo").value,
             tipo: tipoSeleccionado,
             origen: "historia",
+            origen_original: origenExistente || undefined,
             id_beneficiario: document.getElementById("pub_id_beneficiario")
               .value,
             contenido_preayuda: document.getElementById(
@@ -1444,13 +2096,21 @@
             alert("Selecciona al menos una categoría.");
             return;
           }
+          // "pub_contenido" ya no es un campo nativo required (ver cambiarTipoPublicacion),
+          // así que la validación de que no esté vacío se hace aquí a mano.
+          if (!document.getElementById("pub_contenido").value.trim()) {
+            alert("Redacta el contenido de la publicación.");
+            return;
+          }
           const categoriaFinal = categoriasSeleccionadas.join(", ");
           payload = {
             titulo: document.getElementById("pub_titulo").value,
             contenido: document.getElementById("pub_contenido").value,
             url_imagen: document.getElementById("pub_url_imagen").value || null,
+            url_video: document.getElementById("pub_url_video").value || null,
             tipo: tipoSeleccionado,
             origen: "publicacion",
+            origen_original: origenExistente || undefined,
             categoria: categoriaFinal,
             url_documento_consentimiento:
               document.getElementById("pub_url_consentimiento").value || null,
@@ -1485,6 +2145,11 @@
 
           const data = await res.json();
           if (res.ok && data.success) {
+            // Si era una publicación nueva (no historia) y se subieron fotos adicionales
+            // antes de guardar, se registran ahora que ya existe un id_publicacion real.
+            if (!idExistente && !esHistoria && data.id) {
+              await flushGaleriaPendiente(data.id);
+            }
             cerrarModalPublicacion();
             cargarPublicaciones();
             // Si esta publicación vino del botón "Atender" de una solicitud (ver

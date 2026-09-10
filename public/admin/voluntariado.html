@@ -892,6 +892,35 @@
       </div>
     </div>
 
+    <!-- MODAL: HISTORIAL DE ENCUESTAS DE SATISFACCIÓN DE UN ESPECIALISTA (solo lectura) -->
+    <div
+      id="modalHistorialEncuestas"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300"
+    >
+      <div
+        class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[85vh] flex flex-col"
+        id="modalHistorialEncuestasContent"
+      >
+        <div
+          class="bg-gradient-to-r from-primary to-[#f39200] px-8 py-6 text-white flex justify-between items-center"
+        >
+          <div>
+            <h3 id="he_nombre" class="text-2xl font-bold font-plus">
+              Historial de Encuestas
+            </h3>
+            <p id="he_resumen" class="text-white/80 text-sm mt-1"></p>
+          </div>
+          <button
+            onclick="cerrarModalHistorialEncuestas()"
+            class="text-white/80 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-3xl">close</span>
+          </button>
+        </div>
+        <div id="he_cuerpo" class="p-8 overflow-y-auto space-y-3"></div>
+      </div>
+    </div>
+
     <!-- LÓGICA DE JAVASCRIPT -->
     <script src="/js/comun.js"></script>
     <script src="js/notificaciones.js"></script>
@@ -911,6 +940,7 @@
         }
         try {
           const payload = decodeJWT(token);
+          rolActualUsuario = payload.rol;
           aplicarRestriccionesNav(payload.rol, payload.especialidad);
           document.getElementById("nav_user_name").innerText =
             payload.nombre.split(" ")[0];
@@ -929,6 +959,10 @@
       // viven en js/comun.js (generalizadas para toda la app, no solo esta página — ver el
       // comentario ahí) en vez de copiadas aquí.
       let voluntariosGlobales = [];
+      // Rol (1=Admin, 2=Especialista, 3=Coordinador, 4=Voluntario, 5=Donador) del usuario
+      // que tiene la sesión abierta — se llena en el DOMContentLoaded de más abajo. Se usa
+      // para decidir si se muestra el botón "Ver Historial de Encuestas" en cada tarjeta.
+      let rolActualUsuario = null;
 
       // --- MANEJO DE MODALES ---
       function abrirModal(modalId, contentId) {
@@ -947,6 +981,108 @@
             .getElementById(modalId)
             .getElementsByTagName("form");
           if (forms.length > 0) forms[0].reset();
+        }, 300);
+      }
+
+      // --- HISTORIAL DE ENCUESTAS DE SATISFACCIÓN (solo Admin/Coordinador) ---
+      // Abre el modal con el promedio y el historial completo de encuestas respondidas
+      // sobre un especialista (botón "Ver Historial de Encuestas" de su tarjeta).
+      async function verHistorialEncuestasEspecialista(idUsuario, nombre) {
+        document.getElementById("he_nombre").innerText = nombre;
+        document.getElementById("he_resumen").innerText = "Cargando...";
+        document.getElementById("he_cuerpo").innerHTML =
+          '<p class="text-slate-400 text-sm text-center py-6">Cargando...</p>';
+        document.getElementById("modalHistorialEncuestas").classList.remove("hidden");
+        setTimeout(() => {
+          document
+            .getElementById("modalHistorialEncuestas")
+            .classList.remove("opacity-0");
+          document
+            .getElementById("modalHistorialEncuestasContent")
+            .classList.remove("scale-95");
+        }, 10);
+        try {
+          const res = await fetch(
+            `${API_URL}/api/encuestas/especialista/${idUsuario}`,
+            { headers: authHeaders() },
+          );
+          const json = await res.json();
+          if (!json.success) {
+            document.getElementById("he_resumen").innerText = "";
+            document.getElementById("he_cuerpo").innerHTML =
+              '<p class="text-red-400 text-sm text-center py-6">No se pudo cargar el historial.</p>';
+            return;
+          }
+          const r = json.resumen;
+          const promedioTxt = (v) => (v === null || v === undefined ? "N/A" : v);
+          document.getElementById("he_resumen").innerText =
+            `${r.total_respondidas} encuesta(s) respondida(s) · Promedio general: ${promedioTxt(r.promedio_general)}/5`;
+
+          if (json.historial.length === 0) {
+            document.getElementById("he_cuerpo").innerHTML =
+              '<p class="text-slate-400 text-sm text-center py-6">Este especialista no tiene encuestas respondidas todavía.</p>';
+            return;
+          }
+
+          const resumenExtra = `
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="p-3 bg-slate-50 rounded-xl text-center">
+                <p class="text-lg font-bold text-slate-800">${promedioTxt(r.promedio_trato)}</p>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Trato (1-5)</p>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl text-center">
+                <p class="text-lg font-bold text-slate-800">${promedioTxt(r.promedio_puntualidad)}</p>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Puntualidad (1-5)</p>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl text-center">
+                <p class="text-lg font-bold text-slate-800">${promedioTxt(r.promedio_nps)}</p>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">NPS (0-10)</p>
+              </div>
+              <div class="p-3 ${r.respuestas_negativas > 0 ? "bg-red-50" : "bg-slate-50"} rounded-xl text-center">
+                <p class="text-lg font-bold ${r.respuestas_negativas > 0 ? "text-red-600" : "text-slate-800"}">${r.respuestas_negativas}</p>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Respuestas negativas</p>
+              </div>
+            </div>`;
+
+          const filas = json.historial
+            .map((enc) => {
+              const fecha = enc.fecha_respuesta
+                ? new Date(enc.fecha_respuesta).toLocaleDateString("es-MX")
+                : "-";
+              const estrellas =
+                "★".repeat(enc.calificacion) + "☆".repeat(5 - enc.calificacion);
+              return `
+                <div class="p-3 bg-slate-50 rounded-xl">
+                  <div class="flex items-center justify-between gap-3">
+                    <p class="text-sm font-bold text-slate-700">${escapeHtml(enc.beneficiario)}</p>
+                    <span class="text-red-500 text-sm">${estrellas}</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-0.5">${fecha}</p>
+                  ${enc.comentarios ? `<p class="text-xs text-slate-600 italic mt-1">"${escapeHtml(enc.comentarios)}"</p>` : ""}
+                </div>`;
+            })
+            .join("");
+
+          document.getElementById("he_cuerpo").innerHTML = resumenExtra + filas;
+        } catch (e) {
+          console.error("Error al cargar historial de encuestas:", e);
+          document.getElementById("he_resumen").innerText = "";
+          document.getElementById("he_cuerpo").innerHTML =
+            '<p class="text-red-400 text-sm text-center py-6">Error de conexión.</p>';
+        }
+      }
+
+      function cerrarModalHistorialEncuestas() {
+        document
+          .getElementById("modalHistorialEncuestas")
+          .classList.add("opacity-0");
+        document
+          .getElementById("modalHistorialEncuestasContent")
+          .classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("modalHistorialEncuestas")
+            .classList.add("hidden");
         }, 300);
       }
 
@@ -1207,6 +1343,15 @@
                         <button onclick="revisarDocumentoVoluntario(${vol.id_usuario}, 'Rechazado')" class="flex-1 py-2 bg-red-500 text-white font-bold rounded-xl text-[10px] hover:bg-red-600">Rechazar Doc.</button>
                     </div>`;
                 }
+              }
+              // Historial de encuestas de satisfacción: solo tiene sentido para
+              // Especialistas (id_rol 2, quienes atienden beneficiarios), y solo lo puede
+              // ver quien ya puede ver el módulo de encuestas por revisar (Admin/Coordinador).
+              if (
+                vol.id_rol === 2 &&
+                (rolActualUsuario === 1 || rolActualUsuario === 3)
+              ) {
+                botonesActivo += `<button onclick="verHistorialEncuestasEspecialista(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}')" class="w-full py-2 mb-2 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">reviews</span> Ver Historial de Encuestas</button>`;
               }
               if (vol.id_rol !== 5) {
                 // Si es Voluntario puede tener expediente y proyecto físico

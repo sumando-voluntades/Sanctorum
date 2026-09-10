@@ -841,10 +841,11 @@
             metodo_pago: "Método de pago",
             categoria_gasto: "Categoría de gasto",
             nombre_insumo: "Insumo relacionado",
+            registrado_por: "Registrado por",
           },
         },
         satisfaccion: {
-          nombre: "Satisfacción",
+          nombre: "Satisfacción de Beneficiarios",
           columnas: {
             fecha_respuesta: "Fecha de respuesta",
             beneficiario: "Beneficiario",
@@ -855,6 +856,31 @@
             utilidad_sesion: "¿La sesión ayudó?",
             probabilidad_recomendar: "Probabilidad de recomendar (0-10)",
             comentarios: "Comentarios",
+          },
+        },
+        satisfaccion_especialistas: {
+          nombre: "Satisfacción por Especialista",
+          columnas: {
+            especialista: "Especialista",
+            total_encuestas: "Total de encuestas",
+            promedio_general: "Promedio general (1-5)",
+            promedio_trato: "Promedio trato (1-5)",
+            promedio_puntualidad: "Promedio puntualidad (1-5)",
+            promedio_nps: "Promedio NPS (0-10)",
+            respuestas_negativas: "Respuestas negativas (1-2★)",
+          },
+        },
+        escuelas: {
+          nombre: "Escuelas",
+          columnas: {
+            escuela: "Escuela",
+            contacto: "Contacto",
+            puesto: "Puesto",
+            telefono: "Teléfono",
+            ubicacion: "Ubicación",
+            estado: "Estado",
+            ultima_visita: "Última visita",
+            beneficiarios_vinculados: "Beneficiarios vinculados",
           },
         },
       };
@@ -889,7 +915,15 @@
         try {
           const tipos =
             tipo === "todo"
-              ? ["voluntarios", "eventos", "beneficiarios", "donativos", "satisfaccion"]
+              ? [
+                  "voluntarios",
+                  "eventos",
+                  "beneficiarios",
+                  "donativos",
+                  "satisfaccion",
+                  "satisfaccion_especialistas",
+                  "escuelas",
+                ]
               : [tipo];
           const wb = XLSX.utils.book_new();
           let huboDatos = false;
@@ -974,6 +1008,8 @@
               <option value="beneficiarios">Beneficiarios</option>
               <option value="donativos">Donativos</option>
               <option value="satisfaccion">Satisfacción de Beneficiarios</option>
+              <option value="satisfaccion_especialistas">Satisfacción de Especialistas</option>
+              <option value="escuelas">Escuelas</option>
             </select>
           </div>
           <div class="grid grid-cols-2 gap-4">

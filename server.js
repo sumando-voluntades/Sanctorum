@@ -577,6 +577,24 @@ app.put('/api/auth/cambiar-password', verificarToken, async (req, res) => {
 // MÓDULO DE VOLUNTARIADO Y DONADORES
 // ==========================================
 
+// Separa el texto compuesto "<cantidad> <unidad>" (p. ej. "25 Lt") que manda el formulario de
+// Donadores del panel (ver extraerCantidad() en voluntariado.html) en las dos partes reales que
+// alimentan Usuarios.cantidad_donada_valor (NUMERIC) y Usuarios.cantidad_donada_unidad (VARCHAR)
+// -- ver migracion_usuarios_cantidad_donada_split_v1.sql. Nunca lanza: si el texto no trae un
+// número reconocible al inicio, valor queda en null y el resto del guardado sigue su curso
+// normal (Usuarios.cantidad_donada, la columna de texto original, se sigue llenando igual que
+// siempre como caché de compatibilidad).
+function parsearCantidadDonada(cantidadStr) {
+    const texto = (cantidadStr || '').trim();
+    if (!texto) return { valor: null, unidad: null };
+    const partes = texto.split(/\s+/);
+    const numero = parseFloat(partes[0]);
+    return {
+        valor: Number.isFinite(numero) ? numero : null,
+        unidad: partes[1] || null
+    };
+}
+
 // 1. REGISTRAR NUEVO USUARIO (Con correo de confirmación de recibido)
 // Ruta publica (autorregistro de voluntarios/donadores desde como_ayudar), tambien usada por
 // el panel de Admin para dar de alta Coordinadores/Especialistas (voluntariado). Solo un
@@ -600,10 +618,11 @@ app.post('/api/usuarios', async (req, res) => {
         if (userExist.rows.length > 0) return res.status(400).json({ success: false, message: 'Este correo ya está registrado.' });
 
         const placeholderHash = await bcrypt.hash('pendiente_aprobacion', 10);
+        const donacionInicial = parsearCantidadDonada(cantidad);
         await pool.query(
-            `INSERT INTO Usuarios (nombre_completo, correo, telefono, especialidad, contraseña, id_rol, estatus, material_donado, cantidad_donada, documento_profesional_estatus) 
-             VALUES ($1, $2, $3, $4, $5, $6, 'Nuevo', $7, $8, $9)`,
-            [nombre_completo, correo, telefono, especialidad, placeholderHash, id_rol, material, cantidad, estatusDocPorRol(id_rol)]
+            `INSERT INTO Usuarios (nombre_completo, correo, telefono, especialidad, contraseña, id_rol, estatus, material_donado, cantidad_donada, cantidad_donada_valor, cantidad_donada_unidad, documento_profesional_estatus)
+             VALUES ($1, $2, $3, $4, $5, $6, 'Nuevo', $7, $8, $9, $10, $11)`,
+            [nombre_completo, correo, telefono, especialidad, placeholderHash, id_rol, material, cantidad, donacionInicial.valor, donacionInicial.unidad, estatusDocPorRol(id_rol)]
         );
 
         // NUEVO: Correo automático avisando que su solicitud está en revisión
@@ -748,9 +767,10 @@ app.put('/api/voluntarios/:id/asignar', verificarToken, requiereRol(ROL_ADMIN, R
         const tempPassword = crypto.randomBytes(4).toString('hex');
         const hashedPassword = await bcrypt.hash(tempPassword, await bcrypt.genSalt(10));
 
+        const donacionAsignar = parsearCantidadDonada(cantidad);
         await pool.query(
-            "UPDATE Usuarios SET estatus = 'Activo', contraseña = $1, id_rol = $2, especialidad = $3, material_donado = $4, cantidad_donada = $5, documento_profesional_estatus = $6 WHERE id_usuario = $7", 
-            [hashedPassword, id_rol, especialidad, material, cantidad, estatusDocPorRol(id_rol), id]
+            "UPDATE Usuarios SET estatus = 'Activo', contraseña = $1, id_rol = $2, especialidad = $3, material_donado = $4, cantidad_donada = $5, cantidad_donada_valor = $6, cantidad_donada_unidad = $7, documento_profesional_estatus = $8 WHERE id_usuario = $9",
+            [hashedPassword, id_rol, especialidad, material, cantidad, donacionAsignar.valor, donacionAsignar.unidad, estatusDocPorRol(id_rol), id]
         );
         
         if (id_proyecto && id_proyecto !== "0" && id_rol !== 5) { // Si es donador no se le asigna evento físico
@@ -792,9 +812,10 @@ app.put('/api/voluntarios/:id/asignar', verificarToken, requiereRol(ROL_ADMIN, R
 app.put('/api/usuarios/:id/modificar', verificarToken, requiereRol(ROL_ADMIN), async (req, res) => {
     const { id_rol, especialidad, material, cantidad } = req.body;
     try {
+        const donacionModificada = parsearCantidadDonada(cantidad);
         await pool.query(
-            "UPDATE Usuarios SET id_rol = $1, especialidad = $2, material_donado = $3, cantidad_donada = $4, documento_profesional_estatus = $5 WHERE id_usuario = $6", 
-            [id_rol, especialidad, material, cantidad, estatusDocPorRol(id_rol), req.params.id]
+            "UPDATE Usuarios SET id_rol = $1, especialidad = $2, material_donado = $3, cantidad_donada = $4, cantidad_donada_valor = $5, cantidad_donada_unidad = $6, documento_profesional_estatus = $7 WHERE id_usuario = $8",
+            [id_rol, especialidad, material, cantidad, donacionModificada.valor, donacionModificada.unidad, estatusDocPorRol(id_rol), req.params.id]
         );
         res.json({ success: true });
     } catch (e) { res.status(500).json({ success: false }); }
@@ -1253,19 +1274,38 @@ app.delete('/api/activos_fijos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_
 // MÓDULO DE ALIADOS Y DONATIVOS (Contactos_Externos + Donaciones monetarias/en especie
 // ligadas a un aliado externo — alimenta /api/transparencia en el sitio público)
 // ==========================================
+// Por default solo muestra aliados activos (?activo=false para solo archivados,
+// ?activo=todas para ambos) — mismo criterio que /api/agenda/directorio_escuelas. Si la
+// migración que agrega Contactos_Externos.activo todavía no corrió, se degrada a la
+// consulta original (sin esa columna) en vez de tumbar el módulo.
 app.get('/api/aliados', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
+    let filtroActivo = true;
+    if (req.query.activo === 'false') filtroActivo = false;
+    else if (req.query.activo === 'todas') filtroActivo = null;
     try {
         const result = await pool.query(`
             SELECT c.id_contacto, c.nombre_aliado, c.tipo_aliado, c.especialidad, c.id_usuario_enlace,
-                   u.nombre_completo AS usuario_enlace
+                   u.nombre_completo AS usuario_enlace, COALESCE(c.activo, TRUE) AS activo
             FROM Contactos_Externos c
             LEFT JOIN Usuarios u ON c.id_usuario_enlace = u.id_usuario
+            WHERE ($1::boolean IS NULL OR COALESCE(c.activo, TRUE) = $1)
             ORDER BY c.nombre_aliado ASC
-        `);
+        `, [filtroActivo]);
         res.json({ success: true, data: result.rows });
     } catch (error) {
-        console.error("Error al listar aliados:", error);
-        res.status(500).json({ success: false });
+        try {
+            const result = await pool.query(`
+                SELECT c.id_contacto, c.nombre_aliado, c.tipo_aliado, c.especialidad, c.id_usuario_enlace,
+                       u.nombre_completo AS usuario_enlace, TRUE AS activo
+                FROM Contactos_Externos c
+                LEFT JOIN Usuarios u ON c.id_usuario_enlace = u.id_usuario
+                ORDER BY c.nombre_aliado ASC
+            `);
+            res.json({ success: true, data: result.rows });
+        } catch (error2) {
+            console.error("Error al listar aliados:", error2);
+            res.status(500).json({ success: false });
+        }
     }
 });
 
@@ -1301,7 +1341,8 @@ app.put('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINAD
     }
 });
 
-// Elimina un aliado. Falla con 409 si ya tiene donativos ligados (restricción de FK).
+// Elimina un aliado. Falla con 409 si ya tiene donativos ligados (restricción de FK) — para
+// ese caso existe la opción de Archivar, que sí conserva el registro y su historial.
 app.delete('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Contactos_Externos WHERE id_contacto = $1', [req.params.id]);
@@ -1309,23 +1350,55 @@ app.delete('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDI
         res.json({ success: true });
     } catch (error) {
         console.error("Error al eliminar aliado:", error);
-        res.status(409).json({ success: false, message: 'No se puede eliminar: el aliado ya tiene donativos registrados.' });
+        res.status(409).json({ success: false, message: 'No se puede eliminar: el aliado ya tiene donativos registrados. Usa "Archivar" en su lugar.' });
+    }
+});
+
+// Archiva o reactiva un aliado. Nunca se borra de la base cuando ya tiene historial ligado
+// (donativos, etc.): así se conserva ese registro pero deja de ofrecerse como opción activa
+// en el selector de "Aliado / Donante" al capturar un donativo nuevo. Mismo patrón que
+// /api/escuelas/:id/archivar.
+app.put('/api/aliados/:id/archivar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
+    try {
+        const result = await pool.query('UPDATE Contactos_Externos SET activo=$1 WHERE id_contacto=$2', [!!req.body.activo, req.params.id]);
+        if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'Aliado no encontrado.' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error al archivar/reactivar aliado:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde. ¿Ya se corrió la migración de aliados?' });
     }
 });
 
 // Lista todos los donativos (monetarios o en especie) con el nombre del aliado y, si aplica,
-// del insumo relacionado.
+// del insumo relacionado y de quién lo registró.
 app.get('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
-        const result = await pool.query(`
-            SELECT d.id_donacion, d.monto, d.metodo_pago, d.categoria_gasto, d.comprobante_url, d.fecha_donacion,
-                   d.id_contacto, c.nombre_aliado, d.id_insumo, i.nombre_insumo
-            FROM Donaciones d
-            JOIN Contactos_Externos c ON d.id_contacto = c.id_contacto
-            LEFT JOIN Insumos i ON d.id_insumo = i.id_insumo
-            ORDER BY d.fecha_donacion DESC
-        `);
-        res.json({ success: true, data: result.rows });
+        // Con try/catch degradado: si todavía no se corrió la migración que agrega
+        // id_usuario_registro, se sirve la lista igual pero sin esa columna (en vez de
+        // tumbar el módulo completo).
+        try {
+            const result = await pool.query(`
+                SELECT d.id_donacion, d.monto, d.metodo_pago, d.categoria_gasto, d.comprobante_url, d.fecha_donacion,
+                       d.id_contacto, c.nombre_aliado, d.id_insumo, i.nombre_insumo,
+                       ur.nombre_completo AS registrado_por
+                FROM Donaciones d
+                JOIN Contactos_Externos c ON d.id_contacto = c.id_contacto
+                LEFT JOIN Insumos i ON d.id_insumo = i.id_insumo
+                LEFT JOIN Usuarios ur ON d.id_usuario_registro = ur.id_usuario
+                ORDER BY d.fecha_donacion DESC
+            `);
+            return res.json({ success: true, data: result.rows });
+        } catch (colErr) {
+            const result = await pool.query(`
+                SELECT d.id_donacion, d.monto, d.metodo_pago, d.categoria_gasto, d.comprobante_url, d.fecha_donacion,
+                       d.id_contacto, c.nombre_aliado, d.id_insumo, i.nombre_insumo
+                FROM Donaciones d
+                JOIN Contactos_Externos c ON d.id_contacto = c.id_contacto
+                LEFT JOIN Insumos i ON d.id_insumo = i.id_insumo
+                ORDER BY d.fecha_donacion DESC
+            `);
+            return res.json({ success: true, data: result.rows });
+        }
     } catch (error) {
         console.error("Error al listar donativos:", error);
         res.status(500).json({ success: false });
@@ -1367,14 +1440,65 @@ app.post('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADO
             );
             idInsumoFinal = nuevo.rows[0].id_insumo;
         }
-        await pool.query(
-            `INSERT INTO Donaciones (id_contacto, id_insumo, monto, metodo_pago, categoria_gasto, comprobante_url, fecha_donacion)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-            [idContactoFinal, idInsumoFinal, monto, metodo_pago || null, categoria_gasto || null, chkComprobante.valor, fecha_donacion || new Date().toISOString().slice(0, 10)]
-        );
+        // Igual que arriba: si id_usuario_registro todavía no existe (falta la migración),
+        // se degrada a insertar sin esa columna en vez de fallar el registro del donativo.
+        try {
+            await pool.query(
+                `INSERT INTO Donaciones (id_contacto, id_insumo, monto, metodo_pago, categoria_gasto, comprobante_url, fecha_donacion, id_usuario_registro)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+                [idContactoFinal, idInsumoFinal, monto, metodo_pago || null, categoria_gasto || null, chkComprobante.valor, fecha_donacion || new Date().toISOString().slice(0, 10), req.usuario.id]
+            );
+        } catch (colErr) {
+            await pool.query(
+                `INSERT INTO Donaciones (id_contacto, id_insumo, monto, metodo_pago, categoria_gasto, comprobante_url, fecha_donacion)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [idContactoFinal, idInsumoFinal, monto, metodo_pago || null, categoria_gasto || null, chkComprobante.valor, fecha_donacion || new Date().toISOString().slice(0, 10)]
+            );
+        }
         res.status(201).json({ success: true });
     } catch (error) {
         console.error("Error al registrar donativo:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+    }
+});
+
+// Corrige los datos de un donativo ya registrado (por ejemplo, un error de dedo en el
+// monto o la fecha). No cambia quién lo registró originalmente (id_usuario_registro se
+// conserva): esta ruta es para arreglar errores tipográficos, no para reasignar autoría.
+app.put('/api/donativos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
+    const { id_contacto, contacto_nuevo, id_insumo, insumo_nuevo, monto, metodo_pago, categoria_gasto, comprobante_url, fecha_donacion } = req.body;
+    if ((!id_contacto && !(contacto_nuevo && contacto_nuevo.trim())) || !monto) {
+        return res.status(400).json({ success: false, message: 'El aliado (o su nombre, si es nuevo) y el monto son obligatorios.' });
+    }
+    const chkComprobante = validarUrlCloudinaria(comprobante_url, 'comprobante_url');
+    if (!chkComprobante.ok) return res.status(400).json({ success: false, message: chkComprobante.mensaje });
+    try {
+        let idContactoFinal = id_contacto || null;
+        if (!idContactoFinal && contacto_nuevo && contacto_nuevo.trim()) {
+            const nuevoContacto = await pool.query(
+                `INSERT INTO Contactos_Externos (nombre_aliado, tipo_aliado) VALUES ($1, 'Donante Individual') RETURNING id_contacto`,
+                [contacto_nuevo.trim()]
+            );
+            idContactoFinal = nuevoContacto.rows[0].id_contacto;
+        }
+        let idInsumoFinal = id_insumo || null;
+        if (!idInsumoFinal && insumo_nuevo && insumo_nuevo.trim()) {
+            const nuevo = await pool.query(
+                `INSERT INTO Insumos (nombre_insumo, unidad_medida, stock_actual, punto_reorden, costo_unitario, area_proyecto)
+                 VALUES ($1, 'Unidad', 0, 0, NULL, 'Donativo') RETURNING id_insumo`,
+                [insumo_nuevo.trim()]
+            );
+            idInsumoFinal = nuevo.rows[0].id_insumo;
+        }
+        const result = await pool.query(
+            `UPDATE Donaciones SET id_contacto=$1, id_insumo=$2, monto=$3, metodo_pago=$4, categoria_gasto=$5, comprobante_url=$6, fecha_donacion=$7
+             WHERE id_donacion=$8`,
+            [idContactoFinal, idInsumoFinal, monto, metodo_pago || null, categoria_gasto || null, chkComprobante.valor, fecha_donacion || new Date().toISOString().slice(0, 10), req.params.id]
+        );
+        if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'Donativo no encontrado.' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error al actualizar donativo:", error);
         res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
     }
 });
@@ -1417,21 +1541,80 @@ app.get('/api/catalogos_agenda', verificarToken, async (req, res) => {
 // No se crean tablas nuevas: se reutilizan Escuelas, Beneficiarios, Agenda_Visitas y Eventos.
 // ==========================================
 
-// Directorio de escuelas (panel lateral izquierdo)
+// Directorio de escuelas (panel lateral izquierdo). Por default solo muestra escuelas
+// activas (?activo=false para solo archivadas, ?activo=todas para ambas) — así Agenda,
+// que no manda este parámetro, nunca ofrece una escuela archivada para agendar una visita
+// nueva.
 app.get('/api/agenda/directorio_escuelas', async (req, res) => {
     try {
+        let filtroActivo = true;
+        if (req.query.activo === 'false') filtroActivo = false;
+        else if (req.query.activo === 'todas') filtroActivo = null;
         const result = await pool.query(`
             SELECT e.id_escuela, e.nombre_escuela, e.contacto_nombre, e.puesto_contacto, e.telefono_escuela, e.ubicacion,
-                   MAX(av.fecha_cita) AS ultima_visita
+                   COALESCE(e.activo, TRUE) AS activo, MAX(av.fecha_cita) AS ultima_visita
             FROM Escuelas e
             LEFT JOIN Agenda_Visitas av ON av.id_escuela = e.id_escuela
+            WHERE ($1::boolean IS NULL OR COALESCE(e.activo, TRUE) = $1)
             GROUP BY e.id_escuela
             ORDER BY e.nombre_escuela ASC
-        `);
+        `, [filtroActivo]);
         res.json({ success: true, data: result.rows });
     } catch (error) {
         console.error("Error al obtener directorio de escuelas:", error);
         res.status(500).json({ success: false });
+    }
+});
+
+// Registra una escuela nueva SOLO con sus datos de contacto, sin programar ninguna visita —
+// para el registro formal que se hace una vez que la alianza con la escuela ya se concretó
+// (a diferencia de Agenda > "Visita de Prospección", que agenda la primera reunión pero no
+// sirve para capturar los datos de contacto con calma).
+app.post('/api/escuelas', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
+    const { nombre_escuela, contacto_nombre, puesto_contacto, telefono_escuela, ubicacion } = req.body;
+    if (!nombre_escuela || !nombre_escuela.trim()) return res.status(400).json({ success: false, message: 'El nombre de la escuela es obligatorio.' });
+    try {
+        const existente = await pool.query('SELECT id_escuela FROM Escuelas WHERE LOWER(nombre_escuela) = LOWER($1)', [nombre_escuela.trim()]);
+        if (existente.rows.length > 0) return res.status(409).json({ success: false, message: 'Ya existe una escuela registrada con ese nombre.' });
+        const result = await pool.query(
+            `INSERT INTO Escuelas (nombre_escuela, contacto_nombre, puesto_contacto, telefono_escuela, ubicacion) VALUES ($1, $2, $3, $4, $5) RETURNING id_escuela`,
+            [nombre_escuela.trim(), contacto_nombre || null, puesto_contacto || null, telefono_escuela || null, ubicacion || null]
+        );
+        res.status(201).json({ success: true, id: result.rows[0].id_escuela });
+    } catch (error) {
+        console.error("Error al registrar escuela:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+    }
+});
+
+// Actualiza los datos de contacto de una escuela ya registrada.
+app.put('/api/escuelas/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
+    const { nombre_escuela, contacto_nombre, puesto_contacto, telefono_escuela, ubicacion } = req.body;
+    if (!nombre_escuela || !nombre_escuela.trim()) return res.status(400).json({ success: false, message: 'El nombre de la escuela es obligatorio.' });
+    try {
+        const result = await pool.query(
+            `UPDATE Escuelas SET nombre_escuela=$1, contacto_nombre=$2, puesto_contacto=$3, telefono_escuela=$4, ubicacion=$5 WHERE id_escuela=$6`,
+            [nombre_escuela.trim(), contacto_nombre || null, puesto_contacto || null, telefono_escuela || null, ubicacion || null, req.params.id]
+        );
+        if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'Escuela no encontrada.' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error al actualizar escuela:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+    }
+});
+
+// Archiva o reactiva una escuela. Nunca se borra de la base: así se conserva intacto su
+// historial de visitas, eventos y beneficiarios ligados. Archivada, deja de aparecer en el
+// directorio activo (incluyendo el selector de Agenda para agendar visitas nuevas).
+app.put('/api/escuelas/:id/archivar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
+    try {
+        const result = await pool.query('UPDATE Escuelas SET activo=$1 WHERE id_escuela=$2', [!!req.body.activo, req.params.id]);
+        if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'Escuela no encontrada.' });
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error al archivar/reactivar escuela:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
     }
 });
 
@@ -1599,7 +1782,7 @@ app.get('/api/agenda', verificarToken, async (req, res) => {
         if (incluirVisitas) {
             vi = await pool.query(`
                 SELECT av.id_visita as id, 'Visita de Prospección' as titulo, 'Reunión Escolar' as tipo, av.fecha_cita as fecha,
-                       esc.nombre_escuela as lugar, 'visita' as categoria, av.estatus_alerta as estatus,
+                       esc.nombre_escuela as lugar, esc.id_escuela, 'visita' as categoria, av.estatus_alerta as estatus,
                        av.asistentes_plan, av.asistentes_reales, av.id_evento_ejecucion, 0 as num_asistentes, 0 as num_insumos
                 FROM Agenda_Visitas av
                 JOIN Escuelas esc ON av.id_escuela = esc.id_escuela
@@ -1689,10 +1872,14 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
         } 
         else if (tipo_registro === 'evento') {
             const e = await pool.query(
-                "INSERT INTO Eventos (titulo_evento, tipo_evento, fecha_realizacion, id_escuela, url_imagen, direccion_mapa, link_reunion) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id_evento",
-                [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPost.valor, datos.direccion_mapa || null, datos.link_reunion || null]
+                "INSERT INTO Eventos (titulo_evento, tipo_evento, fecha_realizacion, id_escuela, url_imagen, direccion_mapa, link_reunion, descripcion, categoria) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id_evento",
+                [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPost.valor, datos.direccion_mapa || null, datos.link_reunion || null, datos.descripcion || null, datos.categoria || null]
             );
             const id_evento = e.rows[0].id_evento;
+            // "categoria" se sigue guardando también como texto arriba (caché de lectura /
+            // compatibilidad con datos_demo_sanctorum.sql), pero Eventos_Categorias es ahora la
+            // fuente real de verdad para consultas y filtros (ver migracion_normalizacion_categorias_v1.sql).
+            await registrarCategorias(datos.categoria, { tipo: 'evento', id: id_evento });
 
             const equipo = [datos.responsable, ...datos.voluntarios];
             for (let v of equipo) {
@@ -1725,7 +1912,18 @@ app.get('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
             const vis = await pool.query(`SELECT av.fecha_cita, av.asistentes_plan, av.asistentes_reales, av.estatus_alerta, av.id_evento_ejecucion, e.nombre_escuela, e.contacto_nombre, e.puesto_contacto, e.telefono_escuela, e.ubicacion FROM Agenda_Visitas av JOIN Escuelas e ON av.id_escuela = e.id_escuela WHERE av.id_visita = $1`, [id]);
             data = { ...vis.rows[0], tipo_registro: 'visita' };
         } else {
-            const ev = await pool.query("SELECT * FROM Eventos WHERE id_evento = $1", [id]);
+            // "categoria" aquí se recalcula desde Eventos_Categorias (fuente real de verdad) en vez
+            // de leer la columna de texto tal cual -- al llevar el mismo alias que la columna real
+            // de Eventos, la sobreescribe en el objeto de resultado (pg asigna las propiedades en
+            // el orden de las columnas devueltas, así que la última con ese nombre gana).
+            const ev = await pool.query(
+                `SELECT e.*,
+                        (SELECT string_agg(c.nombre_categoria, ', ' ORDER BY c.nombre_categoria)
+                           FROM Eventos_Categorias ec JOIN Categorias c ON c.id_categoria = ec.id_categoria
+                          WHERE ec.id_evento = e.id_evento) AS categoria
+                   FROM Eventos e WHERE e.id_evento = $1`,
+                [id]
+            );
             const evento = ev.rows[0];
             if (evento.tipo_evento === 'Cita Clínica') {
                 const ben = await pool.query("SELECT id_beneficiario FROM Asistencia_Beneficiarios WHERE id_evento = $1", [id]);
@@ -1782,8 +1980,9 @@ app.put('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
             await pool.query("UPDATE Participacion SET id_usuario=$1 WHERE id_evento=$2", [datos.id_especialista, id]);
         } 
         else if (tipo_registro === 'evento') {
-            await pool.query("UPDATE Eventos SET titulo_evento=$1, tipo_evento=$2, fecha_realizacion=$3, id_escuela=$4, url_imagen=$5, direccion_mapa=$6, link_reunion=$7 WHERE id_evento=$8", 
-                [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPut.valor, datos.direccion_mapa || null, datos.link_reunion || null, id]);
+            await pool.query("UPDATE Eventos SET titulo_evento=$1, tipo_evento=$2, fecha_realizacion=$3, id_escuela=$4, url_imagen=$5, direccion_mapa=$6, link_reunion=$7, descripcion=$8, categoria=$9 WHERE id_evento=$10",
+                [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPut.valor, datos.direccion_mapa || null, datos.link_reunion || null, datos.descripcion || null, datos.categoria || null, id]);
+            await registrarCategorias(datos.categoria, { tipo: 'evento', id: Number(id) });
 
             // Actualizar Voluntarios
             await pool.query("DELETE FROM Participacion WHERE id_evento=$1", [id]);
@@ -2022,19 +2221,25 @@ app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN
         // puntualidad, utilidad de la sesión, NPS) y se degrada si aún no existen.
         try {
             const enc = await pool.query(
-                `SELECT id_encuesta AS id_doc, 'Encuesta de Satisfacción' AS nombre_archivo, NULL AS url_archivo,
-                        fecha_respuesta AS fecha_subida, 'encuesta' AS origen, calificacion, comentarios,
-                        calificacion_especialista, calificacion_puntualidad, utilidad_sesion, probabilidad_recomendar
-                 FROM Encuestas_Satisfaccion WHERE id_beneficiario = $1 AND respondida = TRUE`,
+                `SELECT en.id_encuesta AS id_doc, 'Encuesta de Satisfacción' AS nombre_archivo, NULL AS url_archivo,
+                        en.fecha_respuesta AS fecha_subida, 'encuesta' AS origen, en.calificacion, en.comentarios,
+                        en.calificacion_especialista, en.calificacion_puntualidad, en.utilidad_sesion, en.probabilidad_recomendar,
+                        COALESCE(u.nombre_completo, 'N/A') AS especialista
+                 FROM Encuestas_Satisfaccion en
+                 LEFT JOIN Usuarios u ON en.id_especialista = u.id_usuario
+                 WHERE en.id_beneficiario = $1 AND en.respondida = TRUE`,
                 [req.params.id]
             );
             data = [...data, ...enc.rows];
         } catch (encErr) {
             try {
                 const enc = await pool.query(
-                    `SELECT id_encuesta AS id_doc, 'Encuesta de Satisfacción' AS nombre_archivo, NULL AS url_archivo,
-                            fecha_respuesta AS fecha_subida, 'encuesta' AS origen, calificacion, comentarios
-                     FROM Encuestas_Satisfaccion WHERE id_beneficiario = $1 AND respondida = TRUE`,
+                    `SELECT en.id_encuesta AS id_doc, 'Encuesta de Satisfacción' AS nombre_archivo, NULL AS url_archivo,
+                            en.fecha_respuesta AS fecha_subida, 'encuesta' AS origen, en.calificacion, en.comentarios,
+                            COALESCE(u.nombre_completo, 'N/A') AS especialista
+                     FROM Encuestas_Satisfaccion en
+                     LEFT JOIN Usuarios u ON en.id_especialista = u.id_usuario
+                     WHERE en.id_beneficiario = $1 AND en.respondida = TRUE`,
                     [req.params.id]
                 );
                 data = [...data, ...enc.rows];
@@ -2319,6 +2524,47 @@ app.put('/api/encuestas/:id/revisar', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
+// Historial completo de encuestas de satisfacción respondidas para UN especialista, más su
+// promedio general — usado por el botón "Ver historial de encuestas" en Voluntariado
+// (solo visible ahí para Admin/Coordinador).
+app.get('/api/encuestas/especialista/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
+    try {
+        const historial = await pool.query(`
+            SELECT en.id_encuesta, en.fecha_respuesta, en.calificacion, en.calificacion_especialista,
+                   en.calificacion_puntualidad, en.utilidad_sesion, en.probabilidad_recomendar,
+                   en.comentarios, b.nombre_completo AS beneficiario
+            FROM Encuestas_Satisfaccion en
+            JOIN Beneficiarios b ON en.id_beneficiario = b.id_beneficiario
+            WHERE en.id_especialista = $1 AND en.respondida = TRUE
+            ORDER BY en.fecha_respuesta DESC
+        `, [req.params.id]);
+
+        // Los promedios se calculan aquí (no en SQL) para que sea trivial ignorar los NULL
+        // de encuestas viejas (antes de la migración v2) sin complicar la query.
+        const filas = historial.rows;
+        const promedio = (campo) => {
+            const valores = filas.map((f) => f[campo]).filter((v) => v !== null && v !== undefined);
+            if (valores.length === 0) return null;
+            return Math.round((valores.reduce((a, b) => a + Number(b), 0) / valores.length) * 100) / 100;
+        };
+        res.json({
+            success: true,
+            resumen: {
+                total_respondidas: filas.length,
+                promedio_general: promedio('calificacion'),
+                promedio_trato: promedio('calificacion_especialista'),
+                promedio_puntualidad: promedio('calificacion_puntualidad'),
+                promedio_nps: promedio('probabilidad_recomendar'),
+                respuestas_negativas: filas.filter((f) => f.calificacion <= 2).length,
+            },
+            historial: filas,
+        });
+    } catch (error) {
+        console.error("Error al obtener historial de encuestas del especialista:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+    }
+});
+
 app.post('/api/solicitudes', async (req, res) => {
     const { nombre_contacto, telefono, correo, tipo_solicitud, mensaje } = req.body;
     if (!nombre_contacto || !correo || !tipo_solicitud || !mensaje) {
@@ -2527,14 +2773,29 @@ app.get('/api/reportes/exportar', verificarToken, requiereRol(ROL_ADMIN, ROL_COO
         }
         if (tipo === 'donativos') {
             const f = construirFiltroFecha('d.fecha_donacion');
-            const result = await pool.query(`
-                SELECT d.fecha_donacion, c.nombre_aliado, d.monto, d.metodo_pago, d.categoria_gasto, i.nombre_insumo
-                FROM Donaciones d JOIN Contactos_Externos c ON d.id_contacto = c.id_contacto
-                LEFT JOIN Insumos i ON d.id_insumo = i.id_insumo
-                WHERE TRUE ${f.clausula}
-                ORDER BY d.fecha_donacion DESC
-            `, f.params);
-            return res.json({ success: true, data: result.rows });
+            // Degrada sin registrado_por si todavía no se corrió la migración que agrega
+            // id_usuario_registro (mismo patrón que /api/donativos).
+            try {
+                const result = await pool.query(`
+                    SELECT d.fecha_donacion, c.nombre_aliado, d.monto, d.metodo_pago, d.categoria_gasto, i.nombre_insumo,
+                           ur.nombre_completo AS registrado_por
+                    FROM Donaciones d JOIN Contactos_Externos c ON d.id_contacto = c.id_contacto
+                    LEFT JOIN Insumos i ON d.id_insumo = i.id_insumo
+                    LEFT JOIN Usuarios ur ON d.id_usuario_registro = ur.id_usuario
+                    WHERE TRUE ${f.clausula}
+                    ORDER BY d.fecha_donacion DESC
+                `, f.params);
+                return res.json({ success: true, data: result.rows });
+            } catch (colErr) {
+                const result = await pool.query(`
+                    SELECT d.fecha_donacion, c.nombre_aliado, d.monto, d.metodo_pago, d.categoria_gasto, i.nombre_insumo
+                    FROM Donaciones d JOIN Contactos_Externos c ON d.id_contacto = c.id_contacto
+                    LEFT JOIN Insumos i ON d.id_insumo = i.id_insumo
+                    WHERE TRUE ${f.clausula}
+                    ORDER BY d.fecha_donacion DESC
+                `, f.params);
+                return res.json({ success: true, data: result.rows });
+            }
         }
         if (tipo === 'satisfaccion') {
             const f = construirFiltroFecha('en.fecha_respuesta');
@@ -2573,6 +2834,65 @@ app.get('/api/reportes/exportar', verificarToken, requiereRol(ROL_ADMIN, ROL_COO
                     return res.json({ success: true, data: [] });
                 }
             }
+        }
+        if (tipo === 'satisfaccion_especialistas') {
+            // Igual que 'satisfaccion': si las columnas de la migración v2 no existen todavía,
+            // degrada a solo el promedio general en vez de tumbar el reporte completo.
+            const f = construirFiltroFecha('en.fecha_respuesta');
+            try {
+                const result = await pool.query(`
+                    SELECT COALESCE(u.nombre_completo, 'N/A') AS especialista,
+                           COUNT(*) AS total_encuestas,
+                           ROUND(AVG(en.calificacion)::numeric, 2) AS promedio_general,
+                           ROUND(AVG(en.calificacion_especialista)::numeric, 2) AS promedio_trato,
+                           ROUND(AVG(en.calificacion_puntualidad)::numeric, 2) AS promedio_puntualidad,
+                           ROUND(AVG(en.probabilidad_recomendar)::numeric, 2) AS promedio_nps,
+                           COUNT(*) FILTER (WHERE en.calificacion <= 2) AS respuestas_negativas
+                    FROM Encuestas_Satisfaccion en
+                    LEFT JOIN Usuarios u ON en.id_especialista = u.id_usuario
+                    WHERE en.respondida = TRUE ${f.clausula}
+                    GROUP BY u.id_usuario, u.nombre_completo
+                    ORDER BY promedio_general DESC NULLS LAST
+                `, f.params);
+                return res.json({ success: true, data: result.rows });
+            } catch (encErr) {
+                try {
+                    const result = await pool.query(`
+                        SELECT COALESCE(u.nombre_completo, 'N/A') AS especialista,
+                               COUNT(*) AS total_encuestas,
+                               ROUND(AVG(en.calificacion)::numeric, 2) AS promedio_general,
+                               COUNT(*) FILTER (WHERE en.calificacion <= 2) AS respuestas_negativas
+                        FROM Encuestas_Satisfaccion en
+                        LEFT JOIN Usuarios u ON en.id_especialista = u.id_usuario
+                        WHERE en.respondida = TRUE ${f.clausula}
+                        GROUP BY u.id_usuario, u.nombre_completo
+                        ORDER BY promedio_general DESC NULLS LAST
+                    `, f.params);
+                    return res.json({ success: true, data: result.rows });
+                } catch (encErr2) {
+                    console.error("No se pudo generar el reporte de satisfacción por especialista (¿falta la migración?):", encErr2.message);
+                    return res.json({ success: true, data: [] });
+                }
+            }
+        }
+        if (tipo === 'escuelas') {
+            // No se filtra por año/mes: una escuela no tiene una sola fecha representativa
+            // (se registró en un momento pero puede tener visitas en varios períodos), así
+            // que este reporte siempre trae el directorio completo.
+            const result = await pool.query(`
+                SELECT e.nombre_escuela AS escuela, COALESCE(e.contacto_nombre, 'N/A') AS contacto,
+                       COALESCE(e.puesto_contacto, '-') AS puesto, COALESCE(e.telefono_escuela, '-') AS telefono,
+                       COALESCE(e.ubicacion, '-') AS ubicacion,
+                       CASE WHEN COALESCE(e.activo, TRUE) THEN 'Activa' ELSE 'Archivada' END AS estado,
+                       MAX(av.fecha_cita) AS ultima_visita,
+                       COUNT(DISTINCT b.id_beneficiario) AS beneficiarios_vinculados
+                FROM Escuelas e
+                LEFT JOIN Agenda_Visitas av ON av.id_escuela = e.id_escuela
+                LEFT JOIN Beneficiarios b ON b.id_escuela = e.id_escuela
+                GROUP BY e.id_escuela
+                ORDER BY e.nombre_escuela ASC
+            `);
+            return res.json({ success: true, data: result.rows });
         }
         return res.status(400).json({ success: false, message: 'Tipo de reporte inválido.' });
     } catch (error) {
@@ -2997,7 +3317,7 @@ app.get('/api/eventos/:id', async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT e.id_evento, e.titulo_evento, e.tipo_evento, e.fecha_realizacion, e.url_imagen,
-                   e.direccion_mapa, e.link_reunion,
+                   e.direccion_mapa, e.link_reunion, e.descripcion,
                    esc.nombre_escuela
             FROM Eventos e
             LEFT JOIN Escuelas esc ON e.id_escuela = esc.id_escuela
@@ -3023,6 +3343,89 @@ app.get('/api/eventos/:id', async (req, res) => {
 // el frontend sepa a qué endpoint mandar la edición/borrado.
 // ==========================================
 
+// 0. Categorías — catálogo persistente para el selector de Publicaciones y Eventos (antes las
+//    categorías "Otro" solo se guardaban como texto suelto y nunca se reutilizaban). Cualquier
+//    categoría nueva se registra aquí automáticamente al guardar una publicación o evento (ver
+//    registrarCategorias) y también puede registrarse al vuelo desde el mini-buscador del panel
+//    (POST get-or-create), para que quede disponible de inmediato.
+//
+//    Desde migracion_normalizacion_categorias_v1.sql, la relación real entre una publicación/
+//    evento y sus categorías vive en las tablas de unión Publicaciones_Categorias /
+//    Eventos_Categorias (normalizadas, con integridad referencial real contra esta tabla) — las
+//    columnas Publicaciones.categoria / Eventos.categoria (texto separado por comas) se conservan
+//    solo como caché de lectura y por compatibilidad con datos_demo_sanctorum.sql, pero ya no son
+//    la fuente de verdad para consultas ni filtros.
+app.get('/api/categorias', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id_categoria, nombre_categoria FROM Categorias ORDER BY nombre_categoria ASC');
+        res.json({ success: true, data: result.rows });
+    } catch (error) {
+        console.error("Error al listar categorías:", error);
+        res.status(500).json({ success: false, data: [] });
+    }
+});
+
+app.post('/api/categorias', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
+    const nombre = (req.body?.nombre || '').trim();
+    if (!nombre) return res.status(400).json({ success: false, message: 'El nombre de la categoría es obligatorio.' });
+    try {
+        // "Get or create" en una sola consulta: si ya existe (choca con el UNIQUE de
+        // nombre_categoria) el DO UPDATE la deja igual pero permite devolverla con RETURNING.
+        const result = await pool.query(
+            `INSERT INTO Categorias (nombre_categoria) VALUES ($1)
+             ON CONFLICT (nombre_categoria) DO UPDATE SET nombre_categoria = EXCLUDED.nombre_categoria
+             RETURNING id_categoria, nombre_categoria`,
+            [nombre]
+        );
+        res.status(201).json({ success: true, data: result.rows[0] });
+    } catch (error) {
+        console.error("Error al registrar categoría:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+    }
+});
+
+// Registra en el catálogo Categorias cualquier categoría nueva que llegue en una publicación o
+// evento (string separado por comas, p.ej. "Infancia, Mi categoría nueva") y, si se le pasa a qué
+// entidad pertenece (segundo parámetro "entidad"), sincroniza también la tabla de unión
+// normalizada correspondiente (Publicaciones_Categorias / Eventos_Categorias) -- se hace con un
+// DELETE + INSERT del conjunto completo en cada guardado, porque es más simple y seguro que
+// calcular un diff, y el volumen de categorías por publicación/evento es siempre pequeño.
+// Nunca lanza: que falle el registro en el catálogo o la sincronización no debe tumbar el
+// guardado de la publicación/evento en sí (igual que antes).
+async function registrarCategorias(categoriaStr, entidad) {
+    const nombres = (categoriaStr || '').split(',').map((s) => s.trim()).filter(Boolean);
+    const idsCategoria = [];
+    for (const nombre of nombres) {
+        try {
+            const r = await pool.query(
+                `INSERT INTO Categorias (nombre_categoria) VALUES ($1)
+                 ON CONFLICT (nombre_categoria) DO UPDATE SET nombre_categoria = EXCLUDED.nombre_categoria
+                 RETURNING id_categoria`,
+                [nombre]
+            );
+            idsCategoria.push(r.rows[0].id_categoria);
+        } catch (error) {
+            console.error("Error al registrar categoría en catálogo:", nombre, error);
+        }
+    }
+    if (!entidad) return;
+    try {
+        if (entidad.tipo === 'publicacion') {
+            await pool.query('DELETE FROM Publicaciones_Categorias WHERE id_publicacion = $1', [entidad.id]);
+            for (const idCat of idsCategoria) {
+                await pool.query('INSERT INTO Publicaciones_Categorias (id_publicacion, id_categoria) VALUES ($1, $2) ON CONFLICT DO NOTHING', [entidad.id, idCat]);
+            }
+        } else if (entidad.tipo === 'evento') {
+            await pool.query('DELETE FROM Eventos_Categorias WHERE id_evento = $1', [entidad.id]);
+            for (const idCat of idsCategoria) {
+                await pool.query('INSERT INTO Eventos_Categorias (id_evento, id_categoria) VALUES ($1, $2) ON CONFLICT DO NOTHING', [entidad.id, idCat]);
+            }
+        }
+    } catch (error) {
+        console.error("Error al sincronizar tabla de unión de categorías:", entidad, error);
+    }
+}
+
 // 1. Listar (público). Por defecto solo Publicaciones; con ?incluir_historias=1 (usado por el
 //    panel de administración) también trae las Historias de Éxito para gestionarlas juntas.
 app.get('/api/publicaciones', async (req, res) => {
@@ -3033,14 +3436,30 @@ app.get('/api/publicaciones', async (req, res) => {
     const usuarioReq = incluir_historias ? usuarioOpcional(req) : null;
     const soloPropias = usuarioReq && (Number(usuarioReq.rol) === ROL_VOLUNTARIO || Number(usuarioReq.rol) === ROL_ESPECIALISTA);
     try {
-        let query = "SELECT *, 'publicacion' AS origen FROM Publicaciones";
+        // "categoria" se recalcula desde Publicaciones_Categorias (fuente real de verdad, ver
+        // migracion_normalizacion_categorias_v1.sql) en vez de leerse tal cual de la columna de
+        // texto -- al llevar el mismo alias que la columna real, la sobreescribe en cada fila del
+        // resultado (pg asigna las propiedades en el orden de las columnas devueltas).
+        let query = `SELECT p.*,
+                            (SELECT string_agg(c.nombre_categoria, ', ' ORDER BY c.nombre_categoria)
+                               FROM Publicaciones_Categorias pc JOIN Categorias c ON c.id_categoria = pc.id_categoria
+                              WHERE pc.id_publicacion = p.id_publicacion) AS categoria,
+                            'publicacion' AS origen
+                       FROM Publicaciones p`;
         const condiciones = [];
         const params = [];
-        if (tipo) { params.push(tipo); condiciones.push(`tipo = $${params.length}`); }
-        // Una publicación puede tener varias categorías guardadas como "Infancia, Muralismo",
-        // así que el filtro busca coincidencia parcial en vez de una igualdad exacta.
-        if (categoria) { params.push(`%${categoria}%`); condiciones.push(`categoria ILIKE $${params.length}`); }
-        if (soloPropias) { params.push(usuarioReq.id); condiciones.push(`id_autor = $${params.length}`); }
+        if (tipo) { params.push(tipo); condiciones.push(`p.tipo = $${params.length}`); }
+        // Antes esto buscaba coincidencia parcial (ILIKE) sobre el texto separado por comas, lo
+        // que podía dar falsos positivos entre categorías que se contienen entre sí. Con la tabla
+        // de unión ya se puede filtrar por igualdad exacta contra el nombre real de la categoría.
+        if (categoria) {
+            params.push(categoria);
+            condiciones.push(`EXISTS (
+                SELECT 1 FROM Publicaciones_Categorias pc2 JOIN Categorias c2 ON c2.id_categoria = pc2.id_categoria
+                 WHERE pc2.id_publicacion = p.id_publicacion AND c2.nombre_categoria = $${params.length}
+            )`);
+        }
+        if (soloPropias) { params.push(usuarioReq.id); condiciones.push(`p.id_autor = $${params.length}`); }
         if (condiciones.length > 0) query += ' WHERE ' + condiciones.join(' AND ');
         query += ' ORDER BY fecha_post DESC';
         if (limite) {
@@ -3075,7 +3494,15 @@ app.get('/api/publicaciones', async (req, res) => {
 // 2. Obtener una sola (para evento_detalle)
 app.get('/api/publicaciones/:id', async (req, res) => {
     try {
-        const result = await pool.query("SELECT *, 'publicacion' AS origen FROM Publicaciones WHERE id_publicacion = $1", [req.params.id]);
+        const result = await pool.query(
+            `SELECT p.*,
+                    (SELECT string_agg(c.nombre_categoria, ', ' ORDER BY c.nombre_categoria)
+                       FROM Publicaciones_Categorias pc JOIN Categorias c ON c.id_categoria = pc.id_categoria
+                      WHERE pc.id_publicacion = p.id_publicacion) AS categoria,
+                    'publicacion' AS origen
+               FROM Publicaciones p WHERE p.id_publicacion = $1`,
+            [req.params.id]
+        );
         if (result.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
         res.json({ success: true, data: result.rows[0] });
     } catch (error) {
@@ -3087,12 +3514,14 @@ app.get('/api/publicaciones/:id', async (req, res) => {
 // 3. Crear — si el tipo es "Historia de Éxito" se guarda en Historias_Exito (requiere
 //    beneficiario y documento de consentimiento); cualquier otro tipo es una Publicación normal.
 app.post('/api/publicaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
-    const { titulo, contenido, url_imagen, tipo, categoria, url_documento_consentimiento, id_evento_relacionado,
+    const { titulo, contenido, url_imagen, url_video, tipo, categoria, url_documento_consentimiento, id_evento_relacionado,
             id_beneficiario, contenido_preayuda, contenido_postayuda } = req.body;
     if (!titulo || !tipo) return res.status(400).json({ success: false, message: 'Título y tipo son obligatorios.' });
 
     const chkImagenPub = validarUrlCloudinaria(url_imagen, 'url_imagen');
     if (!chkImagenPub.ok) return res.status(400).json({ success: false, message: chkImagenPub.mensaje });
+    const chkVideoPub = validarUrlCloudinaria(url_video, 'url_video');
+    if (!chkVideoPub.ok) return res.status(400).json({ success: false, message: chkVideoPub.mensaje });
     const chkDocConsentimientoPub = validarUrlCloudinaria(url_documento_consentimiento, 'url_documento_consentimiento');
     if (!chkDocConsentimientoPub.ok) return res.status(400).json({ success: false, message: chkDocConsentimientoPub.mensaje });
 
@@ -3116,10 +3545,11 @@ app.post('/api/publicaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECI
 
     try {
         const result = await pool.query(
-            `INSERT INTO Publicaciones (titulo, contenido, url_imagen, tipo, categoria, fecha_post, url_documento_consentimiento, id_evento_relacionado, id_autor)
-             VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, $6, $7, $8) RETURNING id_publicacion`,
-            [titulo, contenido || null, chkImagenPub.valor, tipo, categoria || null, chkDocConsentimientoPub.valor, id_evento_relacionado || null, req.usuario.id]
+            `INSERT INTO Publicaciones (titulo, contenido, url_imagen, url_video, tipo, categoria, fecha_post, url_documento_consentimiento, id_evento_relacionado, id_autor)
+             VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7, $8, $9) RETURNING id_publicacion`,
+            [titulo, contenido || null, chkImagenPub.valor, chkVideoPub.valor, tipo, categoria || null, chkDocConsentimientoPub.valor, id_evento_relacionado || null, req.usuario.id]
         );
+        await registrarCategorias(categoria, { tipo: 'publicacion', id: result.rows[0].id_publicacion });
         res.status(201).json({ success: true, id: result.rows[0].id_publicacion, origen: 'publicacion' });
     } catch (error) {
         console.error("Error al crear publicación:", error);
@@ -3127,17 +3557,28 @@ app.post('/api/publicaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECI
     }
 });
 
-// 4. Actualizar — el body debe traer "origen" ('publicacion' | 'historia') para saber qué tabla tocar.
+// 4. Actualizar — el body debe traer "origen" ('publicacion' | 'historia') para saber a qué
+//    tabla debe quedar el registro, y "origen_original" para saber en cuál vive HOY. Ahora que
+//    el <select> de Tipo ya no se bloquea al editar (ver publicaciones.html), origen puede venir
+//    distinto de origen_original: eso significa que el usuario cruzó de "Publicación normal" a
+//    "Historia de Éxito" (o viceversa), lo que implica mover el registro entre tablas —con IDs
+//    de columnas distintas (id_publicacion / id_historia)— en vez de un UPDATE normal.
 app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
-    const { titulo, contenido, url_imagen, tipo, categoria, url_documento_consentimiento, id_evento_relacionado,
-            id_beneficiario, contenido_preayuda, contenido_postayuda, origen } = req.body;
+    const { titulo, contenido, url_imagen, url_video, tipo, categoria, url_documento_consentimiento, id_evento_relacionado,
+            id_beneficiario, contenido_preayuda, contenido_postayuda, origen, origen_original } = req.body;
+    // Clientes viejos (sin origen_original) no cruzan tipos: se asume que el origen no cambió.
+    const origenActual = origen_original || origen;
+    const cruzaTablas = origen !== origenActual;
 
     const chkImagenPubPut = validarUrlCloudinaria(url_imagen, 'url_imagen');
     if (!chkImagenPubPut.ok) return res.status(400).json({ success: false, message: chkImagenPubPut.mensaje });
+    const chkVideoPubPut = validarUrlCloudinaria(url_video, 'url_video');
+    if (!chkVideoPubPut.ok) return res.status(400).json({ success: false, message: chkVideoPubPut.mensaje });
     const chkDocConsentimientoPubPut = validarUrlCloudinaria(url_documento_consentimiento, 'url_documento_consentimiento');
     if (!chkDocConsentimientoPubPut.ok) return res.status(400).json({ success: false, message: chkDocConsentimientoPubPut.mensaje });
 
-    if (origen === 'historia') {
+    // --- Sigue siendo Historia de Éxito: UPDATE normal sobre Historias_Exito. ---
+    if (origen === 'historia' && !cruzaTablas) {
         if (!puedePublicarHistoria(req.usuario)) return res.status(403).json({ success: false, message: 'Solo un psicólogo, coordinador o administrador puede editar una Historia de Éxito.' });
         if (!url_documento_consentimiento) return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
         try {
@@ -3154,34 +3595,104 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
                 [titulo, contenido_preayuda, contenido_postayuda, chkDocConsentimientoPubPut.valor, id_beneficiario, req.params.id]
             );
             if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
-            return res.json({ success: true });
+            return res.json({ success: true, origen: 'historia', id: Number(req.params.id) });
         } catch (error) {
             console.error("Error al actualizar historia de éxito:", error);
             return res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
         }
     }
 
+    // --- Sigue siendo Publicación normal (el tipo puede cambiar libremente entre
+    //     Aviso/Evento/Otro: es la misma tabla, no hay cruce). UPDATE normal. ---
+    if (origen !== 'historia' && !cruzaTablas) {
+        if (tipo === 'Historia de Éxito' && !url_documento_consentimiento) {
+            return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
+        }
+        try {
+            // Solo el autor original o un Admin pueden editar esta publicación.
+            if (req.usuario.rol !== ROL_ADMIN) {
+                const autorPub = await pool.query('SELECT id_autor FROM Publicaciones WHERE id_publicacion = $1', [req.params.id]);
+                if (autorPub.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
+                if (Number(autorPub.rows[0].id_autor) !== Number(req.usuario.id)) {
+                    return res.status(403).json({ success: false, message: 'Solo el autor original o un Admin pueden modificar esta publicación.' });
+                }
+            }
+            const result = await pool.query(
+                `UPDATE Publicaciones SET titulo=$1, contenido=$2, url_imagen=$3, url_video=$4, tipo=$5, categoria=$6, url_documento_consentimiento=$7, id_evento_relacionado=$8, id_editor=$9 WHERE id_publicacion=$10`,
+                [titulo, contenido || null, chkImagenPubPut.valor, chkVideoPubPut.valor, tipo, categoria || null, chkDocConsentimientoPubPut.valor, id_evento_relacionado || null, req.usuario.id, req.params.id]
+            );
+            if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
+            await registrarCategorias(categoria, { tipo: 'publicacion', id: Number(req.params.id) });
+            return res.json({ success: true, origen: 'publicacion', id: Number(req.params.id) });
+        } catch (error) {
+            console.error("Error al actualizar publicación:", error);
+            return res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+        }
+    }
+
+    // --- Cruce: de Publicación normal a Historia de Éxito. El registro cambia de tabla y de
+    //     id (id_publicacion -> id_historia), así que se valida como un alta nueva de historia
+    //     (mismos requisitos que POST) y se hace en una transacción: INSERT en Historias_Exito
+    //     + DELETE de Publicaciones. Si algo falla, no queda ni a medias ni duplicado. ---
+    if (origen === 'historia' && cruzaTablas) {
+        if (!puedePublicarHistoria(req.usuario)) return res.status(403).json({ success: false, message: 'Solo un psicólogo, coordinador o administrador puede publicar una Historia de Éxito.' });
+        if (!url_documento_consentimiento) return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
+        if (!id_beneficiario) return res.status(400).json({ success: false, message: 'Selecciona a qué beneficiario pertenece esta historia.' });
+        if (!contenido_preayuda || !contenido_postayuda) return res.status(400).json({ success: false, message: 'Completa el contenido de "antes" y "después".' });
+        try {
+            // La autoría a validar es la del registro ORIGINAL (todavía vive en Publicaciones).
+            if (req.usuario.rol !== ROL_ADMIN) {
+                const autorOriginal = await pool.query('SELECT id_autor FROM Publicaciones WHERE id_publicacion = $1', [req.params.id]);
+                if (autorOriginal.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
+                if (Number(autorOriginal.rows[0].id_autor) !== Number(req.usuario.id)) {
+                    return res.status(403).json({ success: false, message: 'Solo el autor original o un Admin pueden modificar esta publicación.' });
+                }
+            }
+            await pool.query('BEGIN');
+            const insertado = await pool.query(
+                `INSERT INTO Historias_Exito (id_beneficiario, id_autor, titulo, contenido_preayuda, contenido_postayuda, consentimiento, url_documento_consentimiento, fecha_creacion)
+                 VALUES ($1, $2, $3, $4, $5, TRUE, $6, CURRENT_TIMESTAMP) RETURNING id_historia`,
+                [id_beneficiario, req.usuario.id, titulo, contenido_preayuda, contenido_postayuda, chkDocConsentimientoPubPut.valor]
+            );
+            await pool.query('DELETE FROM Publicaciones WHERE id_publicacion = $1', [req.params.id]);
+            await pool.query('COMMIT');
+            return res.json({ success: true, cruce: true, origen: 'historia', id: insertado.rows[0].id_historia });
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            console.error("Error al mover publicación a Historia de Éxito:", error);
+            return res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+        }
+    }
+
+    // --- Cruce: de Historia de Éxito a Publicación normal. Mismo principio al revés:
+    //     INSERT en Publicaciones + DELETE de Historias_Exito, en una transacción. ---
+    if (!titulo || !tipo) return res.status(400).json({ success: false, message: 'Título y tipo son obligatorios.' });
     if (tipo === 'Historia de Éxito' && !url_documento_consentimiento) {
         return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
     }
     try {
-        // Solo el autor original o un Admin pueden editar esta publicación.
+        // La autoría a validar es la del registro ORIGINAL (todavía vive en Historias_Exito).
         if (req.usuario.rol !== ROL_ADMIN) {
-            const autorPub = await pool.query('SELECT id_autor FROM Publicaciones WHERE id_publicacion = $1', [req.params.id]);
-            if (autorPub.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
-            if (Number(autorPub.rows[0].id_autor) !== Number(req.usuario.id)) {
+            const autorOriginal = await pool.query('SELECT id_autor FROM Historias_Exito WHERE id_historia = $1', [req.params.id]);
+            if (autorOriginal.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
+            if (Number(autorOriginal.rows[0].id_autor) !== Number(req.usuario.id)) {
                 return res.status(403).json({ success: false, message: 'Solo el autor original o un Admin pueden modificar esta publicación.' });
             }
         }
-        const result = await pool.query(
-            `UPDATE Publicaciones SET titulo=$1, contenido=$2, url_imagen=$3, tipo=$4, categoria=$5, url_documento_consentimiento=$6, id_evento_relacionado=$7, id_editor=$8 WHERE id_publicacion=$9`,
-            [titulo, contenido || null, chkImagenPubPut.valor, tipo, categoria || null, chkDocConsentimientoPubPut.valor, id_evento_relacionado || null, req.usuario.id, req.params.id]
+        await pool.query('BEGIN');
+        const insertado = await pool.query(
+            `INSERT INTO Publicaciones (titulo, contenido, url_imagen, url_video, tipo, categoria, fecha_post, url_documento_consentimiento, id_evento_relacionado, id_autor)
+             VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7, $8, $9) RETURNING id_publicacion`,
+            [titulo, contenido || null, chkImagenPubPut.valor, chkVideoPubPut.valor, tipo, categoria || null, chkDocConsentimientoPubPut.valor, id_evento_relacionado || null, req.usuario.id]
         );
-        if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
-        res.json({ success: true });
+        await pool.query('DELETE FROM Historias_Exito WHERE id_historia = $1', [req.params.id]);
+        await pool.query('COMMIT');
+        await registrarCategorias(categoria, { tipo: 'publicacion', id: insertado.rows[0].id_publicacion });
+        return res.json({ success: true, cruce: true, origen: 'publicacion', id: insertado.rows[0].id_publicacion });
     } catch (error) {
-        console.error("Error al actualizar publicación:", error);
-        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+        await pool.query('ROLLBACK');
+        console.error("Error al mover historia de éxito a publicación:", error);
+        return res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
     }
 });
 

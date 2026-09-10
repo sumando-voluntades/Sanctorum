@@ -32,6 +32,49 @@
         background: rgba(255, 255, 255, 0.7);
         z-index: 50;
       }
+      /* Espaciado del contenido cuando viene con formato del editor (párrafos/listas/enlaces
+         -- ver esContenidoHtml/sanitizarContenidoEnriquecido en comun.js). Debe ser un espejo
+         de las reglas de #pub_contenido_preview en admin/publicaciones.html, para que la vista
+         previa del panel de admin no mienta sobre cómo se ve aquí. */
+      #det_contenido_texto p {
+        margin: 0 0 0.9em;
+      }
+      #det_contenido_texto p:last-child {
+        margin-bottom: 0;
+      }
+      #det_contenido_texto ul,
+      #det_contenido_texto ol {
+        margin: 0 0 0.9em 1.25em;
+      }
+      #det_contenido_texto ul {
+        list-style: disc;
+      }
+      #det_contenido_texto ol {
+        list-style: decimal;
+      }
+      #det_contenido_texto a {
+        color: #be185d;
+        text-decoration: underline;
+      }
+      #det_contenido_texto h2,
+      #det_contenido_texto h3 {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-weight: 700;
+        color: #171c1f;
+        line-height: 1.3;
+      }
+      #det_contenido_texto h2 {
+        font-size: 1.4rem;
+        margin: 1.2em 0 0.5em;
+      }
+      #det_contenido_texto h3 {
+        font-size: 1.15rem;
+        margin: 1em 0 0.4em;
+      }
+      #det_contenido_texto h2:first-child,
+      #det_contenido_texto h3:first-child {
+        margin-top: 0;
+      }
     </style>
   </head>
   <body class="bg-surface text-on-surface min-h-screen flex flex-col">
@@ -51,16 +94,48 @@
           <p class="text-slate-400">Cargando...</p>
         </div>
 
-        <article id="contenido_detalle" class="hidden">
-          <span
-            id="det_badge_tipo"
-            class="inline-block px-4 py-1.5 bg-secondary text-white rounded-full text-sm font-semibold tracking-wide mb-6"
-          ></span>
-          <h1
-            id="det_titulo"
-            class="text-3xl md:text-5xl font-bold text-on-surface mb-4 leading-tight"
-          ></h1>
-          <p id="det_fecha" class="text-slate-500 font-medium mb-8"></p>
+        <!-- Todo el artículo vive dentro de una "tarjeta" blanca con sombra suave y un
+             acento de color arriba, en vez de quedar flotando directo sobre el fondo de la
+             página -- le da a la vista un lugar claro donde "descansar" en vez de un bloque
+             de texto/color continuo. -->
+        <article
+          id="contenido_detalle"
+          class="hidden bg-white rounded-3xl shadow-lg p-6 md:p-10"
+        >
+          <!-- Encabezado tipo "portada de revista": columna angosta y centrada, más legible
+               que el ancho completo de la imagen que viene abajo. -->
+          <div class="max-w-2xl mx-auto">
+            <span
+              id="det_badge_tipo"
+              class="inline-block px-4 py-1.5 bg-secondary text-white rounded-full text-sm font-semibold tracking-wide mb-6"
+            ></span>
+            <h1
+              id="det_titulo"
+              class="text-3xl md:text-5xl font-bold text-on-surface mb-4 leading-tight"
+            ></h1>
+            <div
+              class="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-500 font-medium mb-8 text-sm"
+            >
+              <span class="inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-base"
+                  >calendar_today</span
+                >
+                <span id="det_fecha"></span>
+              </span>
+              <span class="text-slate-300">•</span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-base">person</span>
+                <span id="det_autor"></span>
+              </span>
+              <span class="text-slate-300">•</span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-base"
+                  >schedule</span
+                >
+                <span id="det_tiempo_lectura"></span>
+              </span>
+            </div>
+          </div>
 
           <!-- Visor de imágenes estilo "historia" (soporta 1 o varias imágenes) -->
           <div
@@ -95,12 +170,98 @@
             >
               <span class="material-symbols-outlined">chevron_right</span>
             </button>
+            <!-- Botón para ver la imagen completa (estilo Facebook): abre el lightbox de
+                 abajo en vez de navegar la historia, así no choca con los botones anterior/
+                 siguiente que ya cubren los costados. -->
+            <button
+              onclick="event.stopPropagation(); abrirLightbox()"
+              class="absolute top-3 right-3 z-30 w-9 h-9 bg-black/40 hover:bg-black/60 rounded-full flex items-center justify-center text-white transition-colors"
+              aria-label="Ver imagen completa"
+              title="Ver imagen completa"
+            >
+              <span class="material-symbols-outlined text-lg">open_in_full</span>
+            </button>
           </div>
 
+          <!-- Lightbox: muestra la imagen actual de la historia a tamaño completo, sin
+               recortarla (object-contain), reduciendo su tamaño de despliegue si hace falta
+               para que quepa entera en la pantalla — el "marco" (fondo oscuro) siempre es el
+               mismo, lo que cambia es cuánto se encoge la imagen dentro de él. -->
           <div
-            id="det_contenido"
-            class="prose prose-lg max-w-none text-on-surface-variant leading-relaxed whitespace-pre-line mb-8"
-          ></div>
+            id="lightbox_imagen"
+            class="fixed inset-0 z-[100] bg-black/90 items-center justify-center p-4"
+            style="display: none"
+            onclick="cerrarLightbox()"
+          >
+            <button
+              onclick="cerrarLightbox()"
+              class="absolute top-4 right-4 md:top-6 md:right-6 z-10 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+              aria-label="Cerrar"
+            >
+              <span class="material-symbols-outlined text-2xl">close</span>
+            </button>
+            <!-- Anterior/Siguiente dentro del lightbox: solo tienen sentido si la
+                 publicación trae más de una foto (portada + galería adicional). Se ocultan
+                 por completo si solo hay una, ver abrirLightbox(). -->
+            <button
+              id="lightbox_btn_anterior"
+              onclick="event.stopPropagation(); lightboxAnterior()"
+              class="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+              aria-label="Imagen anterior"
+            >
+              <span class="material-symbols-outlined text-2xl">chevron_left</span>
+            </button>
+            <button
+              id="lightbox_btn_siguiente"
+              onclick="event.stopPropagation(); lightboxSiguiente()"
+              class="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+              aria-label="Siguiente imagen"
+            >
+              <span class="material-symbols-outlined text-2xl">chevron_right</span>
+            </button>
+            <img
+              id="lightbox_imagen_img"
+              src=""
+              alt=""
+              class="max-w-[95vw] max-h-[90vh] object-contain rounded-lg"
+              onclick="event.stopPropagation()"
+            />
+            <span
+              id="lightbox_contador"
+              class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-white/80 text-sm font-medium bg-black/40 px-3 py-1 rounded-full"
+            ></span>
+          </div>
+
+          <!-- Video (opcional, solo publicaciones) -->
+          <div id="det_video_wrap" class="hidden mb-10">
+            <video
+              id="det_video"
+              controls
+              playsinline
+              class="w-full rounded-3xl shadow-xl bg-slate-900"
+              style="max-height: 480px"
+            ></video>
+          </div>
+
+          <!-- Cuerpo del artículo: SIN caja/fondo a propósito (como se veía antes de las
+               pruebas de rediseño) -- solo texto simple debajo de la imagen. El contenido
+               puede venir de dos formas (ver cargarDetalle más abajo, usa esContenidoHtml de
+               comun.js):
+                - Publicaciones nuevas, escritas con el editor con formato del panel de admin:
+                  HTML real (negritas/listas/enlaces), saneado con DOMPurify e insertado con
+                  innerHTML -- ver sanitizarContenidoEnriquecido en comun.js.
+                - Publicaciones "clásicas" de antes del editor: texto plano con saltos de línea
+                  reales. Por eso esta caja conserva "whitespace-pre-wrap": para esos casos el
+                  navegador respeta tal cual los "Enters" que vienen guardados en la base de
+                  datos, sin depender de convertir "\n" a "<br>" a mano. Es un <div>, no un <p>,
+                  porque el HTML del editor ya trae sus propios <p>/<ul>/<li> (un <p> no puede
+                  anidar otro <p>). -->
+          <div id="det_contenido" class="mt-6 mb-8 w-full max-w-4xl mx-auto">
+            <div
+              id="det_contenido_texto"
+              class="text-gray-800 text-base leading-relaxed whitespace-pre-wrap"
+            ></div>
+          </div>
 
           <!-- Ubicación (mapa) -->
           <div id="det_mapa_wrap" class="hidden mb-8">
@@ -172,9 +333,46 @@
 
     <div id="footer-mount"></div>
 
+    <!-- DOMPurify: sanea el HTML que puede traer "Contenido" cuando la publicación se escribió
+         con el editor de texto con formato del panel de admin -- ver
+         sanitizarContenidoEnriquecido en comun.js. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
     <script src="/js/comun.js"></script>
     <script src="/js/incluir.js"></script>
     <script>
+      // Cloudinary genera automáticamente una miniatura (primer fotograma) de cualquier
+      // video subido si se pide la misma URL cambiando la extensión por ".jpg". Se usa como
+      // respaldo de portada cuando una publicación trae video pero no fotografía propia.
+      function posterDeVideo(urlVideo) {
+        if (!urlVideo) return "";
+        return urlVideo.replace(/\.[a-z0-9]+(\?.*)?$/i, ".jpg$1");
+      }
+
+      // Calcula un tiempo de lectura estimado (≈200 palabras/min en español), redondeado
+      // hacia arriba y con un mínimo de 1 minuto, como en los artículos de noticias. Quita
+      // etiquetas HTML primero (ver quitarEtiquetasHtml en comun.js): si no, las publicaciones
+      // escritas con el editor con formato contarían "<p>", "<strong>", etc. como palabras.
+      function calcularTiempoLectura(texto) {
+        const palabras = quitarEtiquetasHtml(texto).split(/\s+/).filter(Boolean);
+        const minutos = Math.max(1, Math.round(palabras.length / 200));
+        return `${minutos} min de lectura`;
+      }
+
+      // Pinta el cuerpo del artículo en #det_contenido_texto. "texto" puede traer HTML real
+      // (publicación escrita con el editor con formato del panel de admin -- se sanea con
+      // DOMPurify e inyecta con innerHTML) o texto plano "clásico" con saltos de línea reales
+      // (se usa textContent + la clase whitespace-pre-wrap de la caja, así el navegador
+      // respeta los "Enters" tal cual, sin convertir "\n" a "<br>" a mano). Ver
+      // esContenidoHtml/sanitizarContenidoEnriquecido en comun.js.
+      function pintarContenidoDetalle(texto) {
+        const el = document.getElementById("det_contenido_texto");
+        if (esContenidoHtml(texto)) {
+          el.innerHTML = sanitizarContenidoEnriquecido(texto);
+        } else {
+          el.textContent = texto;
+        }
+      }
+
       // ---------- VISOR DE IMÁGENES ESTILO "HISTORIA" ----------
       let storyImagenes = [];
       let storyIndiceActual = 0;
@@ -249,6 +447,73 @@
           }, 100);
         }
       }
+
+      // ---------- LIGHTBOX: VER IMAGEN COMPLETA (estilo Facebook) ----------
+      // Muestra la imagen actualmente visible en la historia a pantalla completa, sin
+      // recortarla: "object-contain" reduce su tamaño de despliegue lo necesario para que
+      // quepa entera (nunca al revés). Pausa el avance automático de la historia mientras
+      // está abierto para que no cambie de imagen de fondo sin que se note, y deja
+      // avanzar/retroceder entre todas las fotos de la publicación (portada + galería) si
+      // hay más de una.
+      function abrirLightbox() {
+        if (storyImagenes.length === 0) return;
+        if (storyTimer) clearInterval(storyTimer);
+        document.getElementById("lightbox_imagen").style.display = "flex";
+        document.body.style.overflow = "hidden";
+        mostrarImagenLightbox(storyIndiceActual);
+      }
+
+      // Cierra el lightbox y reanuda el avance automático de la historia (si aplica) desde
+      // la imagen que se estaba mostrando dentro del lightbox.
+      function cerrarLightbox() {
+        document.getElementById("lightbox_imagen").style.display = "none";
+        document.getElementById("lightbox_imagen_img").src = "";
+        document.body.style.overflow = "";
+        mostrarImagenStory(storyIndiceActual);
+      }
+
+      // Muestra la imagen en la posición "indice" dentro del lightbox (acotado al rango
+      // válido) y mantiene storyIndiceActual sincronizado, para que al cerrar el lightbox
+      // el visor de fondo retome exactamente en esa misma imagen. Los controles de
+      // anterior/siguiente y el contador solo se muestran si hay más de una imagen.
+      function mostrarImagenLightbox(indice) {
+        if (indice < 0) indice = 0;
+        if (indice >= storyImagenes.length) indice = storyImagenes.length - 1;
+        storyIndiceActual = indice;
+        document.getElementById("lightbox_imagen_img").src =
+          storyImagenes[indice];
+
+        const hayVarias = storyImagenes.length > 1;
+        document.getElementById("lightbox_btn_anterior").style.display =
+          hayVarias ? "flex" : "none";
+        document.getElementById("lightbox_btn_siguiente").style.display =
+          hayVarias ? "flex" : "none";
+        const contador = document.getElementById("lightbox_contador");
+        contador.style.display = hayVarias ? "block" : "none";
+        contador.innerText = hayVarias
+          ? `${indice + 1} / ${storyImagenes.length}`
+          : "";
+      }
+
+      // Avanza/retrocede una imagen dentro del lightbox, sin salirse del rango (se queda
+      // en la primera/última en vez de dar la vuelta).
+      function lightboxSiguiente() {
+        if (storyIndiceActual < storyImagenes.length - 1)
+          mostrarImagenLightbox(storyIndiceActual + 1);
+      }
+      function lightboxAnterior() {
+        mostrarImagenLightbox(Math.max(0, storyIndiceActual - 1));
+      }
+
+      // Mientras el lightbox está abierto: Escape lo cierra, las flechas izquierda/derecha
+      // navegan entre imágenes (si hay más de una).
+      document.addEventListener("keydown", (e) => {
+        const lb = document.getElementById("lightbox_imagen");
+        if (!lb || lb.style.display !== "flex") return;
+        if (e.key === "Escape") cerrarLightbox();
+        else if (e.key === "ArrowRight") lightboxSiguiente();
+        else if (e.key === "ArrowLeft") lightboxAnterior();
+      });
 
       // Avanza a la siguiente imagen de la historia; si ya está en la última,
       // se queda ahí y solo reinicia el temporizador/barra de esa imagen.
@@ -368,8 +633,17 @@
             const lugar = n.nombre_escuela
               ? `Realizado en ${n.nombre_escuela}.`
               : "Realizado en nuestra sede.";
-            document.getElementById("det_contenido").innerText =
+            // Si quien capturó el evento escribió una Descripción (ver agenda.html), se
+            // muestra tal cual -- igual que el "contenido" de una publicación normal. Si no,
+            // se arma un texto genérico a partir de sus datos reales, como antes.
+            const descripcionEvento =
+              n.descripcion ||
               `Actividad de tipo "${n.tipo_evento}" organizada por Sumando Voluntades Sanctórum. ${lugar}`;
+            pintarContenidoDetalle(descripcionEvento);
+            document.getElementById("det_autor").innerText =
+              "Equipo Sanctórum";
+            document.getElementById("det_tiempo_lectura").innerText =
+              calcularTiempoLectura(descripcionEvento);
 
             iniciarStory([n.url_imagen, ...galeriaExtra]);
 
@@ -400,11 +674,32 @@
               month: "long",
               year: "numeric",
             });
-            document.getElementById("det_contenido").innerText =
-              n.contenido ||
-              "Esta publicación aún no tiene contenido detallado.";
+            pintarContenidoDetalle(
+              n.contenido || "Esta publicación aún no tiene contenido detallado.",
+            );
+            document.getElementById("det_autor").innerText =
+              n.autor || "Equipo Sanctórum";
+            document.getElementById("det_tiempo_lectura").innerText =
+              calcularTiempoLectura(n.contenido);
 
-            iniciarStory([n.url_imagen, ...galeriaExtra]);
+            // Video (opcional): solo las publicaciones (no los eventos) pueden traer uno,
+            // ver migracion_publicaciones_video_v1.sql. Se muestra debajo de la
+            // portada/galería, con la portada como "poster" mientras no se reproduce.
+            if (n.url_video) {
+              const videoEl = document.getElementById("det_video");
+              videoEl.src = n.url_video;
+              videoEl.poster = n.url_imagen || posterDeVideo(n.url_video);
+              document
+                .getElementById("det_video_wrap")
+                .classList.remove("hidden");
+            }
+
+            // Si no hay fotografía de portada pero sí video, usamos la miniatura del video
+            // (Cloudinary la genera solo cambiando la extensión) como portada del visor.
+            iniciarStory([
+              n.url_imagen || posterDeVideo(n.url_video),
+              ...galeriaExtra,
+            ]);
           }
 
           contenido.classList.remove("hidden");
