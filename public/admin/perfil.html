@@ -16,6 +16,8 @@
     />
     <link rel="stylesheet" href="/css/output.css" />
     <style>
+      /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -1055,13 +1057,13 @@
           cargarDocumentosPendientes();
         }
 
-        // Solicitudes de la comunidad: Admin (1), Coordinador (3), o un Especialista (2)
-        // que además sea Psicólogo — mismo criterio que usa el backend (esPsicologo) para
-        // decidir qué le devuelve GET /api/solicitudes.
-        const esPsicologoPerfil =
-          p.id_rol === 2 &&
-          (p.especialidad || "").toLowerCase().includes("psic");
-        if (p.id_rol === 1 || p.id_rol === 3 || esPsicologoPerfil) {
+        // Solicitudes de la comunidad: exclusivo de Admin (1) y Coordinador (3). Antes un
+        // Especialista que fuera Psicólogo también veía esta tarjeta (para atender las de
+        // "Compartir Historia de Éxito"), pero ya no tiene acceso — ver server.js, donde
+        // GET/PUT /api/solicitudes ahora exigen Admin/Coordinador. Si un psicólogo va a
+        // escribir una Historia de Éxito, Admin/Coordinador se lo indican fuera del sistema
+        // y él la redacta directamente en Publicaciones.
+        if (p.id_rol === 1 || p.id_rol === 3) {
           document
             .getElementById("tarjeta_solicitudes_comunidad")
             .classList.remove("hidden");

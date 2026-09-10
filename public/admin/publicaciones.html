@@ -23,6 +23,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css"
     />
     <style>
+      /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -671,6 +673,9 @@
                 <p class="text-xs text-slate-500 mb-4">
                   Genera una tarjeta cuadrada (1080×1080) con la fotografía, el
                   marco institucional y el logo — lista para compartir en redes.
+                  Si la publicación tiene portada, video y/o fotos adicionales,
+                  se genera una tarjeta por cada una y se descargan juntas en un
+                  ZIP.
                 </p>
                 <div class="flex flex-col md:flex-row items-center gap-6">
                   <canvas
@@ -689,8 +694,12 @@
                         class="material-symbols-outlined align-middle text-[18px] mr-1"
                         >auto_awesome</span
                       >
-                      Generar Imagen
+                      Generar Imagen(es)
                     </button>
+                    <p
+                      id="estado_generador_redes"
+                      class="hidden text-xs text-slate-500 text-center"
+                    ></p>
                     <a
                       id="btn_descargar_redes"
                       href="#"
@@ -700,8 +709,7 @@
                       <span
                         class="material-symbols-outlined align-middle text-[18px] mr-1"
                         >download</span
-                      >
-                      Descargar Imagen
+                      ><span id="texto_btn_descargar_redes">Descargar Imagen</span>
                     </a>
                   </div>
                 </div>
@@ -773,6 +781,10 @@
          previa (ver sanitizarContenidoEnriquecido en comun.js). La página pública usa la misma
          librería para lo mismo -- ver evento_detalle.html. -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+    <!-- JSZip: empaqueta en un solo .zip las tarjetas de Instagram/Facebook cuando la
+         publicación tiene más de una foto (portada + galería + miniatura del video) --
+         ver generarImagenRedes() más abajo. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- Quill: editor de texto enriquecido para "Contenido" -- ver inicializarEditorContenido. -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script>
@@ -2227,94 +2239,192 @@
       // ================= GENERADOR DE IMAGEN PARA REDES SOCIALES =================
       // Réplica en Canvas (navegador) del formato definido en generar_foto.py:
       // degradado naranja→rosa, marco blanco central, foto proporcional centrada,
-      // frase institucional en blanco abajo, y logo en la esquina inferior derecha del marco.
-      async function generarImagenRedes() {
-        const urlFoto = document.getElementById("pub_url_imagen").value;
-        if (!urlFoto) {
-          alert("Primero sube una fotografía.");
-          return;
-        }
-
-        const canvas = document.getElementById("canvas_redes");
-        const ctx = canvas.getContext("2d");
+      // frase institucional en blanco abajo, y logo en la esquina inferior derecha del marco
+      // (posición confirmada, no se toca).
+      //
+      // Dibuja la tarjeta 1080x1080 para UNA fotografía sobre el <canvas> (o contexto) que
+      // se le pase — antes este código vivía todo dentro de generarImagenRedes() atado al
+      // único <canvas id="canvas_redes"> visible, así que solo podía generar una imagen (la
+      // portada). Separarlo permite reusarlo tanto para el canvas visible (vista previa) como
+      // para canvases fuera de pantalla (una por cada foto adicional o miniatura de video).
+      async function dibujarTarjetaRedes(ctx, urlFoto) {
         const ANCHO = 1080,
           ALTO = 1080;
 
+        // 1. Degradado vertical de fondo (mismos coeficientes que el script de Python)
+        for (let y = 0; y < ALTO; y++) {
+          const r = Math.round(255 - (y / ALTO) * 40);
+          const g = Math.round(140 - (y / ALTO) * 120);
+          const b = Math.round(0 + (y / ALTO) * 120);
+          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          ctx.fillRect(0, y, ANCHO, 1);
+        }
+
+        // 2. Recuadro blanco central
+        const left = 90,
+          top = 80,
+          right = 990,
+          bottom = 770;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(left, top, right - left, bottom - top);
+
+        // 3. Cargar y dibujar la foto, centrada y proporcional (equivalente a thumbnail + paste centrado)
+        const foto = await cargarImagenParaCanvas(urlFoto);
+        const anchoFotoMax = right - left - 20;
+        const altoFotoMax = bottom - top - 20;
+        const escala = Math.min(
+          anchoFotoMax / foto.width,
+          altoFotoMax / foto.height,
+          1,
+        );
+        const anchoFinal = foto.width * escala;
+        const altoFinal = foto.height * escala;
+        const posXFoto = left + 10 + (anchoFotoMax - anchoFinal) / 2;
+        const posYFoto = top + 10 + (altoFotoMax - altoFinal) / 2;
+        ctx.drawImage(foto, posXFoto, posYFoto, anchoFinal, altoFinal);
+
+        // 4. Frase institucional en la parte inferior
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 28px Quicksand, sans-serif";
+        ctx.fillText('"LA SALUD MENTAL ES RESPONSABILIDAD EN SOCIEDAD"', 90, 950);
+
+        // 5. Logo en la esquina inferior derecha del marco
         try {
-          // 1. Degradado vertical de fondo (mismos coeficientes que el script de Python)
-          for (let y = 0; y < ALTO; y++) {
-            const r = Math.round(255 - (y / ALTO) * 40);
-            const g = Math.round(140 - (y / ALTO) * 120);
-            const b = Math.round(0 + (y / ALTO) * 120);
-            ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-            ctx.fillRect(0, y, ANCHO, 1);
-          }
-
-          // 2. Recuadro blanco central
-          const left = 90,
-            top = 80,
-            right = 990,
-            bottom = 770;
-          ctx.fillStyle = "#FFFFFF";
-          ctx.fillRect(left, top, right - left, bottom - top);
-
-          // 3. Cargar y dibujar la foto, centrada y proporcional (equivalente a thumbnail + paste centrado)
-          const foto = await cargarImagenParaCanvas(urlFoto);
-          const anchoFotoMax = right - left - 20;
-          const altoFotoMax = bottom - top - 20;
-          const escala = Math.min(
-            anchoFotoMax / foto.width,
-            altoFotoMax / foto.height,
-            1,
+          const logo = await cargarImagenParaCanvas("assets/logo.png");
+          const altoLogo = 130;
+          const anchoLogo = altoLogo * (logo.width / logo.height);
+          ctx.drawImage(
+            logo,
+            right - anchoLogo - 10,
+            bottom - altoLogo - 10,
+            anchoLogo,
+            altoLogo,
           );
-          const anchoFinal = foto.width * escala;
-          const altoFinal = foto.height * escala;
-          const posXFoto = left + 10 + (anchoFotoMax - anchoFinal) / 2;
-          const posYFoto = top + 10 + (altoFotoMax - altoFinal) / 2;
-          ctx.drawImage(foto, posXFoto, posYFoto, anchoFinal, altoFinal);
+        } catch (e) {
+          console.warn("No se pudo cargar el logo para la tarjeta de redes:", e);
+        }
+      }
 
-          // 4. Frase institucional en la parte inferior
-          ctx.fillStyle = "#FFFFFF";
-          ctx.font = "bold 28px Quicksand, sans-serif";
-          ctx.fillText(
-            '"LA SALUD MENTAL ES RESPONSABILIDAD EN SOCIEDAD"',
-            90,
-            950,
+      // Junta portada, fotos adicionales de la galería y miniatura del video (si hay) de la
+      // publicación que se está editando en una lista de {nombre, url} — una tarjeta por
+      // cada una. Antes "Generar Imagen" solo tomaba pub_url_imagen (la portada); ahora
+      // arma todas las fuentes disponibles. Las fotos de galería se leen directo del DOM
+      // (mismo <img src> tanto si ya están guardadas -- cargarGaleriaAdicional() -- como si
+      // son nuevas y aún no se registraron en /api/galeria -- renderGaleriaPendiente()), así
+      // no hace falta duplicar ningún estado ni tocar esas funciones.
+      function recolectarFuentesParaRedes() {
+        const fuentes = [];
+        const vistos = new Set();
+        const agregar = (nombre, url) => {
+          if (!url || vistos.has(url)) return;
+          vistos.add(url);
+          fuentes.push({ nombre, url });
+        };
+
+        agregar("portada", document.getElementById("pub_url_imagen").value);
+
+        const urlVideo = document.getElementById("pub_url_video").value;
+        if (urlVideo) agregar("video", posterDeVideo(urlVideo));
+
+        document
+          .querySelectorAll("#galeria_adicional_preview img")
+          .forEach((img, idx) =>
+            agregar(`galeria_${idx + 1}`, img.getAttribute("src")),
           );
 
-          // 5. Logo en la esquina inferior derecha del marco
+        return fuentes;
+      }
+
+      function canvasABlob(canvas) {
+        return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      }
+
+      // URL del último ZIP generado, para liberarla (revokeObjectURL) antes de crear uno
+      // nuevo y no ir acumulando memoria si el usuario le da varias veces a "Generar".
+      let urlZipRedesAnterior = null;
+
+      async function generarImagenRedes() {
+        const fuentes = recolectarFuentesParaRedes();
+        if (fuentes.length === 0) {
+          alert("Primero sube una fotografía, un video o alguna foto adicional.");
+          return;
+        }
+
+        const canvasPreview = document.getElementById("canvas_redes");
+        const ctxPreview = canvasPreview.getContext("2d");
+        const enlace = document.getElementById("btn_descargar_redes");
+        const textoBoton = document.getElementById("texto_btn_descargar_redes");
+        const estado = document.getElementById("estado_generador_redes");
+        const tituloArchivo = (
+          document.getElementById("pub_titulo").value || "publicacion"
+        )
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "_");
+
+        enlace.classList.add("hidden");
+        estado.classList.remove("hidden");
+
+        if (urlZipRedesAnterior) {
+          URL.revokeObjectURL(urlZipRedesAnterior);
+          urlZipRedesAnterior = null;
+        }
+
+        const generadas = [];
+        const fallidas = [];
+
+        for (let i = 0; i < fuentes.length; i++) {
+          const { nombre, url } = fuentes[i];
+          estado.innerText = `Generando ${i + 1} de ${fuentes.length}...`;
           try {
-            const logo = await cargarImagenParaCanvas("assets/logo.png");
-            const altoLogo = 130;
-            const anchoLogo = altoLogo * (logo.width / logo.height);
-            ctx.drawImage(
-              logo,
-              right - anchoLogo - 10,
-              bottom - altoLogo - 10,
-              anchoLogo,
-              altoLogo,
-            );
-          } catch (e) {
-            console.warn(
-              "No se pudo cargar el logo para la tarjeta de redes:",
-              e,
-            );
+            // La primera tarjeta se dibuja directo en el canvas visible (sirve de vista
+            // previa); el resto se dibuja en canvases fuera de pantalla solo para el ZIP.
+            const canvas =
+              i === 0
+                ? canvasPreview
+                : Object.assign(document.createElement("canvas"), {
+                    width: 1080,
+                    height: 1080,
+                  });
+            const ctx = i === 0 ? ctxPreview : canvas.getContext("2d");
+            await dibujarTarjetaRedes(ctx, url);
+            generadas.push({ nombre, canvas });
+          } catch (error) {
+            console.error(`No se pudo generar la tarjeta de "${nombre}":`, error);
+            fallidas.push(nombre);
           }
+        }
 
-          // 6. Habilitar descarga
-          const enlace = document.getElementById("btn_descargar_redes");
-          enlace.href = canvas.toDataURL("image/png");
-          const tituloArchivo = (
-            document.getElementById("pub_titulo").value || "publicacion"
-          )
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "_");
-          enlace.download = `sanctorum_${tituloArchivo}.png`;
-          enlace.classList.remove("hidden");
-        } catch (error) {
-          console.error("Error al generar imagen para redes:", error);
+        estado.classList.add("hidden");
+
+        if (generadas.length === 0) {
           alert(
-            "No se pudo generar la imagen. Si la foto viene de Cloudinary, revisa que tu cuenta permita CORS para descargas (comportamiento por defecto en la mayoría de los planes).",
+            "No se pudo generar ninguna imagen. Si las fotos vienen de Cloudinary, revisa que tu cuenta permita CORS para descargas (comportamiento por defecto en la mayoría de los planes).",
+          );
+          return;
+        }
+
+        if (generadas.length === 1) {
+          enlace.href = generadas[0].canvas.toDataURL("image/png");
+          enlace.download = `sanctorum_${tituloArchivo}.png`;
+          textoBoton.innerText = "Descargar Imagen";
+        } else {
+          const zip = new JSZip();
+          for (const { nombre, canvas } of generadas) {
+            const blob = await canvasABlob(canvas);
+            zip.file(`sanctorum_${tituloArchivo}_${nombre}.png`, blob);
+          }
+          const blobZip = await zip.generateAsync({ type: "blob" });
+          urlZipRedesAnterior = URL.createObjectURL(blobZip);
+          enlace.href = urlZipRedesAnterior;
+          enlace.download = `sanctorum_${tituloArchivo}.zip`;
+          textoBoton.innerText = `Descargar Imágenes (ZIP, ${generadas.length})`;
+        }
+
+        enlace.classList.remove("hidden");
+
+        if (fallidas.length > 0) {
+          alert(
+            `Se generaron ${generadas.length} de ${fuentes.length} imágenes. No se pudieron generar: ${fallidas.join(", ")}. Si vienen de Cloudinary, revisa que tu cuenta permita CORS para descargas.`,
           );
         }
       }

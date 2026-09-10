@@ -22,6 +22,8 @@
       rel="stylesheet"
     />
     <style>
+      /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       @media (min-width: 768px) {
         #sidebar-mount {
           position: fixed;
@@ -1393,10 +1395,16 @@
               extraBadge = `<div class="mt-2 text-[10px] text-slate-500 font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">work</span> ${escapeHtml(vol.proyectos)}</div>`;
             }
 
+            // Avatar: si el usuario ya subió una foto de perfil (foto_perfil_url), se muestra
+            // esa foto real; si no, se cae al círculo con la inicial del nombre de siempre.
+            const avatarHtml = vol.foto_perfil_url
+              ? `<img src="${escapeHtml(vol.foto_perfil_url)}" alt="${escapeHtml(vol.nombre_completo)}" class="w-12 h-12 rounded-full object-cover border border-slate-100">`
+              : `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xl">${escapeHtml(vol.nombre_completo.charAt(0))}</div>`;
+
             const card = `
             <div class="bg-surface-container-lowest p-6 rounded-lg shadow-sm mb-6 hover:scale-[1.02] transition-all relative border border-slate-100 ${status === "Inactivo" ? "grayscale opacity-80" : ""}">
               <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xl">${escapeHtml(vol.nombre_completo.charAt(0))}</div>
+                ${avatarHtml}
                 <div class="flex">${btnContactoEliminar}</div>
               </div>
               <h4 class="text-lg font-bold text-slate-800 mb-1">${escapeHtml(vol.nombre_completo)}</h4>

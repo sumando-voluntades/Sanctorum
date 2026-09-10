@@ -11,8 +11,13 @@
   El ícono de "Panel de Administración" apunta siempre a login (antes, en varias páginas
   apuntaba directo a expedientes, saltándose el login — se corrigió aquí una sola vez).
 -->
+<!-- transform/will-change: en algunos navegadores de Android, un header "fixed" con
+     backdrop-blur puede tardar en repintarse durante un scroll rápido y da la sensación
+     de que "no se mueve con el usuario" (se queda estático o desaparece un instante).
+     Forzar su propia capa de composición (GPU) evita ese parpadeo. -->
 <header
   class="fixed top-0 w-full z-50 rounded-b-xl bg-white/70 backdrop-blur-md shadow-[0_20px_50px_rgba(23,28,31,0.06)]"
+  style="transform: translateZ(0); will-change: transform; backface-visibility: hidden"
 >
   <div class="flex justify-between items-center max-w-7xl mx-auto px-8 py-4">
     <div class="flex items-center gap-3">

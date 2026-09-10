@@ -682,8 +682,8 @@ app.get('/api/voluntarios', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINAD
         const incluirCoordinadores = req.usuario.rol === ROL_ADMIN;
         const filtroRoles = incluirCoordinadores ? '(u.id_rol = 4 OR u.id_rol = 2 OR u.id_rol = 5 OR u.id_rol = 3)' : '(u.id_rol = 4 OR u.id_rol = 2 OR u.id_rol = 5)';
         const query = `
-            SELECT u.id_usuario, u.nombre_completo, u.correo, u.telefono, u.id_rol, u.especialidad, COALESCE(u.estatus, 'Nuevo') as estatus, 
-            u.fecha_registro, u.material_donado, u.cantidad_donada,
+            SELECT u.id_usuario, u.nombre_completo, u.correo, u.telefono, u.id_rol, u.especialidad, COALESCE(u.estatus, 'Nuevo') as estatus,
+            u.fecha_registro, u.material_donado, u.cantidad_donada, u.foto_perfil_url,
             u.documento_profesional_url, COALESCE(u.documento_profesional_estatus, 'Pendiente') as documento_profesional_estatus,
             COALESCE((SELECT string_agg(e.titulo_evento, ', ') FROM Participacion p JOIN Eventos e ON p.id_evento = e.id_evento WHERE p.id_usuario = u.id_usuario), '') as proyectos
             FROM Usuarios u WHERE ${filtroRoles} ORDER BY u.id_usuario DESC
@@ -2624,27 +2624,16 @@ app.post('/api/solicitudes', async (req, res) => {
             html: emailTemplate('Solicitud Recibida', contenido)
         }, 'confirmación de solicitud web');
 
-        // Aviso al staff correspondiente: "Compartir Historia de Éxito" también le
-        // interesa a los Psicólogos (son quienes validan y publican la historia), pero
-        // el resto de solicitudes (Ayuda Psicológica, Donación en Especie, etc.) solo
-        // le corresponde a Admin/Coordinador — igual que el resto del panel de solicitudes.
+        // Aviso al staff correspondiente: la bandeja de "Solicitudes de la Comunidad" es
+        // exclusiva de Admin/Coordinador (ver GET/PUT /api/solicitudes más abajo) — los
+        // Psicólogos ya no le dan seguimiento ahí, así que tampoco tiene sentido avisarles
+        // por correo de una solicitud que no van a poder ver ni atender dentro del sistema.
         try {
-            const esHistoria = tipo_solicitud === 'Compartir Historia de Éxito';
-            const filtroRol = esHistoria
-                ? "id_rol IN (1, 2, 3)"
-                : "id_rol IN (1, 3)";
-            // Nota: se alias "id_rol AS rol" porque esPsicologo() (como el resto del
-            // código) espera un objeto con la propiedad "rol", no "id_rol".
             const staff = await pool.query(
-                `SELECT correo, id_rol AS rol, especialidad FROM Usuarios
-                 WHERE ${filtroRol} AND correo IS NOT NULL AND COALESCE(estatus,'Activo') != 'Inactivo'`
+                `SELECT correo FROM Usuarios
+                 WHERE id_rol IN (1, 3) AND correo IS NOT NULL AND COALESCE(estatus,'Activo') != 'Inactivo'`
             );
-            // Si es Historia de Éxito, de los Especialistas (rol 2) solo nos interesan
-            // los Psicólogos — un Especialista de otra área no necesita este aviso.
-            const correosStaff = staff.rows
-                .filter(u => u.rol !== ROL_ESPECIALISTA || esPsicologo(u))
-                .map(u => u.correo)
-                .filter(Boolean);
+            const correosStaff = staff.rows.map(u => u.correo).filter(Boolean);
             if (correosStaff.length > 0) {
                 const contenidoAvisoStaff = `
                     <p>Hola,</p>
@@ -2672,20 +2661,14 @@ app.post('/api/solicitudes', async (req, res) => {
 });
 
 // Bandeja de solicitudes para el panel administrativo (tarjeta "Solicitudes de la
-// Comunidad" en Perfil). Admin/Coordinador ven todo; un Psicólogo solo ve las de
-// "Compartir Historia de Éxito" (es quien las revisa y publica), nunca las de
-// Ayuda Psicológica ni Donación en Especie — esas son de Admin/Coordinador.
-app.get('/api/solicitudes', verificarToken, async (req, res) => {
-    const esStaffCompleto = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
-    if (!esStaffCompleto && !esPsicologo(req.usuario)) {
-        return res.status(403).json({ success: false, message: 'No tienes permiso para ver las solicitudes.' });
-    }
+// Comunidad" en Perfil). Exclusiva de Admin/Coordinador. Antes un Psicólogo también
+// veía aquí las de "Compartir Historia de Éxito" (para redactarlas/publicarlas), pero
+// se retiró ese acceso: si Admin/Coordinador reciben una así, coordinan directamente
+// con el psicólogo fuera del sistema; él sigue pudiendo publicar la historia desde
+// Publicaciones, solo ya no a través de esta bandeja.
+app.get('/api/solicitudes', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
-        const result = esStaffCompleto
-            ? await pool.query('SELECT * FROM Solicitudes_Web ORDER BY fecha_envio DESC')
-            : await pool.query(
-                "SELECT * FROM Solicitudes_Web WHERE tipo_solicitud = 'Compartir Historia de Éxito' ORDER BY fecha_envio DESC"
-            );
+        const result = await pool.query('SELECT * FROM Solicitudes_Web ORDER BY fecha_envio DESC');
         res.json({ success: true, data: result.rows });
     } catch (error) {
         console.error("Error al listar solicitudes:", error);
@@ -2693,14 +2676,9 @@ app.get('/api/solicitudes', verificarToken, async (req, res) => {
     }
 });
 
-// Marca una solicitud como atendida/descartada. Mismo alcance por rol que el listado:
-// Admin/Coordinador pueden actualizar cualquiera, un Psicólogo solo las de
-// "Compartir Historia de Éxito".
-app.put('/api/solicitudes/:id', verificarToken, async (req, res) => {
-    const esStaffCompleto = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
-    if (!esStaffCompleto && !esPsicologo(req.usuario)) {
-        return res.status(403).json({ success: false, message: 'No tienes permiso para actualizar solicitudes.' });
-    }
+// Marca una solicitud como atendida/descartada. Mismo alcance que el listado: exclusivo
+// de Admin/Coordinador.
+app.put('/api/solicitudes/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { estatus } = req.body; // 'Atendida' | 'Descartada'
     if (!['Atendida', 'Descartada'].includes(estatus)) {
         return res.status(400).json({ success: false, message: 'Estatus inválido.' });
@@ -2711,11 +2689,6 @@ app.put('/api/solicitudes/:id', verificarToken, async (req, res) => {
         const columnaId = await obtenerColumnaPkSolicitudes();
         const actual = await pool.query(`SELECT * FROM Solicitudes_Web WHERE ${columnaId} = $1`, [idNum]);
         if (actual.rows.length === 0) return res.status(404).json({ success: false, message: 'Solicitud no encontrada.' });
-        const solicitud = actual.rows[0];
-        // Un Psicólogo (sin rol Admin/Coordinador) solo puede tocar solicitudes de Historia de Éxito.
-        if (!esStaffCompleto && solicitud.tipo_solicitud !== 'Compartir Historia de Éxito') {
-            return res.status(403).json({ success: false, message: 'No tienes permiso para actualizar esta solicitud.' });
-        }
         await pool.query(`UPDATE Solicitudes_Web SET estatus = $1 WHERE ${columnaId} = $2`, [estatus, idNum]);
         res.json({ success: true });
     } catch (error) {
