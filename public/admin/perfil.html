@@ -718,7 +718,7 @@
           encuestasPorRevisarGlobal = json.data;
           document.getElementById("badge_encuestas_revisar").innerText = json.data.length;
           if (json.data.length === 0) {
-            cont.innerHTML = '<p class="text-sm text-slate-400 italic">No hay encuestas pendientes de revisar. 🎉</p>';
+            cont.innerHTML = '<p class="text-sm text-slate-400 italic">No hay encuestas pendientes de revisar.</p>';
             flechas.classList.add("hidden");
             return;
           }
