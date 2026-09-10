@@ -30,6 +30,32 @@
       body {
         font-family: "Quicksand", sans-serif;
       }
+      /* Fila de categorías de una tarjeta: cuando hay varias categorías (ej. "Agradecimiento,
+         Consejos para padres, Cultura de Paz, Festividad, Identidad"), antes se mostraban
+         todas juntas en un solo globo de texto que se salía de la imagen. Ahora se muestran
+         como globos/chips individuales en una fila que se desliza sola en horizontal, para
+         que quepan sin tapar ni desbordar la imagen de la tarjeta. */
+      .chips-categoria {
+        overflow: hidden;
+        max-width: 100%;
+        -webkit-mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+        mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+      }
+      .chips-categoria-track {
+        display: flex;
+        width: max-content;
+        gap: 0.4rem;
+      }
+      .chips-categoria-track.chips-categoria-animada {
+        animation: chips-categoria-desliz 14s linear infinite;
+      }
+      .chips-categoria:hover .chips-categoria-track.chips-categoria-animada {
+        animation-play-state: paused;
+      }
+      @keyframes chips-categoria-desliz {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -657,6 +683,21 @@
         return partes.length > 0 ? partes : [n.tipo || "Comunidad"];
       }
 
+      // Arma los globos/chips de categoría que van sobre la imagen de una tarjeta. Con una
+      // sola categoría es un globo fijo; con varias, se arma una fila que se desliza sola en
+      // horizontal (la lista se duplica una vez para que el desplazamiento se vea continuo,
+      // sin salto al llegar al final) — así una publicación con muchas categorías nunca tapa
+      // ni desborda la imagen.
+      function chipsCategoriaHtml(categorias) {
+        const chip = (texto) =>
+          `<span class="shrink-0 px-3 py-1 bg-white/90 backdrop-blur text-primary text-xs font-bold rounded-full">${escapeHtml(texto)}</span>`;
+        if (categorias.length <= 1) {
+          return `<div class="chips-categoria"><div class="chips-categoria-track">${chip(categorias[0] || "Comunidad")}</div></div>`;
+        }
+        const chips = categorias.map(chip).join("");
+        return `<div class="chips-categoria"><div class="chips-categoria-track chips-categoria-animada">${chips}${chips}</div></div>`;
+      }
+
       // Construye la lista de categorías del sidebar dinámicamente (con conteo real),
       // en vez de una lista fija hardcodeada — así si mañana agregan una categoría nueva
       // desde Publicaciones, aparece aquí automáticamente sin tocar el HTML.
@@ -748,14 +789,14 @@
               n.url_imagen ||
               posterDeVideo(n.url_video) ||
               IMG_PLACEHOLDER_NOTICIA;
-            const categoria = n.categoria || n.tipo || "Comunidad";
+            const chipsHtml = chipsCategoriaHtml(categoriasDeNoticia(n));
             return `
                 <a href="evento_detalle?id=${n.id_publicacion}"
                    class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(23,28,31,0.05)] hover:translate-y-[-4px] hover:shadow-lg transition-all duration-300 block">
                   <div class="relative h-48">
                     <img class="w-full h-full object-cover" src="${img}" alt="${n.titulo}" />
-                    <div class="absolute bottom-3 left-3">
-                      <span class="px-3 py-1 bg-white/90 backdrop-blur text-primary text-xs font-bold rounded-full">${categoria}</span>
+                    <div class="absolute bottom-3 left-3 right-3">
+                      ${chipsHtml}
                     </div>
                   </div>
                   <div class="p-5">

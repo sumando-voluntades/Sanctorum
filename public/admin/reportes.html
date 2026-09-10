@@ -197,6 +197,35 @@
               ></textarea>
             </div>
 
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1"
+                >Fotos, video o documentos (opcional)</label
+              >
+              <p class="text-xs text-slate-400 mb-2">
+                Sube evidencia del evento: fotos, un video, o un documento
+                (por ejemplo, una lista de asistencia firmada).
+              </p>
+              <label
+                class="inline-flex items-center gap-2 px-4 py-2 bg-[#f0f4f8] rounded-full text-sm font-bold text-slate-600 cursor-pointer hover:bg-slate-200 transition-colors"
+              >
+                <span class="material-symbols-outlined text-[18px]"
+                  >attach_file</span
+                >
+                <span id="texto_btn_subir_adjuntos_reporte"
+                  >Adjuntar archivos</span
+                >
+                <input
+                  type="file"
+                  id="rep_adjuntos_input"
+                  class="hidden"
+                  multiple
+                  accept="image/*,video/*,application/pdf,.doc,.docx"
+                  onchange="subirAdjuntosReporte(event)"
+                />
+              </label>
+              <div id="rep_adjuntos_lista" class="mt-3 space-y-2"></div>
+            </div>
+
             <div class="pt-4 flex gap-4">
               <button
                 type="button"
@@ -525,6 +554,8 @@
           usuarioActual.nombre;
         document.getElementById("contenedor_materiales_reporte").innerHTML =
           '<p class="text-xs text-slate-400 italic">Selecciona primero un evento para ver sus materiales planeados.</p>';
+        adjuntosReporteActual = [];
+        renderAdjuntosReporteLista();
         document.getElementById("modalReporteTitulo").innerText =
           "Nuevo Reporte de Evento";
         document.getElementById("btnGuardarReporte").innerText =
@@ -561,6 +592,11 @@
           r.observaciones || "";
         document.getElementById("rep_autor_display").value =
           r.autor || usuarioActual.nombre;
+        adjuntosReporteActual = (r.url_adjuntos || []).map((url) => ({
+          url,
+          nombre: nombreDeUrlAdjunto(url),
+        }));
+        renderAdjuntosReporteLista();
         document.getElementById("modalReporteTitulo").innerText =
           "Editar Reporte de Evento";
         document.getElementById("btnGuardarReporte").innerText =
@@ -587,6 +623,119 @@
         }, 300);
       }
 
+      // ================= ADJUNTOS (fotos, video, documentos) =================
+      // Config pública de Cloudinary leída del backend (mismo patrón que publicaciones.html):
+      // se cachea para no pedirla de nuevo en cada subida.
+      let _cloudinaryConfigCacheReportes = null;
+      async function obtenerConfigCloudinaryReportes() {
+        if (_cloudinaryConfigCacheReportes) return _cloudinaryConfigCacheReportes;
+        const res = await fetch(`${API_URL}/api/config/cloudinary`);
+        const json = await res.json();
+        _cloudinaryConfigCacheReportes = {
+          cloudName: json.cloud_name,
+          uploadPreset: json.upload_preset,
+        };
+        return _cloudinaryConfigCacheReportes;
+      }
+
+      // Adjuntos ya subidos (o precargados al editar) del reporte que está abierto en el
+      // modal: [{ url, nombre }]. Se manda como url_adjuntos al guardar.
+      let adjuntosReporteActual = [];
+
+      function nombreDeUrlAdjunto(url) {
+        try {
+          const partes = new URL(url).pathname.split("/");
+          return decodeURIComponent(partes[partes.length - 1]) || "archivo";
+        } catch (e) {
+          return "archivo";
+        }
+      }
+
+      // Sube uno o varios archivos (fotos, video o documentos) a Cloudinary sin firmar —
+      // igual que las imágenes/video/consentimiento de Publicaciones. Los PDF/Word se suben
+      // como "raw" (Cloudinary bloquea servir esos tipos como "image"/"auto" a veces).
+      async function subirAdjuntosReporte(event) {
+        const files = Array.from(event.target.files || []);
+        if (files.length === 0) return;
+        const textoBtn = document.getElementById(
+          "texto_btn_subir_adjuntos_reporte",
+        );
+        const textoOriginal = textoBtn.innerText;
+        const { cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET } =
+          await obtenerConfigCloudinaryReportes();
+        if (!CLOUD_NAME || !UPLOAD_PRESET) {
+          alert(
+            "Falta configurar CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET en las variables de entorno del servidor.",
+          );
+          event.target.value = "";
+          return;
+        }
+        let fallas = 0;
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          textoBtn.innerText = `Subiendo ${i + 1} de ${files.length}...`;
+          const esDocumento =
+            file.type === "application/pdf" ||
+            /\.(pdf|docx?|xlsx?)$/i.test(file.name);
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", UPLOAD_PRESET);
+          try {
+            const uploadRes = await fetch(
+              `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${esDocumento ? "raw" : "auto"}/upload`,
+              { method: "POST", body: formData },
+            );
+            const uploadData = await uploadRes.json();
+            if (uploadData.secure_url) {
+              adjuntosReporteActual.push({
+                url: uploadData.secure_url,
+                nombre: file.name,
+              });
+            } else {
+              fallas++;
+            }
+          } catch (error) {
+            console.error("Error al subir adjunto de reporte:", error);
+            fallas++;
+          }
+        }
+        renderAdjuntosReporteLista();
+        textoBtn.innerText = textoOriginal;
+        event.target.value = "";
+        if (fallas > 0) {
+          alert(
+            `No se pudieron subir ${fallas} de ${files.length} archivo(s). Intenta de nuevo con ese archivo.`,
+          );
+        }
+      }
+
+      function quitarAdjuntoReporte(indice) {
+        adjuntosReporteActual.splice(indice, 1);
+        renderAdjuntosReporteLista();
+      }
+
+      function renderAdjuntosReporteLista() {
+        const cont = document.getElementById("rep_adjuntos_lista");
+        if (adjuntosReporteActual.length === 0) {
+          cont.innerHTML = "";
+          return;
+        }
+        cont.innerHTML = adjuntosReporteActual
+          .map(
+            (a, i) => `
+              <div class="flex items-center justify-between gap-2 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs">
+                <a href="${a.url}" target="_blank" rel="noopener" class="flex items-center gap-1.5 text-slate-600 font-bold truncate hover:text-primary">
+                  <span class="material-symbols-outlined text-[16px] shrink-0">description</span>
+                  <span class="truncate">${a.nombre}</span>
+                </a>
+                <button type="button" onclick="quitarAdjuntoReporte(${i})" class="text-slate-400 hover:text-red-500 shrink-0">
+                  <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
+              </div>`,
+          )
+          .join("");
+      }
+
       // ================= GUARDAR =================
       // Envía el formulario de reporte: POST si es nuevo (incluyendo las cantidades reales
       // de materiales usados) o PUT si se está editando (sin tocar materiales, ver comentario arriba).
@@ -602,6 +751,7 @@
           numero_asistentes:
             document.getElementById("rep_asistentes").value || null,
           observaciones: document.getElementById("rep_observaciones").value,
+          url_adjuntos: adjuntosReporteActual.map((a) => a.url),
         };
 
         // Solo en creación recolectamos las cantidades reales por material (edición no las toca).

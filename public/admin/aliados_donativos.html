@@ -245,15 +245,29 @@
               <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
               <span>También se registra una escuela nueva desde Agenda al programar una "Visita de Prospección". Una escuela nunca se elimina del todo: se archiva para conservar su historial y se puede reactivar cuando quieras.</span>
             </p>
-            <label class="flex items-center gap-2 text-xs font-bold text-slate-500 shrink-0 cursor-pointer">
-              <input
-                type="checkbox"
-                id="chk_mostrar_escuelas_archivadas"
-                onchange="cargarEscuelas()"
-                class="rounded border-slate-300"
-              />
-              Mostrar también archivadas
-            </label>
+            <div class="flex items-center gap-3 shrink-0">
+              <!-- Fusionar duplicadas es delicado (reescribe historial) y por eso solo se
+                   muestra a Admin; se revela desde JS (ver aplicarRestriccionesNav) según el
+                   rol de la sesión. -->
+              <button
+                id="btn_fusionar_escuelas"
+                type="button"
+                onclick="abrirModalFusionarEscuelas()"
+                class="hidden text-xs font-bold text-[#b50062] hover:underline flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-[16px]">merge</span>
+                Fusionar duplicadas
+              </button>
+              <label class="flex items-center gap-2 text-xs font-bold text-slate-500 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="chk_mostrar_escuelas_archivadas"
+                  onchange="cargarEscuelas()"
+                  class="rounded border-slate-300"
+                />
+                Mostrar también archivadas
+              </label>
+            </div>
           </div>
           <div
             class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
@@ -806,6 +820,76 @@
         </form>
       </div>
     </div>
+
+    <!-- ================= MODAL: FUSIONAR ESCUELAS DUPLICADAS (solo Admin) ================= -->
+    <div
+      id="modalFusionarEscuelas"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0"
+    >
+      <div
+        class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300"
+        id="modalFusionarEscuelasContent"
+      >
+        <div
+          class="bg-gradient-to-r from-[#8a5100] to-[#f39200] px-8 py-6 text-white flex justify-between items-center"
+        >
+          <div>
+            <h3 class="text-2xl font-bold font-plus">Fusionar Escuelas Duplicadas</h3>
+          </div>
+          <button
+            onclick="cerrarModalFusionarEscuelas()"
+            class="text-white/80 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-3xl">close</span>
+          </button>
+        </div>
+        <form id="formFusionarEscuelas" class="p-8 space-y-4">
+          <p class="text-xs text-slate-500 bg-amber-50 border border-amber-100 rounded-xl p-3">
+            Usa esto cuando la misma escuela quedó registrada dos veces (por ejemplo, con el
+            nombre escrito de forma distinta). Todos los beneficiarios, eventos y visitas de la
+            escuela "duplicada" se pasan automáticamente a la escuela "a conservar", y la
+            duplicada se archiva (no se borra: su historial queda intacto). Esta acción no se
+            puede deshacer.
+          </p>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1 ml-1"
+              >Escuela a conservar (la correcta)</label
+            >
+            <select
+              id="fus_id_conservar"
+              required
+              class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none"
+            ></select>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1 ml-1"
+              >Escuela duplicada (se va a archivar)</label
+            >
+            <select
+              id="fus_id_duplicada"
+              required
+              class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none"
+            ></select>
+          </div>
+          <div class="pt-4 flex gap-4">
+            <button
+              type="button"
+              onclick="cerrarModalFusionarEscuelas()"
+              class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-full hover:bg-slate-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              id="btnFusionarEscuelas"
+              class="flex-1 py-3 bg-[#b50062] text-white font-bold rounded-full shadow-lg hover:bg-[#e2007c] transition-colors"
+            >
+              Fusionar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
     <script src="/js/comun.js"></script>
     <script src="js/notificaciones.js"></script>
     <script src="/js/incluir.js"></script>
@@ -854,6 +938,14 @@
           document.getElementById("nav_user_name").innerText =
             payload.nombre.split(" ")[0];
           verificarAccesoDocumento(payload);
+          // Fusionar escuelas duplicadas reescribe historial de varias tablas a la vez y no
+          // tiene deshacer, así que el botón solo se muestra a Admin (el backend también lo
+          // exige de forma independiente).
+          if (payload.rol === 1) {
+            document
+              .getElementById("btn_fusionar_escuelas")
+              .classList.remove("hidden");
+          }
         } catch (e) {
           window.location.replace("login");
           return;
@@ -1562,6 +1654,104 @@
           alert("Error de conexión.");
         }
       }
+
+      // Abre el modal de fusión: llena ambos selects con las escuelas activas cargadas en
+      // escuelasGlobal (recarga primero por si el usuario no ha visitado la pestaña Escuelas).
+      async function abrirModalFusionarEscuelas() {
+        if (!escuelasGlobal.length) await cargarEscuelas();
+        const opciones = escuelasGlobal
+          .filter((e) => e.activo !== false)
+          .sort((a, b) => a.nombre_escuela.localeCompare(b.nombre_escuela))
+          .map(
+            (e) =>
+              `<option value="${e.id_escuela}">${e.nombre_escuela}</option>`,
+          )
+          .join("");
+        document.getElementById("fus_id_conservar").innerHTML =
+          `<option value="">Selecciona...</option>` + opciones;
+        document.getElementById("fus_id_duplicada").innerHTML =
+          `<option value="">Selecciona...</option>` + opciones;
+        document
+          .getElementById("modalFusionarEscuelas")
+          .classList.remove("hidden");
+        setTimeout(() => {
+          document
+            .getElementById("modalFusionarEscuelas")
+            .classList.remove("opacity-0");
+          document
+            .getElementById("modalFusionarEscuelasContent")
+            .classList.remove("scale-95");
+        }, 10);
+      }
+
+      function cerrarModalFusionarEscuelas() {
+        document
+          .getElementById("modalFusionarEscuelas")
+          .classList.add("opacity-0");
+        document
+          .getElementById("modalFusionarEscuelasContent")
+          .classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("modalFusionarEscuelas")
+            .classList.add("hidden");
+          document.getElementById("formFusionarEscuelas").reset();
+        }, 300);
+      }
+
+      // Envía la fusión: reasigna beneficiarios/eventos/visitas de la duplicada hacia la
+      // que se conserva y archiva la duplicada. Solo Admin tiene el botón visible, pero el
+      // backend también lo exige (requiereRol(ROL_ADMIN)) por si alguien manipula el DOM.
+      document
+        .getElementById("formFusionarEscuelas")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const id_conservar = document.getElementById("fus_id_conservar").value;
+          const id_duplicada = document.getElementById("fus_id_duplicada").value;
+          if (!id_conservar || !id_duplicada) return;
+          if (id_conservar === id_duplicada) {
+            alert("Selecciona dos escuelas distintas.");
+            return;
+          }
+          const nombreConservar = escuelasGlobal.find(
+            (x) => String(x.id_escuela) === id_conservar,
+          )?.nombre_escuela;
+          const nombreDuplicada = escuelasGlobal.find(
+            (x) => String(x.id_escuela) === id_duplicada,
+          )?.nombre_escuela;
+          if (
+            !confirm(
+              `¿Fusionar "${nombreDuplicada}" dentro de "${nombreConservar}"? Todo su historial se reasigna y "${nombreDuplicada}" se archiva. Esta acción no se puede deshacer.`,
+            )
+          )
+            return;
+          const btn = e.target.querySelector('button[type="submit"]');
+          const textoOriginal = btn.innerText;
+          btn.innerText = "Fusionando...";
+          btn.disabled = true;
+          try {
+            const res = await fetch(`${API_URL}/api/escuelas/fusionar`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", ...authHeaders() },
+              body: JSON.stringify({ id_conservar, id_duplicada }),
+            });
+            const json = await res.json();
+            if (json.success) {
+              const r = json.resumen || {};
+              alert(
+                `Escuelas fusionadas. Se reasignaron ${r.beneficiarios || 0} beneficiario(s), ${r.eventos || 0} evento(s) y ${r.visitas || 0} visita(s) de "${nombreDuplicada}" hacia "${nombreConservar}".`,
+              );
+              cerrarModalFusionarEscuelas();
+              document.getElementById("chk_mostrar_escuelas_archivadas").checked = true;
+              cargarEscuelas();
+            } else alert(json.message || "No se pudieron fusionar las escuelas.");
+          } catch (error) {
+            alert("Error de conexión.");
+          } finally {
+            btn.innerText = textoOriginal;
+            btn.disabled = false;
+          }
+        });
 
       // ================= DONATIVOS =================
       // Trae la lista de donativos registrados del backend y la pinta en su tabla.

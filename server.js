@@ -251,6 +251,20 @@ function validarUrlCloudinaria(valor, nombreCampo) {
     return { ok: false, mensaje: `${nombreCampo} debe ser una URL de Cloudinary válida (empezar con ${PREFIJO_URL_CLOUDINARY}).` };
 }
 
+// Igual que validarUrlCloudinaria pero para un arreglo de URLs (adjuntos de un Reporte de
+// Evento: fotos, video, documentos) — cada elemento debe ser una URL de Cloudinary válida.
+function validarUrlsCloudinariaArray(valor, nombreCampo) {
+    if (valor === undefined || valor === null) return { ok: true, valor: [] };
+    if (!Array.isArray(valor)) return { ok: false, mensaje: `${nombreCampo} debe ser una lista de URLs.` };
+    const limpio = [];
+    for (const item of valor) {
+        const chk = validarUrlCloudinaria(item, nombreCampo);
+        if (!chk.ok) return chk;
+        if (chk.valor) limpio.push(chk.valor);
+    }
+    return { ok: true, valor: limpio };
+}
+
 // Valida el formato del correo del remitente en POST /api/solicitudes (buzón público, sin
 // autenticación) antes de usarlo en el "to:" de nodemailer, que separa direcciones por coma
 // en un string de "to". Es una validación simple a propósito (no intenta ser 100% RFC 5322):
@@ -1628,6 +1642,43 @@ app.put('/api/escuelas/:id/archivar', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
+// Fusiona dos escuelas duplicadas (mismo lugar, capturado con escritura distinta) en una
+// sola: reasigna Beneficiarios, Eventos y Agenda_Visitas de la escuela duplicada hacia la
+// escuela que se conserva, y archiva la duplicada (nunca se borra, igual que /archivar, para
+// no perder su nombre del historial). Solo Admin puede fusionar — reescribe varias tablas a
+// la vez y no tiene deshacer, así que se deja fuera del alcance normal de Coordinador.
+app.post('/api/escuelas/fusionar', verificarToken, requiereRol(ROL_ADMIN), async (req, res) => {
+    const id_conservar = parseInt(req.body.id_conservar, 10);
+    const id_duplicada = parseInt(req.body.id_duplicada, 10);
+    if (!id_conservar || !id_duplicada) {
+        return res.status(400).json({ success: false, message: 'Selecciona la escuela que se conserva y la escuela duplicada.' });
+    }
+    if (id_conservar === id_duplicada) {
+        return res.status(400).json({ success: false, message: 'Selecciona dos escuelas distintas.' });
+    }
+    try {
+        await pool.query('BEGIN');
+        const existentes = await pool.query('SELECT id_escuela FROM Escuelas WHERE id_escuela IN ($1, $2)', [id_conservar, id_duplicada]);
+        if (existentes.rows.length !== 2) {
+            await pool.query('ROLLBACK');
+            return res.status(404).json({ success: false, message: 'Una de las dos escuelas no existe.' });
+        }
+        const benef = await pool.query('UPDATE Beneficiarios SET id_escuela=$1 WHERE id_escuela=$2', [id_conservar, id_duplicada]);
+        const ev = await pool.query('UPDATE Eventos SET id_escuela=$1 WHERE id_escuela=$2', [id_conservar, id_duplicada]);
+        const vis = await pool.query('UPDATE Agenda_Visitas SET id_escuela=$1 WHERE id_escuela=$2', [id_conservar, id_duplicada]);
+        await pool.query('UPDATE Escuelas SET activo=FALSE WHERE id_escuela=$1', [id_duplicada]);
+        await pool.query('COMMIT');
+        res.json({
+            success: true,
+            resumen: { beneficiarios: benef.rowCount, eventos: ev.rowCount, visitas: vis.rowCount }
+        });
+    } catch (error) {
+        await pool.query('ROLLBACK');
+        console.error("Error al fusionar escuelas:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
+    }
+});
+
 // Directorio de pacientes/beneficiarios (panel lateral izquierdo)
 app.get('/api/agenda/directorio_pacientes', verificarToken, async (req, res) => {
     try {
@@ -1740,8 +1791,13 @@ app.get('/api/agenda', verificarToken, async (req, res) => {
         if (u.rol === ROL_ADMIN) {
             incluirVisitas = true; // ve todo, sin filtros adicionales
         } else if (u.rol === ROL_COORDINADOR) {
-            // Coordinador: NUNCA citas clínicas. Eventos operativos completos. Solo SUS visitas de prospección.
-            eventosQuery += ` AND e.tipo_evento != 'Cita Clínica'`;
+            // Coordinador: NUNCA citas clínicas. Ve los eventos operativos de especialistas,
+            // voluntarios, sin responsable capturado (eventos de antes de esta migración), y
+            // los suyos propios — pero NO los eventos a cargo de OTRO Coordinador (un
+            // coordinador no supervisa a otro coordinador). Solo SUS visitas de prospección.
+            eventosQuery += ` AND e.tipo_evento != 'Cita Clínica'
+                AND (e.id_responsable IS NULL OR e.id_responsable = $1
+                     OR e.id_responsable NOT IN (SELECT id_usuario FROM Usuarios WHERE id_rol = ${ROL_COORDINADOR}))`;
             incluirVisitas = true;
             filtroVisitas = 'WHERE av.id_usuario_creador = $1';
             visitasParams.push(u.id);
@@ -1881,9 +1937,13 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
             }
         } 
         else if (tipo_registro === 'evento') {
+            // id_responsable (quién está a cargo del evento) se guarda para que, en Agenda,
+            // un Coordinador deje de ver los eventos a cargo de OTRO Coordinador — ver
+            // migracion_eventos_responsable_v1.sql. Eventos creados antes de esa migración
+            // simplemente quedan con id_responsable en NULL (visibles para todos, como hoy).
             const e = await pool.query(
-                "INSERT INTO Eventos (titulo_evento, tipo_evento, fecha_realizacion, id_escuela, url_imagen, direccion_mapa, link_reunion, descripcion, categoria) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id_evento",
-                [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPost.valor, datos.direccion_mapa || null, datos.link_reunion || null, datos.descripcion || null, datos.categoria || null]
+                "INSERT INTO Eventos (titulo_evento, tipo_evento, fecha_realizacion, id_escuela, url_imagen, direccion_mapa, link_reunion, descripcion, categoria, id_responsable) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id_evento",
+                [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPost.valor, datos.direccion_mapa || null, datos.link_reunion || null, datos.descripcion || null, datos.categoria || null, datos.responsable || null]
             );
             const id_evento = e.rows[0].id_evento;
             // "categoria" se sigue guardando también como texto arriba (caché de lectura /
@@ -1990,8 +2050,8 @@ app.put('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
             await pool.query("UPDATE Participacion SET id_usuario=$1 WHERE id_evento=$2", [datos.id_especialista, id]);
         } 
         else if (tipo_registro === 'evento') {
-            await pool.query("UPDATE Eventos SET titulo_evento=$1, tipo_evento=$2, fecha_realizacion=$3, id_escuela=$4, url_imagen=$5, direccion_mapa=$6, link_reunion=$7, descripcion=$8, categoria=$9 WHERE id_evento=$10",
-                [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPut.valor, datos.direccion_mapa || null, datos.link_reunion || null, datos.descripcion || null, datos.categoria || null, id]);
+            await pool.query("UPDATE Eventos SET titulo_evento=$1, tipo_evento=$2, fecha_realizacion=$3, id_escuela=$4, url_imagen=$5, direccion_mapa=$6, link_reunion=$7, descripcion=$8, categoria=$9, id_responsable=$10 WHERE id_evento=$11",
+                [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPut.valor, datos.direccion_mapa || null, datos.link_reunion || null, datos.descripcion || null, datos.categoria || null, datos.responsable || null, id]);
             await registrarCategorias(datos.categoria, { tipo: 'evento', id: Number(id) });
 
             // Actualizar Voluntarios
@@ -3823,13 +3883,21 @@ app.get('/api/eventos/:id/insumos_consumidos', async (req, res) => {
 // Lista todos los reportes de evento con el título/fecha del evento, el nombre de quien
 // reportó, y el equipo de participantes (Participacion) como JSON agregado.
 app.get('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
-    // Voluntario/Especialista solo ven los reportes que ellos mismos generaron;
-    // Coordinador/Admin ven todos.
+    // Voluntario/Especialista solo ven los reportes que ellos mismos generaron. Admin ve
+    // todos. Coordinador ve todos MENOS los de otros Coordinadores (sí ve los de
+    // especialistas, voluntarios, admin, y los suyos propios) — un coordinador no supervisa
+    // a otro coordinador.
     const soloPropios = req.usuario.rol !== ROL_ADMIN && req.usuario.rol !== ROL_COORDINADOR;
     try {
         const params = [];
         let filtro = '';
-        if (soloPropios) { params.push(req.usuario.id); filtro = `WHERE r.id_usuario = $${params.length}`; }
+        if (soloPropios) {
+            params.push(req.usuario.id);
+            filtro = `WHERE r.id_usuario = $${params.length}`;
+        } else if (req.usuario.rol === ROL_COORDINADOR) {
+            params.push(req.usuario.id, ROL_COORDINADOR);
+            filtro = `WHERE (u.id_rol IS DISTINCT FROM $${params.length} OR r.id_usuario = $${params.length - 1})`;
+        }
         const result = await pool.query(`
             SELECT r.*, e.titulo_evento, e.fecha_realizacion, u.nombre_completo AS autor,
                    COALESCE((
@@ -3876,10 +3944,12 @@ app.put('/api/reportes_evento/:id/participantes', verificarToken, requiereRol(RO
 // lo planeado en Consumo_Insumos, y devuelve al inventario lo que sobró (o descuenta lo que
 // se usó de más). Esto es lo que "recicla" el sobrante para futuros eventos.
 app.post('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
-    const { id_evento, id_usuario, actividades_realizadas, materiales_reales, numero_asistentes, observaciones } = req.body;
+    const { id_evento, id_usuario, actividades_realizadas, materiales_reales, numero_asistentes, observaciones, url_adjuntos } = req.body;
     if (!id_evento || !id_usuario || !actividades_realizadas) {
         return res.status(400).json({ success: false, message: 'Evento, usuario y actividades realizadas son obligatorios.' });
     }
+    const chkAdjuntos = validarUrlsCloudinariaArray(url_adjuntos, 'url_adjuntos');
+    if (!chkAdjuntos.ok) return res.status(400).json({ success: false, message: chkAdjuntos.mensaje });
     try {
         await pool.query('BEGIN');
 
@@ -3909,9 +3979,9 @@ app.post('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPE
         }
 
         await pool.query(
-            `INSERT INTO Reportes_Evento (id_evento, id_usuario, actividades_realizadas, materiales_utilizados, numero_asistentes, observaciones)
-             VALUES ($1, $2, $3, $4, $5, $6)`,
-            [id_evento, id_usuario, actividades_realizadas, resumenMateriales, numero_asistentes || null, observaciones || null]
+            `INSERT INTO Reportes_Evento (id_evento, id_usuario, actividades_realizadas, materiales_utilizados, numero_asistentes, observaciones, url_adjuntos)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [id_evento, id_usuario, actividades_realizadas, resumenMateriales, numero_asistentes || null, observaciones || null, chkAdjuntos.valor]
         );
 
         await pool.query('COMMIT');
@@ -3926,11 +3996,13 @@ app.post('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPE
 // Actualiza el contenido de un reporte de evento (actividades, materiales, asistentes,
 // observaciones). Solo el autor original o un Admin pueden editarlo (verificarAutorORol).
 app.put('/api/reportes_evento/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), verificarAutorORol('Reportes_Evento', 'id_reporte', 'id_usuario'), async (req, res) => {
-    const { actividades_realizadas, materiales_utilizados, numero_asistentes, observaciones } = req.body;
+    const { actividades_realizadas, materiales_utilizados, numero_asistentes, observaciones, url_adjuntos } = req.body;
+    const chkAdjuntos = validarUrlsCloudinariaArray(url_adjuntos, 'url_adjuntos');
+    if (!chkAdjuntos.ok) return res.status(400).json({ success: false, message: chkAdjuntos.mensaje });
     try {
         const result = await pool.query(
-            `UPDATE Reportes_Evento SET actividades_realizadas=$1, materiales_utilizados=$2, numero_asistentes=$3, observaciones=$4 WHERE id_reporte=$5`,
-            [actividades_realizadas, materiales_utilizados || null, numero_asistentes || null, observaciones || null, req.params.id]
+            `UPDATE Reportes_Evento SET actividades_realizadas=$1, materiales_utilizados=$2, numero_asistentes=$3, observaciones=$4, url_adjuntos=$5 WHERE id_reporte=$6`,
+            [actividades_realizadas, materiales_utilizados || null, numero_asistentes || null, observaciones || null, chkAdjuntos.valor, req.params.id]
         );
         if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'Reporte no encontrado.' });
         res.json({ success: true });
