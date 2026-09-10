@@ -57,10 +57,11 @@
             </p>
             <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
               <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
-              <span>Esta información es confidencial: solo Administradores y Especialistas de Psicología pueden verla y editarla. No compartas datos de beneficiarios fuera de este panel.</span>
+              <span>Esta información es confidencial: solo Administradores, Coordinadores y Especialistas de Psicología pueden verla y editarla. No compartas datos de beneficiarios fuera de este panel.</span>
             </p>
           </div>
           <button
+            id="btn_nuevo_expediente"
             onclick="abrirModalNuevoExpediente()"
             class="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-[#b50062] to-[#e2007c] text-white rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all"
           >
@@ -968,6 +969,16 @@
             usuarioActual.nombre.split(" ")[0];
           cargarNotificaciones();
           verificarAccesoDocumento(usuarioActual);
+
+          // Solo Admin/Coordinador pueden dar de alta expedientes clínicos; el backend
+          // ya lo exige (POST /api/expedientes), aquí solo ocultamos el botón para no
+          // dar una falsa impresión a los Especialistas (incluidos los psicólogos).
+          const btnNuevoExpediente = document.getElementById(
+            "btn_nuevo_expediente",
+          );
+          if (btnNuevoExpediente && Number(usuarioActual.rol) === 2) {
+            btnNuevoExpediente.remove();
+          }
         } catch (e) {
           window.location.replace("login");
           return;

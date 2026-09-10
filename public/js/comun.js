@@ -142,7 +142,10 @@ function permisosPorPagina(rol, especialidad) {
     const esPsico = Number(rol) === ROL_ESPECIALISTA && typeof especialidad === 'string' && especialidad.toLowerCase().includes('psic');
     return {
         dashboard: [ROL_ADMIN, ROL_COORDINADOR],
-        expedientes: esPsico ? [ROL_ADMIN, ROL_ESPECIALISTA] : [ROL_ADMIN],
+        // Coordinador tiene acceso completo al módulo de Expedientes, igual que Admin.
+        // Un Especialista solo entra si es psicólogo (los demás, ej. Pedagogía, no tienen
+        // ningún expediente clínico que les corresponda).
+        expedientes: esPsico ? [ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA] : [ROL_ADMIN, ROL_COORDINADOR],
         voluntariado: [ROL_ADMIN, ROL_COORDINADOR],
         inventario: [ROL_ADMIN, ROL_COORDINADOR],
         agenda: [ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO],

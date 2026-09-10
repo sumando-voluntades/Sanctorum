@@ -1344,18 +1344,28 @@
                     </div>`;
                 }
               }
-              // Historial de encuestas de satisfacción: solo tiene sentido para
-              // Especialistas (id_rol 2, quienes atienden beneficiarios), y solo lo puede
-              // ver quien ya puede ver el módulo de encuestas por revisar (Admin/Coordinador).
-              if (
+              // Un Especialista (id_rol 2) solo atiende beneficiarios clínicamente si su
+              // especialidad es de psicología (mismo criterio que esPsicologo() en server.js:
+              // especialidad contiene "psic", insensible a mayúsculas) -- un Especialista de
+              // otra área (ej. Pedagogía) no tiene expedientes ni encuestas de satisfacción
+              // que revisar, así que esos botones no le aplican y antes se mostraban igual
+              // por error (la condición solo miraba id_rol === 2, sin ver la especialidad).
+              const esEspecialistaPsicologo =
                 vol.id_rol === 2 &&
+                (vol.especialidad || "").toLowerCase().includes("psic");
+
+              // Historial de encuestas de satisfacción: solo aplica a un Especialista
+              // psicólogo, y solo lo puede ver quien ya puede ver el módulo de encuestas
+              // por revisar (Admin/Coordinador).
+              if (
+                esEspecialistaPsicologo &&
                 (rolActualUsuario === 1 || rolActualUsuario === 3)
               ) {
                 botonesActivo += `<button onclick="verHistorialEncuestasEspecialista(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}')" class="w-full py-2 mb-2 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">reviews</span> Ver Historial de Encuestas</button>`;
               }
               if (vol.id_rol !== 5) {
-                // Si es Voluntario puede tener expediente y proyecto físico
-                if (vol.especialidad === "Psicología" || vol.id_rol === 2) {
+                // Solo un Especialista psicólogo puede tener expediente clínico asignado.
+                if (esEspecialistaPsicologo) {
                   botonesActivo += `<button onclick="abrirModalExpediente()" class="w-full py-2 mb-2 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">folder_shared</span> Asignar Expediente</button>`;
                 }
                 botonesActivo += `<button onclick="abrirModalAsignarActivo(${vol.id_usuario})" class="w-full py-2 mb-3 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-[#f39200] hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">assignment_ind</span> Asignar a Proyecto</button>`;

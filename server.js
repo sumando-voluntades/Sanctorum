@@ -485,7 +485,8 @@ function requiereRol(...rolesPermitidos) {
 // asignado al beneficiario del :id de la ruta — un Especialista solo puede leer/editar el
 // expediente clinico de sus propios pacientes.
 async function verificarOwnershipExpediente(req, res, next) {
-    if (req.usuario && req.usuario.rol === ROL_ADMIN) return next();
+    // Coordinador tiene acceso completo al módulo de Expedientes, igual que Admin.
+    if (req.usuario && (req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR)) return next();
     try {
         const result = await pool.query('SELECT id_especialista FROM Beneficiarios WHERE id_beneficiario = $1', [req.params.id]);
         if (result.rows.length === 0) return res.status(404).json({ success: false, message: 'Expediente no encontrado.' });
@@ -941,7 +942,16 @@ app.put('/api/usuarios/:id/perfil', verificarToken, async (req, res) => {
     if (req.usuario.rol !== ROL_ADMIN && req.usuario.id !== idObjetivo) {
         return res.status(403).json({ success: false, message: 'No puedes editar el perfil de otro usuario.' });
     }
-    const { telefono, especialidad, biografia, nombre_completo, correo, edad, genero } = req.body;
+    const { telefono, biografia, nombre_completo, edad, genero } = req.body;
+    // Auditoría de seguridad: especialidad y correo NO se aceptan de un usuario editando su
+    // propio perfil. especialidad determina permisos reales (si contiene "psic" da acceso a
+    // Expedientes y Citas Clínicas vía esPsicologo()), así que cualquiera podía auto-asignarse
+    // ese acceso con solo escribir "Psicología" en su perfil. correo es el identificador de
+    // login y lo asigna la organización, no debe poder cambiarlo el propio usuario. Solo un
+    // Admin puede tocar estos dos campos (aquí mismo, editando el perfil de otro usuario, o
+    // desde Gestión de Voluntariado vía /api/usuarios/:id/modificar).
+    const especialidad = req.usuario.rol === ROL_ADMIN ? req.body.especialidad : undefined;
+    const correo = req.usuario.rol === ROL_ADMIN ? req.body.correo : undefined;
     try {
         let correoCambiado = false;
         if (correo) {
@@ -2060,8 +2070,11 @@ app.delete('/api/agenda/:categoria/:id', verificarToken, requiereRol(ROL_ADMIN, 
 // 1. Catálogos para el modal de nuevo expediente (especialistas + escuelas)
 app.get('/api/catalogos_expedientes', async (req, res) => {
     try {
+        // Solo Especialistas cuya especialidad sea Psicología pueden quedar como
+        // "Especialista Asignado" de un expediente clínico — antes esta lista incluía
+        // a cualquier Especialista (ej. Pedagogía), que es un área fuera de su competencia.
         const especialistas = await pool.query(
-            "SELECT id_usuario, nombre_completo FROM Usuarios WHERE id_rol = 2 AND COALESCE(estatus,'Activo') != 'Inactivo' ORDER BY nombre_completo ASC"
+            "SELECT id_usuario, nombre_completo FROM Usuarios WHERE id_rol = 2 AND especialidad ILIKE '%psic%' AND COALESCE(estatus,'Activo') != 'Inactivo' ORDER BY nombre_completo ASC"
         );
         const escuelas = await pool.query('SELECT id_escuela, nombre_escuela FROM Escuelas ORDER BY nombre_escuela ASC');
         res.json({ success: true, especialistas: especialistas.rows, escuelas: escuelas.rows });
@@ -2072,11 +2085,18 @@ app.get('/api/catalogos_expedientes', async (req, res) => {
 });
 
 // 2. Listado de expedientes (tabla principal)
-app.get('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
+app.get('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), async (req, res) => {
     try {
         // Un psicólogo (Especialista con especialidad "Psicología") solo ve SUS pacientes.
-        // Admin ve todos. Cualquier otro rol ya fue bloqueado por requiereRol arriba.
-        const filtrarPorEspecialista = esPsicologo(req.usuario);
+        // Admin y Coordinador ven todos. Un Especialista que NO es psicólogo (ej. Pedagogía)
+        // no tiene ningún expediente clínico que le corresponda — antes, al no ser psicólogo,
+        // simplemente no se aplicaba ningún filtro y terminaba viendo TODOS los expedientes
+        // sin querer (bug), así que aquí se le niega el acceso explícitamente.
+        const esCoordOAdmin = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
+        if (!esCoordOAdmin && !esPsicologo(req.usuario)) {
+            return res.status(403).json({ success: false, message: 'No tienes permiso para ver expedientes clínicos.' });
+        }
+        const filtrarPorEspecialista = !esCoordOAdmin && esPsicologo(req.usuario);
         const params = [];
         let filtroWhere = '';
         if (filtrarPorEspecialista) {
@@ -2106,7 +2126,9 @@ app.get('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALI
 });
 
 // 3. Crear nuevo expediente (beneficiario) — permite crear escuela nueva "al vuelo"
-app.post('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
+// Solo Admin/Coordinador pueden dar de alta expedientes clínicos; los Especialistas
+// (incluidos los psicólogos) ya no pueden crear expedientes por su cuenta.
+app.post('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { nombre, fecha_nacimiento, genero, colonia_puebla, id_escuela, escuela_nueva, tutor, telefono_tutor, correo_tutor, id_especialista } = req.body;
     try {
         await pool.query('BEGIN');
@@ -2141,7 +2163,7 @@ app.post('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIAL
 });
 
 // 4. Cambiar estatus clínico (ACTIVO / EN PAUSA / ALTA)
-app.put('/api/expedientes/:id/estatus', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.put('/api/expedientes/:id/estatus', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
     const { estatus } = req.body;
     try {
         await pool.query('UPDATE Beneficiarios SET estatus = $1 WHERE id_beneficiario = $2', [estatus, req.params.id]);
@@ -2153,7 +2175,7 @@ app.put('/api/expedientes/:id/estatus', verificarToken, requiereRol(ROL_ADMIN, R
 });
 
 // 5. Notas de evolución — listar
-app.get('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.get('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT n.id_nota, n.fecha_atencion, n.contenido_nota, n.tipo_intervencion,
@@ -2179,7 +2201,7 @@ const MAPA_TIPO_INTERVENCION = {
     'Intervención': 'Crisis',
     'Cierre': 'Cierre'
 };
-app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
     const { id_especialista, nota, tipo_sesion, modalidad, asistencia, nivel_riesgo } = req.body;
     const tipoIntervencion = MAPA_TIPO_INTERVENCION[tipo_sesion] || 'Seguimiento';
     try {
@@ -2206,7 +2228,7 @@ app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, RO
 });
 
 // 7. Documentos del expediente — listar
-app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
     try {
         const result = await pool.query(
             "SELECT id_doc, nombre_archivo, url_archivo, fecha_subida, 'archivo' AS origen, NULL::int AS calificacion, NULL::text AS comentarios FROM Expedientes_Documentos WHERE id_beneficiario = $1",
@@ -2257,7 +2279,7 @@ app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN
 });
 
 // 8. Documentos del expediente — registrar (la subida física ya ocurrió vía Cloudinary desde el frontend)
-app.post('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.post('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
     const { nombre_archivo, url_archivo } = req.body;
     try {
         await pool.query(
@@ -2272,7 +2294,7 @@ app.post('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMI
 });
 
 // 8b. Documentos del expediente — eliminar
-app.delete('/api/expedientes/:id/documentos/:id_doc', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.delete('/api/expedientes/:id/documentos/:id_doc', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Expedientes_Documentos WHERE id_doc = $1 AND id_beneficiario = $2', [req.params.id_doc, req.params.id]);
         if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'Documento no encontrado.' });
@@ -2285,7 +2307,7 @@ app.delete('/api/expedientes/:id/documentos/:id_doc', verificarToken, requiereRo
 
 // 8c. Editar datos de contacto del tutor (nombre, teléfono, correo) y del beneficiario
 // (género, colonia) — necesario para emergencias y para completar el expediente.
-app.put('/api/expedientes/:id/tutor', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.put('/api/expedientes/:id/tutor', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
     const { tutor, telefono_tutor, correo_tutor, genero, colonia_puebla } = req.body;
     try {
         await pool.query(
@@ -2299,9 +2321,9 @@ app.put('/api/expedientes/:id/tutor', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
-// 4a-bis. Reasignar el especialista responsable de un expediente (solo Admin). Antes de
-// este endpoint no existia forma de cambiar el especialista de un expediente ya creado.
-app.put('/api/expedientes/:id/especialista', verificarToken, requiereRol(ROL_ADMIN), async (req, res) => {
+// 4a-bis. Reasignar el especialista responsable de un expediente (Admin/Coordinador). Antes
+// de este endpoint no existia forma de cambiar el especialista de un expediente ya creado.
+app.put('/api/expedientes/:id/especialista', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { id_especialista } = req.body;
     try {
         const result = await pool.query(
@@ -2319,7 +2341,7 @@ app.put('/api/expedientes/:id/especialista', verificarToken, requiereRol(ROL_ADM
 // 4b. Editar los datos propios del beneficiario (nombre, fecha de nacimiento, escuela, género, colonia).
 //     La escuela se recibe como texto libre: si coincide (sin importar mayúsculas) con una escuela
 //     ya registrada se reutiliza esa fila; si no existe, se crea una nueva — igual que al abrir expediente.
-app.put('/api/expedientes/:id/datos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.put('/api/expedientes/:id/datos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
     const { nombre, fecha_nacimiento, genero, colonia_puebla, escuela_texto } = req.body;
     try {
         let idEscuelaFinal = null;

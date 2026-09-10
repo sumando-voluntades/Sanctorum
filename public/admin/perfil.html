@@ -275,8 +275,15 @@
               <input
                 id="edit_perfil_correo"
                 type="email"
-                class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none"
+                class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none disabled:opacity-60 disabled:cursor-not-allowed"
               />
+              <p
+                id="nota_correo_bloqueado"
+                class="hidden text-[11px] text-slate-400 mt-1"
+              >
+                Tu correo lo asigna la organización; pide a un Administrador
+                que lo cambie si lo necesitas.
+              </p>
             </div>
             <div>
               <label
@@ -297,8 +304,14 @@
               <input
                 id="edit_perfil_especialidad"
                 type="text"
-                class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none"
+                class="w-full px-3 py-2.5 bg-[#f0f4f8] border-none rounded-xl outline-none disabled:opacity-60 disabled:cursor-not-allowed"
               />
+              <p
+                id="nota_especialidad_bloqueada"
+                class="hidden text-[11px] text-slate-400 mt-1"
+              >
+                Solo un Administrador puede cambiar tu especialidad.
+              </p>
             </div>
             <div>
               <label
@@ -1088,6 +1101,21 @@
             perfilActual.genero || "";
           document.getElementById("edit_perfil_especialidad").value =
             perfilActual.especialidad || "";
+
+          // correo y especialidad solo los puede cambiar un Admin (el backend ya los
+          // ignora si los manda alguien más — ver PUT /api/usuarios/:id/perfil); aquí
+          // solo reflejamos esa regla en la UI para no dar falsa impresión de que se
+          // pueden editar.
+          const esAdmin = usuarioActual && Number(usuarioActual.rol) === 1;
+          document.getElementById("edit_perfil_correo").disabled = !esAdmin;
+          document.getElementById("edit_perfil_especialidad").disabled =
+            !esAdmin;
+          document
+            .getElementById("nota_correo_bloqueado")
+            .classList.toggle("hidden", esAdmin);
+          document
+            .getElementById("nota_especialidad_bloqueada")
+            .classList.toggle("hidden", esAdmin);
         }
       }
 
