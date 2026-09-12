@@ -3751,8 +3751,11 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
     }
 });
 
-// 5. Eliminar — ?origen=historia borra de Historias_Exito, si no de Publicaciones.
-app.delete('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR), async (req, res) => {
+// 5. Eliminar — ?origen=historia borra de Historias_Exito, si no de Publicaciones. Se incluye
+//    ROL_VOLUNTARIO aquí porque un Voluntario sí puede publicar, y por lo tanto debe poder
+//    borrar (solo) lo que él mismo publicó, por si se equivocó — el filtro real de "solo el
+//    autor o un Admin" ocurre abajo.
+app.delete('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     try {
         const esHistoria = req.query.origen === 'historia';
         const tablaPub = esHistoria ? 'Historias_Exito' : 'Publicaciones';

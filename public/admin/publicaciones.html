@@ -44,6 +44,33 @@
         }
       }
 
+      /* Fila de categorías sobre la miniatura de cada tarjeta en la cuadrícula de este panel:
+         con varias categorías (ej. "Agradecimiento, Consejos para padres, Cultura de Paz,
+         Festividad, Identidad") antes se mostraban todas juntas y tapaban la imagen. Ahora se
+         muestran como globos/chips individuales en una fila que se desliza sola en horizontal
+         -- mismo patrón que comunidad_blog.html (público), para que quepan sin desbordar. */
+      .chips-categoria {
+        overflow: hidden;
+        max-width: 100%;
+        -webkit-mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+        mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+      }
+      .chips-categoria-track {
+        display: flex;
+        width: max-content;
+        gap: 0.4rem;
+      }
+      .chips-categoria-track.chips-categoria-animada {
+        animation: chips-categoria-desliz 14s linear infinite;
+      }
+      .chips-categoria:hover .chips-categoria-track.chips-categoria-animada {
+        animation-play-state: paused;
+      }
+      @keyframes chips-categoria-desliz {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+
       /* Editor de contenido (Quill) y su vista previa: el toolbar de Quill trae su propio look
          "cuadriculado" por defecto que no combina con el resto del panel, así que se le quitan
          los bordes y se le da la misma pinta redondeada que los demás campos del formulario. */
@@ -806,7 +833,12 @@
       let publicacionesGlobal = [];
       let idPubAEliminar = null;
       let origenPubAEliminar = "publicacion";
-      let esRolVoluntario = false;
+      // Quién puede eliminar una publicación/historia (debe reflejar exactamente la regla del
+      // backend en DELETE /api/publicaciones/:id): un Admin puede borrar cualquiera; cualquier
+      // otro rol que pueda publicar (Voluntario, Especialista, Coordinador) solo puede borrar
+      // las que él mismo publicó -- por si se equivocó al capturarla.
+      let usuarioActualId = null;
+      let esRolAdminActual = false;
       // Solo un psicólogo (Especialista con "psic" en su especialidad), Coordinador o Admin
       // puede publicar/editar Historias de Éxito — regla real aplicada en el backend
       // (puedePublicarHistoria() en server.js); aquí solo se refleja en la interfaz para no
@@ -814,7 +846,7 @@
       let puedePublicarHistoriaExito = false;
 
       // Punto de entrada: monta los parciales, valida la sesión, calcula los permisos
-      // propios de esta página (esRolVoluntario, puedePublicarHistoriaExito) y arranca la
+      // propios de esta página (usuarioActualId, esRolAdminActual, puedePublicarHistoriaExito) y arranca la
       // carga de publicaciones y los catálogos que usa el modal (eventos, beneficiarios).
       document.addEventListener("DOMContentLoaded", async () => {
         inicializarEditorContenido();
@@ -840,7 +872,8 @@
           document.getElementById("nav_user_name").innerText =
             payload.nombre.split(" ")[0];
           cargarNotificaciones();
-          esRolVoluntario = payload.rol === 4; // Voluntario no puede eliminar publicaciones
+          usuarioActualId = payload.id;
+          esRolAdminActual = payload.rol === 1;
           puedePublicarHistoriaExito =
             payload.rol === 1 ||
             payload.rol === 3 ||
@@ -1488,9 +1521,25 @@
         aplicarFiltrosPublicaciones();
       }
 
+      // Arma los globos/chips de categoría que van sobre la miniatura de cada tarjeta. Con una
+      // sola categoría es un globo fijo; con varias, se arma una fila que se desliza sola en
+      // horizontal (la lista se duplica una vez para que el desplazamiento se vea continuo) --
+      // mismo patrón que chipsCategoriaHtml en comunidad_blog.html (público), para que una
+      // publicación con muchas categorías nunca tape ni desborde la imagen de la tarjeta.
+      function chipsCategoriaHtmlAdmin(categorias) {
+        const chip = (texto) =>
+          `<span class="shrink-0 text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-white/90 text-slate-600">${escapeHtml(texto)}</span>`;
+        if (categorias.length === 0) return "";
+        if (categorias.length === 1) {
+          return `<div class="chips-categoria min-w-0"><div class="chips-categoria-track">${chip(categorias[0])}</div></div>`;
+        }
+        const chips = categorias.map(chip).join("");
+        return `<div class="chips-categoria min-w-0"><div class="chips-categoria-track chips-categoria-animada">${chips}${chips}</div></div>`;
+      }
+
       // Pinta el grid de tarjetas de publicaciones. Oculta el botón de editar en historias
-      // si el usuario no puede publicarlas (puedePublicarHistoriaExito) y el de eliminar
-      // si el usuario es Voluntario (esRolVoluntario).
+      // si el usuario no puede publicarlas (puedePublicarHistoriaExito) y el de eliminar si
+      // esta tarjeta en particular no es suya ni es Admin (ver puedeEliminarEstaPub más abajo).
       function renderPublicaciones(lista) {
         const grid = document.getElementById("grid_publicaciones");
         if (lista.length === 0) {
@@ -1513,6 +1562,12 @@
               ? p.url_documento_consentimiento || ""
               : p.url_imagen || posterDeVideo(p.url_video) || "";
             const imgEsFoto = esHistoriaCard ? esUrlDeImagen(img) : true;
+            // Debe ser un espejo exacto de la regla del backend en DELETE /api/publicaciones/:id:
+            // un Admin puede borrar cualquier publicación/historia; cualquier otro rol solo puede
+            // borrar la que él mismo publicó.
+            const puedeEliminarEstaPub =
+              esRolAdminActual ||
+              Number(p.id_autor) === Number(usuarioActualId);
             const badgeTipo =
               p.tipo === "Evento"
                 ? "bg-blue-100 text-blue-700"
@@ -1534,17 +1589,14 @@
               <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden group">
                 <div class="h-40 bg-slate-100 relative">
                   ${bloqueImagen}
-                  <div class="absolute top-3 left-3 flex gap-2">
-                    <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full ${badgeTipo}">${escapeHtml(p.tipo)}</span>
-                    ${(p.categoria || "")
-                      .split(",")
-                      .map((c) => c.trim())
-                      .filter(Boolean)
-                      .map(
-                        (c) =>
-                          `<span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-white/90 text-slate-600">${escapeHtml(c)}</span>`,
-                      )
-                      .join("")}
+                  <div class="absolute top-3 left-3 right-3 flex items-center gap-2">
+                    <span class="shrink-0 text-[10px] font-bold uppercase px-3 py-1 rounded-full ${badgeTipo}">${escapeHtml(p.tipo)}</span>
+                    ${chipsCategoriaHtmlAdmin(
+                      (p.categoria || "")
+                        .split(",")
+                        .map((c) => c.trim())
+                        .filter(Boolean),
+                    )}
                   </div>
                 </div>
                 <div class="p-5">
@@ -1564,11 +1616,11 @@
                     </button>`
                     }
                     ${
-                      esRolVoluntario
-                        ? ""
-                        : `<button onclick="abrirModalEliminarPub(${p.id_publicacion}, '${p.origen}')" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
+                      puedeEliminarEstaPub
+                        ? `<button onclick="abrirModalEliminarPub(${p.id_publicacion}, '${p.origen}')" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-full transition-colors" title="Eliminar">
                       <span class="material-symbols-outlined text-[18px]">delete</span>
                     </button>`
+                        : ""
                     }
                   </div>
                 </div>
@@ -2289,8 +2341,15 @@
         ctx.fillText('"LA SALUD MENTAL ES RESPONSABILIDAD EN SOCIEDAD"', 90, 950);
 
         // 5. Logo en la esquina inferior derecha del marco
+        // OJO: la ruta debe ser absoluta y con la mayúscula exacta del archivo real
+        // (public/assets/Logo.png, con "L" mayúscula) -- así lo referencian navbar_admin.html,
+        // navbar_publico.html, footer_publico.html, login.html, etc. La ruta relativa en
+        // minúsculas que había aquí ("assets/logo.png") nunca cargaba en producción (server
+        // de archivos con mayúsculas/minúsculas distintas): el error se comía silenciosamente
+        // en el catch de abajo y la tarjeta se generaba sin logo, aunque el dibujo en sí
+        // nunca se tocó.
         try {
-          const logo = await cargarImagenParaCanvas("assets/logo.png");
+          const logo = await cargarImagenParaCanvas("/assets/Logo.png");
           const altoLogo = 130;
           const anchoLogo = altoLogo * (logo.width / logo.height);
           ctx.drawImage(
