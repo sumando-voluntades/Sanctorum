@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generador de Menú y Precios | Sumando Voluntades A.C.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: #f1f5f9;
+      }
+      .font-menu {
+        font-family: "Quicksand", sans-serif;
+      }
+      .bg-sv-orange {
+        background-color: #f39200;
+      }
+      .bg-sv-pink {
+        background-color: #e6007e;
+      }
+      .text-sv-orange {
+        color: #f39200;
+      }
+      .text-sv-pink {
+        color: #e6007e;
+      }
+      .menu-container {
+        width: 750px;
+        background-color: white;
+        border-radius: 3rem;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      }
+      .price-tag {
+        background: linear-gradient(135deg, #f39200 0%, #e6007e 100%);
+        color: white;
+        padding: 6px 18px;
+        border-radius: 9999px;
+        font-weight: 800;
+      }
+      .combo-card {
+        background: linear-gradient(145deg, #fffcf9 0%, #fff0f6 100%);
+        border: 2px dashed #e6007e;
+      }
+      .product-row:nth-child(even) {
+        background-color: #fefaf6;
+      }
+    </style>
+  </head>
+  <body class="text-slate-800 min-h-screen flex flex-col">
+    <!-- BARRA SUPERIOR INSTITUCIONAL -->
+    <header
+      class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm"
+    >
+      <div class="flex items-center gap-3">
+        <a
+          href="herramientas"
+          class="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+          title="Volver a Herramientas"
+        >
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <img
+            src="/assets/Logo.png"
+            alt="Logo"
+            class="h-8 w-auto"
+            onerror="this.src = 'Copy of Sumando Voluntades.png'"
+          />
+          <div>
+            <h1 class="text-sm font-extrabold text-slate-800 leading-tight">
+              Generador de Volante y Lista de Precios
+            </h1>
+            <p class="text-[11px] text-slate-400 font-medium">
+              Programa de Apoyo Alimentario
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span
+          class="text-xs font-bold px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full flex items-center gap-1.5"
+        >
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span> Exclusivo
+          Administración
+        </span>
+      </div>
+    </header>
+
+    <!-- ÁREA DE TRABAJO -->
+    <div
+      class="flex-1 p-6 md:p-8 flex flex-col xl:flex-row gap-8 items-start justify-center max-w-[1750px] mx-auto w-full"
+    >
+      <!-- PANEL DE EDICIÓN DINÁMICA (IZQUIERDA) -->
+      <aside
+        class="w-full xl:w-[460px] bg-white rounded-3xl p-6 shadow-sm border border-slate-200 shrink-0 space-y-5"
+      >
+        <div>
+          <h2
+            class="text-sm font-bold text-slate-800 flex items-center gap-1.5 mb-1"
+          >
+            <span class="material-symbols-outlined text-[#e6007e] text-base"
+              >edit_note</span
+            >
+            Editor Completo de Menú y Precios
+          </h2>
+          <p class="text-[11px] text-slate-400 leading-snug">
+            Modifica textos, emojis, precios, agrega o retira productos y
+            promociones en tiempo real.
+          </p>
+        </div>
+
+        <!-- ENCABEZADOS -->
+        <div class="space-y-3 pt-2">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label
+                class="block text-[11px] font-bold text-slate-600 uppercase mb-1"
+                >Título</label
+              >
+              <input
+                type="text"
+                id="inTitulo"
+                oninput="renderVolante()"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none"
+                value="Nuestros Productos"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-[11px] font-bold text-slate-600 uppercase mb-1"
+                >Etiqueta Lista</label
+              >
+              <input
+                type="text"
+                id="inEtiquetaLista"
+                oninput="renderVolante()"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none"
+                value="Lista de Precios"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- GESTOR DE PRODUCTOS -->
+        <div
+          class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-3"
+        >
+          <div class="flex items-center justify-between">
+            <span
+              class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-sm text-[#f39200]"
+                >format_list_bulleted</span
+              >
+              Artículos / Lista
+            </span>
+            <button
+              type="button"
+              onclick="agregarProducto()"
+              class="px-2.5 py-1 bg-white hover:bg-orange-50 border border-slate-200 text-[#f39200] font-bold rounded-lg text-[11px] transition-colors flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-xs">add</span> Añadir
+            </button>
+          </div>
+
+          <div
+            id="editorProductos"
+            class="space-y-2 max-h-56 overflow-y-auto pr-1"
+          ></div>
+        </div>
+
+        <!-- GESTOR DE COMBOS / PROMOCIONES -->
+        <div
+          class="p-3.5 rounded-2xl bg-pink-50/40 border border-pink-100 space-y-3"
+        >
+          <div class="flex items-center justify-between">
+            <span
+              class="text-xs font-bold text-[#b50062] uppercase tracking-wider flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-sm text-[#e6007e]"
+                >loyalty</span
+              >
+              Combos / Promociones
+            </span>
+            <button
+              type="button"
+              onclick="agregarCombo()"
+              class="px-2.5 py-1 bg-white hover:bg-pink-50 border border-pink-200 text-[#e6007e] font-bold rounded-lg text-[11px] transition-colors flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-xs">add</span> Añadir
+              Combo
+            </button>
+          </div>
+
+          <div
+            id="editorCombos"
+            class="space-y-2 max-h-48 overflow-y-auto pr-1"
+          ></div>
+        </div>
+
+        <!-- LEYENDAS Y PIE -->
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <label
+              class="block text-[11px] font-bold text-slate-600 uppercase mb-1"
+              >Nota al pie de lista</label
+            >
+            <input
+              type="text"
+              id="inNota"
+              oninput="renderVolante()"
+              class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+              value="* El excedente de gramaje en los productos se cobrará al momento."
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[11px] font-bold text-slate-600 uppercase mb-1"
+              >Mensaje de impacto social</label
+            >
+            <input
+              type="text"
+              id="inMensajeImpacto"
+              oninput="renderVolante()"
+              class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+              value="Al adquirir nuestros productos, apoyas directamente a los programas sociales de la asociación."
+            />
+          </div>
+        </div>
+
+        <!-- BOTÓN DE DESCARGA -->
+        <div class="pt-2">
+          <button
+            id="btnDescargar"
+            onclick="downloadMenu()"
+            class="w-full py-3.5 bg-gradient-to-r from-[#b50062] to-[#e2007c] hover:scale-[1.02] active:scale-95 text-white rounded-2xl font-bold text-xs shadow-lg shadow-pink-200 transition-all flex items-center justify-center gap-2"
+          >
+            <span class="material-symbols-outlined text-base">download</span>
+            <span>Descargar Menú Semanal (PNG HD)</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- PREVISUALIZACIÓN DE LA CARTA (DERECHA) -->
+      <main
+        class="flex-1 w-full flex flex-col items-center justify-start overflow-auto pb-12"
+      >
+        <div
+          class="w-full flex items-center justify-between mb-3 px-2 max-w-[750px]"
+        >
+          <span
+            class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+            >Vista Previa del Menú</span
+          >
+          <span class="text-xs text-slate-400">750 px · Formato Digital</span>
+        </div>
+
+        <div class="overflow-x-auto w-full flex justify-center py-2">
+          <div
+            id="menu-area"
+            class="menu-container font-menu shadow-2xl border-[16px] border-white outline outline-2 outline-gray-100 select-none shrink-0"
+          >
+            <div class="pt-10 pb-5 text-center">
+              <img
+                src="/assets/Logo.png"
+                alt="Logo"
+                class="h-28 mx-auto object-contain mb-3"
+                onerror="this.src = 'Copy of Sumando Voluntades.png'"
+              />
+              <h2
+                id="outTitulo"
+                class="text-4xl font-black text-sv-orange uppercase tracking-tight"
+              >
+                Nuestros Productos
+              </h2>
+              <div
+                class="h-1.5 w-32 bg-sv-pink mx-auto mt-2.5 rounded-full"
+              ></div>
+            </div>
+
+            <div class="px-10 pb-8">
+              <!-- LISTA DE PRECIOS -->
+              <div class="mb-8">
+                <h3
+                  id="outEtiquetaLista"
+                  class="text-xs font-bold text-gray-400 uppercase tracking-[0.4em] mb-4 pl-4"
+                >
+                  Lista de Precios
+                </h3>
+                <div
+                  id="outListaProductos"
+                  class="rounded-[2.2rem] overflow-hidden border-2 border-orange-50 shadow-sm"
+                >
+                  <!-- Inyectado por JS -->
+                </div>
+              </div>
+
+              <!-- COMBOS DE LA SEMANA -->
+              <div class="mb-6">
+                <h3
+                  class="text-xs font-bold text-sv-pink uppercase tracking-[0.4em] mb-4 pl-4"
+                >
+                  Promociones de la Semana
+                </h3>
+                <div id="outListaCombos" class="grid grid-cols-1 gap-4">
+                  <!-- Inyectado por JS -->
+                </div>
+                <p
+                  id="outNota"
+                  class="text-[10px] text-gray-400 mt-3 italic font-bold leading-tight pl-4"
+                >
+                  * El excedente de gramaje en los productos se cobrará al
+                  momento.
+                </p>
+              </div>
+
+              <!-- CAJA DE IMPACTO -->
+              <div
+                class="mt-6 bg-orange-50 p-5 rounded-[2rem] border-2 border-orange-100 flex items-center gap-4"
+              >
+                <div class="bg-white p-2.5 rounded-full shadow-sm text-2xl">
+                  🤝
+                </div>
+                <p
+                  id="outMensajeImpacto"
+                  class="text-xs text-gray-600 font-medium italic leading-relaxed"
+                >
+                  Al adquirir nuestros productos, apoyas directamente a los
+                  programas sociales de la asociación.
+                </p>
+              </div>
+            </div>
+
+            <!-- PIE DE REDES -->
+            <footer class="bg-gray-50 p-8 border-t border-gray-100 text-center">
+              <p
+                class="text-xs font-black text-sv-pink uppercase tracking-[0.3em] mb-4"
+              >
+                "La salud mental es responsabilidad en sociedad"
+              </p>
+              <div class="flex justify-center gap-6">
+                <div class="flex items-center gap-2 opacity-70">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg"
+                    class="h-4 w-4"
+                  />
+                  <span class="text-[9px] font-bold"
+                    >Sumando Voluntades Sanctorum</span
+                  >
+                </div>
+                <div class="flex items-center gap-2 opacity-70">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg"
+                    class="h-4 w-4"
+                  />
+                  <span class="text-[9px] font-bold"
+                    >@sumandovoluntadessanctorum</span
+                  >
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="/js/comun.js"></script>
+    <script>
+      // RBAC: Solo Administradores (1) y Coordinadores (3)
+      const token = localStorage.getItem("token_sanctorum");
+      if (!token) {
+        window.location.replace("login");
+      } else {
+        try {
+          const payload = decodeJWT(token);
+          if (Number(payload.rol) !== 1 && Number(payload.rol) !== 3) {
+            alert(
+              "Acceso denegado: solo personal de Administración y Coordinación puede editar volantes oficiales.",
+            );
+            window.location.replace("herramientas");
+          }
+        } catch (e) {
+          window.location.replace("login");
+        }
+      }
+
+      // Estado inicial dinámico
+      let productos = [
+        { emoji: "🧈", nombre: "Manteca", precio: "$63" },
+        { emoji: "🥩", nombre: "Carnera", precio: "$179" },
+        { emoji: "🍖", nombre: "Pastilla natural", precio: "$131" },
+        { emoji: "🌮", nombre: "Carne árabe", precio: "$110" },
+        { emoji: "🐷", nombre: "Cabeza de cerdo", precio: "$57" },
+        { emoji: "🧀", nombre: "Queso gouda", precio: "$178" },
+        { emoji: "🌭", nombre: "Chorizo argentino", precio: "$111" },
+        { emoji: "🥘", nombre: "Carne molida mixta", precio: "$152" },
+        { emoji: "🥓", nombre: "Bistec de cerdo", precio: "$120" },
+        { emoji: "🌶️", nombre: "Carne enchilada", precio: "$122" },
+      ];
+
+      let combos = [
+        {
+          emoji: "🍲",
+          titulo: "Promoción 1",
+          descripcion:
+            "1 kg Maíz pozolero + 1 kg Codillo<br>+ 1 kg Pechuga congelada",
+          precio: "$194",
+        },
+        {
+          emoji: "🐟",
+          titulo: "Promoción 2",
+          descripcion: "1 kg Filete tilapia<br>+ 1 kg Basa en rebanadas",
+          precio: "$149",
+        },
+      ];
+
+      document.addEventListener("DOMContentLoaded", () => {
+        renderPanelEditores();
+        renderVolante();
+      });
+
+      function renderPanelEditores() {
+        // Render editor productos
+        const contProd = document.getElementById("editorProductos");
+        contProd.innerHTML = productos
+          .map(
+            (p, i) => `
+          <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-slate-200">
+            <input
+              type="text"
+              value="${p.emoji}"
+              oninput="actualizarItemProd(${i}, 'emoji', this.value)"
+              class="w-8 text-center text-sm py-1 bg-slate-50 rounded-lg outline-none"
+              title="Emoji"
+            />
+            <input
+              type="text"
+              value="${p.nombre}"
+              oninput="actualizarItemProd(${i}, 'nombre', this.value)"
+              class="flex-1 px-2 py-1 bg-slate-50 rounded-lg text-xs font-semibold outline-none"
+              placeholder="Producto"
+            />
+            <input
+              type="text"
+              value="${p.precio}"
+              oninput="actualizarItemProd(${i}, 'precio', this.value)"
+              class="w-16 px-1 text-center py-1 bg-slate-50 rounded-lg text-xs font-bold text-[#e6007e] outline-none"
+              placeholder="$00"
+            />
+            <button
+              type="button"
+              onclick="eliminarProducto(${i})"
+              class="p-1 text-slate-400 hover:text-red-600 rounded-lg transition-colors"
+              title="Eliminar"
+            >
+              <span class="material-symbols-outlined text-base">close</span>
+            </button>
+          </div>
+        `,
+          )
+          .join("");
+
+        // Render editor combos
+        const contComb = document.getElementById("editorCombos");
+        contComb.innerHTML = combos
+          .map(
+            (c, i) => `
+          <div class="bg-white p-2 rounded-xl border border-pink-100 space-y-1">
+            <div class="flex items-center gap-1.5">
+              <input
+                type="text"
+                value="${c.emoji}"
+                oninput="actualizarItemCombo(${i}, 'emoji', this.value)"
+                class="w-8 text-center text-sm py-1 bg-slate-50 rounded-lg outline-none"
+              />
+              <input
+                type="text"
+                value="${c.titulo}"
+                oninput="actualizarItemCombo(${i}, 'titulo', this.value)"
+                class="flex-1 px-2 py-1 bg-slate-50 rounded-lg text-xs font-bold outline-none"
+                placeholder="Título del combo"
+              />
+              <input
+                type="text"
+                value="${c.precio}"
+                oninput="actualizarItemCombo(${i}, 'precio', this.value)"
+                class="w-16 text-center py-1 bg-slate-50 rounded-lg text-xs font-bold text-[#e6007e] outline-none"
+                placeholder="$00"
+              />
+              <button
+                type="button"
+                onclick="eliminarCombo(${i})"
+                class="p-1 text-slate-400 hover:text-red-600 rounded-lg"
+              >
+                <span class="material-symbols-outlined text-base">close</span>
+              </button>
+            </div>
+            <textarea
+              rows="1"
+              oninput="actualizarItemCombo(${i}, 'descripcion', this.value.replace(/\\n/g, '<br>'))"
+              class="w-full px-2 py-1 bg-slate-50 rounded-lg text-[11px] text-slate-600 outline-none resize-none"
+              placeholder="Descripción del combo"
+            >${c.descripcion.replace(/<br\s*[\/]?>/gi, "\n")}</textarea>
+          </div>
+        `,
+          )
+          .join("");
+      }
+
+      function actualizarItemProd(index, key, val) {
+        productos[index][key] = val;
+        renderVolante();
+      }
+
+      function actualizarItemCombo(index, key, val) {
+        combos[index][key] = val;
+        renderVolante();
+      }
+
+      function agregarProducto() {
+        productos.push({
+          emoji: "🥩",
+          nombre: "Nuevo Producto",
+          precio: "$00",
+        });
+        renderPanelEditores();
+        renderVolante();
+      }
+
+      function eliminarProducto(index) {
+        productos.splice(index, 1);
+        renderPanelEditores();
+        renderVolante();
+      }
+
+      function agregarCombo() {
+        combos.push({
+          emoji: "🎁",
+          titulo: `Promoción ${combos.length + 1}`,
+          descripcion: "Descripción del paquete promocional",
+          precio: "$00",
+        });
+        renderPanelEditores();
+        renderVolante();
+      }
+
+      function eliminarCombo(index) {
+        combos.splice(index, 1);
+        renderPanelEditores();
+        renderVolante();
+      }
+
+      function renderVolante() {
+        document.getElementById("outTitulo").innerText =
+          document.getElementById("inTitulo").value || "Nuestros Productos";
+        document.getElementById("outEtiquetaLista").innerText =
+          document.getElementById("inEtiquetaLista").value ||
+          "Lista de Precios";
+        document.getElementById("outNota").innerText =
+          document.getElementById("inNota").value || "";
+        document.getElementById("outMensajeImpacto").innerText =
+          document.getElementById("inMensajeImpacto").value || "";
+
+        // Render lista productos en el volante
+        const contProd = document.getElementById("outListaProductos");
+        if (productos.length === 0) {
+          contProd.innerHTML =
+            '<p class="text-xs text-slate-400 p-4 text-center">Sin productos en la lista.</p>';
+        } else {
+          contProd.innerHTML = productos
+            .map(
+              (p) => `
+            <div class="product-row flex items-center justify-between p-3.5 border-b border-orange-50/50 last:border-none">
+              <div class="flex items-center gap-4">
+                <span class="text-2xl">${p.emoji}</span>
+                <span class="font-bold text-gray-700 text-lg">${p.nombre}</span>
+              </div>
+              <span class="price-tag text-lg">${p.precio}</span>
+            </div>
+          `,
+            )
+            .join("");
+        }
+
+        // Render combos en el volante
+        const contComb = document.getElementById("outListaCombos");
+        if (combos.length === 0) {
+          contComb.innerHTML =
+            '<p class="text-xs text-slate-400 p-3 text-center">Sin promociones activas.</p>';
+        } else {
+          contComb.innerHTML = combos
+            .map(
+              (c) => `
+            <div class="combo-card p-5 rounded-[2.2rem] flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-4">
+                <div class="bg-orange-100 p-2.5 rounded-2xl text-2xl shrink-0">${c.emoji}</div>
+                <div>
+                  <p class="text-sv-orange font-black text-lg leading-none uppercase mb-1">
+                    ${c.titulo}
+                  </p>
+                  <p class="text-xs text-gray-600 font-bold leading-tight">
+                    ${c.descripcion}
+                  </p>
+                </div>
+              </div>
+              <div class="text-right shrink-0 ml-3">
+                <span class="block text-[9px] font-bold text-sv-pink uppercase tracking-widest">A solo</span>
+                <span class="text-3xl font-black text-sv-pink">${c.precio}</span>
+              </div>
+            </div>
+          `,
+            )
+            .join("");
+        }
+      }
+
+      function downloadMenu() {
+        const btn = document.getElementById("btnDescargar");
+        const originalText = btn.innerHTML;
+        btn.innerHTML =
+          '<span class="material-symbols-outlined text-base animate-spin">progress_activity</span> Generando imagen HD...';
+        btn.disabled = true;
+
+        const element = document.getElementById("menu-area");
+        html2canvas(element, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          logging: false,
+          borderRadius: 48,
+        })
+          .then((canvas) => {
+            const link = document.createElement("a");
+            link.download = "Menu_Semanal_SumandoVoluntades_HD.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          })
+          .catch((err) => {
+            console.error("Error al exportar:", err);
+            alert("Ocurrió un error al generar la imagen.");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          });
+      }
+    </script>
+  </body>
+</html>

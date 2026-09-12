@@ -8,30 +8,19 @@ const crypto = require('crypto');
 const path = require('path');
 require('dotenv').config();
 
-// JWT_SECRET es obligatorio: el servidor no arranca si no esta configurado en el .env.
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim().length === 0) {
-    console.error('ERROR FATAL: falta la variable de entorno JWT_SECRET en el .env. '
-        + 'Genera un secreto fuerte (ej. "openssl rand -hex 64") y agregalo antes de iniciar el servidor.');
+    console.error('ERROR FATAL: falta la variable de entorno JWT_SECRET en el .env.');
     process.exit(1);
 }
 
 const app = express();
 
-// CORS restringido a una lista blanca explicita de origenes del frontend.
-// NOTA: el backend (este servidor) ya escucha en el puerto 3000 (ver app.listen mas abajo),
-// asi que el frontend estatico en desarrollo se sirve en el puerto 5500 (Live Server de VS
-// Code) — NO en 3000, que esta ocupado por este mismo backend. Si sirves el frontend con otra
-// herramienta/puerto, agrega aqui ese origen exacto.
-// (ej. 'https://sanctorum.vercel.app') — y quitar los origenes de localhost si ya no se
-// necesitan para desarrollo.
 const ORIGENES_PERMITIDOS = [
     'https://sumandovoluntadesensanctorum.org',
     'http://localhost:3000'
 ];
 const opcionesCors = {
     origin(origin, callback) {
-        // Sin cabecera Origin (curl, Postman, llamadas servidor-a-servidor) se permite: no es
-        // el navegador de una victima el que esta haciendo la peticion en ese caso.
         if (!origin || ORIGENES_PERMITIDOS.includes(origin)) return callback(null, true);
         callback(new Error('Origen no permitido por la politica de CORS.'));
     },
@@ -39,34 +28,14 @@ const opcionesCors = {
 app.use(cors(opcionesCors));
 app.use(express.json());
 
-// Servir archivos estáticos desde /public y permitir URLs sin extensión
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 app.use('/partials', express.static(path.join(__dirname, 'public', 'partials')));
 app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
 
-// ==========================================
-// CABECERAS DE SEGURIDAD (fallback sin helmet)
-// ==========================================
-// No se pudo instalar "helmet" (el registro de npm esta bloqueado en este entorno de trabajo),
-// asi que se agregan a mano las cabeceras equivalentes mas
-// importantes. Este servidor sirve tanto la API JSON como los archivos estaticos del
-// frontend (carpeta public/, ver express.static mas arriba), asi que estas cabeceras
-// protegen ambas cosas. El CSP de aqui incluye los CDNs que usa el frontend (Tailwind,
-// Google Fonts, cdnjs).
-// Cuando tengas acceso normal a npm, se recomienda reemplazar este bloque por "helmet".
 app.use((req, res, next) => {
-    // Evita que el navegador intente adivinar el tipo de contenido real de la respuesta
-    // (MIME sniffing), que puede convertir una respuesta JSON en HTML/JS ejecutable.
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    // Evita que esta API (o cualquier HTML que llegue a servir) se cargue dentro de un
-    // <iframe> de otro sitio (clickjacking).
     res.setHeader('X-Frame-Options', 'DENY');
-    // Fuerza HTTPS en el navegador durante 1 año, incluyendo subdominios. Solo tiene efecto
-    // real cuando el sitio ya se sirve por HTTPS (como en Render/Vercel en produccion).
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-    // Content-Security-Policy: permite los CDNs que usa el frontend (Tailwind Play CDN,
-    // cdnjs, Google Fonts) y Cloudinary (subida/consulta de archivos), bloqueando todo lo
-    // demas por defecto.
     res.setHeader('Content-Security-Policy', [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com",
@@ -79,27 +48,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// ==========================================
-// RATE LIMITING MANUAL (sin dependencias externas)
-// ==========================================
-// Limita los intentos a /api/auth/login, /api/auth/recuperar y /api/auth/cambiar-password
-// contra fuerza bruta, y al resto de la API contra abuso/scraping automatizado. Limitador
-// en memoria (un Map por IP con ventana fija), sin depender de una libreria externa.
-// LIMITACIONES CONOCIDAS de este fallback (documentadas a proposito):
-//  - Es por-proceso: si corres varias instancias del servidor (o un balanceador con multiples
-//    workers), cada una lleva su propio conteo — no es un limite global real.
-//  - Se reinicia a cero cada vez que el servidor reinicia.
-//  - req.ip refleja la IP del cliente directo; si el servidor corre detras de un proxy/balanceador
-//    (Vercel, Nginx, etc.) hay que configurar `app.set('trust proxy', ...)` acorde a tu topologia
-//    real para que req.ip sea la IP real del visitante y no la del proxy (no lo activamos aqui
-//    por defecto porque, mal configurado, un atacante podria falsear esa cabecera y saltarse
-//    el limite por completo).
-// Si en el futuro se quiere una libreria dedicada, express-rate-limit es la opcion estandar
-// (y, si algun dia corres varias instancias, conviene un store compartido como Redis).
 function crearLimitador({ ventanaMs, maxIntentos, mensaje }) {
-    const intentosPorIp = new Map(); // ip -> { count, resetAt }
-
-    // Limpieza periodica para no acumular memoria indefinidamente con IPs viejas.
+    const intentosPorIp = new Map();
     const limpieza = setInterval(() => {
         const ahora = Date.now();
         for (const [ip, datos] of intentosPorIp.entries()) {
@@ -125,14 +75,11 @@ function crearLimitador({ ventanaMs, maxIntentos, mensaje }) {
     };
 }
 
-// Regla estricta para autenticacion: 5 intentos por minuto por IP.
 const limitadorAuth = crearLimitador({
     ventanaMs: 60 * 1000,
     maxIntentos: 5,
     mensaje: 'Demasiados intentos. Espera un minuto antes de volver a intentar.'
 });
-// Regla laxa para el resto de la API: 200 solicitudes por minuto por IP (suficiente para
-// paneles que disparan varias peticiones en paralelo al cargar, pero corta abuso/scraping).
 const limitadorGeneral = crearLimitador({
     ventanaMs: 60 * 1000,
     maxIntentos: 200,
@@ -152,13 +99,6 @@ const transporter = nodemailer.createTransport({
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
-// Si en "Material a utilizar" se escogió "Otro: escribir...", se da de alta un Insumo nuevo
-// (con el stock inicial igual a lo que se va a usar, para que quede en 0 tras el consumo) en
-// vez de fallar por no existir en el catálogo. Si ya viene un id de insumo real, se usa tal cual.
-// Valida que las URLs de archivos (foto de perfil, documento profesional, comprobante de
-// donativo, imagen de evento/galeria, documento de consentimiento) vengan de Cloudinary antes
-// de guardarlas — el frontend las renderiza tal cual en <a href> / <img src>. Se acepta un
-// valor vacio/nulo, o uno que empiece exactamente con "https://res.cloudinary.com/".
 const PREFIJO_URL_CLOUDINARY = 'https://res.cloudinary.com/';
 function validarUrlCloudinaria(valor, nombreCampo) {
     if (valor === undefined || valor === null || valor === '') return { ok: true, valor: null };
@@ -166,18 +106,11 @@ function validarUrlCloudinaria(valor, nombreCampo) {
     return { ok: false, mensaje: `${nombreCampo} debe ser una URL de Cloudinary válida (empezar con ${PREFIJO_URL_CLOUDINARY}).` };
 }
 
-// Valida el formato del correo del remitente en POST /api/solicitudes (buzón público, sin
-// autenticación) antes de usarlo en el "to:" de nodemailer, que separa direcciones por coma
-// en un string de "to". Es una validación simple a propósito (no intenta ser 100% RFC 5322):
-// solo rechaza lo que permitiría inyectar más de un destinatario o caracteres de control.
 const FORMATO_CORREO_SIMPLE = /^[^\s,;<>]+@[^\s,;<>]+\.[^\s,;<>]+$/;
 function validarFormatoCorreo(valor) {
     return typeof valor === 'string' && FORMATO_CORREO_SIMPLE.test(valor.trim());
 }
 
-// Escapa HTML antes de interpolar texto libre (Solicitudes_Web: nombre, teléfono, mensaje)
-// en los correos que arma este archivo (confirmación de solicitud, aviso al staff, etc.),
-// ya que ese texto puede venir de un formulario público sin autenticación.
 function escapeHtmlServidor(valor) {
     return String(valor ?? '')
         .replace(/&/g, '&amp;')
@@ -187,9 +120,6 @@ function escapeHtmlServidor(valor) {
         .replace(/'/g, '&#39;');
 }
 
-// Resuelve el id_insumo a usar en un evento: si el item ya trae un id real se usa tal cual;
-// si en cambio viene "otro" con nombre_otro (opción "Otro: escribir..." del formulario), se da
-// de alta un Insumo nuevo con stock inicial igual a la cantidad a usar (queda en 0 tras el consumo).
 async function resolverIdInsumoParaEvento(cliente, item) {
     if (item.id && item.id !== 'otro') return item.id;
     if (!item.nombre_otro || !item.nombre_otro.trim()) return null;
@@ -201,10 +131,6 @@ async function resolverIdInsumoParaEvento(cliente, item) {
     return nuevo.rows[0].id_insumo;
 }
 
-// Plantilla HTML compartida por todos los correos salientes (login, recuperación, aprobación,
-// avisos de documentos, solicitudes, etc.): envuelve el contenido específico de cada correo
-// en el mismo encabezado/pie con la identidad visual de Sanctorum A.C.
-// Plantilla HTML visual de alta compatibilidad para todos los correos salientes
 const emailTemplate = (titulo, contenido, subtitulo = "Construyendo comunidad paso a paso") => `
 <!DOCTYPE html>
 <html lang="es">
@@ -217,22 +143,15 @@ const emailTemplate = (titulo, contenido, subtitulo = "Construyendo comunidad pa
   <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
       <td align="center">
-        <!-- Tarjeta Principal -->
         <table role="presentation" style="max-width: 480px; width: 100%; background-color: #ffffff; border-radius: 28px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1);" border="0" cellspacing="0" cellpadding="0">
-          
-          <!-- Barra Superior Degradada Institucional -->
           <tr>
             <td style="height: 8px; width: 100%; background: linear-gradient(90deg, #e6007e 0%, #f39200 50%, #43b02a 75%, #0072ce 100%);"></td>
           </tr>
-
-          <!-- Cabecera con Logo Institucional -->
           <tr>
             <td align="center" style="padding: 32px 24px 16px 24px; background: linear-gradient(180deg, #fdf2f7 0%, #fff8f0 40%, #ffffff 100%); border-bottom: 1px solid #f1f5f9;">
               <img src="https://sumandovoluntadesensanctorum.org/assets/Logo.png" alt="Sumando Voluntades en Sanctórum A.C." style="max-width: 190px; width: 100%; height: auto; display: block; margin: 0 auto 12px auto;" />
             </td>
           </tr>
-
-          <!-- Título y Subtítulo de la Notificación -->
           <tr>
             <td align="center" style="padding: 24px 28px 8px 28px;">
               <h2 style="margin: 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.25;">
@@ -243,15 +162,11 @@ const emailTemplate = (titulo, contenido, subtitulo = "Construyendo comunidad pa
               </p>
             </td>
           </tr>
-
-          <!-- Contenido Dinámico del Mensaje -->
           <tr>
             <td style="padding: 16px 28px 24px 28px; font-size: 14px; line-height: 1.6; color: #334155;">
               ${contenido}
             </td>
           </tr>
-
-          <!-- Botón de Acción Principal al Sitio -->
           <tr>
             <td align="center" style="padding: 0 28px 28px 28px;">
               <a href="https://sumandovoluntadesensanctorum.org" target="_blank" style="display: block; width: 100%; max-width: 320px; box-sizing: border-box; background: linear-gradient(90deg, #e6007e 0%, #b50062 100%); color: #ffffff; text-decoration: none; padding: 14px 24px; border-radius: 9999px; font-weight: 700; font-size: 13px; text-align: center; box-shadow: 0 4px 14px rgba(230, 0, 126, 0.3);">
@@ -259,8 +174,6 @@ const emailTemplate = (titulo, contenido, subtitulo = "Construyendo comunidad pa
               </a>
             </td>
           </tr>
-
-          <!-- Lema y Firma Oficial -->
           <tr>
             <td align="center" style="padding: 20px 28px; border-top: 1px solid #f1f5f9; background-color: #fafaf9;">
               <p style="margin: 0; font-size: 14px; font-weight: 700; font-style: italic; color: #b50062;">
@@ -274,8 +187,6 @@ const emailTemplate = (titulo, contenido, subtitulo = "Construyendo comunidad pa
               </p>
             </td>
           </tr>
-
-          <!-- Pie Institucional -->
           <tr>
             <td align="center" style="padding: 20px 24px; background-color: #0b1120; color: #94a3b8; font-size: 11px; line-height: 1.5;">
               <p style="margin: 0 0 8px 0; color: #cbd5e1;">
@@ -286,7 +197,6 @@ const emailTemplate = (titulo, contenido, subtitulo = "Construyendo comunidad pa
               </p>
             </td>
           </tr>
-
         </table>
       </td>
     </tr>
@@ -295,15 +205,6 @@ const emailTemplate = (titulo, contenido, subtitulo = "Construyendo comunidad pa
 </html>
 `;
 
-// ==========================================
-// MÓDULO DE AUTENTICACIÓN Y SEGURIDAD
-// ==========================================
-
-// Mismo mensaje generico y mismo codigo de estado tanto si el correo no existe como si la
-// contraseña es incorrecta, para no permitir enumerar correos registrados. El estatus de la
-// cuenta (Inactivo / en revision) solo se revela DESPUES de una contraseña valida. El
-// bcrypt.compare "señuelo" cuando el correo no existe evita ademas que el tiempo de
-// respuesta delate por temporizacion si el correo esta registrado o no.
 const HASH_SEÑUELO_TIMING = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
 app.post('/api/auth/login', async (req, res) => {
     const { correo, contraseña } = req.body;
@@ -330,12 +231,6 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// ==========================================
-// MIDDLEWARE DE AUTENTICACIÓN Y RESTRICCIONES POR ROL (RBAC)
-// ==========================================
-// Verifica de verdad la firma del token (no solo lo decodifica) y adjunta el usuario
-// autenticado a req.usuario. Los endpoints protegidos requieren el header:
-//   Authorization: Bearer <token>
 function verificarToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -343,36 +238,26 @@ function verificarToken(req, res, next) {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, usuario) => {
         if (err) return res.status(403).json({ success: false, message: 'Token inválido o expirado. Vuelve a iniciar sesión.' });
-        req.usuario = usuario; // { id, rol, nombre, correo, especialidad }
+        req.usuario = usuario;
         next();
     });
 }
 
-// Roles: 1=Admin, 2=Especialista, 3=Coordinador, 4=Voluntario, 5=Donador
 const ROL_ADMIN = 1, ROL_ESPECIALISTA = 2, ROL_COORDINADOR = 3, ROL_VOLUNTARIO = 4;
 
-// Un Especialista (rol 2) se considera "psicólogo" solo si su campo especialidad contiene
-// "psic" (comparación insensible a mayúsculas/minúsculas). Se usa para dar acceso clínico
-// especial (expedientes, citas) distinto al de otros Especialistas (maestros, trabajo social, etc.).
 function esPsicologo(usuario) {
     return usuario.rol === ROL_ESPECIALISTA && (usuario.especialidad || '').toLowerCase().includes('psic');
 }
 
-// Publicar/editar una Historia de Éxito requiere criterio clínico o de coordinación sobre
-// qué se comparte de un beneficiario: solo Admin, Coordinador o un Especialista que sea
-// psicólogo pueden hacerlo. Un Voluntario o un Especialista de otra área no pueden.
 function puedePublicarHistoria(usuario) {
     return usuario.rol === ROL_ADMIN || usuario.rol === ROL_COORDINADOR || esPsicologo(usuario);
 }
 
-// Especialistas y Coordinadores deben validar su documento profesional antes de tener
-// acceso completo; Admin, Voluntario y Donador quedan exentos ("No Aplica").
 function estatusDocPorRol(idRol) {
     const rolNum = parseInt(idRol, 10);
     return (rolNum === ROL_ESPECIALISTA || rolNum === ROL_COORDINADOR) ? 'Pendiente' : 'No Aplica';
 }
 
-// Exige que el rol del usuario autenticado esté en la lista permitida.
 function requiereRol(...rolesPermitidos) {
     return (req, res, next) => {
         if (!req.usuario || !rolesPermitidos.includes(req.usuario.rol)) {
@@ -382,29 +267,6 @@ function requiereRol(...rolesPermitidos) {
     };
 }
 
-// Exige que, si el usuario no es Admin, su req.usuario.id coincida con el id_especialista
-// asignado al beneficiario del :id de la ruta — un Especialista solo puede leer/editar el
-// expediente clinico de sus propios pacientes.
-async function verificarOwnershipExpediente(req, res, next) {
-    if (req.usuario && req.usuario.rol === ROL_ADMIN) return next();
-    try {
-        const result = await pool.query('SELECT id_especialista FROM Beneficiarios WHERE id_beneficiario = $1', [req.params.id]);
-        if (result.rows.length === 0) return res.status(404).json({ success: false, message: 'Expediente no encontrado.' });
-        const idEspecialistaAsignado = result.rows[0].id_especialista;
-        if (idEspecialistaAsignado === null || Number(idEspecialistaAsignado) !== Number(req.usuario.id)) {
-            return res.status(403).json({ success: false, message: 'No tienes permiso para acceder a este expediente.' });
-        }
-        next();
-    } catch (error) {
-        console.error('Error al verificar propiedad del expediente:', error);
-        res.status(500).json({ success: false });
-    }
-}
-
-// Genera un middleware para rutas de una sola tabla que exige ser el autor original
-// (comparado por columnaAutor) o un Admin, para PUT/DELETE. Publicaciones/Historias_Exito, al
-// tener dos tablas posibles segun el body/query, resuelven esto en linea dentro del propio
-// handler en vez de usar este helper (ver mas abajo).
 function verificarAutorORol(tabla, columnaId, columnaAutor) {
     return async (req, res, next) => {
         if (req.usuario && req.usuario.rol === ROL_ADMIN) return next();
@@ -422,8 +284,6 @@ function verificarAutorORol(tabla, columnaId, columnaAutor) {
     };
 }
 
-// Responde siempre el mismo mensaje generico, exista o no la cuenta (evita enumerar correos
-// registrados); el envio real de correo solo ocurre por dentro si existe.
 const MENSAJE_RECUPERAR_GENERICO = { success: true, message: 'Si el correo está registrado, en unos minutos llegarán las instrucciones para recuperar el acceso.' };
 app.post('/api/auth/recuperar', async (req, res) => {
     const { correo } = req.body;
@@ -439,7 +299,6 @@ app.post('/api/auth/recuperar', async (req, res) => {
 
         const contenidoCorreo = `<p>Hola <b>${voluntario.nombre_completo}</b>,</p><p>Tu nueva contraseña temporal es: <span style="background: #ffd9e2; padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 16px;">${tempPassword}</span></p><p>Cámbiala inmediatamente al iniciar sesión.</p>`;
         
-        // Enviamos el correo
         await transporter.sendMail({ 
             from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`, 
             to: correo, 
@@ -449,13 +308,11 @@ app.post('/api/auth/recuperar', async (req, res) => {
 
         res.json(MENSAJE_RECUPERAR_GENERICO);
     } catch (err) { 
-        console.error("ERROR DE GMAIL AL RECUPERAR:", err); // <-- Esto te dirá el error exacto en tu terminal
+        console.error("ERROR DE GMAIL AL RECUPERAR:", err);
         res.status(500).json({ success: false }); 
     }
 });
 
-// Requiere sesion valida; la identidad SIEMPRE sale del token firmado (req.usuario.id),
-// ignorando por completo cualquier "correo" que venga en el body.
 app.put('/api/auth/cambiar-password', verificarToken, async (req, res) => {
     const { password_actual, password_nueva } = req.body;
     try {
@@ -474,17 +331,6 @@ app.put('/api/auth/cambiar-password', verificarToken, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false }); }
 });
 
-// ==========================================
-// MÓDULO DE VOLUNTARIADO Y DONADORES
-// ==========================================
-
-// 1. REGISTRAR NUEVO USUARIO (Con correo de confirmación de recibido)
-// Ruta publica (autorregistro de voluntarios/donadores desde como_ayudar), tambien usada por
-// el panel de Admin para dar de alta Coordinadores/Especialistas (voluntariado). Solo un
-// Admin/Coordinador con sesion valida puede pedir un rol de staff (2=Especialista,
-// 3=Coordinador); cualquier otro caso (publico, anonimo, o rol invalido) siempre cae a
-// Voluntario (4), salvo que pida explicitamente Donador (5). Nunca se permite crear un Admin
-// (1) por esta via, ni siquiera autenticado.
 app.post('/api/usuarios', async (req, res) => {
     const { nombre_completo, correo, telefono, especialidad, material, cantidad } = req.body;
     const usuarioSolicitante = usuarioOpcionalDesdeToken(req);
@@ -507,13 +353,10 @@ app.post('/api/usuarios', async (req, res) => {
             [nombre_completo, correo, telefono, especialidad, placeholderHash, id_rol, material, cantidad, estatusDocPorRol(id_rol)]
         );
 
-        // NUEVO: Correo automático avisando que su solicitud está en revisión
-        // Notificación de recepción con tarjeta de estado
         const contenidoRegistro = `
             <p style="margin-top: 0; font-size: 15px;">Hola <strong style="color: #b50062;">${escapeHtmlServidor(nombre_completo)}</strong>,</p>
             <p>Hemos recibido con entusiasmo tu solicitud para formar parte de <strong>Sumando Voluntades Sanctórum</strong>. Nos alegra profundamente contar con personas comprometidas y dispuestas a aportar su energía a nuestras causas sociales.</p>
             
-            <!-- Tarjeta de Estado de Solicitud -->
             <div style="margin: 20px 0; padding: 16px; border-radius: 16px; background-color: #fffbeb; border: 1px solid #fde68a;">
               <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
@@ -551,16 +394,13 @@ app.post('/api/usuarios', async (req, res) => {
 
         res.status(201).json({ success: true });
     } catch (error) { 
-        console.error("ERROR DE GMAIL AL REGISTRAR:", error); // <-- Te avisará si Google bloquea el envío
+        console.error("ERROR DE GMAIL AL REGISTRAR:", error);
         res.status(500).json({ success: false }); 
     }
 });
 
-// 2. OBTENER PARA EL KANBAN (Agregamos el Rol 5 y las nuevas columnas)
 app.get('/api/voluntarios', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
-        // El Admin ve también a los Coordinadores en este listado (antes se excluían por error).
-        // Un Coordinador que consulta esta vista no ve a otros Coordinadores, solo Voluntarios/Especialistas/Donadores.
         const incluirCoordinadores = req.usuario.rol === ROL_ADMIN;
         const filtroRoles = incluirCoordinadores ? '(u.id_rol = 4 OR u.id_rol = 2 OR u.id_rol = 5 OR u.id_rol = 3)' : '(u.id_rol = 4 OR u.id_rol = 2 OR u.id_rol = 5)';
         const query = `
@@ -575,7 +415,6 @@ app.get('/api/voluntarios', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINAD
     } catch (error) { res.status(500).json({ success: false }); }
 });
 
-// Catálogo simple de eventos (excluyendo Entrevistas) para poblar selects del frontend.
 app.get('/api/proyectos', async (req, res) => {
     try {
         const result = await pool.query("SELECT id_evento, titulo_evento FROM Eventos WHERE tipo_evento != 'Entrevista' ORDER BY fecha_realizacion DESC");
@@ -590,22 +429,17 @@ app.get('/api/beneficiarios', verificarToken, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false }); }
 });
 
-// Agenda (o reagenda) la entrevista de un aspirante: crea un Evento tipo 'Entrevista', marca
-// al usuario con estatus 'Entrevista' y le envía por correo la fecha/hora/link de la videollamada.
 app.post('/api/entrevistas', async (req, res) => {
     const { id_usuario, correo, nombre, fecha, hora, link } = req.body;
     try {
-        // 1. Verificamos si es primera vez o si es reagendada
         const userRes = await pool.query('SELECT estatus FROM Usuarios WHERE id_usuario = $1', [id_usuario]);
         const estatusActual = userRes.rows.length > 0 ? userRes.rows[0].estatus : 'Nuevo';
         const esReagendada = (estatusActual === 'Entrevista');
 
-        // 2. Guardamos en Base de Datos
         const fecha_timestamp = `${fecha} ${hora}:00`;
         await pool.query("INSERT INTO Eventos (titulo_evento, tipo_evento, fecha_realizacion) VALUES ($1, 'Entrevista', $2)", [`Entrevista - ${nombre}`, fecha_timestamp]);
         await pool.query("UPDATE Usuarios SET estatus = 'Entrevista' WHERE id_usuario = $1", [id_usuario]);
 
-        // 3. Preparamos el contenido del correo dinámicamente
         const tituloCorreo = esReagendada ? 'Actualización de Entrevista' : 'Entrevista Programada';
         const textoIntro = esReagendada 
             ? `<p>Hola <b>${nombre}</b>,</p><p>Tu entrevista para unirte a Sanctorum A.C. ha sido <b>reagendada</b> exitosamente.</p>`
@@ -623,7 +457,6 @@ app.post('/api/entrevistas', async (req, res) => {
             <p style="font-style: italic; color: #877362; text-align: center; margin-top: 30px;">"Sumando Voluntades"</p>
         `;
 
-        // 4. Enviamos el correo
         await transporter.sendMail({
             from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
             to: correo,
@@ -638,8 +471,6 @@ app.post('/api/entrevistas', async (req, res) => {
     }
 });
 
-// 3. APROBAR OFICIALMENTE (Y ENVIAR CREDENCIALES)
-// Activa la cuenta, fija id_rol y genera + envia una contraseña temporal.
 app.put('/api/voluntarios/:id/asignar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { id_proyecto, id_rol, especialidad, material, cantidad } = req.body;
     const { id } = req.params;
@@ -655,11 +486,10 @@ app.put('/api/voluntarios/:id/asignar', verificarToken, requiereRol(ROL_ADMIN, R
             [hashedPassword, id_rol, especialidad, material, cantidad, estatusDocPorRol(id_rol), id]
         );
         
-        if (id_proyecto && id_proyecto !== "0" && id_rol !== 5) { // Si es donador no se le asigna evento físico
+        if (id_proyecto && id_proyecto !== "0" && id_rol !== 5) {
             await pool.query("INSERT INTO Participacion (id_evento, id_usuario, horas_invertidas) VALUES ($1, $2, 0)", [id_proyecto, id]);
         }
 
-        // ¡EL CÓDIGO DEL CORREO QUE FALTABA!
         const contenidoCorreo = `
             <p>Hola <b>${voluntario.nombre_completo}</b>,</p>
             <p>Nos emociona informarte que tu perfil ha sido aprobado. Oficialmente eres parte de la familia Sanctorum.</p>
@@ -688,7 +518,6 @@ app.put('/api/voluntarios/:id/asignar', verificarToken, requiereRol(ROL_ADMIN, R
     }
 });
 
-// 4. MODIFICAR PERFIL
 app.put('/api/usuarios/:id/modificar', verificarToken, requiereRol(ROL_ADMIN), async (req, res) => {
     const { id_rol, especialidad, material, cantidad } = req.body;
     try {
@@ -700,8 +529,6 @@ app.put('/api/usuarios/:id/modificar', verificarToken, requiereRol(ROL_ADMIN), a
     } catch (e) { res.status(500).json({ success: false }); }
 });
 
-// Historial de donaciones en especie de un usuario (Donador). Es un registro ACUMULATIVO:
-// cada llamada agrega una entrada nueva, nunca sobreescribe las anteriores.
 app.get('/api/usuarios/:id/donaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query(
@@ -715,8 +542,6 @@ app.get('/api/usuarios/:id/donaciones', verificarToken, requiereRol(ROL_ADMIN, R
     }
 });
 
-// Agrega una entrada nueva al historial acumulativo de donaciones en especie de un usuario
-// (nunca sobreescribe las anteriores).
 app.post('/api/usuarios/:id/donaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { material, cantidad, unidad } = req.body;
     if (!material || !cantidad) return res.status(400).json({ success: false, message: 'Material y cantidad son obligatorios.' });
@@ -760,18 +585,6 @@ app.put('/api/usuarios/:id/reactivar', verificarToken, requiereRol(ROL_ADMIN, RO
     } catch (error) { res.status(500).json({ success: false }); }
 });
 
-// ==========================================
-// MÓDULO DE PERFIL DE USUARIO (Bloque 1 - Misión 1.5)
-// NOTA: requiere las columnas foto_perfil_url y documento_profesional_url en Usuarios.
-// Si tu base de datos aún no las tiene, ejecuta primero en Supabase:
-//   ALTER TABLE Usuarios ADD COLUMN foto_perfil_url TEXT;
-//   ALTER TABLE Usuarios ADD COLUMN documento_profesional_url TEXT;
-// ==========================================
-
-// NOTA: esta ruta específica va ANTES de '/api/usuarios/:id' — si fuera después,
-// Express interpretaría 'pendientes_revision' como el parámetro :id y esta ruta
-// nunca se ejecutaría (ese era el bug: el panel de Perfil siempre mostraba vacío).
-// 4c. Lista de documentos pendientes de revisión (para Admin/Coordinador)
 app.get('/api/usuarios/pendientes_revision', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query(`
@@ -787,7 +600,6 @@ app.get('/api/usuarios/pendientes_revision', verificarToken, requiereRol(ROL_ADM
     }
 });
 
-// 1. Obtener el perfil completo de un usuario (datos reales de la BD, no solo lo que trae el JWT)
 app.get('/api/usuarios/:id', verificarToken, async (req, res) => {
     const idNum = parseInt(req.params.id, 10);
     if (isNaN(idNum)) return res.status(400).json({ success: false, message: 'ID de usuario inválido.' });
@@ -813,8 +625,6 @@ app.get('/api/usuarios/:id', verificarToken, async (req, res) => {
     }
 });
 
-// 2. Actualizar datos básicos editables del perfil (nombre / correo / teléfono / especialidad / biografía)
-// Solo el dueño de la cuenta (o un Admin) puede editar estos datos — ver el chequeo mas abajo.
 app.put('/api/usuarios/:id/perfil', verificarToken, async (req, res) => {
     const idObjetivo = parseInt(req.params.id, 10);
     if (req.usuario.rol !== ROL_ADMIN && req.usuario.id !== idObjetivo) {
@@ -846,7 +656,6 @@ app.put('/api/usuarios/:id/perfil', verificarToken, async (req, res) => {
     }
 });
 
-// 3. Guardar la URL de la foto de perfil (la subida física a Cloudinary ya ocurrió en el frontend)
 app.put('/api/usuarios/:id/foto', verificarToken, async (req, res) => {
     const idObjetivoFoto = parseInt(req.params.id, 10);
     if (req.usuario.rol !== ROL_ADMIN && req.usuario.id !== idObjetivoFoto) {
@@ -865,7 +674,6 @@ app.put('/api/usuarios/:id/foto', verificarToken, async (req, res) => {
     }
 });
 
-// 4. Guardar la URL del documento profesional (cédula / certificado) — solo aplica a Especialistas (id_rol = 2)
 app.put('/api/usuarios/:id/documento_profesional', verificarToken, async (req, res) => {
     const idObjetivoDoc = parseInt(req.params.id, 10);
     if (req.usuario.rol !== ROL_ADMIN && req.usuario.id !== idObjetivoDoc) {
@@ -888,7 +696,6 @@ app.put('/api/usuarios/:id/documento_profesional', verificarToken, async (req, r
             [chkDoc.valor, req.params.id]
         );
 
-        // Avisamos a Admin y Coordinadores que hay un documento nuevo por revisar.
         try {
             const revisores = await pool.query(
                 "SELECT correo FROM Usuarios WHERE id_rol IN (1, 3) AND correo IS NOT NULL AND COALESCE(estatus,'Activo') != 'Inactivo'"
@@ -900,9 +707,6 @@ app.put('/api/usuarios/:id/documento_profesional', verificarToken, async (req, r
                     <p><b>${usuarioDoc.nombre_completo}</b> subió su documento profesional y está esperando revisión.</p>
                     <p>Entra a tu Perfil dentro de la plataforma para aprobarlo o rechazarlo.</p>
                 `;
-                // Nota: si el correo de Admin/Coordinador en la base de datos todavía es un
-                // valor de prueba (ej. Admin@Admin.com), el aviso rebotará aunque el envío
-                // en sí funcione — hay que actualizar ese correo real desde Perfil.
                 console.log(`Aviso de documento pendiente enviado a: ${correos.join(', ')}`);
                 await transporter.sendMail({
                     from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
@@ -910,8 +714,6 @@ app.put('/api/usuarios/:id/documento_profesional', verificarToken, async (req, r
                     subject: 'Documento profesional pendiente de revisión - Sanctorum A.C.',
                     html: emailTemplate('Nuevo documento por revisar', contenidoAviso)
                 });
-            } else {
-                console.log('Aviso de documento pendiente: no hay ningún Admin/Coordinador con correo registrado, no se envió nada.');
             }
         } catch (mailErr) {
             console.error("No se pudo enviar el aviso de documento pendiente:", mailErr);
@@ -924,9 +726,8 @@ app.put('/api/usuarios/:id/documento_profesional', verificarToken, async (req, r
     }
 });
 
-// 4b. Revisar (aprobar/rechazar) el documento profesional — solo Admin/Coordinador
 app.put('/api/usuarios/:id/documento_profesional/revisar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
-    const { estatus } = req.body; // 'Aprobado' | 'Rechazado'
+    const { estatus } = req.body;
     if (!['Aprobado', 'Rechazado'].includes(estatus)) {
         return res.status(400).json({ success: false, message: 'Estatus inválido.' });
     }
@@ -960,14 +761,6 @@ app.put('/api/usuarios/:id/documento_profesional/revisar', verificarToken, requi
     }
 });
 
-// Configuración pública para subidas de archivos (Cloudinary usa "unsigned upload",
-// por diseño el cloud_name y el upload_preset SON públicos — no son secretos como
-// una API key. Así el frontend nunca necesita hardcodearlos, solo lee esto una vez.
-// ==========================================
-// MÓDULO: GALERÍA DE IMÁGENES MÚLTIPLES (eventos, noticias, murales)
-// Permite que una noticia/evento tenga varias fotos, mostradas como carrusel
-// tipo "historia" en evento_detalle.
-// ==========================================
 app.get('/api/galeria/:tipo/:id', async (req, res) => {
     const { tipo, id } = req.params;
     if (tipo !== 'noticia' && tipo !== 'evento') return res.status(400).json({ success: false, message: 'Tipo inválido.' });
@@ -983,9 +776,6 @@ app.get('/api/galeria/:tipo/:id', async (req, res) => {
     }
 });
 
-// Agrega una imagen a la galería de una noticia/evento (entidad polimórfica: tipo_entidad +
-// id_entidad identifican a qué pertenece). La subida física a Cloudinary ya ocurrió en el
-// frontend; aquí solo se valida y guarda la URL resultante.
 app.post('/api/galeria', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     const { tipo_entidad, id_entidad, url_imagen, orden } = req.body;
     if (!tipo_entidad || !id_entidad || !url_imagen) return res.status(400).json({ success: false, message: 'Faltan datos.' });
@@ -1003,7 +793,6 @@ app.post('/api/galeria', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA
     }
 });
 
-// Elimina una imagen puntual de la galería por su id.
 app.delete('/api/galeria/:id_imagen', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Galeria_Imagenes WHERE id_imagen = $1', [req.params.id_imagen]);
@@ -1015,8 +804,6 @@ app.delete('/api/galeria/:id_imagen', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
-// Expone el cloud_name y upload_preset de Cloudinary al frontend. No son secretos: al usar
-// "unsigned upload" son valores públicos por diseño, así el frontend nunca los hardcodea.
 app.get('/api/config/cloudinary', (req, res) => {
     res.json({
         success: true,
@@ -1025,11 +812,6 @@ app.get('/api/config/cloudinary', (req, res) => {
     });
 });
 
-// ==========================================
-// MÓDULO DE INVENTARIO
-// ==========================================
-
-// 1. OBTENER TODOS LOS INSUMOS
 app.get('/api/insumos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM Insumos ORDER BY id_insumo DESC');
@@ -1040,7 +822,6 @@ app.get('/api/insumos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR),
     }
 });
 
-// 2. REGISTRAR NUEVO INSUMO
 app.post('/api/insumos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { nombre_insumo, unidad_medida, stock_actual, punto_reorden, costo_unitario, area_proyecto } = req.body;
     try {
@@ -1056,7 +837,6 @@ app.post('/api/insumos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR)
     }
 });
 
-// 3. MODIFICAR INSUMO EXISTENTE
 app.put('/api/insumos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { nombre_insumo, unidad_medida, stock_actual, punto_reorden, costo_unitario, area_proyecto } = req.body;
     try {
@@ -1073,22 +853,17 @@ app.put('/api/insumos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINAD
     }
 });
 
-// 4. ELIMINAR INSUMO
 app.delete('/api/insumos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Insumos WHERE id_insumo = $1', [req.params.id]);
         if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'Insumo no encontrado.' });
         res.json({ success: true });
     } catch (error) {
-        // Si el insumo ya fue usado en algún evento (Consumo_Insumos), la FK impide borrarlo.
         console.error("Error al eliminar insumo:", error);
         res.status(409).json({ success: false, message: 'No se puede eliminar: el insumo ya tiene movimientos registrados en eventos.' });
     }
 });
 
-// ==========================================
-// MÓDULO DE ACTIVOS FIJOS (equipo físico de la AC: cámaras, proyectores, etc.)
-// ==========================================
 app.get('/api/activos_fijos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query(`
@@ -1105,7 +880,6 @@ app.get('/api/activos_fijos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDIN
     }
 });
 
-// Registra un nuevo activo fijo (equipo físico) en el inventario.
 app.post('/api/activos_fijos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { nombre_equipo, estado_actual, ubicacion, id_responsable } = req.body;
     if (!nombre_equipo) return res.status(400).json({ success: false, message: 'El nombre del equipo es obligatorio.' });
@@ -1121,7 +895,6 @@ app.post('/api/activos_fijos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDI
     }
 });
 
-// Actualiza los datos de un activo fijo existente.
 app.put('/api/activos_fijos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { nombre_equipo, estado_actual, ubicacion, id_responsable } = req.body;
     try {
@@ -1137,7 +910,6 @@ app.put('/api/activos_fijos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COO
     }
 });
 
-// Elimina un activo fijo por id.
 app.delete('/api/activos_fijos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Activos_Fijos WHERE id_activo = $1', [req.params.id]);
@@ -1149,10 +921,6 @@ app.delete('/api/activos_fijos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_
     }
 });
 
-// ==========================================
-// MÓDULO DE ALIADOS Y DONATIVOS (Contactos_Externos + Donaciones monetarias/en especie
-// ligadas a un aliado externo — alimenta /api/transparencia en el sitio público)
-// ==========================================
 app.get('/api/aliados', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query(`
@@ -1169,7 +937,6 @@ app.get('/api/aliados', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR),
     }
 });
 
-// Da de alta un nuevo aliado/contacto externo (Contactos_Externos).
 app.post('/api/aliados', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { nombre_aliado, tipo_aliado, especialidad, id_usuario_enlace } = req.body;
     if (!nombre_aliado) return res.status(400).json({ success: false, message: 'El nombre del aliado es obligatorio.' });
@@ -1185,7 +952,6 @@ app.post('/api/aliados', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR)
     }
 });
 
-// Actualiza los datos de un aliado existente.
 app.put('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { nombre_aliado, tipo_aliado, especialidad, id_usuario_enlace } = req.body;
     try {
@@ -1201,7 +967,6 @@ app.put('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINAD
     }
 });
 
-// Elimina un aliado. Falla con 409 si ya tiene donativos ligados (restricción de FK).
 app.delete('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Contactos_Externos WHERE id_contacto = $1', [req.params.id]);
@@ -1213,8 +978,6 @@ app.delete('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDI
     }
 });
 
-// Lista todos los donativos (monetarios o en especie) con el nombre del aliado y, si aplica,
-// del insumo relacionado.
 app.get('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query(`
@@ -1232,8 +995,6 @@ app.get('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR
     }
 });
 
-// Registra un donativo ligado a un aliado externo. Si el insumo donado no existe en catálogo
-// (opción "Otro: escribir"), lo da de alta con stock inicial 0 antes de insertar el donativo.
 app.post('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { id_contacto, contacto_nuevo, id_insumo, insumo_nuevo, monto, metodo_pago, categoria_gasto, comprobante_url, fecha_donacion } = req.body;
     if ((!id_contacto && !(contacto_nuevo && contacto_nuevo.trim())) || !monto) {
@@ -1242,12 +1003,6 @@ app.post('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADO
     const chkComprobante = validarUrlCloudinaria(comprobante_url, 'comprobante_url');
     if (!chkComprobante.ok) return res.status(400).json({ success: false, message: chkComprobante.mensaje });
     try {
-        // Igual que con insumo_nuevo: si el donativo trae un contacto que todavía no está
-        // registrado como Aliado (opción "Otro: escribir..." — por ejemplo, un donante
-        // individual que llegó por el formulario público de "Donación en Especie"), se da
-        // de alta en Contactos_Externos al vuelo. Nota: esa tabla no tiene columnas de
-        // correo/teléfono — solo nombre y tipo — así que esos datos del donante (si venían
-        // de una solicitud web) no quedan guardados aquí, solo el nombre.
         let idContactoFinal = id_contacto || null;
         if (!idContactoFinal && contacto_nuevo && contacto_nuevo.trim()) {
             const nuevoContacto = await pool.query(
@@ -1256,8 +1011,6 @@ app.post('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADO
             );
             idContactoFinal = nuevoContacto.rows[0].id_contacto;
         }
-        // Si el donativo trae un insumo que no está en catálogo (opción "Otro: escribir"),
-        // se da de alta como un Insumo nuevo (stock inicial 0) para que quede en Inventario.
         let idInsumoFinal = id_insumo || null;
         if (!idInsumoFinal && insumo_nuevo && insumo_nuevo.trim()) {
             const nuevo = await pool.query(
@@ -1279,7 +1032,6 @@ app.post('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADO
     }
 });
 
-// Elimina un donativo por id.
 app.delete('/api/donativos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Donaciones WHERE id_donacion = $1', [req.params.id]);
@@ -1291,28 +1043,17 @@ app.delete('/api/donativos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COOR
     }
 });
 
-// ==========================================
-// MÓDULO DE AGENDA Y EVENTOS (COMPLETO)
-// ==========================================
-
-// 1. Cargar TODOS los catálogos para el Modal
 app.get('/api/catalogos_agenda', verificarToken, async (req, res) => {
     try {
         const escuelas = await pool.query('SELECT * FROM Escuelas ORDER BY nombre_escuela ASC');
         const insumos = await pool.query('SELECT * FROM Insumos WHERE stock_actual > 0 ORDER BY nombre_insumo ASC');
         const voluntarios = await pool.query("SELECT id_usuario, nombre_completo, especialidad, id_rol FROM Usuarios WHERE estatus != 'Inactivo' ORDER BY nombre_completo ASC");
-        const beneficiarios = await pool.query('SELECT id_beneficiario, nombre_completo FROM Beneficiarios ORDER BY nombre_completo ASC');
+        const beneficiarios = await pool.query('SELECT id_beneficiario, nombre_completo, id_especialista FROM Beneficiarios ORDER BY nombre_completo ASC');
         
         res.json({ success: true, escuelas: escuelas.rows, insumos: insumos.rows, voluntarios: voluntarios.rows, beneficiarios: beneficiarios.rows });
     } catch (error) { console.error("Error catalogos:", error); res.status(500).json({ success: false }); }
 });
 
-// ==========================================
-// AGENDA: DIRECTORIO DE ESCUELAS Y PACIENTES (Misión 1.5 - restructura según Figma)
-// No se crean tablas nuevas: se reutilizan Escuelas, Beneficiarios, Agenda_Visitas y Eventos.
-// ==========================================
-
-// Directorio de escuelas (panel lateral izquierdo)
 app.get('/api/agenda/directorio_escuelas', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -1330,11 +1071,8 @@ app.get('/api/agenda/directorio_escuelas', async (req, res) => {
     }
 });
 
-// Directorio de pacientes/beneficiarios (panel lateral izquierdo)
 app.get('/api/agenda/directorio_pacientes', verificarToken, async (req, res) => {
     try {
-        // Un psicólogo solo ve a SUS pacientes; Admin y Coordinador (que no gestionan
-        // pacientes clínicos directamente, pero pueden necesitar consultar) ven todos.
         const filtrarPropios = esPsicologo(req.usuario);
         const params = [];
         let filtroWhere = '';
@@ -1345,7 +1083,7 @@ app.get('/api/agenda/directorio_pacientes', verificarToken, async (req, res) => 
 
         const result = await pool.query(`
             SELECT b.id_beneficiario, b.nombre_completo, COALESCE(b.estatus, 'ACTIVO') AS estatus,
-                   u.nombre_completo AS especialista
+                   u.nombre_completo AS especialista, b.id_especialista
             FROM Beneficiarios b
             LEFT JOIN Usuarios u ON b.id_especialista = u.id_usuario
             ${filtroWhere}
@@ -1358,7 +1096,6 @@ app.get('/api/agenda/directorio_pacientes', verificarToken, async (req, res) => 
     }
 });
 
-// Eventos/visitas relacionados a una escuela específica (panel derecho al seleccionar una escuela)
 app.get('/api/agenda/escuela/:id/eventos', async (req, res) => {
     try {
         const escuela = await pool.query('SELECT * FROM Escuelas WHERE id_escuela = $1', [req.params.id]);
@@ -1389,7 +1126,6 @@ app.get('/api/agenda/escuela/:id/eventos', async (req, res) => {
     }
 });
 
-// Citas clínicas de un paciente específico (panel derecho al seleccionar un paciente)
 app.get('/api/agenda/paciente/:id/citas', verificarToken, async (req, res) => {
     try {
         const paciente = await pool.query(`
@@ -1415,7 +1151,6 @@ app.get('/api/agenda/paciente/:id/citas', verificarToken, async (req, res) => {
     }
 });
 
-// 2. Obtener lista combinada para pintar la tabla
 app.get('/api/agenda', verificarToken, async (req, res) => {
     try {
         const u = req.usuario;
@@ -1431,24 +1166,19 @@ app.get('/api/agenda', verificarToken, async (req, res) => {
             LEFT JOIN Beneficiarios b ON ab.id_beneficiario = b.id_beneficiario
             WHERE e.tipo_evento != 'Entrevista'
         `;
-        // $1 se usa arriba para saber si el usuario actual ya está en el equipo de cada evento
-        // (botón "Unirse" en la agenda); las ramas de abajo pueden agregar más condiciones AND
-        // sin nuevos parámetros, o reemplazar esta consulta por completo (Psicólogo/Voluntario).
         const eventosParams = [u.id];
         let incluirVisitas = false;
         let filtroVisitas = '';
         const visitasParams = [];
 
         if (u.rol === ROL_ADMIN) {
-            incluirVisitas = true; // ve todo, sin filtros adicionales
+            incluirVisitas = true;
         } else if (u.rol === ROL_COORDINADOR) {
-            // Coordinador: NUNCA citas clínicas. Eventos operativos completos. Solo SUS visitas de prospección.
             eventosQuery += ` AND e.tipo_evento != 'Cita Clínica'`;
             incluirVisitas = true;
             filtroVisitas = 'WHERE av.id_usuario_creador = $1';
             visitasParams.push(u.id);
         } else if (esPsicologo(u)) {
-            // Psicólogo: SOLO sus propias citas clínicas (nada de eventos generales ni visitas).
             eventosQuery = `
                 SELECT e.id_evento as id, e.titulo_evento as titulo, e.tipo_evento as tipo, e.fecha_realizacion as fecha,
                        COALESCE(b.nombre_completo, 'Sede S.A.C.') as lugar, 'evento' as categoria,
@@ -1460,16 +1190,11 @@ app.get('/api/agenda', verificarToken, async (req, res) => {
                 LEFT JOIN Beneficiarios b ON ab.id_beneficiario = b.id_beneficiario
                 WHERE e.tipo_evento = 'Cita Clínica'
             `;
-            eventosParams.push(u.id);
             incluirVisitas = false;
         } else if (u.rol === ROL_ESPECIALISTA) {
-            // Especialista NO psicólogo (maestro, trabajador social, etc.): eventos operativos,
-            // nunca citas clínicas ni visitas de prospección.
             eventosQuery += ` AND e.tipo_evento != 'Cita Clínica'`;
             incluirVisitas = false;
         } else if (u.rol === ROL_VOLUNTARIO) {
-            // Voluntario: ve TODOS los eventos operativos (no solo los suyos), para poder
-            // "Unirse" a los que le interesen; ya_asignado indica si ya forma parte del equipo.
             eventosQuery = `
                 SELECT e.id_evento as id, e.titulo_evento as titulo, e.tipo_evento as tipo, e.fecha_realizacion as fecha,
                        COALESCE(esc.nombre_escuela, 'Sede S.A.C.') as lugar, 'evento' as categoria,
@@ -1484,7 +1209,6 @@ app.get('/api/agenda', verificarToken, async (req, res) => {
             eventosParams.push(u.id);
             incluirVisitas = false;
         } else {
-            // Cualquier otro rol (ej. Donador): sin acceso a la agenda.
             return res.json({ success: true, data: [] });
         }
 
@@ -1507,14 +1231,11 @@ app.get('/api/agenda', verificarToken, async (req, res) => {
     } catch (error) { console.error("Error agenda lista:", error); res.status(500).json({ success: false }); }
 });
 
-// 3. Crear Registro Nuevo (POST)
 app.post('/api/agenda', verificarToken, async (req, res) => {
     const { tipo_registro, datos } = req.body;
-    // RBAC: un Psicólogo únicamente puede agendar Citas Clínicas (nunca visitas ni eventos operativos).
     if (esPsicologo(req.usuario) && tipo_registro !== 'clinica') {
         return res.status(403).json({ success: false, message: 'Como Psicólogo(a) solo puedes agendar Citas Clínicas.' });
     }
-    // Valida url_imagen antes de abrir la transaccion.
     const chkUrlImagenAgendaPost = validarUrlCloudinaria(datos?.url_imagen, 'url_imagen');
     if (!chkUrlImagenAgendaPost.ok) return res.status(400).json({ success: false, message: chkUrlImagenAgendaPost.mensaje });
     try {
@@ -1525,8 +1246,6 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
                 "INSERT INTO Escuelas (nombre_escuela, contacto_nombre, puesto_contacto, telefono_escuela, ubicacion) VALUES ($1, $2, $3, $4, $5) RETURNING id_escuela",
                 [datos.escuela, datos.contacto, datos.puesto, datos.telefono, datos.ubicacion]
             );
-            // Toda visita agendada desde aquí es una visita de prospección (es_prospeccion=TRUE);
-            // asistentes_plan guarda cuántas personas se esperan, para comparar luego con la asistencia real.
             await pool.query("INSERT INTO Agenda_Visitas (id_escuela, fecha_cita, estatus_alerta, id_usuario_creador, es_prospeccion, asistentes_plan) VALUES ($1, $2, 'Pendiente', $3, TRUE, $4)", 
                 [esc.rows[0].id_escuela, `${datos.fecha} ${datos.hora}:00`, req.usuario.id, datos.asistentes_plan || null]);
         } 
@@ -1541,7 +1260,6 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
             await pool.query("INSERT INTO Asistencia_Beneficiarios (id_evento, id_beneficiario) VALUES ($1, $2)", [e.rows[0].id_evento, datos.id_beneficiario]);
             await pool.query("INSERT INTO Participacion (id_evento, id_usuario, horas_invertidas) VALUES ($1, $2, 0)", [e.rows[0].id_evento, datos.id_especialista]);
 
-            // Aviso por correo al tutor sobre la cita agendada.
             try {
                 const benRes = await pool.query('SELECT nombre_completo, nombre_tutor, correo_tutor FROM Beneficiarios WHERE id_beneficiario = $1', [datos.id_beneficiario]);
                 const ben = benRes.rows[0];
@@ -1595,13 +1313,10 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
     } catch (e) {
         await pool.query('ROLLBACK');
         console.error("Error post agenda:", e);
-        // Exponemos el mensaje real del error de Postgres (ej. violación de CHECK constraint)
-        // para que el frontend pueda mostrarlo y no se quede como un fallo silencioso.
         res.status(500).json({ success: false, message: e.message });
     }
 });
 
-// 4. Obtener un registro para Modificar (GET by ID) - ESTE ERA EL QUE FALLABA
 app.get('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
     try {
         const { categoria, id } = req.params;
@@ -1626,15 +1341,12 @@ app.get('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
     } catch (e) { console.error("Error GET por ID:", e); res.status(500).json({ success: false }); }
 });
 
-// 5. Actualizar Registro Existente (PUT)
 app.put('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
     const { categoria, id } = req.params;
     const { tipo_registro, datos } = req.body;
-    // RBAC: un Psicólogo únicamente puede modificar Citas Clínicas.
     if (esPsicologo(req.usuario) && tipo_registro !== 'clinica') {
         return res.status(403).json({ success: false, message: 'Como Psicólogo(a) solo puedes modificar Citas Clínicas.' });
     }
-    // Valida url_imagen antes de abrir la transaccion.
     const chkUrlImagenAgendaPut = validarUrlCloudinaria(datos?.url_imagen, 'url_imagen');
     if (!chkUrlImagenAgendaPut.ok) return res.status(400).json({ success: false, message: chkUrlImagenAgendaPut.mensaje });
     try {
@@ -1661,14 +1373,12 @@ app.put('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
             await pool.query("UPDATE Eventos SET titulo_evento=$1, tipo_evento=$2, fecha_realizacion=$3, id_escuela=$4, url_imagen=$5, direccion_mapa=$6, link_reunion=$7 WHERE id_evento=$8", 
                 [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPut.valor, datos.direccion_mapa || null, datos.link_reunion || null, id]);
 
-            // Actualizar Voluntarios
             await pool.query("DELETE FROM Participacion WHERE id_evento=$1", [id]);
             const equipo = [datos.responsable, ...datos.voluntarios];
             for (let v of equipo) {
                 if(v) await pool.query("INSERT INTO Participacion (id_evento, id_usuario, horas_invertidas) VALUES ($1, $2, 0)", [id, v]);
             }
 
-            // Actualizar Insumos (Devuelve viejo, descuenta nuevo)
             const oldIns = await pool.query("SELECT id_insumo, cantidad_usada FROM Consumo_Insumos WHERE id_evento=$1", [id]);
             for (let old of oldIns.rows) {
                 await pool.query("UPDATE Insumos SET stock_actual = stock_actual + $1 WHERE id_insumo = $2", [old.cantidad_usada, old.id_insumo]);
@@ -1687,8 +1397,6 @@ app.put('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
     } catch (e) { await pool.query('ROLLBACK'); console.error("Error PUT:", e); res.status(500).json({ success: false, message: e.message }); }
 });
 
-// 5b. Marcar una visita de prospección como realizada: registra cuántas personas
-// asistieron de verdad y, opcionalmente, la vincula al evento operativo que se generó.
 app.put('/api/agenda/visita/:id/completar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { asistentes_reales, id_evento_ejecucion } = req.body;
     try {
@@ -1704,8 +1412,6 @@ app.put('/api/agenda/visita/:id/completar', verificarToken, requiereRol(ROL_ADMI
     }
 });
 
-// Cualquier usuario autenticado puede "Unirse" a un evento operativo desde la agenda,
-// registrándose a sí mismo en el equipo de campo (tabla Participacion).
 app.post('/api/agenda/evento/:id/unirse', verificarToken, async (req, res) => {
     try {
         const existe = await pool.query('SELECT 1 FROM Participacion WHERE id_evento = $1 AND id_usuario = $2', [req.params.id, req.usuario.id]);
@@ -1718,8 +1424,6 @@ app.post('/api/agenda/evento/:id/unirse', verificarToken, async (req, res) => {
     }
 });
 
-// 6. Eliminar Actividad
-// Accion destructiva: restringido a Admin/Coordinador (mas estricto que crear/editar).
 app.delete('/api/agenda/:categoria/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         if (req.params.categoria === 'visita') await pool.query("DELETE FROM Agenda_Visitas WHERE id_visita = $1", [req.params.id]);
@@ -1728,13 +1432,6 @@ app.delete('/api/agenda/:categoria/:id', verificarToken, requiereRol(ROL_ADMIN, 
     } catch (e) { console.error("Error DELETE:", e); res.status(500).json({ success: false }); }
 });
 
-// ==========================================
-// MÓDULO DE EXPEDIENTES CLÍNICOS (RF-01)
-// Nota: el frontend de esta vista usa API_URL = 'http://localhost:3000/api',
-// por eso aquí las rutas se registran bajo el prefijo /api/... igual que el resto.
-// ==========================================
-
-// 1. Catálogos para el modal de nuevo expediente (especialistas + escuelas)
 app.get('/api/catalogos_expedientes', async (req, res) => {
     try {
         const especialistas = await pool.query(
@@ -1748,11 +1445,8 @@ app.get('/api/catalogos_expedientes', async (req, res) => {
     }
 });
 
-// 2. Listado de expedientes (tabla principal)
 app.get('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     try {
-        // Un psicólogo (Especialista con especialidad "Psicología") solo ve SUS pacientes.
-        // Admin ve todos. Cualquier otro rol ya fue bloqueado por requiereRol arriba.
         const filtrarPorEspecialista = esPsicologo(req.usuario);
         const params = [];
         let filtroWhere = '';
@@ -1782,7 +1476,6 @@ app.get('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALI
     }
 });
 
-// 3. Crear nuevo expediente (beneficiario) — permite crear escuela nueva "al vuelo"
 app.post('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     const { nombre, fecha_nacimiento, genero, colonia_puebla, id_escuela, escuela_nueva, tutor, telefono_tutor, correo_tutor, id_especialista } = req.body;
     try {
@@ -1799,9 +1492,6 @@ app.post('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIAL
             idEscuelaFinal = nueva.rows[0].id_escuela;
         }
 
-        // RETURNING id_beneficiario: antes esta ruta no devolvía el ID del expediente recién
-        // creado, así que nada en el frontend podía encadenar una acción sobre él justo
-        // después de crearlo (ej. agregar automáticamente su primera nota de evolución).
         const nuevoBeneficiario = await pool.query(
             `INSERT INTO Beneficiarios (nombre_completo, fecha_nacimiento, genero, colonia_puebla, nombre_tutor, telefono_tutor, correo_tutor, id_escuela, id_especialista, estatus, fecha_registro)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'ACTIVO', CURRENT_TIMESTAMP) RETURNING id_beneficiario`,
@@ -1817,8 +1507,7 @@ app.post('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIAL
     }
 });
 
-// 4. Cambiar estatus clínico (ACTIVO / EN PAUSA / ALTA)
-app.put('/api/expedientes/:id/estatus', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.put('/api/expedientes/:id/estatus', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     const { estatus } = req.body;
     try {
         await pool.query('UPDATE Beneficiarios SET estatus = $1 WHERE id_beneficiario = $2', [estatus, req.params.id]);
@@ -1829,8 +1518,7 @@ app.put('/api/expedientes/:id/estatus', verificarToken, requiereRol(ROL_ADMIN, R
     }
 });
 
-// 5. Notas de evolución — listar
-app.get('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.get('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT n.id_nota, n.fecha_atencion, n.contenido_nota, n.tipo_intervencion,
@@ -1848,15 +1536,13 @@ app.get('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
-// 6. Notas de evolución — crear
-// Mapeamos tipo_sesion (campo libre nuevo) a tipo_intervencion (enum legado) para no romper el CHECK constraint.
 const MAPA_TIPO_INTERVENCION = {
     'Ordinaria': 'Seguimiento',
     'Evaluación': 'Diagnóstico',
     'Intervención': 'Crisis',
     'Cierre': 'Cierre'
 };
-app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     const { id_especialista, nota, tipo_sesion, modalidad, asistencia, nivel_riesgo } = req.body;
     const tipoIntervencion = MAPA_TIPO_INTERVENCION[tipo_sesion] || 'Seguimiento';
     try {
@@ -1873,8 +1559,7 @@ app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, RO
     }
 });
 
-// 7. Documentos del expediente — listar
-app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     try {
         const result = await pool.query(
             'SELECT id_doc, nombre_archivo, url_archivo, fecha_subida FROM Expedientes_Documentos WHERE id_beneficiario = $1 ORDER BY fecha_subida DESC',
@@ -1887,8 +1572,7 @@ app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN
     }
 });
 
-// 8. Documentos del expediente — registrar (la subida física ya ocurrió vía Cloudinary desde el frontend)
-app.post('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.post('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     const { nombre_archivo, url_archivo } = req.body;
     try {
         await pool.query(
@@ -1902,8 +1586,7 @@ app.post('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMI
     }
 });
 
-// 8b. Documentos del expediente — eliminar
-app.delete('/api/expedientes/:id/documentos/:id_doc', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.delete('/api/expedientes/:id/documentos/:id_doc', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Expedientes_Documentos WHERE id_doc = $1 AND id_beneficiario = $2', [req.params.id_doc, req.params.id]);
         if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'Documento no encontrado.' });
@@ -1914,9 +1597,7 @@ app.delete('/api/expedientes/:id/documentos/:id_doc', verificarToken, requiereRo
     }
 });
 
-// 8c. Editar datos de contacto del tutor (nombre, teléfono, correo) y del beneficiario
-// (género, colonia) — necesario para emergencias y para completar el expediente.
-app.put('/api/expedientes/:id/tutor', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.put('/api/expedientes/:id/tutor', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     const { tutor, telefono_tutor, correo_tutor, genero, colonia_puebla } = req.body;
     try {
         await pool.query(
@@ -1930,8 +1611,6 @@ app.put('/api/expedientes/:id/tutor', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
-// 4a-bis. Reasignar el especialista responsable de un expediente (solo Admin). Antes de
-// este endpoint no existia forma de cambiar el especialista de un expediente ya creado.
 app.put('/api/expedientes/:id/especialista', verificarToken, requiereRol(ROL_ADMIN), async (req, res) => {
     const { id_especialista } = req.body;
     try {
@@ -1947,10 +1626,7 @@ app.put('/api/expedientes/:id/especialista', verificarToken, requiereRol(ROL_ADM
     }
 });
 
-// 4b. Editar los datos propios del beneficiario (nombre, fecha de nacimiento, escuela, género, colonia).
-//     La escuela se recibe como texto libre: si coincide (sin importar mayúsculas) con una escuela
-//     ya registrada se reutiliza esa fila; si no existe, se crea una nueva — igual que al abrir expediente.
-app.put('/api/expedientes/:id/datos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
+app.put('/api/expedientes/:id/datos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
     const { nombre, fecha_nacimiento, genero, colonia_puebla, escuela_texto } = req.body;
     try {
         let idEscuelaFinal = null;
@@ -1976,16 +1652,6 @@ app.put('/api/expedientes/:id/datos', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
-// ==========================================
-// MÓDULO DE SOLICITUDES WEB (RF-08) — Bandeja de entrada pública
-// ==========================================
-// El Diccionario de Datos (02_Arquitectura_Técnica/Diccionario_Datos_Final.xlsx) marca
-// explícitamente la columna PK de Solicitudes_Web como "no confirmada" — nunca hubo, hasta
-// ahora, una ruta que necesitara filtrar por ID individual (SELECT *, INSERT y nada más).
-// En vez de asumir un nombre a ciegas, lo detectamos una sola vez contra information_schema
-// (con 'id_solicitud' — la convención id_<entidad> que usa el resto del esquema — como
-// primera opción) y lo cacheamos; si por lo que sea la detección falla, igual asumimos
-// 'id_solicitud' para no romper el arranque del servidor.
 let _columnaPkSolicitudes = null;
 async function obtenerColumnaPkSolicitudes() {
     if (_columnaPkSolicitudes) return _columnaPkSolicitudes;
@@ -2008,8 +1674,6 @@ app.post('/api/solicitudes', async (req, res) => {
     if (!nombre_contacto || !correo || !tipo_solicitud || !mensaje) {
         return res.status(400).json({ success: false, message: 'Faltan campos obligatorios.' });
     }
-    // Valida el formato antes de usarlo en el "to:" del correo de confirmación (ver
-    // validarFormatoCorreo()).
     if (!validarFormatoCorreo(correo)) {
         return res.status(400).json({ success: false, message: 'El correo no tiene un formato válido.' });
     }
@@ -2020,7 +1684,6 @@ app.post('/api/solicitudes', async (req, res) => {
             [nombre_contacto, telefono || null, correo, tipo_solicitud, mensaje]
         );
 
-        // Correo de confirmación automático (no bloquea la respuesta si falla)
         try {
             const contenido = `
                 <p>Hola <b>${escapeHtmlServidor(nombre_contacto)}</b>,</p>
@@ -2037,23 +1700,15 @@ app.post('/api/solicitudes', async (req, res) => {
             console.error("No se pudo enviar el correo de confirmación de solicitud:", mailErr);
         }
 
-        // Aviso al staff correspondiente: "Compartir Historia de Éxito" también le
-        // interesa a los Psicólogos (son quienes validan y publican la historia), pero
-        // el resto de solicitudes (Ayuda Psicológica, Donación en Especie, etc.) solo
-        // le corresponde a Admin/Coordinador — igual que el resto del panel de solicitudes.
         try {
             const esHistoria = tipo_solicitud === 'Compartir Historia de Éxito';
             const filtroRol = esHistoria
                 ? "id_rol IN (1, 2, 3)"
                 : "id_rol IN (1, 3)";
-            // Nota: se alias "id_rol AS rol" porque esPsicologo() (como el resto del
-            // código) espera un objeto con la propiedad "rol", no "id_rol".
             const staff = await pool.query(
                 `SELECT correo, id_rol AS rol, especialidad FROM Usuarios
                  WHERE ${filtroRol} AND correo IS NOT NULL AND COALESCE(estatus,'Activo') != 'Inactivo'`
             );
-            // Si es Historia de Éxito, de los Especialistas (rol 2) solo nos interesan
-            // los Psicólogos — un Especialista de otra área no necesita este aviso.
             const correosStaff = staff.rows
                 .filter(u => u.rol !== ROL_ESPECIALISTA || esPsicologo(u))
                 .map(u => u.correo)
@@ -2072,8 +1727,6 @@ app.post('/api/solicitudes', async (req, res) => {
                     subject: `Nueva solicitud: ${tipo_solicitud} - Sanctorum A.C.`,
                     html: emailTemplate('Nueva solicitud recibida', contenidoAvisoStaff)
                 });
-            } else {
-                console.log(`Aviso de nueva solicitud (${tipo_solicitud}): no hay staff con correo registrado para este tipo, no se envió nada.`);
             }
         } catch (mailErr) {
             console.error("No se pudo enviar el aviso de nueva solicitud al staff:", mailErr);
@@ -2086,10 +1739,6 @@ app.post('/api/solicitudes', async (req, res) => {
     }
 });
 
-// Bandeja de solicitudes para el panel administrativo (tarjeta "Solicitudes de la
-// Comunidad" en Perfil). Admin/Coordinador ven todo; un Psicólogo solo ve las de
-// "Compartir Historia de Éxito" (es quien las revisa y publica), nunca las de
-// Ayuda Psicológica ni Donación en Especie — esas son de Admin/Coordinador.
 app.get('/api/solicitudes', verificarToken, async (req, res) => {
     const esStaffCompleto = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
     if (!esStaffCompleto && !esPsicologo(req.usuario)) {
@@ -2108,15 +1757,12 @@ app.get('/api/solicitudes', verificarToken, async (req, res) => {
     }
 });
 
-// Marca una solicitud como atendida/descartada. Mismo alcance por rol que el listado:
-// Admin/Coordinador pueden actualizar cualquiera, un Psicólogo solo las de
-// "Compartir Historia de Éxito".
 app.put('/api/solicitudes/:id', verificarToken, async (req, res) => {
     const esStaffCompleto = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
     if (!esStaffCompleto && !esPsicologo(req.usuario)) {
         return res.status(403).json({ success: false, message: 'No tienes permiso para actualizar solicitudes.' });
     }
-    const { estatus } = req.body; // 'Atendida' | 'Descartada'
+    const { estatus } = req.body;
     if (!['Atendida', 'Descartada'].includes(estatus)) {
         return res.status(400).json({ success: false, message: 'Estatus inválido.' });
     }
@@ -2127,7 +1773,6 @@ app.put('/api/solicitudes/:id', verificarToken, async (req, res) => {
         const actual = await pool.query(`SELECT * FROM Solicitudes_Web WHERE ${columnaId} = $1`, [idNum]);
         if (actual.rows.length === 0) return res.status(404).json({ success: false, message: 'Solicitud no encontrada.' });
         const solicitud = actual.rows[0];
-        // Un Psicólogo (sin rol Admin/Coordinador) solo puede tocar solicitudes de Historia de Éxito.
         if (!esStaffCompleto && solicitud.tipo_solicitud !== 'Compartir Historia de Éxito') {
             return res.status(403).json({ success: false, message: 'No tienes permiso para actualizar esta solicitud.' });
         }
@@ -2139,12 +1784,6 @@ app.put('/api/solicitudes/:id', verificarToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// MÓDULO DE DASHBOARD (KPIs reales para el panel administrativo)
-// ==========================================
-// Este endpoint alimenta tanto el Dashboard como el panel de notificaciones de varias
-// páginas. Por eso NO exige token (rompería las notificaciones), pero si viene uno válido
-// de un Coordinador, filtra la actividad a solo lo que le pertenece a él.
 function usuarioOpcionalDesdeToken(req) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -2152,9 +1791,6 @@ function usuarioOpcionalDesdeToken(req) {
     try { return jwt.verify(token, process.env.JWT_SECRET); } catch (e) { return null; }
 }
 
-// Exportación a Excel desde el Panel de Control: entrega filas ya filtradas por año/mes
-// para que el frontend arme el .xlsx con SheetJS, sin depender de ninguna librería en el
-// servidor. "todos" en anio o mes significa "sin filtrar ese campo".
 app.get('/api/reportes/exportar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { tipo, anio, mes } = req.query;
     const construirFiltroFecha = (columna) => {
@@ -2232,18 +1868,12 @@ app.get('/api/dashboard/resumen', async (req, res) => {
         const esCoordinadorPropio = usuario && usuario.rol === ROL_COORDINADOR;
 
         const [beneficiariosAtendidos, voluntarios, visitas, bajoStock, solicitudes, donacionesMes] = await Promise.all([
-            // "Beneficiarios Atendidos": total de beneficiarios registrados en el sistema
-            // (no depende de que ya tengan una nota clínica capturada, para no mostrar 0
-            // cuando apenas se está dando de alta a alguien).
             pool.query("SELECT COUNT(*) FROM Beneficiarios"),
             pool.query("SELECT COUNT(*) FROM Usuarios WHERE COALESCE(estatus,'Activo') = 'Activo' AND id_rol IN (2,4,5)"),
             esCoordinadorPropio
                 ? pool.query("SELECT COUNT(*) FROM Agenda_Visitas WHERE estatus_alerta IN ('Pendiente', 'Confirmado (3 días)') AND id_usuario_creador = $1", [usuario.id])
                 : pool.query("SELECT COUNT(*) FROM Agenda_Visitas WHERE estatus_alerta IN ('Pendiente', 'Confirmado (3 días)')"),
             pool.query("SELECT COUNT(*) FROM Insumos WHERE stock_actual <= punto_reorden"),
-            // "Solicitudes pendientes" combina dos fuentes que en la práctica son lo mismo
-            // para el equipo administrativo: mensajes del formulario público (Solicitudes_Web)
-            // Y registros nuevos de voluntariado que aún no se revisan (Usuarios.estatus='Nuevo').
             pool.query(`
                 SELECT
                     (SELECT COUNT(*) FROM Solicitudes_Web WHERE estatus = 'Pendiente') +
@@ -2290,11 +1920,6 @@ app.get('/api/dashboard/resumen', async (req, res) => {
     }
 });
 
-// Gráfico de Impacto Social: personas atendidas por mes durante el año en curso.
-// Contamos beneficiarios distintos con al menos una nota clínica registrada en cada mes.
-// Configuración de cada métrica disponible para la gráfica: tabla/columna de fecha,
-// columna a agregar, y función de agregación. Todo queda en una lista blanca fija
-// (no se arma SQL con texto libre del usuario) para evitar inyección SQL.
 const METRICAS_IMPACTO = {
     beneficiarios: {
         etiqueta: 'Beneficiarios recibidos por mes (nuevos registros)',
@@ -2327,9 +1952,6 @@ const METRICAS_IMPACTO = {
     },
     participacion: {
         etiqueta: 'Personas que participaron por mes (voluntarios + ciudadanos reportados)',
-        // Suma, por cada evento de ese mes: personal/voluntarios (Participacion) +
-        // beneficiarios formalmente vinculados (Asistencia_Beneficiarios) + asistencia real
-        // de ciudadanos reportada por el voluntario tras el evento (Reportes_Evento).
         sql: `SELECT date_trunc('month', e.fecha_realizacion) AS mes,
                      SUM(
                          COALESCE((SELECT COUNT(*) FROM Participacion p WHERE p.id_evento = e.id_evento), 0) +
@@ -2352,7 +1974,6 @@ app.get('/api/dashboard/impacto_mensual', async (req, res) => {
 
         const result = await pool.query(metrica.sql, [anio]);
 
-        // Rellenamos los 12 meses del año (aunque no tengan datos) para que la gráfica no tenga huecos.
         const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         const porMes = new Array(12).fill(0);
         result.rows.forEach(r => {
@@ -2360,7 +1981,6 @@ app.get('/api/dashboard/impacto_mensual', async (req, res) => {
             porMes[idx] = metrica.formato === 'moneda' ? parseFloat(r.total) : parseInt(r.total, 10);
         });
 
-        // Años disponibles (con al menos un registro en la fuente de esta métrica).
         const aniosDisponibles = await pool.query(metrica.sqlAnios);
         let listaAnios = aniosDisponibles.rows.map(r => r.anio);
         if (listaAnios.length === 0) listaAnios = [new Date().getFullYear()];
@@ -2381,11 +2001,6 @@ app.get('/api/dashboard/impacto_mensual', async (req, res) => {
     }
 });
 
-// Comparativa mensual: beneficiarios ACTIVO vs ALTA, agrupados por mes de REGISTRO
-// (fecha_registro). IMPORTANTE: el esquema no guarda un historial de cambios de estatus,
-// solo el estatus actual — así que esto muestra, para cada mes en que se registraron
-// beneficiarios, cuántos de ellos tienen HOY estatus ACTIVO vs cuántos ya llegaron a ALTA.
-// No es "cuántos estaban activos ese mes en el pasado", sino la cohorte de ingreso.
 app.get('/api/dashboard/comparativa_beneficiarios', async (req, res) => {
     try {
         const anio = parseInt(req.query.anio, 10) || new Date().getFullYear();
@@ -2427,16 +2042,9 @@ app.get('/api/dashboard/comparativa_beneficiarios', async (req, res) => {
     }
 });
 
-// Top eventos por participación total (personal/voluntarios vía Participacion +
-// beneficiarios asistentes vía Asistencia_Beneficiarios).
 app.get('/api/dashboard/top_eventos', async (req, res) => {
     try {
         const limite = parseInt(req.query.limite, 10) || 5;
-        // "Personas" combina 3 fuentes: personal/voluntarios asignados (Participacion),
-        // beneficiarios formalmente vinculados (Asistencia_Beneficiarios), y sobre todo la
-        // asistencia REAL de ciudadanos/comunidad que el voluntario reportó a mano después
-        // del evento (Reportes_Evento.numero_asistentes) — esta última suele ser la cifra
-        // más representativa del público general, ya que Participacion solo registra personal.
         const result = await pool.query(`
             SELECT e.id_evento, e.titulo_evento, e.tipo_evento, e.fecha_realizacion,
                    COALESCE((SELECT COUNT(*) FROM Participacion p WHERE p.id_evento = e.id_evento), 0) AS num_staff,
@@ -2463,7 +2071,6 @@ app.get('/api/dashboard/top_eventos', async (req, res) => {
     }
 });
 
-// Top voluntarios/personal por número de eventos en los que participaron.
 app.get('/api/dashboard/top_voluntarios', async (req, res) => {
     try {
         const limite = parseInt(req.query.limite, 10) || 5;
@@ -2485,8 +2092,6 @@ app.get('/api/dashboard/top_voluntarios', async (req, res) => {
     }
 });
 
-// "Acuerdos Pendientes": las próximas visitas/reuniones escolares agendadas que aún no se
-// han realizado (Agenda_Visitas). No es una tabla nueva — son las visitas existentes.
 app.get('/api/dashboard/acuerdos_pendientes', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2504,11 +2109,6 @@ app.get('/api/dashboard/acuerdos_pendientes', async (req, res) => {
     }
 });
 
-// ==========================================
-// MÓDULO WEB PÚBLICA (RF-06, RF-07, RF-09) — datos dinámicos para el sitio público
-// ==========================================
-
-// 1. Transparencia financiera (RF-09) — % de donaciones por categoría de gasto
 app.get('/api/transparencia', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2531,13 +2131,8 @@ app.get('/api/transparencia', async (req, res) => {
     }
 });
 
-// 3. Necesidades de donación / metas por insumo (para barras de progreso en "Cómo Ayudar")
-// NOTA: el modelo de datos no tiene una columna explícita de "meta de donación".
-// Como aproximación, tratamos punto_reorden como la meta: 100% = stock_actual alcanza el punto de reorden.
 app.get('/api/necesidades_donacion', async (req, res) => {
     try {
-        // Solo insumos en bajo stock o justo en su punto de reorden — son los que realmente
-        // necesitan donación urgente. Esto alimenta el slider de "Necesidades Actuales".
         const result = await pool.query(`
             SELECT id_insumo, nombre_insumo, unidad_medida, stock_actual, punto_reorden, area_proyecto
             FROM Insumos
@@ -2559,8 +2154,6 @@ app.get('/api/necesidades_donacion', async (req, res) => {
     }
 });
 
-// 4. Eventos públicos próximos (para banner de "Próximo Evento" y calendario comunitario)
-// Se excluyen Entrevistas y Citas Clínicas por confidencialidad.
 app.get('/api/eventos_publicos', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2580,8 +2173,6 @@ app.get('/api/eventos_publicos', async (req, res) => {
     }
 });
 
-// Eventos anteriores (ya realizados) — misma tabla Eventos, no Noticias_Eventos.
-// Alimenta el carrusel "Eventos Anteriores" en comunidad_blog.
 app.get('/api/eventos_anteriores', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2601,8 +2192,6 @@ app.get('/api/eventos_anteriores', async (req, res) => {
     }
 });
 
-// Todos los eventos públicos (pasados Y futuros), sin límite de fecha — alimenta el
-// calendario visual de calendario_eventos y la sección "Calendario de Comunidad".
 app.get('/api/eventos_calendario_publico', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2620,7 +2209,6 @@ app.get('/api/eventos_calendario_publico', async (req, res) => {
     }
 });
 
-// Detalle público de un evento operativo (tabla Eventos) — para evento_detalle?tipo=evento
 app.get('/api/eventos/:id', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2639,29 +2227,20 @@ app.get('/api/eventos/:id', async (req, res) => {
     }
 });
 
-// ==========================================
-// MÓDULO CMS: PUBLICACIONES
-// Tabla Publicaciones: id_publicacion, titulo, contenido, url_imagen,
-// tipo ('Aviso'|'Evento'|'Historia de Éxito'|libre), categoria, fecha_post,
-// url_documento_consentimiento, id_evento_relacionado, id_autor, id_editor.
-// Alimenta: carrusel de "Nuestros Proyectos" en index, comunidad_blog y evento_detalle.
-// Las Historias de Éxito se gestionan desde esta misma pantalla de administración pero, por
-// requerir datos de un beneficiario (consentimiento, id_beneficiario), viven en la tabla
-// Historias_Exito. Cada fila del listado trae "origen" ('publicacion' | 'historia') para que
-// el frontend sepa a qué endpoint mandar la edición/borrado.
-// ==========================================
-
-// 1. Listar (público). Por defecto solo Publicaciones; con ?incluir_historias=1 (usado por el
-//    panel de administración) también trae las Historias de Éxito para gestionarlas juntas.
 app.get('/api/publicaciones', async (req, res) => {
     const { tipo, categoria, limite, incluir_historias } = req.query;
+    const usuario = usuarioOpcionalDesdeToken(req);
     try {
         let query = "SELECT *, 'publicacion' AS origen FROM Publicaciones";
         const condiciones = [];
         const params = [];
+
+        if (usuario && (Number(usuario.rol) === ROL_VOLUNTARIO || Number(usuario.rol) === ROL_ESPECIALISTA)) {
+            params.push(usuario.id);
+            condiciones.push(`id_autor = $${params.length}`);
+        }
+
         if (tipo) { params.push(tipo); condiciones.push(`tipo = $${params.length}`); }
-        // Una publicación puede tener varias categorías guardadas como "Infancia, Muralismo",
-        // así que el filtro busca coincidencia parcial en vez de una igualdad exacta.
         if (categoria) { params.push(`%${categoria}%`); condiciones.push(`categoria ILIKE $${params.length}`); }
         if (condiciones.length > 0) query += ' WHERE ' + condiciones.join(' AND ');
         query += ' ORDER BY fecha_post DESC';
@@ -2673,7 +2252,7 @@ app.get('/api/publicaciones', async (req, res) => {
         let data = result.rows;
 
         if (incluir_historias) {
-            const hist = await pool.query(`
+            let histQuery = `
                 SELECT h.id_historia AS id_publicacion, h.titulo, h.contenido_postayuda AS contenido,
                        NULL::text AS url_imagen, 'Historia de Éxito' AS tipo, NULL::text AS categoria,
                        h.fecha_creacion AS fecha_post, h.url_documento_consentimiento,
@@ -2681,8 +2260,14 @@ app.get('/api/publicaciones', async (req, res) => {
                        h.id_beneficiario, h.contenido_preayuda, h.contenido_postayuda, h.consentimiento,
                        'historia' AS origen
                 FROM Historias_Exito h
-                ORDER BY h.fecha_creacion DESC
-            `);
+            `;
+            const histParams = [];
+            if (usuario && (Number(usuario.rol) === ROL_VOLUNTARIO || Number(usuario.rol) === ROL_ESPECIALISTA)) {
+                histParams.push(usuario.id);
+                histQuery += ` WHERE h.id_autor = $1`;
+            }
+            histQuery += ` ORDER BY h.fecha_creacion DESC`;
+            const hist = await pool.query(histQuery, histParams);
             data = [...data, ...hist.rows].sort((a, b) => new Date(b.fecha_post) - new Date(a.fecha_post));
         }
         res.json({ success: true, data });
@@ -2692,7 +2277,6 @@ app.get('/api/publicaciones', async (req, res) => {
     }
 });
 
-// 2. Obtener una sola (para evento_detalle)
 app.get('/api/publicaciones/:id', async (req, res) => {
     try {
         const result = await pool.query("SELECT *, 'publicacion' AS origen FROM Publicaciones WHERE id_publicacion = $1", [req.params.id]);
@@ -2704,8 +2288,6 @@ app.get('/api/publicaciones/:id', async (req, res) => {
     }
 });
 
-// 3. Crear — si el tipo es "Historia de Éxito" se guarda en Historias_Exito (requiere
-//    beneficiario y documento de consentimiento); cualquier otro tipo es una Publicación normal.
 app.post('/api/publicaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     const { titulo, contenido, url_imagen, tipo, categoria, url_documento_consentimiento, id_evento_relacionado,
             id_beneficiario, contenido_preayuda, contenido_postayuda } = req.body;
@@ -2747,7 +2329,6 @@ app.post('/api/publicaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECI
     }
 });
 
-// 4. Actualizar — el body debe traer "origen" ('publicacion' | 'historia') para saber qué tabla tocar.
 app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     const { titulo, contenido, url_imagen, tipo, categoria, url_documento_consentimiento, id_evento_relacionado,
             id_beneficiario, contenido_preayuda, contenido_postayuda, origen } = req.body;
@@ -2761,7 +2342,6 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
         if (!puedePublicarHistoria(req.usuario)) return res.status(403).json({ success: false, message: 'Solo un psicólogo, coordinador o administrador puede editar una Historia de Éxito.' });
         if (!url_documento_consentimiento) return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
         try {
-            // Solo el autor original o un Admin pueden editar esta historia.
             if (req.usuario.rol !== ROL_ADMIN) {
                 const autorHistoria = await pool.query('SELECT id_autor FROM Historias_Exito WHERE id_historia = $1', [req.params.id]);
                 if (autorHistoria.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
@@ -2785,7 +2365,6 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
         return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
     }
     try {
-        // Solo el autor original o un Admin pueden editar esta publicación.
         if (req.usuario.rol !== ROL_ADMIN) {
             const autorPub = await pool.query('SELECT id_autor FROM Publicaciones WHERE id_publicacion = $1', [req.params.id]);
             if (autorPub.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
@@ -2805,13 +2384,11 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
     }
 });
 
-// 5. Eliminar — ?origen=historia borra de Historias_Exito, si no de Publicaciones.
 app.delete('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR), async (req, res) => {
     try {
         const esHistoria = req.query.origen === 'historia';
         const tablaPub = esHistoria ? 'Historias_Exito' : 'Publicaciones';
         const columnaIdPub = esHistoria ? 'id_historia' : 'id_publicacion';
-        // Solo el autor original o un Admin pueden eliminar esta publicación/historia.
         if (req.usuario.rol !== ROL_ADMIN) {
             const autorRes = await pool.query(`SELECT id_autor FROM ${tablaPub} WHERE ${columnaIdPub} = $1`, [req.params.id]);
             if (autorRes.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
@@ -2830,12 +2407,6 @@ app.delete('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_
     }
 });
 
-// ==========================================
-// MÓDULO: HISTORIAS DE ÉXITO (público, solo con consentimiento firmado)
-// IMPORTANTE: por protección de datos de menores (LFPDPPP), esta ruta NUNCA expone
-// el nombre completo real del beneficiario ni ningún otro dato identificable —
-// solo el primer nombre (o un alias genérico) y el contenido ya redactado para publicación.
-// ==========================================
 app.get('/api/historias_exito', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2860,7 +2431,6 @@ app.get('/api/historias_exito', async (req, res) => {
                 titulo: r.titulo,
                 contenido_preayuda: r.contenido_preayuda,
                 contenido_postayuda: r.contenido_postayuda,
-                // Anonimización estricta: solo primer nombre y edad, nunca nombre completo ni foto real.
                 protagonista: (r.nombre_completo_interno || '').trim().split(' ')[0] || 'Un beneficiario',
                 edad
             };
@@ -2872,9 +2442,6 @@ app.get('/api/historias_exito', async (req, res) => {
     }
 });
 
-// ==========================================
-// MÓDULO: "NOSOTROS" — Equipo público (solo Admin/Especialista/Coordinador, NUNCA Voluntario/Donador)
-// ==========================================
 app.get('/api/equipo', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2892,13 +2459,6 @@ app.get('/api/equipo', async (req, res) => {
     }
 });
 
-// ==========================================
-// MÓDULO: REPORTES DE EVENTO (llenados por voluntarios asignados)
-// Requiere la tabla Reportes_Evento — ver migracion_ronda4.sql
-// ==========================================
-
-// Catálogo de eventos disponibles para reportar (excluye Entrevista/Cita Clínica por confidencialidad)
-// Solo eventos ya realizados (tiene sentido reportar después de que ocurrió, no antes)
 app.get('/api/eventos_para_reporte', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2916,8 +2476,6 @@ app.get('/api/eventos_para_reporte', async (req, res) => {
     }
 });
 
-// Materiales que ya se registraron como planeados/consumidos para este evento
-// (capturados al crear el evento en Agenda) — se usan para prellenar el formulario de reporte.
 app.get('/api/eventos/:id/insumos_consumidos', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -2934,10 +2492,17 @@ app.get('/api/eventos/:id/insumos_consumidos', async (req, res) => {
     }
 });
 
-// Lista todos los reportes de evento con el título/fecha del evento, el nombre de quien
-// reportó, y el equipo de participantes (Participacion) como JSON agregado.
-app.get('/api/reportes_evento', async (req, res) => {
+app.get('/api/reportes_evento', verificarToken, async (req, res) => {
     try {
+        const esStaffGeneral = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
+        let filtroAutor = '';
+        const params = [];
+
+        if (!esStaffGeneral) {
+            params.push(req.usuario.id);
+            filtroAutor = 'WHERE r.id_usuario = $1';
+        }
+
         const result = await pool.query(`
             SELECT r.*, e.titulo_evento, e.fecha_realizacion, u.nombre_completo AS autor,
                    COALESCE((
@@ -2948,8 +2513,9 @@ app.get('/api/reportes_evento', async (req, res) => {
             FROM Reportes_Evento r
             JOIN Eventos e ON r.id_evento = e.id_evento
             LEFT JOIN Usuarios u ON r.id_usuario = u.id_usuario
+            ${filtroAutor}
             ORDER BY r.fecha_reporte DESC
-        `);
+        `, params);
         res.json({ success: true, data: result.rows });
     } catch (error) {
         console.error("Error al listar reportes de evento:", error);
@@ -2957,8 +2523,6 @@ app.get('/api/reportes_evento', async (req, res) => {
     }
 });
 
-// Editar quiénes participaron realmente en el evento de un reporte (equipo de campo /
-// tabla Participacion) — permite desmarcar a quien no asistió o agregar a quien se sumó.
 app.put('/api/reportes_evento/:id/participantes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     const { ids_usuarios } = req.body;
     try {
@@ -2979,9 +2543,6 @@ app.put('/api/reportes_evento/:id/participantes', verificarToken, requiereRol(RO
     }
 });
 
-// Crear reporte: recibe el USO REAL de cada material (materiales_reales), lo compara contra
-// lo planeado en Consumo_Insumos, y devuelve al inventario lo que sobró (o descuenta lo que
-// se usó de más). Esto es lo que "recicla" el sobrante para futuros eventos.
 app.post('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     const { id_evento, id_usuario, actividades_realizadas, materiales_reales, numero_asistentes, observaciones } = req.body;
     if (!id_evento || !id_usuario || !actividades_realizadas) {
@@ -3001,7 +2562,7 @@ app.post('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPE
                 const planeadoRes = await pool.query('SELECT cantidad_usada FROM Consumo_Insumos WHERE id_evento = $1 AND id_insumo = $2', [id_evento, m.id_insumo]);
                 const planeado = planeadoRes.rows.length > 0 ? parseFloat(planeadoRes.rows[0].cantidad_usada) : 0;
                 const real = parseFloat(m.cantidad_real) || 0;
-                const diferencia = planeado - real; // positivo = sobró (regresa a stock), negativo = se usó de más (se descuenta)
+                const diferencia = planeado - real;
 
                 if (diferencia !== 0) {
                     await pool.query('UPDATE Insumos SET stock_actual = stock_actual + $1 WHERE id_insumo = $2', [diferencia, m.id_insumo]);
@@ -3030,8 +2591,6 @@ app.post('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPE
     }
 });
 
-// Actualiza el contenido de un reporte de evento (actividades, materiales, asistentes,
-// observaciones). Solo el autor original o un Admin pueden editarlo (verificarAutorORol).
 app.put('/api/reportes_evento/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), verificarAutorORol('Reportes_Evento', 'id_reporte', 'id_usuario'), async (req, res) => {
     const { actividades_realizadas, materiales_utilizados, numero_asistentes, observaciones } = req.body;
     try {
@@ -3047,8 +2606,6 @@ app.put('/api/reportes_evento/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_E
     }
 });
 
-// Elimina un reporte de evento. Solo el autor original o un Admin pueden borrarlo
-// (verificarAutorORol).
 app.delete('/api/reportes_evento/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), verificarAutorORol('Reportes_Evento', 'id_reporte', 'id_usuario'), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Reportes_Evento WHERE id_reporte = $1', [req.params.id]);
@@ -3060,9 +2617,6 @@ app.delete('/api/reportes_evento/:id', verificarToken, requiereRol(ROL_ADMIN, RO
     }
 });
 
-// ==========================================
-// MÓDULO: ESTADÍSTICAS PÚBLICAS DE ASISTENCIA PSICOLÓGICA (para index)
-// ==========================================
 app.get('/api/estadisticas_psicologia', async (req, res) => {
     try {
         const [activos, exitosos] = await Promise.all([
@@ -3082,26 +2636,7 @@ app.get('/api/estadisticas_psicologia', async (req, res) => {
     }
 });
 
-// ==========================================
-// MANEJO GLOBAL DE ERRORES
-// ==========================================
-// Sin esto, dos casos caian en el manejador de errores POR DEFECTO de Express, que en modo
-// "development" (el valor que usa Express si la variable de entorno NODE_ENV no esta
-// configurada) responde con una pagina HTML que incluye el STACK TRACE completo del error —
-// rutas de archivos del servidor, nombres de funciones internas, a veces fragmentos de la
-// consulta SQL. Los dos casos son:
-//   1. JSON malformado en el body: express.json() lanza el error ANTES de llegar a
-//      cualquier ruta, asi que ningun try/catch de las rutas lo atrapa.
-//   2. Cualquier error que se escape de una ruta sin su propio try/catch (o que ocurra
-//      fuera de uno, por descuido futuro).
-// ACCION MANUAL RECOMENDADA: ademas de esto, configura NODE_ENV=production en el entorno
-// donde corra este servidor (Render, etc.) — es una capa extra de defensa por si en el
-// futuro se agrega algun middleware/libreria que tambien dependa de ese valor.
-// ==========================================
-// FALLBACK STATIC / SPA Y MANEJO DE ERRORES
-// ==========================================
 app.use((req, res, next) => {
-    // Si es una petición a la API y llegó hasta aquí, responder 404 en JSON y no mandar HTML
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ success: false, message: 'Endpoint no encontrado.' });
     }
@@ -3128,7 +2663,6 @@ app.use((err, req, res, next) => {
     res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
 });
 
-// Arrancar el servidor al final de todas las definiciones de rutas
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);

@@ -51,8 +51,20 @@
             <h2
               class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2"
             >
-              Publicaciones
+        Publicaciones
             </h2>
+                <!-- GUÍA CONTEXTUAL: PUBLICACIONES -->
+        <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-100 flex items-start gap-3 shadow-sm">
+          <span class="material-symbols-outlined text-rose-600 mt-0.5">verified_user</span>
+          <div class="text-xs text-slate-700 leading-relaxed space-y-1">
+            <p><strong class="text-rose-900 font-bold">Lineamientos de difusión y privacidad:</strong></p>
+            <ul class="list-disc list-inside space-y-0.5 text-slate-600">
+              <li><strong>Avisos y Eventos:</strong> Se sincronizan con la página comunitaria abierta. Verifica redacción y fechas antes de publicar.</li>
+              <li><strong>Historias de Éxito:</strong> Por normativa de protección de datos, requieren obligatoriamente adjuntar el documento de consentimiento firmado.</li>
+              <li><strong>Privacidad:</strong> Voluntarios y especialistas únicamente tienen visibilidad de sus publicaciones propias.</li>
+            </ul>
+          </div>
+        </div>
             <p class="text-slate-500 max-w-xl">
               Noticias, avisos y eventos que alimentan la página pública (Inicio
               y Comunidad).
@@ -928,7 +940,9 @@
       async function cargarPublicaciones() {
         try {
           const res = await fetch(
-            `${API_URL}/api/publicaciones?incluir_historias=1`,
+            `${API_URL}/api/publicaciones?incluir_historias=1`,{
+              headers: authHeaders()
+            }
           );
           const json = await res.json();
           if (json.success) {

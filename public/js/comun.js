@@ -83,10 +83,10 @@ function cerrarSesion() {
 const ROL_ADMIN = 1, ROL_ESPECIALISTA = 2, ROL_COORDINADOR = 3, ROL_VOLUNTARIO = 4;
 
 function permisosPorPagina(rol, especialidad) {
-    const esPsico = Number(rol) === ROL_ESPECIALISTA && typeof especialidad === 'string' && especialidad.toLowerCase().includes('psic');
     return {
         dashboard: [ROL_ADMIN, ROL_COORDINADOR],
-        expedientes: esPsico ? [ROL_ADMIN, ROL_ESPECIALISTA] : [ROL_ADMIN],
+        // expedientes: se retira de las rutas activas
+        herramientas: [ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO],
         voluntariado: [ROL_ADMIN, ROL_COORDINADOR],
         inventario: [ROL_ADMIN, ROL_COORDINADOR],
         agenda: [ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO],

@@ -15,7 +15,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/output.css" />
-    </script>
     <style>
       .material-symbols-outlined {
         font-variation-settings:
@@ -53,6 +52,38 @@
             >
               Agenda
             </h2>
+
+            <!-- GUÍA CONTEXTUAL: AGENDA -->
+            <div
+              class="mb-6 p-4 rounded-2xl bg-blue-50 border border-blue-100 flex items-start gap-3 shadow-sm"
+            >
+              <span class="material-symbols-outlined text-blue-600 mt-0.5"
+                >help_outline</span
+              >
+              <div class="text-xs text-slate-700 leading-relaxed space-y-1">
+                <p>
+                  <strong class="text-blue-900 font-bold"
+                    >Guía de programación por tipo de registro:</strong
+                  >
+                </p>
+                <ul class="list-disc list-inside space-y-0.5 text-slate-600">
+                  <li>
+                    <strong>Visita de Prospección:</strong> Reuniones de
+                    vinculación con autoridades de escuelas e instituciones.
+                  </li>
+                  <li>
+                    <strong>Evento Operativo:</strong> Talleres y jornadas
+                    muralistas; aparta materiales de almacén y permite que el
+                    voluntariado se sume al equipo.
+                  </li>
+                  <li>
+                    <strong>Cita Clínica:</strong> Exclusiva para psicólogos;
+                    vinculada de forma confidencial a los beneficiarios
+                    asignados a su cargo.
+                  </li>
+                </ul>
+              </div>
+            </div>
             <p class="text-slate-500 max-w-xl">
               Eventos, reuniones escolares y citas clínicas — todo en un solo
               lugar.
@@ -131,7 +162,6 @@
 
           <!-- ============ COLUMNA DERECHA: CALENDARIO (arriba) + DETALLE (abajo) ============ -->
           <div class="lg:col-span-2 flex flex-col gap-6">
-            <!-- Calendario Visual -->
             <div
               class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6"
             >
@@ -176,7 +206,6 @@
               <div id="grid_calendario" class="grid grid-cols-7 gap-2"></div>
             </div>
 
-            <!-- Detalle / Actividades Generales -->
             <div
               class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 overflow-y-auto flex-1"
               style="max-height: 500px"
@@ -416,7 +445,7 @@
               <div
                 class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100"
               >
-                <!-- SECCIÓN MATERIALES (BARRA DESPLAZADORA) -->
+                <!-- SECCIÓN MATERIALES -->
                 <div
                   class="bg-amber-50 p-5 rounded-2xl border border-amber-100"
                 >
@@ -429,13 +458,10 @@
                     Material a utilizar
                   </h4>
 
-                  <!-- Barra desplazadora activada aquí -->
                   <div
                     id="contenedor_insumos"
                     class="space-y-3 max-h-40 overflow-y-auto pr-2 pb-2"
-                  >
-                    <!-- Fila inyectada por JS -->
-                  </div>
+                  ></div>
                   <button
                     type="button"
                     onclick="agregarFilaInsumo()"
@@ -479,9 +505,7 @@
                   <div
                     id="ev_voluntarios_list"
                     class="max-h-32 overflow-y-auto bg-white border border-slate-200 rounded-xl p-2 space-y-1 text-sm shadow-inner"
-                  >
-                    <!-- Checkboxes inyectados -->
-                  </div>
+                  ></div>
                 </div>
               </div>
 
@@ -728,7 +752,7 @@
       </div>
     </div>
 
-    <!-- INSUMOS TEMPLATE (OCULTO, SOLO PARA COPIAR JS) -->
+    <!-- INSUMOS TEMPLATE -->
     <select id="insumos_template" class="hidden">
       <option value="0">No requiere material...</option>
       <option value="otro">Otro: escribir... (no está en inventario)</option>
@@ -738,9 +762,6 @@
     <script src="js/notificaciones.js"></script>
     <script src="/js/incluir.js"></script>
     <script>
-      // Config pública de Cloudinary leída del backend (que a su vez la lee de variables
-      // de entorno: CLOUDINARY_CLOUD_NAME y CLOUDINARY_UPLOAD_PRESET). Se cachea para no
-      // pedirla de nuevo en cada subida.
       let _cloudinaryConfigCache = null;
       async function obtenerConfigCloudinary() {
         if (_cloudinaryConfigCache) return _cloudinaryConfigCache;
@@ -755,10 +776,8 @@
 
       let userIdActual = null;
       let esUsuarioPsicologo = false;
+      let todosLosBeneficiarios = [];
 
-      // Punto de entrada: monta los parciales, valida sesión, calcula permisos propios de
-      // Agenda (quién puede agendar, quién ve el directorio de pacientes) y dispara todas
-      // las cargas iniciales (directorios, calendario, catálogos del modal).
       document.addEventListener("DOMContentLoaded", async () => {
         await incluirParcial("#sidebar-mount", "partials/navbar_admin.html");
         await incluirParcial("#header-mount", "partials/header_admin.html");
@@ -782,8 +801,6 @@
           document.getElementById("nav_user_name").innerText =
             payload.nombre.split(" ")[0];
 
-          // Solo Admin, Coordinador y Psicólogo pueden agendar actividades — lógica propia
-          // de esta página (no forma parte de aplicarRestriccionesNav compartida).
           const esPsico =
             Number(payload.rol) === ROL_ESPECIALISTA &&
             (payload.especialidad || "").toLowerCase().includes("psic");
@@ -810,10 +827,6 @@
         cambiarVistaFormulario();
       });
 
-      // ================= MODAL LÓGICA =================
-      // Abre el modal en modo "crear": limpia el formulario, resetea el título/botón a modo
-      // alta, fuerza el tipo "clinica" y lo bloquea si el usuario es psicólogo (solo puede
-      // agendar citas clínicas), y arranca con una fila de insumos vacía.
       function abrirModalAgenda() {
         document.getElementById("edit_id").value = "";
         document.getElementById("formAgenda").reset();
@@ -825,6 +838,12 @@
           esUsuarioPsicologo;
         if (esUsuarioPsicologo) {
           document.getElementById("tipo_agendamiento").value = "clinica";
+          const selPsi = document.getElementById("cli_especialista");
+          if (selPsi) {
+            selPsi.value = userIdActual;
+            selPsi.disabled = true;
+          }
+          poblarSelectorBeneficiarios();
         }
         cambiarVistaFormulario();
         cambiarModalidadClinica();
@@ -846,7 +865,6 @@
         }, 10);
       }
 
-      // Cierra el modal con la animación de fade/scale y resetea el formulario a la vista por defecto.
       function cerrarModalAgenda() {
         document.getElementById("modalAgenda").classList.add("opacity-0");
         document.getElementById("modalAgendaContent").classList.add("scale-95");
@@ -857,9 +875,6 @@
         }, 300);
       }
 
-      // Muestra la sub-sección del formulario correspondiente al tipo elegido (visita,
-      // evento o clínica) y ajusta qué campos son "required" según esa vista, para que el
-      // navegador no exija campos ocultos de las otras vistas.
       function cambiarVistaFormulario() {
         const tipo = document.getElementById("tipo_agendamiento").value;
         document
@@ -879,8 +894,6 @@
           tipo === "clinica";
       }
 
-      // Alterna entre mostrar el campo de ubicación física o el de link de Meet, según si
-      // la cita clínica se marcó como presencial o en línea.
       function cambiarModalidadClinica() {
         const campoOnline = document.getElementById("cli_modalidad_online");
         const online = campoOnline ? campoOnline.checked : false;
@@ -892,8 +905,6 @@
           .classList.toggle("hidden", online);
       }
 
-      // Filtra visualmente (oculta con .hidden) las etiquetas de voluntarios del equipo de
-      // campo cuyo nombre no coincide con el texto buscado.
       function filtrarEquipoCampo() {
         const campo = document.getElementById("ev_buscar_equipo");
         const texto = (campo ? campo.value : "").trim().toLowerCase();
@@ -905,12 +916,6 @@
           });
       }
 
-      // ================= LÓGICA DE INVENTARIO =================
-      // ================= FOTOGRAFÍA DEL EVENTO (Cloudinary) =================
-      // Sube la foto del evento directamente desde el navegador a Cloudinary (sin pasar por
-      // nuestro backend) usando el cloud_name/upload_preset públicos. La respuesta trae
-      // "secure_url", que es lo único que guardamos: se mete en el input oculto
-      // #ev_url_imagen y es lo que se envía al backend al guardar el evento.
       async function subirImagenEvento(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -961,9 +966,6 @@
         }
       }
 
-      // Agrega dinámicamente una fila de "material a utilizar" al formulario de evento,
-      // clonando las opciones del <select id="insumos_template"> oculto (que ya trae el
-      // catálogo de insumos cargado por cargarCatalogosModal).
       function agregarFilaInsumo() {
         const div = document.createElement("div");
         div.className =
@@ -983,8 +985,6 @@
         document.getElementById("contenedor_insumos").appendChild(div);
       }
 
-      // Muestra el campo de texto libre "Nombre del material" cuando el usuario elige la
-      // opción "otro" (material que no está en el inventario) en el <select> de la fila.
       function toggleInsumoOtro(selectEl) {
         const contenedorFila = selectEl.closest("div.flex.flex-col");
         const inputOtro = contenedorFila
@@ -994,8 +994,6 @@
           inputOtro.classList.toggle("hidden", selectEl.value !== "otro");
       }
 
-      // Filtra visualmente las opciones del <select> de materiales según lo que se escriba,
-      // para poder buscar rápido en catálogos largos sin perder el <select> nativo.
       function filtrarOpcionesInsumo(inputEl) {
         const texto = inputEl.value.trim().toLowerCase();
         const select = inputEl.parentElement.querySelector(".insumo_select");
@@ -1015,9 +1013,6 @@
         }
       }
 
-      // Evita pedir más cantidad de un insumo de la que hay en stock: compara la cantidad
-      // escrita contra el data-stock de la opción seleccionada y, si se pasa, la recorta
-      // al máximo disponible y avisa con un alert.
       function validarStock(inputField) {
         const select = inputField.parentElement.querySelector(".insumo_select");
         if (!select) return;
@@ -1034,7 +1029,6 @@
         }
       }
 
-      // ================= CARGA DE DATOS (CATÁLOGOS) =================
       async function cargarCatalogosModal() {
         try {
           const res = await fetch(`${API_URL}/api/catalogos_agenda`, {
@@ -1042,7 +1036,6 @@
           });
           const json = await res.json();
           if (json.success) {
-            // Escuelas
             const selEscuelas = document.querySelectorAll(".cat_escuelas");
             json.escuelas.forEach((e) => {
               selEscuelas.forEach(
@@ -1051,18 +1044,17 @@
               );
             });
 
-            // Insumos
             const template = document.getElementById("insumos_template");
             json.insumos.forEach((i) => {
               template.innerHTML += `<option value="${i.id_insumo}" data-stock="${i.stock_actual}">${i.nombre_insumo} (Disp: ${i.stock_actual} ${i.unidad_medida})</option>`;
             });
-            agregarFilaInsumo(); // Pre-llena la primera fila
+            agregarFilaInsumo();
 
-            // Voluntarios
             const divVols = document.getElementById("ev_voluntarios_list");
             const selResp = document.getElementById("ev_responsable");
             const selPsi = document.getElementById("cli_especialista");
 
+            selPsi.innerHTML = "";
             json.voluntarios.forEach((v) => {
               const selectedStr =
                 v.id_usuario === userIdActual ? "selected" : "";
@@ -1070,7 +1062,8 @@
               if (
                 v.id_rol === 2 ||
                 v.id_rol === 1 ||
-                v.especialidad === "Psicología"
+                (v.especialidad &&
+                  v.especialidad.toLowerCase().includes("psic"))
               ) {
                 selPsi.innerHTML += `<option value="${v.id_usuario}" ${selectedStr}>${v.nombre_completo}</option>`;
               }
@@ -1081,18 +1074,41 @@
                         </label>`;
             });
 
-            // Beneficiarios
-            const selBen = document.getElementById("cli_beneficiario");
-            json.beneficiarios.forEach((b) => {
-              selBen.innerHTML += `<option value="${b.id_beneficiario}">${b.nombre_completo}</option>`;
-            });
+            todosLosBeneficiarios = json.beneficiarios || [];
+            poblarSelectorBeneficiarios();
+
+            if (esUsuarioPsicologo) {
+              selPsi.value = userIdActual;
+              selPsi.disabled = true;
+            }
           }
         } catch (e) {
           console.error("Error catálogos", e);
         }
       }
 
-      // ================= MODIFICAR: PRELLENAR DATOS =================
+      function poblarSelectorBeneficiarios() {
+        const selBen = document.getElementById("cli_beneficiario");
+        selBen.innerHTML =
+          '<option value="">Selecciona al beneficiario...</option>';
+
+        const lista = esUsuarioPsicologo
+          ? todosLosBeneficiarios.filter(
+              (b) => Number(b.id_especialista) === Number(userIdActual),
+            )
+          : todosLosBeneficiarios;
+
+        if (lista.length === 0 && esUsuarioPsicologo) {
+          selBen.innerHTML =
+            '<option value="" disabled>No tienes beneficiarios asignados a tu cargo</option>';
+          return;
+        }
+
+        lista.forEach((b) => {
+          selBen.innerHTML += `<option value="${b.id_beneficiario}">${b.nombre_completo}</option>`;
+        });
+      }
+
       async function editarActividad(id, categoria) {
         try {
           const res = await fetch(`${API_URL}/api/agenda/${categoria}/${id}`, {
@@ -1110,10 +1126,9 @@
 
             document.getElementById("tipo_agendamiento").value =
               data.tipo_registro;
-            document.getElementById("tipo_agendamiento").disabled = true; // Bloqueado al editar
+            document.getElementById("tipo_agendamiento").disabled = true;
             cambiarVistaFormulario();
 
-            // Formatear Fecha y Hora para los inputs
             const fechaCita = new Date(
               data.fecha_cita || data.fecha_realizacion,
             );
@@ -1154,7 +1169,6 @@
                 data.link_reunion || "";
               cambiarModalidadClinica();
             } else {
-              // Evento Operativo
               document.getElementById("ev_titulo").value =
                 data.titulo_evento || "";
               if (data.url_imagen) {
@@ -1179,13 +1193,12 @@
               document.getElementById("ev_link_reunion").value =
                 data.link_reunion || "";
 
-              // Limpiar y Llenar Voluntarios
               document
                 .querySelectorAll('input[name="asistentes"]')
                 .forEach((cb) => (cb.checked = false));
               if (data.voluntarios && data.voluntarios.length > 0) {
                 document.getElementById("ev_responsable").value =
-                  data.voluntarios[0]; // El 1ro es el responsable
+                  data.voluntarios[0];
                 data.voluntarios.forEach((vid) => {
                   const cb = document.querySelector(
                     `input[name="asistentes"][value="${vid}"]`,
@@ -1194,7 +1207,6 @@
                 });
               }
 
-              // Limpiar y Llenar Insumos
               document.getElementById("contenedor_insumos").innerHTML = "";
               if (!data.insumos || data.insumos.length === 0) {
                 agregarFilaInsumo();
@@ -1211,7 +1223,6 @@
               }
             }
 
-            // Abrir modal suavemente
             document.getElementById("modalAgenda").classList.remove("hidden");
             setTimeout(() => {
               document
@@ -1229,7 +1240,6 @@
         }
       }
 
-      // ================= GUARDAR AGENDA (POST / PUT) =================
       document
         .getElementById("formAgenda")
         .addEventListener("submit", async (e) => {
@@ -1267,8 +1277,9 @@
             payload.datos.titulo = document.getElementById("cli_titulo").value;
             payload.datos.id_beneficiario =
               document.getElementById("cli_beneficiario").value;
-            payload.datos.id_especialista =
-              document.getElementById("cli_especialista").value;
+            payload.datos.id_especialista = esUsuarioPsicologo
+              ? userIdActual
+              : document.getElementById("cli_especialista").value;
             const modalidadSeleccionada = document.getElementById(
               "cli_modalidad_online",
             ).checked
@@ -1280,7 +1291,6 @@
             payload.datos.link_reunion =
               document.getElementById("cli_link_reunion").value || null;
           } else {
-            // Evento Operativo
             const checkboxes = document.querySelectorAll(
               'input[name="asistentes"]:checked',
             );
@@ -1358,9 +1368,6 @@
           }
         });
 
-      // ================= LISTADO, FILTROS Y ELIMINAR =================
-      // Marca una visita de prospección como realizada: pide por prompt() cuántas personas
-      // asistieron de verdad y lo manda al backend para cerrar el registro.
       async function completarVisita(id) {
         const asistentesReales = prompt(
           "¿Cuántas personas asistieron realmente a esta visita?",
@@ -1393,8 +1400,6 @@
         }
       }
 
-      // Elimina una actividad (visita, evento o cita) tras confirmar; el backend se encarga
-      // de regresar el material usado al inventario.
       async function eliminarActividad(id, categoria) {
         if (
           !confirm(
@@ -1413,14 +1418,11 @@
         }
       }
 
-      // ================= DIRECTORIOS (Escuelas / Pacientes) =================
       let directorioEscuelas = [];
       let directorioPacientes = [];
       let tabDirectorioActivo = "escuelas";
-      let seleccionActual = null; // { tipo: 'escuela'|'paciente', id: N } o null (vista general)
+      let seleccionActual = null;
 
-      // Carga en paralelo el directorio de escuelas y el de pacientes/beneficiarios y los
-      // guarda en las variables globales que usa renderDirectorio() para pintarlos.
       async function cargarDirectorios() {
         try {
           const [resEsc, resPac] = await Promise.all([
@@ -1443,21 +1445,16 @@
         }
       }
 
-      // Solo Admin, Coordinador y Psicólogo (Especialista con especialidad "Psicología")
-      // pueden ver el directorio de Pacientes. El resto (otros especialistas, voluntarios)
-      // solo debe ver Escuelas — se oculta la pestaña por completo y se fuerza esa vista.
       function restringirPestanaPacientes(rol, especialidad) {
         const esPsico =
           rol === 2 && (especialidad || "").toLowerCase().includes("psic");
         const puedeVerPacientes = rol === 1 || rol === 3 || esPsico;
         if (!puedeVerPacientes) {
-          cambiarTabDirectorio("escuelas"); // primero forzamos la vista, luego quitamos el botón
+          cambiarTabDirectorio("escuelas");
           document.getElementById("tabDirPacientes").remove();
         }
       }
 
-      // Cambia entre la pestaña "Escuelas" y "Pacientes" del panel izquierdo: actualiza los
-      // estilos de las pestañas, limpia el buscador y vuelve a pintar la lista.
       function cambiarTabDirectorio(tab) {
         tabDirectorioActivo = tab;
         const btnEsc = document.getElementById("tabDirEscuelas");
@@ -1474,14 +1471,10 @@
         renderDirectorio();
       }
 
-      // Se llama al escribir en el buscador del directorio; simplemente re-pinta la lista
-      // (el filtrado por texto ocurre dentro de renderDirectorio).
       function filtrarDirectorio() {
         renderDirectorio();
       }
 
-      // Pinta la lista del directorio (escuelas o pacientes según la pestaña activa),
-      // aplicando el filtro de texto y resaltando el elemento actualmente seleccionado.
       function renderDirectorio() {
         const texto = document
           .getElementById("buscador_directorio")
@@ -1555,7 +1548,6 @@
         }
       }
 
-      // ================= SELECCIÓN: ESCUELA =================
       async function seleccionarEscuela(id) {
         seleccionActual = { tipo: "escuela", id };
         renderDirectorio();
@@ -1593,7 +1585,6 @@
         }
       }
 
-      // ================= SELECCIÓN: PACIENTE =================
       async function seleccionarPaciente(id) {
         seleccionActual = { tipo: "paciente", id };
         renderDirectorio();
@@ -1652,7 +1643,6 @@
         }
       }
 
-      // ================= VISTA GENERAL (todas las actividades) =================
       async function cargarVistaGeneral() {
         seleccionActual = null;
         renderDirectorio();
@@ -1670,26 +1660,18 @@
         }
       }
 
-      // Vuelve a cargar lo que se esté mostrando ahora mismo (vista general, escuela o
-      // paciente seleccionados) tras crear/editar/eliminar una actividad, y refresca
-      // también los directorios y el calendario porque pudieron cambiar.
       function recargarVistaActual() {
         if (!seleccionActual) cargarVistaGeneral();
         else if (seleccionActual.tipo === "escuela")
           seleccionarEscuela(seleccionActual.id);
         else seleccionarPaciente(seleccionActual.id);
-        cargarDirectorios(); // refresca "última visita" y listas por si cambiaron
-        cargarCalendario(); // refresca los días resaltados
+        cargarDirectorios();
+        cargarCalendario();
       }
 
-      // Render reutilizable para actividades tipo 'evento'/'visita' (vista general y por escuela)
       let ultimaListaActividades = [];
       let contextoActividadesActual = "general";
 
-      // Determina si una actividad coincide con el buscador de texto y el filtro de tipo
-      // de la vista de "Actividades Generales". El caso especial del tipo "visita" hace
-      // match tanto por ev.tipo como por ev.categoria, porque las visitas no tienen un
-      // "tipo" propio como los eventos.
       function actividadCoincideFiltro(ev) {
         const campoTexto = document.getElementById("buscador_actividades");
         const texto = (campoTexto ? campoTexto.value : "").trim().toLowerCase();
@@ -1706,8 +1688,6 @@
         return coincideTexto && coincideTipo;
       }
 
-      // Re-pinta la lista de actividades ya cargada (ultimaListaActividades) aplicando los
-      // filtros actuales, sin volver a pedirla al servidor.
       function filtrarActividadesGenerales() {
         renderActividadesGenerico(
           ultimaListaActividades,
@@ -1716,8 +1696,6 @@
         );
       }
 
-      // Conecta el buscador principal del navbar (#buscador_principal) con los dos
-      // buscadores propios de esta página: replica el texto en ambos y dispara sus filtros.
       function buscarGlobalAgenda(valor) {
         const campoDirectorio = document.getElementById("buscador_directorio");
         const campoActividades = document.getElementById(
@@ -1832,8 +1810,6 @@
           .join("");
       }
 
-      // Permite que el usuario actual se agregue como voluntario/staff a un evento
-      // operativo existente, sin pasar por el modal de edición completo.
       async function unirseAEvento(idEvento) {
         try {
           const res = await fetch(
@@ -1852,13 +1828,10 @@
         }
       }
 
-      // ================= CALENDARIO VISUAL =================
       let mesCalendarioActual = new Date();
-      let actividadesPorFecha = {}; // { 'YYYY-MM-DD': [ {titulo, categoria, id}, ... ] }
+      let actividadesPorFecha = {};
       let diaSeleccionadoCalendario = null;
 
-      // Trae todas las actividades y las agrupa en actividadesPorFecha por día (clave
-      // 'YYYY-MM-DD'), para que el calendario mensual pueda marcar qué días tienen eventos.
       async function cargarCalendario() {
         try {
           const res = await fetch(`${API_URL}/api/agenda`, {
@@ -1879,7 +1852,6 @@
         }
       }
 
-      // Avanza o retrocede el calendario un mes (direccion: 1 o -1) y vuelve a pintarlo.
       function cambiarMesCalendario(direccion) {
         mesCalendarioActual.setMonth(
           mesCalendarioActual.getMonth() + direccion,
@@ -1887,9 +1859,6 @@
         renderCalendario();
       }
 
-      // Dibuja la cuadrícula de días del mes actual (relleno con celdas vacías antes del
-      // día 1 según el día de la semana en que cae), resaltando el día de hoy, el día
-      // seleccionado y los días que tienen actividades registradas (punto rosa).
       function renderCalendario() {
         const anio = mesCalendarioActual.getFullYear();
         const mes = mesCalendarioActual.getMonth();
@@ -1910,7 +1879,7 @@
         document.getElementById("titulo_mes_calendario").innerText =
           `${nombresMes[mes]} ${anio}`;
 
-        const primerDiaSemana = new Date(anio, mes, 1).getDay(); // 0=Dom
+        const primerDiaSemana = new Date(anio, mes, 1).getDay();
         const diasEnMes = new Date(anio, mes + 1, 0).getDate();
         const hoy = new Date();
         const hoyStr = hoy.toISOString().split("T")[0];
@@ -1946,8 +1915,6 @@
         grid.innerHTML = celdas;
       }
 
-      // Al hacer clic en un día del calendario: lo marca como seleccionado, limpia la
-      // selección de escuela/paciente del directorio y muestra solo las actividades de ese día.
       function verDiaCalendario(claveFecha) {
         diaSeleccionadoCalendario = claveFecha;
         seleccionActual = null;
@@ -1955,8 +1922,11 @@
         renderCalendario();
 
         const actividadesDia = actividadesPorFecha[claveFecha] || [];
+        const [año, mesNum, diaNum] = claveFecha.split("-").map(Number);
         const fechaLegible = new Date(
-          claveFecha + "T12:00:00",
+          año,
+          mesNum - 1,
+          diaNum,
         ).toLocaleDateString("es-MX", {
           weekday: "long",
           day: "numeric",

@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Emisión de Credenciales Institucionales | Sumando Voluntades A.C.
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: #f1f5f9;
+      }
+      .font-card {
+        font-family: "Montserrat", sans-serif;
+      }
+      .id-card-frame {
+        width: 340px;
+        height: 540px;
+        position: relative;
+        background: #ffffff;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.15);
+      }
+      .card-gradient-top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 160px;
+        background: linear-gradient(135deg, #f39200 0%, #e6007e 100%);
+        clip-path: ellipse(130% 65% at 50% 0%);
+        z-index: 0;
+      }
+      .card-slot {
+        width: 50px;
+        height: 12px;
+        background-color: #cbd5e1;
+        border-radius: 9999px;
+        margin: 0 auto 8px auto;
+      }
+    </style>
+  </head>
+  <body class="text-slate-800 min-h-screen flex flex-col">
+    <!-- BARRA SUPERIOR -->
+    <header
+      class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm"
+    >
+      <div class="flex items-center gap-3">
+        <a
+          href="herramientas"
+          class="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+          title="Volver a Herramientas"
+        >
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <img
+            src="/assets/Logo.png"
+            alt="Logo"
+            class="h-8 w-auto"
+            onerror="this.src = 'Copy of Sumando Voluntades.png'"
+          />
+          <div>
+            <h1 class="text-sm font-extrabold text-slate-800 leading-tight">
+              Generador de Credenciales y Gafetes
+            </h1>
+            <p class="text-[11px] text-slate-400 font-medium">
+              Acreditación Oficial de Personal y Voluntariado
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span
+          class="text-xs font-bold px-3 py-1 bg-pink-50 text-[#b50062] border border-pink-200 rounded-full flex items-center gap-1.5"
+        >
+          <span class="w-2 h-2 rounded-full bg-[#b50062]"></span> Personal
+          Autorizado
+        </span>
+      </div>
+    </header>
+
+    <!-- ÁREA PRINCIPAL -->
+    <div
+      class="flex-1 p-6 md:p-10 flex flex-col xl:flex-row gap-8 items-start justify-center max-w-[1600px] mx-auto w-full"
+    >
+      <!-- PANEL DE EDICIÓN Y BASE DE DATOS -->
+      <aside
+        class="w-full xl:w-[420px] bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 space-y-5 shrink-0"
+      >
+        <!-- AUTOCOMPLETAR DESDE BASE DE DATOS -->
+        <div
+          class="p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50/40 border border-purple-100 space-y-2.5"
+        >
+          <div class="flex items-center justify-between">
+            <span
+              class="text-xs font-bold text-purple-900 flex items-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-purple-600 text-sm"
+                >badge</span
+              >
+              Cargar de la Base de Datos
+            </span>
+            <span
+              class="text-[10px] font-semibold text-purple-700 bg-white px-2 py-0.5 rounded-md border border-purple-200"
+              >Rápido</span
+            >
+          </div>
+          <p class="text-[11px] text-slate-500 leading-snug">
+            Selecciona un integrante registrado para rellenar nombre, rol,
+            especialidad y fotografía automáticamente.
+          </p>
+          <select
+            id="selUsuarioBD"
+            onchange="aplicarUsuarioBD(this.value)"
+            class="w-full text-xs font-semibold px-3 py-2.5 bg-white border border-purple-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-slate-700 cursor-pointer"
+          >
+            <option value="">Cargando lista de integrantes...</option>
+          </select>
+        </div>
+
+        <!-- FORMULARIO EDITABLE -->
+        <div class="space-y-4 font-sans">
+          <div>
+            <label
+              class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+              >Nombre Completo</label
+            >
+            <input
+              type="text"
+              id="inNombre"
+              oninput="actualizarCredencial()"
+              class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#e6007e]/30"
+              value="Rodrigo Samuel Bernal Moreno"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >Rol / Cargo</label
+              >
+              <input
+                type="text"
+                id="inRol"
+                oninput="actualizarCredencial()"
+                class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#e6007e]/30"
+                value="Coordinación Operativa"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >Especialidad</label
+              >
+              <input
+                type="text"
+                id="inEspecialidad"
+                oninput="actualizarCredencial()"
+                class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#e6007e]/30"
+                value="Ingeniería & Logística"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >ID / Matrícula</label
+              >
+              <input
+                type="text"
+                id="inId"
+                oninput="actualizarCredencial()"
+                class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#e6007e]/30"
+                value="SV-OP-024"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >Vigencia</label
+              >
+              <input
+                type="text"
+                id="inVigencia"
+                oninput="actualizarCredencial()"
+                class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#e6007e]/30"
+                value="Dic 2026"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+              >Teléfono de Contacto (Reverso)</label
+            >
+            <input
+              type="text"
+              id="inTel"
+              oninput="actualizarCredencial()"
+              class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#e6007e]/30"
+              value="222 337 4322"
+            />
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+              >Foto del Integrante</label
+            >
+            <div class="flex items-center gap-3">
+              <input
+                type="file"
+                id="inFotoSubir"
+                accept="image/*"
+                onchange="subirFotoLocal(event)"
+                class="hidden"
+              />
+              <button
+                type="button"
+                onclick="document.getElementById('inFotoSubir').click()"
+                class="px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold rounded-xl text-xs transition-colors flex items-center gap-1.5"
+              >
+                <span class="material-symbols-outlined text-base">upload</span>
+                Cambiar Imagen
+              </button>
+              <span
+                id="txtFotoNombre"
+                class="text-[11px] text-slate-400 truncate max-w-[180px]"
+                >Usando foto actual</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTONES DE EXPORTACIÓN -->
+        <div class="pt-4 border-t border-slate-100 space-y-2.5">
+          <button
+            onclick="descargarWord()"
+            id="btnDocx"
+            class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+          >
+            <span class="material-symbols-outlined text-sm">description</span>
+            Descargar en Word (.docx con Frente y Reverso)
+          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              onclick="descargarFrentePNG()"
+              class="py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-sm">image</span>
+              Frente (PNG)
+            </button>
+            <button
+              onclick="descargarReversoPNG()"
+              class="py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-sm">image</span>
+              Reverso (PNG)
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- PREVISUALIZACIÓN DE AMBAS CARAS -->
+      <main
+        class="flex flex-col md:flex-row items-center justify-center gap-8 pb-10"
+      >
+        <!-- FRENTE DE LA CREDENCIAL -->
+        <div class="flex flex-col items-center">
+          <span
+            class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3"
+            >Cara Frontal</span
+          >
+
+          <div
+            id="card-front"
+            class="id-card-frame font-card border-2 border-white flex flex-col justify-between items-center text-center p-5 select-none shrink-0"
+          >
+            <div class="card-gradient-top"></div>
+
+            <!-- RANURA SUPERIOR Y LOGO -->
+            <div class="relative z-10 w-full flex flex-col items-center pt-1">
+              <div class="card-slot"></div>
+              <div
+                class="bg-white px-5 py-2.5 rounded-2xl shadow-md border border-slate-100 flex items-center justify-center mt-1 w-[85%]"
+              >
+                <img
+                  src="/assets/Logo.png"
+                  alt="Logo SV"
+                  class="h-10 w-auto object-contain"
+                  onerror="this.src = 'Copy of Sumando Voluntades.png'"
+                />
+              </div>
+            </div>
+
+            <!-- FOTO DE PERFIL CIRCULAR CON BORDE -->
+            <div class="relative z-10 my-2">
+              <div
+                class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-slate-100 mx-auto"
+              >
+                <img
+                  id="outFoto"
+                  src="https://res.cloudinary.com/demo/image/upload/avatar.png"
+                  alt="Foto de perfil"
+                  class="w-full h-full object-cover"
+                  onerror="
+                    this.src =
+                      'https://res.cloudinary.com/demo/image/upload/avatar.png'
+                  "
+                />
+              </div>
+              <span
+                id="outMatriculaPill"
+                class="inline-block mt-2 px-3 py-0.5 bg-slate-800 text-white text-[9px] font-extrabold uppercase rounded-full tracking-widest shadow-sm"
+              >
+                SV-OP-024
+              </span>
+            </div>
+
+            <!-- DATOS DEL INTEGRANTE -->
+            <div class="relative z-10 px-4 flex-1 flex flex-col justify-center">
+              <h3
+                id="outNombre"
+                class="text-base font-extrabold text-slate-900 leading-tight mb-1"
+              >
+                Rodrigo Samuel Bernal Moreno
+              </h3>
+              <p
+                id="outRol"
+                class="text-xs font-black text-[#e6007e] uppercase tracking-wider"
+              >
+                Coordinación Operativa
+              </p>
+              <p
+                id="outEspecialidad"
+                class="text-[10px] font-bold text-slate-500 tracking-wide mt-0.5"
+              >
+                Ingeniería & Logística
+              </p>
+            </div>
+
+            <!-- PIE FRONTAL -->
+            <div
+              class="w-full relative z-10 pt-2 border-t border-slate-100 flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-slate-400"
+            >
+              <span>Sanctórum A.C.</span>
+              <span class="text-[#f39200]"
+                >Vigencia:
+                <b id="outVigencia" class="text-slate-700">Dic 2026</b></span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- REVERSO DE LA CREDENCIAL -->
+        <div class="flex flex-col items-center">
+          <span
+            class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3"
+            >Cara Posterior</span
+          >
+
+          <div
+            id="card-back"
+            class="id-card-frame font-card border-2 border-white flex flex-col justify-between p-6 select-none shrink-0 bg-slate-50"
+          >
+            <!-- ENCABEZADO TRASERO -->
+            <div
+              class="flex items-center justify-between border-b border-slate-200 pb-3"
+            >
+              <div class="text-left">
+                <span
+                  class="text-[8px] font-black uppercase text-[#e6007e] tracking-widest block"
+                  >Acreditación Legal</span
+                >
+                <span class="text-[10px] font-bold text-slate-700"
+                  >Sumando Voluntades en Sanctórum</span
+                >
+              </div>
+              <div
+                class="w-7 h-7 bg-white rounded-lg p-1 shadow-sm border border-slate-200 flex items-center justify-center"
+              >
+                <img
+                  src="/assets/Logo.png"
+                  alt="Icono"
+                  class="h-full w-auto"
+                  onerror="this.src = 'Copy of Sumando Voluntades.png'"
+                />
+              </div>
+            </div>
+
+            <!-- LEYENDA INSTITUCIONAL Y CONTACTO -->
+            <div class="space-y-3 py-2 text-center">
+              <p
+                class="text-[9px] text-slate-600 leading-relaxed italic text-justify px-1"
+              >
+                "El portador de la presente se encuentra acreditado formalmente
+                como representante institucional de nuestra asociación para la
+                ejecución de proyectos comunitarios y de salud mental."
+              </p>
+
+              <!-- QR DE VALIDACIÓN -->
+              <div
+                class="flex items-center justify-center gap-3 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm"
+              >
+                <img
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://sumandovoluntadesensanctorum.org/nosotros"
+                  alt="QR Verificación"
+                  class="w-14 h-14 rounded-lg"
+                />
+                <div class="text-left">
+                  <p class="text-[9px] font-bold text-slate-800">
+                    Verificación Oficial
+                  </p>
+                  <p class="text-[8px] text-slate-400 leading-tight">
+                    Escanea para validar vigencia e impacto en nuestro portal
+                    web.
+                  </p>
+                  <p
+                    id="outTel"
+                    class="text-[9px] font-bold text-[#f39200] mt-0.5"
+                  >
+                    Tel: 222 337 4322
+                  </p>
+                </div>
+              </div>
+
+              <!-- DATOS SEDE -->
+              <div class="text-[8px] text-slate-500 space-y-0.5">
+                <p>📍 Avenida Cholula #14 B, Cuautlancingo, Pue.</p>
+                <p>🌐 sumandovoluntadesensanctorum.org</p>
+              </div>
+            </div>
+
+            <!-- FIRMA AUTORIZADA -->
+            <div
+              class="border-t border-slate-200 pt-2 flex flex-col items-center text-center"
+            >
+              <div class="h-10 flex items-end justify-center mb-0.5">
+                <img
+                  src="firma.png"
+                  alt="Firma"
+                  class="h-9 w-auto object-contain"
+                  onerror="this.style.opacity = '0.1'"
+                />
+              </div>
+              <div class="w-32 border-t border-slate-400"></div>
+              <p class="text-[9px] font-bold text-slate-800 uppercase mt-0.5">
+                Patricia Méndez Romero
+              </p>
+              <p
+                class="text-[7px] text-[#e6007e] font-black uppercase tracking-widest"
+              >
+                Presidenta de la A.C.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- SCRIPTS DE PROTECCIÓN Y COMPILACIÓN -->
+    <script src="/js/comun.js"></script>
+    <script>
+      let listaUsuarios = [];
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Validación de permisos estricta (Solo Admin 1 y Coordinador 3)
+        const token = localStorage.getItem("token_sanctorum");
+        if (!token) {
+          window.location.replace("login");
+          return;
+        }
+        try {
+          const payload = decodeJWT(token);
+          if (Number(payload.rol) !== 1 && Number(payload.rol) !== 3) {
+            alert(
+              "Acceso reservado a Coordinación y Administración para emisión de gafetes.",
+            );
+            window.location.replace("herramientas");
+            return;
+          }
+        } catch (e) {
+          window.location.replace("login");
+          return;
+        }
+
+        // Cargar directorio de usuarios desde la base de datos
+        cargarUsuariosDesdeBD();
+        actualizarCredencial();
+      });
+
+      async function cargarUsuariosDesdeBD() {
+        const sel = document.getElementById("selUsuarioBD");
+        try {
+          const res = await fetch(`${API_URL}/api/voluntarios`, {
+            headers: authHeaders(),
+          });
+          const json = await res.json();
+          if (json.success && json.data) {
+            listaUsuarios = json.data;
+            sel.innerHTML =
+              '<option value="">-- Seleccionar Integrante --</option>';
+            listaUsuarios.forEach((u, index) => {
+              sel.innerHTML += `<option value="${index}">${u.nombre_completo} (${u.especialidad || "General"})</option>`;
+            });
+          } else {
+            sel.innerHTML = '<option value="">Edición manual lista</option>';
+          }
+        } catch (e) {
+          console.error("Error al cargar usuarios:", e);
+          sel.innerHTML = '<option value="">Edición manual disponible</option>';
+        }
+      }
+
+      function aplicarUsuarioBD(index) {
+        if (index === "" || !listaUsuarios[index]) return;
+        const u = listaUsuarios[index];
+
+        document.getElementById("inNombre").value = u.nombre_completo || "";
+
+        let nombreRol = "Voluntariado";
+        if (Number(u.id_rol) === 1) nombreRol = "Dirección / Admin";
+        else if (Number(u.id_rol) === 2) nombreRol = "Especialista Clínico";
+        else if (Number(u.id_rol) === 3) nombreRol = "Coordinación";
+        else if (Number(u.id_rol) === 5) nombreRol = "Donador Aliado";
+
+        document.getElementById("inRol").value = nombreRol;
+        document.getElementById("inEspecialidad").value =
+          u.especialidad || "Comunitario";
+        document.getElementById("inId").value =
+          `SV-${(u.especialidad || "VOL").substring(0, 3).toUpperCase()}-0${u.id_usuario}`;
+
+        if (u.telefono) {
+          document.getElementById("inTel").value = `Tel: ${u.telefono}`;
+        }
+
+        if (u.foto_perfil_url) {
+          document.getElementById("outFoto").src = u.foto_perfil_url;
+          document.getElementById("txtFotoNombre").innerText =
+            "Foto desde perfil";
+        }
+
+        actualizarCredencial();
+      }
+
+      function subirFotoLocal(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            document.getElementById("outFoto").src = e.target.result;
+            document.getElementById("txtFotoNombre").innerText = file.name;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function actualizarCredencial() {
+        document.getElementById("outNombre").innerText =
+          document.getElementById("inNombre").value || "Nombre del Integrante";
+        document.getElementById("outRol").innerText =
+          document.getElementById("inRol").value || "Rol";
+        document.getElementById("outEspecialidad").innerText =
+          document.getElementById("inEspecialidad").value || "";
+
+        const mat = document.getElementById("inId").value || "SV-000";
+        document.getElementById("outMatriculaPill").innerText = mat;
+        document.getElementById("outVigencia").innerText =
+          document.getElementById("inVigencia").value || "2026";
+        document.getElementById("outTel").innerText =
+          document.getElementById("inTel").value || "Tel: 222 337 4322";
+      }
+
+      function descargarFrentePNG() {
+        const front = document.getElementById("card-front");
+        html2canvas(front, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: null,
+        }).then((canvas) => {
+          const link = document.createElement("a");
+          link.download = `Gafete_Frente_${document.getElementById("inNombre").value.replace(/\s+/g, "_")}.png`;
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+        });
+      }
+
+      function descargarReversoPNG() {
+        const back = document.getElementById("card-back");
+        html2canvas(back, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: null,
+        }).then((canvas) => {
+          const link = document.createElement("a");
+          link.download = `Gafete_Reverso_${document.getElementById("inNombre").value.replace(/\s+/g, "_")}.png`;
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+        });
+      }
+
+      async function descargarWord() {
+        const btn = document.getElementById("btnDocx");
+        const originalText = btn.innerHTML;
+        btn.innerHTML =
+          '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span> Compilando documento...';
+        btn.disabled = true;
+
+        try {
+          const frontCanvas = await html2canvas(
+            document.getElementById("card-front"),
+            { scale: 3, useCORS: true },
+          );
+          const backCanvas = await html2canvas(
+            document.getElementById("card-back"),
+            { scale: 3, useCORS: true },
+          );
+
+          const frontBlob = await (
+            await fetch(frontCanvas.toDataURL("image/png"))
+          ).arrayBuffer();
+          const backBlob = await (
+            await fetch(backCanvas.toDataURL("image/png"))
+          ).arrayBuffer();
+
+          const {
+            Document,
+            Packer,
+            Paragraph,
+            ImageRun,
+            AlignmentType,
+            PageBreak,
+          } = docx;
+
+          const doc = new Document({
+            sections: [
+              {
+                properties: {
+                  page: {
+                    margin: { top: 720, bottom: 720, left: 720, right: 720 },
+                  },
+                },
+                children: [
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [
+                      new ImageRun({
+                        data: frontBlob,
+                        transformation: { width: 250, height: 395 },
+                      }),
+                    ],
+                  }),
+                  new Paragraph({ children: [new PageBreak()] }),
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [
+                      new ImageRun({
+                        data: backBlob,
+                        transformation: { width: 250, height: 395 },
+                      }),
+                    ],
+                  }),
+                ],
+              },
+            ],
+          });
+
+          const buffer = await Packer.toBlob(doc);
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(buffer);
+          link.download = `Credencial_SV_${document.getElementById("inNombre").value.replace(/\s+/g, "_")}.docx`;
+          link.click();
+        } catch (err) {
+          console.error(err);
+          alert("No se pudo compilar el archivo Word.");
+        } finally {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
+    </script>
+  </body>
+</html>

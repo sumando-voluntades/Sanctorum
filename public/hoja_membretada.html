@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hoja Membretada Oficial | Sumando Voluntades A.C.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: #f1f5f9;
+        margin: 0;
+        padding: 0;
+      }
+      .font-doc {
+        font-family: Arial, sans-serif;
+      }
+      .page-letter {
+        width: 21.59cm;
+        min-height: 27.94cm;
+        padding: 0 2.5cm 3.5cm 2.5cm;
+        background: #ffffff;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+      .header-wave-container {
+        position: relative;
+        margin-left: -2.5cm;
+        margin-right: -2.5cm;
+        width: calc(100% + 5cm);
+        height: 140px;
+        overflow: hidden;
+      }
+      .header-wave-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .header {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        z-index: 2;
+      }
+      .logo-container {
+        width: 42%;
+      }
+      .logo-placeholder {
+        width: 180px;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .logo-placeholder img {
+        max-width: 100%;
+        max-height: 100%;
+        display: block;
+      }
+      .header-text {
+        width: 55%;
+        text-align: right;
+        font-size: 11.5px;
+        color: #333;
+        line-height: 1.5;
+      }
+      .divider {
+        height: 4px;
+        background: linear-gradient(
+          to right,
+          #e91e63,
+          #ff9800,
+          #ffeb3b,
+          #4caf50,
+          #03a9f4
+        );
+        margin-bottom: 30px;
+        border-radius: 2px;
+      }
+      .content {
+        font-size: 13.5px;
+        line-height: 1.55;
+        color: #000;
+        text-align: justify;
+      }
+      .content p {
+        margin-bottom: 14px;
+      }
+      .signature-section {
+        position: relative;
+        text-align: center;
+        margin-top: 45px;
+      }
+      .signature-line {
+        width: 300px;
+        border-bottom: 1px solid #000;
+        margin: 0 auto 10px auto;
+      }
+      .sello-derecha {
+        position: absolute;
+        right: 25px;
+        top: 15px;
+        width: 175px;
+        height: auto;
+        opacity: 0.85;
+        pointer-events: none;
+      }
+      .footer {
+        position: absolute;
+        bottom: 1.5cm;
+        left: 2.5cm;
+        right: 2.5cm;
+        border-top: 2px solid #e91e63;
+        padding-top: 10px;
+        font-size: 11px;
+        text-align: center;
+        color: #555;
+        line-height: 1.5;
+      }
+      @media print {
+        body {
+          background: white;
+          margin: 0;
+        }
+        header,
+        aside {
+          display: none !important;
+        }
+        .page-letter {
+          margin: 0;
+          box-shadow: none;
+          width: 100%;
+          min-height: auto;
+        }
+        .header-wave-container,
+        .divider,
+        .footer,
+        .page-letter {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    </style>
+  </head>
+  <body class="text-slate-800 min-h-screen flex flex-col">
+    <!-- BARRA SUPERIOR -->
+    <header
+      class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm"
+    >
+      <div class="flex items-center gap-3">
+        <a
+          href="herramientas"
+          class="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+          title="Volver a Herramientas"
+        >
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <img
+            src="/assets/Logo.png"
+            alt="Logo"
+            class="h-8 w-auto"
+            onerror="this.src = 'Copy of Sumando Voluntades.png'"
+          />
+          <div>
+            <h1 class="text-sm font-extrabold text-slate-800 leading-tight">
+              Emisión de Documentos Oficiales
+            </h1>
+            <p class="text-[11px] text-slate-400 font-medium">
+              Sumando Voluntades en Sanctórum A.C.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span
+          class="text-xs font-bold px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full flex items-center gap-1.5"
+        >
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span> Uso Exclusivo
+          de Administración
+        </span>
+      </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div
+      class="flex-1 p-6 flex flex-col xl:flex-row gap-8 items-start justify-center max-w-[1700px] mx-auto w-full"
+    >
+      <!-- PANEL DE CONTROL (IZQUIERDA) -->
+      <aside
+        class="w-full xl:w-[420px] bg-white rounded-3xl p-6 shadow-sm border border-slate-200 shrink-0 space-y-4"
+      >
+        <!-- SELECTOR DE PLANTILLA -->
+        <div>
+          <label
+            class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2"
+            >Plantilla Oficial</label
+          >
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              id="btnTipoLiberacion"
+              onclick="seleccionarPlantilla('liberacion')"
+              class="py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 bg-[#b50062] text-white border-[#b50062] shadow-sm"
+            >
+              <span class="material-symbols-outlined text-sm">task_alt</span>
+              Liberación
+            </button>
+            <button
+              type="button"
+              id="btnTipoAceptacion"
+              onclick="seleccionarPlantilla('aceptacion')"
+              class="py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+            >
+              <span class="material-symbols-outlined text-sm">how_to_reg</span>
+              Aceptación
+            </button>
+          </div>
+        </div>
+
+        <!-- AUTOCOMPLETAR DESDE BD -->
+        <div
+          class="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50/40 border border-blue-100 space-y-2"
+        >
+          <div class="flex items-center justify-between">
+            <span
+              class="text-xs font-bold text-blue-900 flex items-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-blue-600 text-sm"
+                >database</span
+              >
+              Autocompletar Integrante
+            </span>
+            <span
+              class="text-[10px] font-semibold text-blue-700 bg-white px-2 py-0.5 rounded-md border border-blue-200"
+              >BD</span
+            >
+          </div>
+          <p class="text-[11px] text-slate-500 leading-snug">
+            Selecciona a un integrante registrado para rellenar sus datos
+            automáticamente o déjalo en blanco para redactar libremente.
+          </p>
+          <select
+            id="selVoluntarioBD"
+            onchange="aplicarVoluntarioBD(this.value)"
+            class="w-full text-xs font-semibold px-3 py-2 bg-white border border-blue-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 cursor-pointer"
+          >
+            <option value="">-- Plantilla en blanco (Personalizar) --</option>
+          </select>
+        </div>
+
+        <!-- CAMPOS DEL DOCUMENTO -->
+        <div class="space-y-3">
+          <div>
+            <label
+              class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+              >Nombre del Alumno(a)</label
+            >
+            <input
+              type="text"
+              id="inNombre"
+              oninput="actualizarDocumento()"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-pink-500/30"
+              placeholder="[Nombre del Alumno]"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >Matrícula</label
+              >
+              <input
+                type="text"
+                id="inMatricula"
+                oninput="actualizarDocumento()"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-500/30"
+                placeholder="[Matrícula]"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >Modalidad</label
+              >
+              <select
+                id="inModalidad"
+                onchange="actualizarDocumento()"
+                class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium outline-none cursor-pointer"
+              >
+                <option value="Servicio Social">Servicio Social</option>
+                <option value="Prácticas Profesionales">
+                  Prácticas Profesionales
+                </option>
+                <option value="Voluntariado Comunitario">
+                  Voluntariado Comunitario
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+              >Licenciatura / Carrera</label
+            >
+            <input
+              type="text"
+              id="inCarrera"
+              oninput="actualizarDocumento()"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-500/30"
+              placeholder="[Nombre de la Licenciatura]"
+            />
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+              >Universidad / Institución</label
+            >
+            <input
+              type="text"
+              id="inUniversidad"
+              oninput="actualizarDocumento()"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-500/30"
+              value="UNIVERSIDAD POPULAR AUTÓNOMA DEL ESTADO DE PUEBLA (UPAEP)"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >Total de Horas</label
+              >
+              <input
+                type="text"
+                id="inHoras"
+                oninput="actualizarDocumento()"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-pink-500/30"
+                placeholder="[Total de Horas]"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >Folio / Oficio</label
+              >
+              <input
+                type="text"
+                id="inFolio"
+                oninput="actualizarDocumento()"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono outline-none focus:ring-2 focus:ring-pink-500/30"
+                value="SV-OFC-2026-____"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >Fecha Inicio</label
+              >
+              <input
+                type="text"
+                id="inInicio"
+                oninput="actualizarDocumento()"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-500/30"
+                placeholder="[Fecha de Inicio]"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+                >Fecha Conclusión</label
+              >
+              <input
+                type="text"
+                id="inFin"
+                oninput="actualizarDocumento()"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-500/30"
+                placeholder="[Fecha de Fin]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1"
+              >Lugar y Fecha de Emisión</label
+            >
+            <input
+              type="text"
+              id="inFechaEmision"
+              oninput="actualizarDocumento()"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-pink-500/30"
+            />
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100">
+          <button
+            id="btn-docx"
+            onclick="downloadEditableDocx()"
+            class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+          >
+            <span class="material-symbols-outlined text-base">description</span>
+            Descargar en Word Editable (.docx)
+          </button>
+        </div>
+      </aside>
+
+      <!-- PREVISUALIZACIÓN DE LA HOJA MEMBRETADA (DERECHA) -->
+      <main
+        class="flex-1 w-full flex flex-col items-center justify-start overflow-auto pb-12"
+      >
+        <div
+          class="w-full flex items-center justify-between mb-3 px-2 max-w-[21.59cm]"
+        >
+          <span
+            class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+            >Vista Previa de Impresión (Tamaño Carta Oficial)</span
+          >
+          <span class="text-xs text-slate-400">21.59 × 27.94 cm</span>
+        </div>
+
+        <div class="overflow-x-auto w-full flex justify-center py-2">
+          <div
+            class="page-letter font-doc text-slate-900 select-none shrink-0"
+            id="hoja-membretada"
+          >
+            <div class="header-wave-container" id="wave-box">
+              <svg
+                class="header-wave-svg"
+                viewBox="0 0 1000 140"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M 0,0 L 1000,0 L 1000,85 C 700,140 450,45 0,110 Z"
+                  fill="#0288d1"
+                />
+                <path
+                  d="M 0,0 L 1000,0 L 1000,60 C 650,125 400,20 0,80 Z"
+                  fill="#1565c0"
+                />
+                <path
+                  d="M 0,0 L 1000,0 L 1000,35 C 750,90 350,-5 0,55 Z"
+                  fill="#0d47a1"
+                />
+              </svg>
+            </div>
+
+            <div class="header" id="header-box">
+              <div class="logo-container">
+                <div class="logo-placeholder">
+                  <img
+                    id="main-logo"
+                    src="Copy of Sumando Voluntades.png"
+                    alt="Logo de Sumando Voluntades"
+                    onerror="this.src = '/assets/Logo.png'"
+                  />
+                </div>
+              </div>
+              <div class="header-text" id="header-metadata">
+                <strong>Asociación Civil sin Fines de Lucro</strong><br />
+                <span id="outFolio">Folio / Oficio: SV-OFC-2026-____</span
+                ><br />
+                <span id="outFechaEmision"
+                  >Sanctorum, Cuautlancingo, Puebla; a __ de ________ de
+                  2026.</span
+                >
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="content" id="cuerpo-documento">
+              <p id="doc-asunto">
+                <strong>ASUNTO:</strong> CARTA DE LIBERACIÓN / CONSTANCIA
+                INSTITUCIONAL
+              </p>
+              <p id="doc-destinatario">
+                <strong>A QUIEN CORRESPONDA:</strong><br />
+                <strong id="outUniversidad"
+                  >UNIVERSIDAD POPULAR AUTÓNOMA DEL ESTADO DE PUEBLA
+                  (UPAEP)</strong
+                ><br />
+                <strong>PRESENTE.</strong>
+              </p>
+
+              <div id="parrafos-dinamicos">
+                <p id="parrafo-principal">
+                  Por medio de la presente,
+                  <strong>Sumando Voluntades en Sanctorum A.C.</strong> hace
+                  constar formalmente que él/la alumno(a)
+                  <strong id="outNombre">[Nombre del Alumno]</strong>, con
+                  matrícula <strong id="outMatricula">[Matrícula]</strong>,
+                  adscrito(a) a la licenciatura en
+                  <strong id="outCarrera">[Nombre de la Licenciatura]</strong>,
+                  ha concluido satisfactoriamente su periodo de
+                  <strong id="outModalidad"
+                    >[Prácticas Profesionales / Servicio Social]</strong
+                  >
+                  en nuestra organización, cubriendo un total de
+                  <strong id="outHoras">[Total de Horas]</strong> horas, durante
+                  el periodo comprendido del
+                  <strong id="outInicio">[Fecha de Inicio]</strong> al
+                  <strong id="outFin">[Fecha de Fin]</strong>.
+                </p>
+                <p id="parrafo-secundario">
+                  Durante su estancia, demostró un alto sentido de
+                  responsabilidad, ética y compromiso social en el desarrollo de
+                  programas dirigidos al bienestar comunitario y la salud
+                  mental.
+                </p>
+                <p>
+                  Se extiende la presente para los fines académicos y
+                  administrativos que al interesado(a) convengan.
+                </p>
+              </div>
+
+              <div class="signature-section">
+                <p><strong>ATENTAMENTE</strong></p>
+                <p><em>“La salud mental es responsabilidad en sociedad”</em></p>
+                <br /><br /><br /><br />
+                <img
+                  id="main-seal"
+                  class="sello-derecha"
+                  src="sello_oficial.png"
+                  alt="Sello Oficial"
+                  onerror="this.style.opacity = '0.1'"
+                />
+                <div class="signature-line"></div>
+                <p>
+                  <strong>PATRICIA MÉNDEZ ROMERO</strong><br />
+                  Directora General / Representante Legal<br />
+                  <strong>Sumando Voluntades en Sanctorum A.C.</strong>
+                </p>
+              </div>
+            </div>
+            <div class="footer" id="footer-box">
+              📍 Sanctorum, Cuautlancingo, Puebla, México.<br />
+              📞 Teléfono / WhatsApp: (222) 521 5313 / (222) 337 4322<br />
+              🌐 Redes Sociales: @Sumandovoluntadesensanctorum | ✉️ Contacto:
+              contacto@sumandovoluntades.org
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="/js/comun.js"></script>
+    <script>
+      let plantillaSeleccionada = "liberacion";
+      let listaVoluntarios = [];
+
+      const token = localStorage.getItem("token_sanctorum");
+      if (!token) {
+        window.location.replace("login");
+      } else {
+        try {
+          const payload = decodeJWT(token);
+          if (Number(payload.rol) !== 1 && Number(payload.rol) !== 3) {
+            alert(
+              "No tienes permisos para emitir documentos oficiales de la asociación.",
+            );
+            window.location.replace("herramientas");
+          }
+        } catch (e) {
+          window.location.replace("login");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        cargarVoluntariosDesdeBD();
+
+        const hoy = new Date();
+        const meses = [
+          "enero",
+          "febrero",
+          "marzo",
+          "abril",
+          "mayo",
+          "junio",
+          "julio",
+          "agosto",
+          "septiembre",
+          "octubre",
+          "noviembre",
+          "diciembre",
+        ];
+        const fechaActualTexto = `Sanctorum, Cuautlancingo, Puebla; a ${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}.`;
+        document.getElementById("inFechaEmision").value = fechaActualTexto;
+        document.getElementById("outFechaEmision").innerText = fechaActualTexto;
+
+        actualizarDocumento();
+      });
+
+      async function cargarVoluntariosDesdeBD() {
+        const sel = document.getElementById("selVoluntarioBD");
+        try {
+          const res = await fetch(`${API_URL}/api/voluntarios`, {
+            headers: authHeaders(),
+          });
+          const json = await res.json();
+          if (json.success && json.data) {
+            listaVoluntarios = json.data;
+            sel.innerHTML =
+              '<option value="">-- Plantilla en blanco (Personalizar) --</option>';
+            listaVoluntarios.forEach((u, idx) => {
+              sel.innerHTML += `<option value="${idx}">${u.nombre_completo} (${u.especialidad || "General"})</option>`;
+            });
+          }
+        } catch (e) {
+          console.error("Error al cargar lista:", e);
+          sel.innerHTML =
+            '<option value="">-- Plantilla en blanco (Personalizar) --</option>';
+        }
+      }
+
+      function aplicarVoluntarioBD(idx) {
+        if (idx === "" || !listaVoluntarios[idx]) {
+          document.getElementById("inNombre").value = "";
+          document.getElementById("inCarrera").value = "";
+          document.getElementById("inFolio").value = "SV-OFC-2026-____";
+          actualizarDocumento();
+          return;
+        }
+        const v = listaVoluntarios[idx];
+        document.getElementById("inNombre").value = v.nombre_completo || "";
+        document.getElementById("inCarrera").value =
+          v.especialidad || "Licenciatura";
+        document.getElementById("inFolio").value =
+          `SV-OFC-2026-0${v.id_usuario}`;
+        actualizarDocumento();
+      }
+
+      function seleccionarPlantilla(tipo) {
+        plantillaSeleccionada = tipo;
+        const btnLib = document.getElementById("btnTipoLiberacion");
+        const btnAce = document.getElementById("btnTipoAceptacion");
+
+        if (tipo === "liberacion") {
+          btnLib.className =
+            "py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 bg-[#b50062] text-white border-[#b50062] shadow-sm";
+          btnAce.className =
+            "py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100";
+        } else {
+          btnAce.className =
+            "py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 bg-[#b50062] text-white border-[#b50062] shadow-sm";
+          btnLib.className =
+            "py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100";
+        }
+
+        actualizarDocumento();
+      }
+
+      function actualizarDocumento() {
+        const nombre =
+          document.getElementById("inNombre").value.trim() ||
+          "[Nombre del Alumno]";
+        const matricula =
+          document.getElementById("inMatricula").value.trim() || "[Matrícula]";
+        const modalidad = document.getElementById("inModalidad").value;
+        const carrera =
+          document.getElementById("inCarrera").value.trim() ||
+          "[Nombre de la Licenciatura]";
+        const uni =
+          document.getElementById("inUniversidad").value.trim() ||
+          "UNIVERSIDAD POPULAR AUTÓNOMA DEL ESTADO DE PUEBLA (UPAEP)";
+        const horas =
+          document.getElementById("inHoras").value.trim() || "[Total de Horas]";
+        const inicio =
+          document.getElementById("inInicio").value.trim() ||
+          "[Fecha de Inicio]";
+        const fin =
+          document.getElementById("inFin").value.trim() || "[Fecha de Fin]";
+        const folio =
+          document.getElementById("inFolio").value.trim() || "SV-OFC-2026-____";
+        const fechaEmision = document
+          .getElementById("inFechaEmision")
+          .value.trim();
+
+        document.getElementById("outFolio").innerText =
+          `Folio / Oficio: ${folio}`;
+        document.getElementById("outFechaEmision").innerText = fechaEmision;
+        document.getElementById("outUniversidad").innerText = uni;
+
+        const asuntoEl = document.getElementById("doc-asunto");
+        const pPrincipal = document.getElementById("parrafo-principal");
+        const pSecundario = document.getElementById("parrafo-secundario");
+
+        if (plantillaSeleccionada === "aceptacion") {
+          asuntoEl.innerHTML = `<strong>ASUNTO:</strong> CARTA DE ACEPTACIÓN / ${modalidad.toUpperCase()}`;
+          pPrincipal.innerHTML = `
+            Por medio de la presente, <strong>Sumando Voluntades en Sanctorum A.C.</strong> hace constar formalmente que él/la alumno(a) <strong>${nombre}</strong>, con matrícula <strong>${matricula}</strong>, adscrito(a) a la licenciatura en <strong>${carrera}</strong>, ha sido formalmente aceptado(a) para realizar su periodo de <strong>${modalidad}</strong> en nuestra organización, previendo cubrir un total de <strong>${horas} horas</strong>, durante el periodo comprendido del <strong>${inicio}</strong> al <strong>${fin}</strong>.
+          `;
+          pSecundario.innerHTML = `
+            Durante su desarrollo, el/la estudiante colaborará activamente en tareas operativas, formativas y comunitarias enfocadas en el bienestar social y la salud mental, contando con la supervisión y acompañamiento correspondiente.
+          `;
+        } else {
+          asuntoEl.innerHTML = `<strong>ASUNTO:</strong> CARTA DE LIBERACIÓN / ${modalidad.toUpperCase()}`;
+          pPrincipal.innerHTML = `
+            Por medio de la presente, <strong>Sumando Voluntades en Sanctorum A.C.</strong> hace constar formalmente que él/la alumno(a) <strong>${nombre}</strong>, con matrícula <strong>${matricula}</strong>, adscrito(a) a la licenciatura en <strong>${carrera}</strong>, ha concluido satisfactoriamente su periodo de <strong>${modalidad}</strong> en nuestra organización, cubriendo un total de <strong>${horas} horas</strong>, durante el periodo comprendido del <strong>${inicio}</strong> al <strong>${fin}</strong>.
+          `;
+          pSecundario.innerHTML = `
+            Durante su estancia, demostró un alto sentido de responsabilidad, ética y compromiso social en el desarrollo de programas dirigidos al bienestar comunitario y la salud mental.
+          `;
+        }
+      }
+
+      async function downloadEditableDocx() {
+        const btn = document.getElementById("btn-docx");
+        const originalText = btn.innerText;
+        btn.innerText = "⏳ Generando Word editable...";
+        btn.disabled = true;
+
+        try {
+          const waveCanvas = await html2canvas(
+            document.getElementById("wave-box"),
+            { scale: 2, useCORS: true },
+          );
+          const waveBlob = await (
+            await fetch(waveCanvas.toDataURL("image/png"))
+          ).arrayBuffer();
+
+          let logoBlob = null;
+          try {
+            const logoImg = document.getElementById("main-logo");
+            const logoCanvas = await html2canvas(logoImg, {
+              scale: 2,
+              useCORS: true,
+            });
+            logoBlob = await (
+              await fetch(logoCanvas.toDataURL("image/png"))
+            ).arrayBuffer();
+          } catch (e) {}
+
+          const {
+            Document,
+            Packer,
+            Paragraph,
+            TextRun,
+            ImageRun,
+            AlignmentType,
+            Table,
+            TableRow,
+            TableCell,
+            WidthType,
+            BorderStyle,
+            Header,
+            Footer,
+          } = docx;
+
+          const esAceptacion = plantillaSeleccionada === "aceptacion";
+          const modalidad = document
+            .getElementById("inModalidad")
+            .value.toUpperCase();
+          const tituloAsunto = esAceptacion
+            ? `CARTA DE ACEPTACIÓN / ${modalidad}`
+            : `CARTA DE LIBERACIÓN / ${modalidad}`;
+
+          const nombre =
+            document.getElementById("inNombre").value.trim() ||
+            "[Nombre del Alumno]";
+          const matricula =
+            document.getElementById("inMatricula").value.trim() ||
+            "[Matrícula]";
+          const carrera =
+            document.getElementById("inCarrera").value.trim() ||
+            "[Nombre de la Licenciatura]";
+          const uni =
+            document.getElementById("inUniversidad").value.trim() ||
+            "UNIVERSIDAD POPULAR AUTÓNOMA DEL ESTADO DE PUEBLA (UPAEP)";
+          const horas =
+            document.getElementById("inHoras").value.trim() ||
+            "[Total de Horas]";
+          const inicio =
+            document.getElementById("inInicio").value.trim() ||
+            "[Fecha de Inicio]";
+          const fin =
+            document.getElementById("inFin").value.trim() || "[Fecha de Fin]";
+          const folio =
+            document.getElementById("inFolio").value.trim() ||
+            "SV-OFC-2026-____";
+          const fechaEmision = document
+            .getElementById("inFechaEmision")
+            .value.trim();
+
+          const doc = new Document({
+            sections: [
+              {
+                properties: {
+                  page: {
+                    margin: {
+                      top: 1440,
+                      bottom: 1440,
+                      left: 1440,
+                      right: 1440,
+                    },
+                    header: 0,
+                    footer: 720,
+                  },
+                },
+                headers: {
+                  default: new Header({
+                    children: [
+                      new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        spacing: { before: 0, after: 0 },
+                        children: [
+                          new ImageRun({
+                            data: waveBlob,
+                            transformation: { width: 612, height: 75 },
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                },
+                footers: {
+                  default: new Footer({
+                    children: [
+                      new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        border: {
+                          top: {
+                            color: "E91E63",
+                            space: 6,
+                            style: BorderStyle.SINGLE,
+                            size: 12,
+                          },
+                        },
+                        spacing: { before: 100 },
+                        children: [
+                          new TextRun({
+                            text: "📍 Sanctorum, Cuautlancingo, Puebla, México.  |  📞 Teléfono: (222) 521 5313 / (222) 337 4322\n",
+                            size: 16,
+                            color: "555555",
+                          }),
+                          new TextRun({
+                            text: "🌐 Redes Sociales: @Sumandovoluntadesensanctorum  |  ✉️ Contacto: contacto@sumandovoluntades.org",
+                            size: 16,
+                            color: "555555",
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                },
+                children: [
+                  new Table({
+                    width: { size: 100, type: WidthType.PERCENTAGE },
+                    borders: {
+                      top: { style: BorderStyle.NONE },
+                      bottom: { style: BorderStyle.NONE },
+                      left: { style: BorderStyle.NONE },
+                      right: { style: BorderStyle.NONE },
+                      insideHorizontal: { style: BorderStyle.NONE },
+                      insideVertical: { style: BorderStyle.NONE },
+                    },
+                    rows: [
+                      new TableRow({
+                        children: [
+                          new TableCell({
+                            width: { size: 45, type: WidthType.PERCENTAGE },
+                            children: logoBlob
+                              ? [
+                                  new Paragraph({
+                                    children: [
+                                      new ImageRun({
+                                        data: logoBlob,
+                                        transformation: {
+                                          width: 135,
+                                          height: 60,
+                                        },
+                                      }),
+                                    ],
+                                  }),
+                                ]
+                              : [new Paragraph({ text: "Sumando Voluntades" })],
+                          }),
+                          new TableCell({
+                            width: { size: 55, type: WidthType.PERCENTAGE },
+                            children: [
+                              new Paragraph({
+                                alignment: AlignmentType.RIGHT,
+                                children: [
+                                  new TextRun({
+                                    text: "Asociación Civil sin Fines de Lucro",
+                                    bold: true,
+                                    size: 18,
+                                  }),
+                                ],
+                              }),
+                              new Paragraph({
+                                alignment: AlignmentType.RIGHT,
+                                children: [
+                                  new TextRun({
+                                    text: `Folio / Oficio: ${folio}`,
+                                    size: 18,
+                                  }),
+                                ],
+                              }),
+                              new Paragraph({
+                                alignment: AlignmentType.RIGHT,
+                                children: [
+                                  new TextRun({
+                                    text: fechaEmision,
+                                    size: 18,
+                                  }),
+                                ],
+                              }),
+                            ],
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+
+                  new Paragraph({
+                    spacing: { before: 140, after: 180 },
+                    border: {
+                      bottom: {
+                        color: "E91E63",
+                        space: 1,
+                        style: BorderStyle.SINGLE,
+                        size: 18,
+                      },
+                    },
+                  }),
+
+                  new Paragraph({
+                    spacing: { after: 140 },
+                    children: [
+                      new TextRun({ text: "ASUNTO: ", bold: true, size: 21 }),
+                      new TextRun({
+                        text: tituloAsunto,
+                        size: 21,
+                      }),
+                    ],
+                  }),
+
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: "A QUIEN CORRESPONDA:",
+                        bold: true,
+                        size: 21,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: uni,
+                        bold: true,
+                        size: 21,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    spacing: { after: 180 },
+                    children: [
+                      new TextRun({ text: "PRESENTE.", bold: true, size: 21 }),
+                    ],
+                  }),
+
+                  new Paragraph({
+                    alignment: AlignmentType.JUSTIFIED,
+                    spacing: { after: 140 },
+                    children: esAceptacion
+                      ? [
+                          new TextRun({
+                            text: "Por medio de la presente, ",
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: "Sumando Voluntades en Sanctorum A.C.",
+                            bold: true,
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: " hace constar formalmente que él/la alumno(a) ",
+                            size: 21,
+                          }),
+                          new TextRun({ text: nombre, bold: true, size: 21 }),
+                          new TextRun({ text: ", con matrícula ", size: 21 }),
+                          new TextRun({
+                            text: matricula,
+                            bold: true,
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: ", adscrito(a) a la licenciatura en ",
+                            size: 21,
+                          }),
+                          new TextRun({ text: carrera, bold: true, size: 21 }),
+                          new TextRun({
+                            text: ", ha sido formalmente aceptado(a) para realizar su periodo de ",
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: modalidad,
+                            bold: true,
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: " en nuestra organización, previendo cubrir un total de ",
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: `${horas} horas`,
+                            bold: true,
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: ", durante el periodo comprendido del ",
+                            size: 21,
+                          }),
+                          new TextRun({ text: inicio, bold: true, size: 21 }),
+                          new TextRun({ text: " al ", size: 21 }),
+                          new TextRun({ text: fin, bold: true, size: 21 }),
+                          new TextRun({ text: ".", size: 21 }),
+                        ]
+                      : [
+                          new TextRun({
+                            text: "Por medio de la presente, ",
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: "Sumando Voluntades en Sanctorum A.C.",
+                            bold: true,
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: " hace constar formalmente que él/la alumno(a) ",
+                            size: 21,
+                          }),
+                          new TextRun({ text: nombre, bold: true, size: 21 }),
+                          new TextRun({ text: ", con matrícula ", size: 21 }),
+                          new TextRun({
+                            text: matricula,
+                            bold: true,
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: ", adscrito(a) a la licenciatura en ",
+                            size: 21,
+                          }),
+                          new TextRun({ text: carrera, bold: true, size: 21 }),
+                          new TextRun({
+                            text: ", ha concluido satisfactoriamente su periodo de ",
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: modalidad,
+                            bold: true,
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: " en nuestra organización, cubriendo un total de ",
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: `${horas} horas`,
+                            bold: true,
+                            size: 21,
+                          }),
+                          new TextRun({
+                            text: ", durante el periodo comprendido del ",
+                            size: 21,
+                          }),
+                          new TextRun({ text: inicio, bold: true, size: 21 }),
+                          new TextRun({ text: " al ", size: 21 }),
+                          new TextRun({ text: fin, bold: true, size: 21 }),
+                          new TextRun({ text: ".", size: 21 }),
+                        ],
+                  }),
+
+                  new Paragraph({
+                    alignment: AlignmentType.JUSTIFIED,
+                    spacing: { after: 140 },
+                    children: [
+                      new TextRun({
+                        text: esAceptacion
+                          ? "Durante su desarrollo, el/la estudiante colaborará activamente en tareas operativas, formativas y comunitarias enfocadas en el bienestar social y la salud mental, contando con la supervisión y acompañamiento correspondiente."
+                          : "Durante su estancia, demostró un alto sentido de responsabilidad, ética y compromiso social en el desarrollo de programas dirigidos al bienestar comunitario y la salud mental.",
+                        size: 21,
+                      }),
+                    ],
+                  }),
+
+                  new Paragraph({
+                    alignment: AlignmentType.JUSTIFIED,
+                    spacing: { after: 260 },
+                    children: [
+                      new TextRun({
+                        text: "Se extiende la presente para los fines académicos y administrativos que al interesado(a) convengan.",
+                        size: 21,
+                      }),
+                    ],
+                  }),
+
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 40 },
+                    children: [
+                      new TextRun({
+                        text: "ATENTAMENTE",
+                        bold: true,
+                        size: 21,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 450 },
+                    children: [
+                      new TextRun({
+                        text: "“La salud mental es responsabilidad en sociedad”",
+                        italics: true,
+                        size: 20,
+                      }),
+                    ],
+                  }),
+
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [
+                      new TextRun({
+                        text: "_______________________________________",
+                        size: 20,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [
+                      new TextRun({
+                        text: "PATRICIA MÉNDEZ ROMERO",
+                        bold: true,
+                        size: 21,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [
+                      new TextRun({
+                        text: "Directora General / Representante Legal",
+                        size: 19,
+                      }),
+                    ],
+                  }),
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [
+                      new TextRun({
+                        text: "Sumando Voluntades en Sanctorum A.C.",
+                        bold: true,
+                        size: 19,
+                      }),
+                    ],
+                  }),
+                ],
+              },
+            ],
+          });
+
+          const buffer = await Packer.toBlob(doc);
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(buffer);
+          link.download = `Hoja_Membretada_${plantillaSeleccionada}_Sumando_Voluntades.docx`;
+          link.click();
+        } catch (err) {
+          console.error(err);
+          alert("Ocurrió un error al compilar el archivo Word editable.");
+        } finally {
+          btn.innerText = originalText;
+          btn.disabled = false;
+        }
+      }
+    </script>
+  </body>
+</html>

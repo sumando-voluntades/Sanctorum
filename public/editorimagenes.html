@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editor de Privacidad y Marcos | Sumando Voluntades A.C.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: #f1f5f9;
+      }
+      .font-brand {
+        font-family: "Montserrat", sans-serif;
+      }
+      .dropzone {
+        border: 2px dashed #cbd5e1;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .dropzone.dragover {
+        border-color: #e6007e;
+        background-color: #fdf2f8;
+      }
+      .loader {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #e6007e;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .face-marker {
+        position: absolute;
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          background-color 0.2s ease;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transform: translate(-50%, -50%);
+      }
+      .face-marker:hover {
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+      .face-marker.blur-active {
+        background-color: rgba(230, 0, 126, 0.75);
+        border-color: #e6007e;
+      }
+      .face-marker.blur-inactive {
+        background-color: rgba(71, 85, 105, 0.6);
+        border-color: #cbd5e1;
+      }
+    </style>
+  </head>
+  <body class="text-slate-800 min-h-screen flex flex-col">
+    <!-- BARRA SUPERIOR INSTITUCIONAL -->
+    <header
+      class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm"
+    >
+      <div class="flex items-center gap-3">
+        <a
+          href="herramientas"
+          class="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+          title="Volver a Herramientas"
+        >
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <img
+            src="/assets/Logo.png"
+            alt="Logo"
+            class="h-8 w-auto"
+            onerror="this.src = 'Copy of Sumando Voluntades.png'"
+          />
+          <div>
+            <h1 class="text-sm font-extrabold text-slate-800 leading-tight">
+              Editor de Privacidad y Difusión
+            </h1>
+            <p class="text-[11px] text-slate-400 font-medium">
+              Protección de Datos e Identidad Comunitaria
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span
+          class="text-xs font-bold px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full flex items-center gap-1.5"
+        >
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span> Uso Exclusivo
+          de Administración
+        </span>
+      </div>
+    </header>
+
+    <!-- ÁREA PRINCIPAL -->
+    <div
+      class="flex-1 p-6 md:p-8 flex flex-col xl:flex-row gap-8 items-start justify-center max-w-[1700px] mx-auto w-full"
+    >
+      <!-- PANEL DE CONTROL LATERAL (IZQUIERDA) -->
+      <aside
+        class="w-full xl:w-[420px] bg-white rounded-3xl p-6 shadow-sm border border-slate-200 shrink-0 space-y-5"
+      >
+        <!-- VINCULACIÓN CON LA BASE DE DATOS -->
+        <div
+          class="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50/40 border border-blue-100 space-y-2.5"
+        >
+          <div class="flex items-center justify-between">
+            <span
+              class="text-xs font-bold text-blue-900 flex items-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-blue-600 text-sm"
+                >event</span
+              >
+              Vincular a Evento
+            </span>
+            <span
+              class="text-[10px] font-semibold text-blue-700 bg-white px-2 py-0.5 rounded-md border border-blue-200"
+              >BD</span
+            >
+          </div>
+          <p class="text-[11px] text-slate-500 leading-snug">
+            Selecciona la actividad de la base de datos para nombrar el archivo
+            comprimido automáticamente.
+          </p>
+          <select
+            id="selEventoBD"
+            onchange="actualizarNombreLote(this.value)"
+            class="w-full text-xs font-semibold px-3 py-2.5 bg-white border border-blue-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 cursor-pointer"
+          >
+            <option value="">-- Actividad General (Sin vincular) --</option>
+          </select>
+        </div>
+
+        <!-- CONFIGURACIÓN DE PRIVACIDAD -->
+        <div class="space-y-3">
+          <label
+            class="block text-xs font-bold text-slate-600 uppercase tracking-wider"
+            >Ajustes de Privacidad</label
+          >
+
+          <button
+            type="button"
+            id="toggle-censor-btn"
+            class="w-full py-3 px-4 rounded-2xl font-bold text-xs shadow-sm flex items-center justify-between transition-all bg-gradient-to-r from-[#b50062] to-[#e2007c] text-white"
+          >
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">blur_on</span>
+              <span>Censura Facial Automática</span>
+            </span>
+            <span
+              id="txt-censor-status"
+              class="bg-white/20 px-2.5 py-0.5 rounded-full text-[10px]"
+              >Activa</span
+            >
+          </button>
+
+          <div
+            class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs text-slate-500 space-y-1"
+          >
+            <p class="font-bold text-slate-700 flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm text-[#e6007e]"
+                >touch_app</span
+              >
+              Edición Manual:
+            </p>
+            <p class="text-[11px] leading-relaxed">
+              • Haz clic en un marcador para alternar su censura.<br />
+              • Haz clic sobre cualquier parte de la foto para añadir un nuevo
+              punto de protección.
+            </p>
+          </div>
+        </div>
+
+        <!-- INDICADOR DE PROGRESO DE IA -->
+        <div
+          id="status-container"
+          class="hidden flex-col bg-orange-50 p-4 rounded-2xl border border-orange-100 space-y-2"
+        >
+          <div class="flex items-center gap-3">
+            <div id="loader" class="loader shrink-0"></div>
+            <p id="status-text" class="text-xs font-bold text-slate-700">
+              Cargando modelos de IA...
+            </p>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+            <div
+              id="progress-bar"
+              class="bg-gradient-to-r from-[#f39200] to-[#e6007e] h-2 rounded-full transition-all duration-300"
+              style="width: 0%"
+            ></div>
+          </div>
+        </div>
+
+        <!-- BOTÓN DE DESCARGA ZIP -->
+        <div class="pt-2">
+          <button
+            id="download-btn"
+            class="hidden w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-xs shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+          >
+            <span class="material-symbols-outlined text-base">folder_zip</span>
+            <span>Descargar Lote Protegido (.ZIP)</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ÁREA DE CARGA Y PREVISUALIZACIONES (DERECHA) -->
+      <main class="flex-1 w-full space-y-6">
+        <!-- DROPZONE DE ARCHIVOS -->
+        <div
+          id="drop-area"
+          class="dropzone rounded-3xl p-8 md:p-12 flex flex-col items-center justify-center cursor-pointer bg-white relative overflow-hidden shadow-sm hover:border-[#e6007e] transition-all"
+        >
+          <input
+            type="file"
+            id="file-input"
+            multiple
+            accept="image/*"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          />
+          <div
+            class="w-14 h-14 rounded-2xl bg-pink-50 text-[#e6007e] flex items-center justify-center mb-3"
+          >
+            <span class="material-symbols-outlined text-3xl"
+              >add_photo_alternate</span
+            >
+          </div>
+          <p class="text-sm font-bold text-slate-800 mb-1">
+            Arrastra tus fotografías aquí o haz clic para seleccionarlas
+          </p>
+          <p class="text-xs text-slate-400">
+            Formato JPG, PNG o WEBP (El marco oficial de 1080×1080 px se
+            aplicará automáticamente)
+          </p>
+        </div>
+
+        <!-- GRID DE RESULTADOS -->
+        <div
+          id="preview-grid"
+          class="grid grid-cols-1 md:grid-cols-2 gap-6"
+        ></div>
+      </main>
+    </div>
+
+    <!-- RECURSO LOGO PARA EL CANVAS -->
+    <img
+      id="logo-img"
+      src="/assets/Logo.png"
+      crossorigin="anonymous"
+      class="hidden"
+      onerror="this.src = 'Copy of Sumando Voluntades.png'"
+    />
+
+    <script src="/js/comun.js"></script>
+    <script>
+      // RBAC: Solo Administradores (1) y Coordinadores (3) pueden acceder al editor oficial
+      const token = localStorage.getItem("token_sanctorum");
+      if (!token) {
+        window.location.replace("login");
+      } else {
+        try {
+          const payload = decodeJWT(token);
+          if (Number(payload.rol) !== 1 && Number(payload.rol) !== 3) {
+            alert(
+              "Acceso denegado: solo personal de Administración y Coordinación puede utilizar el editor institucional.",
+            );
+            window.location.replace("herramientas");
+          }
+        } catch (e) {
+          window.location.replace("login");
+        }
+      }
+
+      const dropArea = document.getElementById("drop-area");
+      const fileInput = document.getElementById("file-input");
+      const previewGrid = document.getElementById("preview-grid");
+      const statusContainer = document.getElementById("status-container");
+      const statusText = document.getElementById("status-text");
+      const progressBar = document.getElementById("progress-bar");
+      const downloadBtn = document.getElementById("download-btn");
+      const toggleCensorBtn = document.getElementById("toggle-censor-btn");
+      const txtCensorStatus = document.getElementById("txt-censor-status");
+      const logoImg = document.getElementById("logo-img");
+
+      let imagesData = [];
+      let modelsReady = false;
+      let censorEnabled = true;
+      let nombreLoteDescarga = "Fotos_Sanctorum_Protegidas";
+      const previewRenderers = [];
+
+      document.addEventListener("DOMContentLoaded", () => {
+        cargarEventosParaLote();
+      });
+
+      async function cargarEventosParaLote() {
+        const sel = document.getElementById("selEventoBD");
+        try {
+          const [resPub, resAnt] = await Promise.all([
+            fetch(`${API_URL}/api/eventos_publicos`),
+            fetch(`${API_URL}/api/eventos_anteriores`),
+          ]);
+          const jsonPub = await resPub.json();
+          const jsonAnt = await resAnt.json();
+          const eventos = [...(jsonPub.data || []), ...(jsonAnt.data || [])];
+
+          eventos.forEach((ev) => {
+            sel.innerHTML += `<option value="${ev.titulo_evento}">${ev.titulo_evento} (${ev.tipo_evento || "Evento"})</option>`;
+          });
+        } catch (e) {
+          console.error("Error al cargar eventos:", e);
+        }
+      }
+
+      function actualizarNombreLote(titulo) {
+        if (!titulo) {
+          nombreLoteDescarga = "Fotos_Sanctorum_Protegidas";
+        } else {
+          nombreLoteDescarga = `Fotos_SV_${titulo.replace(/[^a-zA-Z0-9]/g, "_")}`;
+        }
+      }
+
+      const updateCensorButton = () => {
+        txtCensorStatus.innerText = censorEnabled ? "Activa" : "Desactivada";
+        if (censorEnabled) {
+          toggleCensorBtn.className =
+            "w-full py-3 px-4 rounded-2xl font-bold text-xs shadow-sm flex items-center justify-between transition-all bg-gradient-to-r from-[#b50062] to-[#e2007c] text-white";
+        } else {
+          toggleCensorBtn.className =
+            "w-full py-3 px-4 rounded-2xl font-bold text-xs shadow-sm flex items-center justify-between transition-all bg-slate-200 text-slate-700 hover:bg-slate-300";
+        }
+      };
+
+      const renderAllPreviews = () => {
+        previewRenderers.forEach((render) => render());
+      };
+
+      const loadModels = async () => {
+        try {
+          const MODEL_URL =
+            "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+          await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+          modelsReady = true;
+        } catch (err) {
+          statusText.innerText = "Error al conectar con la red de IA.";
+        }
+      };
+      loadModels();
+
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((e) =>
+        dropArea.addEventListener(e, (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+        }),
+      );
+
+      ["dragenter", "dragover"].forEach((e) =>
+        dropArea.addEventListener(e, () => dropArea.classList.add("dragover")),
+      );
+
+      ["dragleave", "drop"].forEach((e) =>
+        dropArea.addEventListener(e, () =>
+          dropArea.classList.remove("dragover"),
+        ),
+      );
+
+      dropArea.addEventListener("drop", (e) =>
+        processFiles(e.dataTransfer.files),
+      );
+      fileInput.addEventListener("change", (e) => processFiles(e.target.files));
+
+      toggleCensorBtn.addEventListener("click", () => {
+        censorEnabled = !censorEnabled;
+        updateCensorButton();
+        renderAllPreviews();
+      });
+
+      async function processFiles(files) {
+        if (files.length === 0) return;
+        if (!modelsReady) {
+          statusContainer.classList.remove("hidden");
+          statusContainer.classList.add("flex");
+          await new Promise((r) => {
+            const i = setInterval(() => {
+              if (modelsReady) {
+                clearInterval(i);
+                r();
+              }
+            }, 500);
+          });
+        }
+
+        imagesData = [];
+        previewRenderers.length = 0;
+        previewGrid.innerHTML = "";
+        statusContainer.classList.remove("hidden");
+        statusContainer.classList.add("flex");
+
+        const fileArray = Array.from(files);
+        for (let i = 0; i < fileArray.length; i++) {
+          const file = fileArray[i];
+          if (!file.type.startsWith("image/")) continue;
+
+          progressBar.style.width = `${((i + 1) / fileArray.length) * 100}%`;
+          statusText.innerText = `Procesando fotografía ${i + 1} de ${fileArray.length}...`;
+
+          await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const img = new Image();
+              img.onload = async () => {
+                await analyzeAndCreatePreview(img, file.name);
+                resolve();
+              };
+              img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+
+        statusContainer.classList.add("hidden");
+        downloadBtn.classList.remove("hidden");
+      }
+
+      async function analyzeAndCreatePreview(img, name) {
+        const size = 1080;
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = size;
+        canvas.height = size;
+
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, size, size);
+        const border = 40;
+        const banner = 160;
+        const sW = size - border * 2;
+        const sH = size - border - banner;
+        const sc = Math.min(sW / img.width, sH / img.height);
+        const w = img.width * sc;
+        const h = img.height * sc;
+        const xOff = border + sW / 2 - w / 2;
+        const yOff = border + sH / 2 - h / 2;
+        ctx.drawImage(img, xOff, yOff, w, h);
+
+        const grad = ctx.createLinearGradient(0, 0, size, size);
+        grad.addColorStop(0, "#f39200");
+        grad.addColorStop(1, "#e6007e");
+        ctx.lineWidth = border;
+        ctx.strokeStyle = grad;
+        ctx.strokeRect(border / 2, border / 2, size - border, size - border);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, size - banner, size, banner);
+        ctx.fillStyle = "white";
+        ctx.font = "900 28px Montserrat, sans-serif";
+        ctx.fillText(
+          '"LA SALUD MENTAL ES RESPONSABILIDAD EN SOCIEDAD"',
+          50,
+          size - banner / 2 + 10,
+        );
+
+        const lH = 110;
+        const lW = logoImg.width ? logoImg.width * (lH / logoImg.height) : 220;
+        try {
+          ctx.drawImage(
+            logoImg,
+            size - lW - 40,
+            size - banner - lH / 2,
+            lW,
+            lH,
+          );
+        } catch (err) {}
+
+        const detections = await faceapi.detectAllFaces(
+          canvas,
+          new faceapi.SsdMobilenetv1Options({ minConfidence: 0.15 }),
+        );
+
+        const imageData = {
+          name: name,
+          img: img,
+          faces: detections.map((d) => ({
+            x: d.box.x + d.box.width / 2,
+            y: d.box.y + d.box.height / 2,
+            size: Math.max(d.box.width, d.box.height) * 0.8,
+            blur: true,
+          })),
+        };
+        imagesData.push(imageData);
+
+        const container = document.createElement("div");
+        container.className =
+          "relative rounded-2xl overflow-hidden shadow-md border-2 border-white bg-slate-100 cursor-crosshair group";
+
+        const displayImg = document.createElement("img");
+        displayImg.src = canvas.toDataURL("image/jpeg", 0.7);
+        displayImg.className = "w-full h-auto block";
+        container.appendChild(displayImg);
+
+        const renderMarkers = () => {
+          container.querySelectorAll(".face-marker").forEach((m) => m.remove());
+          imageData.faces.forEach((face) => {
+            const marker = document.createElement("div");
+            const markerActive = censorEnabled && face.blur;
+            marker.className = `face-marker ${markerActive ? "blur-active" : "blur-inactive"}`;
+            marker.style.left = `${(face.x / size) * 100}%`;
+            marker.style.top = `${(face.y / size) * 100}%`;
+            const markerSize = (face.size / size) * 100;
+            marker.style.width = `${markerSize}%`;
+            marker.style.height = `${markerSize}%`;
+            marker.innerHTML =
+              '<span class="material-symbols-outlined text-white text-xs">shield</span>';
+            marker.onclick = (e) => {
+              e.stopPropagation();
+              face.blur = !face.blur;
+              renderMarkers();
+            };
+            container.appendChild(marker);
+          });
+        };
+
+        container.onclick = (e) => {
+          const rect = container.getBoundingClientRect();
+          const clickX = ((e.clientX - rect.left) / rect.width) * size;
+          const clickY = ((e.clientY - rect.top) / rect.height) * size;
+          imageData.faces.push({
+            x: clickX,
+            y: clickY,
+            size: size * 0.08,
+            blur: true,
+          });
+          renderMarkers();
+        };
+
+        renderMarkers();
+        previewRenderers.push(renderMarkers);
+        previewGrid.appendChild(container);
+      }
+
+      downloadBtn.onclick = async () => {
+        downloadBtn.disabled = true;
+        const originalText = downloadBtn.innerHTML;
+        downloadBtn.innerHTML =
+          '<span class="material-symbols-outlined text-base animate-spin">progress_activity</span> Generando archivo ZIP...';
+
+        const zip = new JSZip();
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const size = 1080;
+        canvas.width = size;
+        canvas.height = size;
+
+        for (const data of imagesData) {
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, size, size);
+          const border = 40;
+          const banner = 160;
+          const sW = size - border * 2;
+          const sH = size - border - banner;
+          const sc = Math.min(sW / data.img.width, sH / data.img.height);
+          const w = data.img.width * sc;
+          const h = data.img.height * sc;
+          const x = border + sW / 2 - w / 2;
+          const y = border + sH / 2 - h / 2;
+          ctx.drawImage(data.img, x, y, w, h);
+
+          data.faces.forEach((face) => {
+            if (censorEnabled && face.blur) {
+              ctx.save();
+              ctx.beginPath();
+              ctx.arc(face.x, face.y, face.size, 0, Math.PI * 2);
+              ctx.clip();
+              ctx.filter = "blur(60px)";
+              ctx.drawImage(canvas, 0, 0);
+              ctx.restore();
+            }
+          });
+
+          const grad = ctx.createLinearGradient(0, 0, size, size);
+          grad.addColorStop(0, "#f39200");
+          grad.addColorStop(1, "#e6007e");
+          ctx.lineWidth = border;
+          ctx.strokeStyle = grad;
+          ctx.strokeRect(border / 2, border / 2, size - border, size - border);
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, size - banner, size, banner);
+          ctx.fillStyle = "white";
+          ctx.font = "900 28px Montserrat, sans-serif";
+          ctx.fillText(
+            '"LA SALUD MENTAL ES RESPONSABILIDAD EN SOCIEDAD"',
+            50,
+            size - banner / 2 + 10,
+          );
+          const lH = 110;
+          const lW = logoImg.width
+            ? logoImg.width * (lH / logoImg.height)
+            : 220;
+          try {
+            ctx.drawImage(
+              logoImg,
+              size - lW - 40,
+              size - banner - lH / 2,
+              lW,
+              lH,
+            );
+          } catch (err) {}
+
+          const blob = await new Promise((r) =>
+            canvas.toBlob(r, "image/jpeg", 0.92),
+          );
+          zip.file(`SV_${data.name.replace(/\.[^/.]+$/, "")}.jpg`, blob);
+        }
+
+        const content = await zip.generateAsync({ type: "blob" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(content);
+        a.download = `${nombreLoteDescarga}.zip`;
+        a.click();
+
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = originalText;
+      };
+    </script>
+  </body>
+</html>
