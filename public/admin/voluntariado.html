@@ -22,6 +22,8 @@
       rel="stylesheet"
     />
     <style>
+      /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       @media (min-width: 768px) {
         #sidebar-mount {
           position: fixed;
@@ -57,7 +59,6 @@
         -webkit-backdrop-filter: blur(24px);
       }
     </style>
-    </script>
   </head>
 
   <body class="text-on-surface">
@@ -82,6 +83,10 @@
             <p class="text-on-surface-variant max-w-xl">
               Organiza, supervisa y conecta a nuestra red de voluntarios con las
               necesidades de la comunidad.
+            </p>
+            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
+              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+              <span>Aprobar una solicitud no crea la cuenta del usuario: usa "Nuevo Registro" con su correo institucional de Sanctorum para darlo de alta en el sistema.</span>
             </p>
           </div>
           <button
@@ -268,9 +273,9 @@
         >
           <span class="material-symbols-outlined text-3xl">delete_forever</span>
         </div>
-        <h3 class="text-xl font-bold text-slate-800 mb-2">Eliminar Petición</h3>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Eliminar Usuario</h3>
         <p class="text-sm text-slate-500 mb-6">
-          ¿Estás seguro de que deseas eliminar permanentemente la petición de
+          ¿Estás seguro de que deseas eliminar permanentemente a
           <b id="elim_nombre"></b>? Esta acción no se puede deshacer.
         </p>
         <input type="hidden" id="elim_id" />
@@ -785,6 +790,9 @@
                 required
                 class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none"
               />
+              <p class="text-xs text-slate-500 mt-1 ml-1">
+                Usa el correo institucional generado por Sanctorum para este perfil, no el correo personal de la solicitud original. Los perfiles nuevos deben registrarse aquí (botón "Nuevo Registro") con ese correo.
+              </p>
             </div>
             <div>
               <label class="block text-sm font-bold text-slate-700 mb-1 ml-1"
@@ -888,6 +896,35 @@
       </div>
     </div>
 
+    <!-- MODAL: HISTORIAL DE ENCUESTAS DE SATISFACCIÓN DE UN ESPECIALISTA (solo lectura) -->
+    <div
+      id="modalHistorialEncuestas"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300"
+    >
+      <div
+        class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[85vh] flex flex-col"
+        id="modalHistorialEncuestasContent"
+      >
+        <div
+          class="bg-gradient-to-r from-primary to-[#f39200] px-8 py-6 text-white flex justify-between items-center"
+        >
+          <div>
+            <h3 id="he_nombre" class="text-2xl font-bold font-plus">
+              Historial de Encuestas
+            </h3>
+            <p id="he_resumen" class="text-white/80 text-sm mt-1"></p>
+          </div>
+          <button
+            onclick="cerrarModalHistorialEncuestas()"
+            class="text-white/80 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-3xl">close</span>
+          </button>
+        </div>
+        <div id="he_cuerpo" class="p-8 overflow-y-auto space-y-3"></div>
+      </div>
+    </div>
+
     <!-- LÓGICA DE JAVASCRIPT -->
     <script src="/js/comun.js"></script>
     <script src="js/notificaciones.js"></script>
@@ -907,6 +944,7 @@
         }
         try {
           const payload = decodeJWT(token);
+          rolActualUsuario = payload.rol;
           aplicarRestriccionesNav(payload.rol, payload.especialidad);
           document.getElementById("nav_user_name").innerText =
             payload.nombre.split(" ")[0];
@@ -925,6 +963,10 @@
       // viven en js/comun.js (generalizadas para toda la app, no solo esta página — ver el
       // comentario ahí) en vez de copiadas aquí.
       let voluntariosGlobales = [];
+      // Rol (1=Admin, 2=Especialista, 3=Coordinador, 4=Voluntario, 5=Donador) del usuario
+      // que tiene la sesión abierta — se llena en el DOMContentLoaded de más abajo. Se usa
+      // para decidir si se muestra el botón "Ver Historial de Encuestas" en cada tarjeta.
+      let rolActualUsuario = null;
 
       // --- MANEJO DE MODALES ---
       function abrirModal(modalId, contentId) {
@@ -943,6 +985,108 @@
             .getElementById(modalId)
             .getElementsByTagName("form");
           if (forms.length > 0) forms[0].reset();
+        }, 300);
+      }
+
+      // --- HISTORIAL DE ENCUESTAS DE SATISFACCIÓN (solo Admin/Coordinador) ---
+      // Abre el modal con el promedio y el historial completo de encuestas respondidas
+      // sobre un especialista (botón "Ver Historial de Encuestas" de su tarjeta).
+      async function verHistorialEncuestasEspecialista(idUsuario, nombre) {
+        document.getElementById("he_nombre").innerText = nombre;
+        document.getElementById("he_resumen").innerText = "Cargando...";
+        document.getElementById("he_cuerpo").innerHTML =
+          '<p class="text-slate-400 text-sm text-center py-6">Cargando...</p>';
+        document.getElementById("modalHistorialEncuestas").classList.remove("hidden");
+        setTimeout(() => {
+          document
+            .getElementById("modalHistorialEncuestas")
+            .classList.remove("opacity-0");
+          document
+            .getElementById("modalHistorialEncuestasContent")
+            .classList.remove("scale-95");
+        }, 10);
+        try {
+          const res = await fetch(
+            `${API_URL}/api/encuestas/especialista/${idUsuario}`,
+            { headers: authHeaders() },
+          );
+          const json = await res.json();
+          if (!json.success) {
+            document.getElementById("he_resumen").innerText = "";
+            document.getElementById("he_cuerpo").innerHTML =
+              '<p class="text-red-400 text-sm text-center py-6">No se pudo cargar el historial.</p>';
+            return;
+          }
+          const r = json.resumen;
+          const promedioTxt = (v) => (v === null || v === undefined ? "N/A" : v);
+          document.getElementById("he_resumen").innerText =
+            `${r.total_respondidas} encuesta(s) respondida(s) · Promedio general: ${promedioTxt(r.promedio_general)}/5`;
+
+          if (json.historial.length === 0) {
+            document.getElementById("he_cuerpo").innerHTML =
+              '<p class="text-slate-400 text-sm text-center py-6">Este especialista no tiene encuestas respondidas todavía.</p>';
+            return;
+          }
+
+          const resumenExtra = `
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="p-3 bg-slate-50 rounded-xl text-center">
+                <p class="text-lg font-bold text-slate-800">${promedioTxt(r.promedio_trato)}</p>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Trato (1-5)</p>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl text-center">
+                <p class="text-lg font-bold text-slate-800">${promedioTxt(r.promedio_puntualidad)}</p>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Puntualidad (1-5)</p>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl text-center">
+                <p class="text-lg font-bold text-slate-800">${promedioTxt(r.promedio_nps)}</p>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">NPS (0-10)</p>
+              </div>
+              <div class="p-3 ${r.respuestas_negativas > 0 ? "bg-red-50" : "bg-slate-50"} rounded-xl text-center">
+                <p class="text-lg font-bold ${r.respuestas_negativas > 0 ? "text-red-600" : "text-slate-800"}">${r.respuestas_negativas}</p>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Respuestas negativas</p>
+              </div>
+            </div>`;
+
+          const filas = json.historial
+            .map((enc) => {
+              const fecha = enc.fecha_respuesta
+                ? new Date(enc.fecha_respuesta).toLocaleDateString("es-MX")
+                : "-";
+              const estrellas =
+                "★".repeat(enc.calificacion) + "☆".repeat(5 - enc.calificacion);
+              return `
+                <div class="p-3 bg-slate-50 rounded-xl">
+                  <div class="flex items-center justify-between gap-3">
+                    <p class="text-sm font-bold text-slate-700">${escapeHtml(enc.beneficiario)}</p>
+                    <span class="text-red-500 text-sm">${estrellas}</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-0.5">${fecha}</p>
+                  ${enc.comentarios ? `<p class="text-xs text-slate-600 italic mt-1">"${escapeHtml(enc.comentarios)}"</p>` : ""}
+                </div>`;
+            })
+            .join("");
+
+          document.getElementById("he_cuerpo").innerHTML = resumenExtra + filas;
+        } catch (e) {
+          console.error("Error al cargar historial de encuestas:", e);
+          document.getElementById("he_resumen").innerText = "";
+          document.getElementById("he_cuerpo").innerHTML =
+            '<p class="text-red-400 text-sm text-center py-6">Error de conexión.</p>';
+        }
+      }
+
+      function cerrarModalHistorialEncuestas() {
+        document
+          .getElementById("modalHistorialEncuestas")
+          .classList.add("opacity-0");
+        document
+          .getElementById("modalHistorialEncuestasContent")
+          .classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("modalHistorialEncuestas")
+            .classList.add("hidden");
         }, 300);
       }
 
@@ -1167,6 +1311,7 @@
                     <button onclick="abrirModalProyecto(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}', ${vol.id_rol}, '${escapeAttrJs(vol.especialidad)}', '${escapeAttrJs(vol.material_donado || "")}', '${escapeAttrJs(vol.cantidad_donada || "")}')" class="flex-1 py-2 bg-green-100 text-green-700 font-bold rounded-xl text-xs hover:bg-green-500 hover:text-white">Aprobar</button>
                 </div>`;
             } else if (status === "Inactivo") {
+<<<<<<< HEAD
   cI++;
   btnAccion = `
     <div class="flex gap-2 w-full">
@@ -1178,6 +1323,15 @@
         </button>
     </div>`;
 }else {
+=======
+              cI++;
+              btnAccion = `
+                <div class="flex gap-2 w-full">
+                    <button onclick="reactivarUsuario(${vol.id_usuario})" class="flex-1 py-2 bg-slate-200 text-slate-600 font-bold rounded-full text-xs hover:bg-green-500 hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">settings_backup_restore</span> Reactivar</button>
+                    <button onclick="prepararEliminar(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}')" class="flex-1 py-2 bg-red-50 text-red-600 font-bold rounded-full text-xs hover:bg-red-100 transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">delete</span> Eliminar</button>
+                </div>`;
+            } else {
+>>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
               cA++;
               let botonesActivo = ``;
               if (vol.id_rol === 2 || vol.id_rol === 3) {
@@ -1208,9 +1362,28 @@
                     </div>`;
                 }
               }
+              // Un Especialista (id_rol 2) solo atiende beneficiarios clínicamente si su
+              // especialidad es de psicología (mismo criterio que esPsicologo() en server.js:
+              // especialidad contiene "psic", insensible a mayúsculas) -- un Especialista de
+              // otra área (ej. Pedagogía) no tiene expedientes ni encuestas de satisfacción
+              // que revisar, así que esos botones no le aplican y antes se mostraban igual
+              // por error (la condición solo miraba id_rol === 2, sin ver la especialidad).
+              const esEspecialistaPsicologo =
+                vol.id_rol === 2 &&
+                (vol.especialidad || "").toLowerCase().includes("psic");
+
+              // Historial de encuestas de satisfacción: solo aplica a un Especialista
+              // psicólogo, y solo lo puede ver quien ya puede ver el módulo de encuestas
+              // por revisar (Admin/Coordinador).
+              if (
+                esEspecialistaPsicologo &&
+                (rolActualUsuario === 1 || rolActualUsuario === 3)
+              ) {
+                botonesActivo += `<button onclick="verHistorialEncuestasEspecialista(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}')" class="w-full py-2 mb-2 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">reviews</span> Ver Historial de Encuestas</button>`;
+              }
               if (vol.id_rol !== 5) {
-                // Si es Voluntario puede tener expediente y proyecto físico
-                if (vol.especialidad === "Psicología" || vol.id_rol === 2) {
+                // Solo un Especialista psicólogo puede tener expediente clínico asignado.
+                if (esEspecialistaPsicologo) {
                   botonesActivo += `<button onclick="abrirModalExpediente()" class="w-full py-2 mb-2 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">folder_shared</span> Asignar Expediente</button>`;
                 }
                 botonesActivo += `<button onclick="abrirModalAsignarActivo(${vol.id_usuario})" class="w-full py-2 mb-3 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-[#f39200] hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">assignment_ind</span> Asignar a Proyecto</button>`;
@@ -1238,10 +1411,16 @@
               extraBadge = `<div class="mt-2 text-[10px] text-slate-500 font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">work</span> ${escapeHtml(vol.proyectos)}</div>`;
             }
 
+            // Avatar: si el usuario ya subió una foto de perfil (foto_perfil_url), se muestra
+            // esa foto real; si no, se cae al círculo con la inicial del nombre de siempre.
+            const avatarHtml = vol.foto_perfil_url
+              ? `<img src="${escapeHtml(vol.foto_perfil_url)}" alt="${escapeHtml(vol.nombre_completo)}" class="w-12 h-12 rounded-full object-cover border border-slate-100">`
+              : `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xl">${escapeHtml(vol.nombre_completo.charAt(0))}</div>`;
+
             const card = `
             <div class="bg-surface-container-lowest p-6 rounded-lg shadow-sm mb-6 hover:scale-[1.02] transition-all relative border border-slate-100 ${status === "Inactivo" ? "grayscale opacity-80" : ""}">
               <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xl">${escapeHtml(vol.nombre_completo.charAt(0))}</div>
+                ${avatarHtml}
                 <div class="flex">${btnContactoEliminar}</div>
               </div>
               <h4 class="text-lg font-bold text-slate-800 mb-1">${escapeHtml(vol.nombre_completo)}</h4>

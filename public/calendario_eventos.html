@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="/css/output.css" />
     </script>
     <style>
+      /* Salvaguarda de responsividad: evita que un elemento que se pase del ancho del
+         viewport en móvil (ver index.html) haga que toda la página se desplace
+         horizontalmente. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       body {
         font-family: "Quicksand", sans-serif;
       }

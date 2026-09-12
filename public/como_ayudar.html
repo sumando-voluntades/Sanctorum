@@ -25,6 +25,10 @@
     <link rel="stylesheet" href="/css/output.css" />
     </script>
     <style>
+      /* Salvaguarda de responsividad: evita que un elemento que se pase del ancho del
+         viewport en móvil (ver index.html) haga que toda la página se desplace
+         horizontalmente. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -60,7 +64,7 @@
     <main class="flex-grow pt-24">
       <!-- Hero Section -->
       <section class="relative px-6 py-20 overflow-hidden">
-        <div class="max-w-7xl mx-auto grid md:grid-cols-2 items-center gap-12">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
           <div class="z-10">
             <span
               class="inline-block px-4 py-1.5 mb-6 text-sm font-bold tracking-wider text-secondary uppercase bg-secondary-fixed rounded-full"

@@ -15,8 +15,9 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/output.css" />
-    </script>
     <style>
+      /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -67,6 +68,10 @@
         </div>
             <p class="text-slate-500 max-w-xl">
               Control de insumos, materiales y equipo físico de la AC.
+            </p>
+            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
+              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+              <span>El stock se descuenta solo al registrar el consumo real de insumos en un evento o reporte. Edita una cantidad manualmente únicamente para corregir un error de captura.</span>
             </p>
           </div>
           <button

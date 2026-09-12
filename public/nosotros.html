@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="/css/output.css" />
     </script>
     <style>
+      /* Salvaguarda de responsividad: evita que un elemento que se pase del ancho del
+         viewport en móvil (ver index.html) haga que toda la página se desplace
+         horizontalmente. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       body {
         font-family: "Quicksand", sans-serif;
       }
@@ -70,7 +74,7 @@
 
       <!-- Misión / Visión / Valores -->
       <section class="max-w-7xl mx-auto px-8 mb-24">
-        <div class="grid md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div
             class="bg-white p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow"
           >

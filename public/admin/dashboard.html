@@ -16,8 +16,9 @@
     />
     <link rel="stylesheet" href="/css/output.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    </script>
     <style>
+      /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -56,6 +57,10 @@
             </h2>
             <p id="saludo_admin" class="text-slate-500 max-w-xl">
               Bienvenida de nuevo. Aquí está el impacto de hoy.
+            </p>
+            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
+              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+              <span>Este panel es solo de lectura: resume la actividad de los demás módulos. Usa "Generar Reporte" para exportar un resumen de un rango de fechas.</span>
             </p>
           </div>
           <button
@@ -490,7 +495,7 @@
             .map((d) => {
               const alturaPct = Math.round((d.total / maximo) * 100);
               return `
-                  <div class="flex-1 flex flex-col items-center justify-end h-full gap-2 group">
+                  <div class="flex-1 min-w-0 flex flex-col items-center justify-end h-full gap-2 group">
                     <span class="text-xs font-bold text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">${formatearValor(d.total)}</span>
                     <div class="w-full bg-[#f0e4d3] rounded-t-xl transition-all hover:bg-primary" style="height: ${Math.max(alturaPct, 3)}%"></div>
                     <span class="text-[10px] font-bold text-slate-400 uppercase">${d.mes}</span>
@@ -546,7 +551,7 @@
               const altEnPausa = Math.round((d.en_pausa / maximo) * 100);
               const altAltas = Math.round((d.altas / maximo) * 100);
               return `
-                  <div class="flex-1 flex flex-col items-center justify-end h-full gap-2 group">
+                  <div class="flex-1 min-w-0 flex flex-col items-center justify-end h-full gap-2 group">
                     <span class="text-[10px] font-bold text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">${d.activos} / ${d.en_pausa} / ${d.altas}</span>
                     <div class="w-full flex items-end justify-center gap-1 h-full">
                       <div class="w-1/3 bg-primary/70 rounded-t-lg transition-all hover:bg-primary" style="height: ${Math.max(altActivos, d.activos > 0 ? 3 : 0)}%" title="Activos: ${d.activos}"></div>
@@ -838,6 +843,46 @@
             metodo_pago: "Método de pago",
             categoria_gasto: "Categoría de gasto",
             nombre_insumo: "Insumo relacionado",
+            registrado_por: "Registrado por",
+          },
+        },
+        satisfaccion: {
+          nombre: "Satisfacción de Beneficiarios",
+          columnas: {
+            fecha_respuesta: "Fecha de respuesta",
+            beneficiario: "Beneficiario",
+            especialista: "Especialista",
+            calificacion: "Calificación general (1-5)",
+            calificacion_especialista: "Trato del especialista (1-5)",
+            calificacion_puntualidad: "Puntualidad (1-5)",
+            utilidad_sesion: "¿La sesión ayudó?",
+            probabilidad_recomendar: "Probabilidad de recomendar (0-10)",
+            comentarios: "Comentarios",
+          },
+        },
+        satisfaccion_especialistas: {
+          nombre: "Satisfacción por Especialista",
+          columnas: {
+            especialista: "Especialista",
+            total_encuestas: "Total de encuestas",
+            promedio_general: "Promedio general (1-5)",
+            promedio_trato: "Promedio trato (1-5)",
+            promedio_puntualidad: "Promedio puntualidad (1-5)",
+            promedio_nps: "Promedio NPS (0-10)",
+            respuestas_negativas: "Respuestas negativas (1-2★)",
+          },
+        },
+        escuelas: {
+          nombre: "Escuelas",
+          columnas: {
+            escuela: "Escuela",
+            contacto: "Contacto",
+            puesto: "Puesto",
+            telefono: "Teléfono",
+            ubicacion: "Ubicación",
+            estado: "Estado",
+            ultima_visita: "Última visita",
+            beneficiarios_vinculados: "Beneficiarios vinculados",
           },
         },
       };
@@ -872,7 +917,15 @@
         try {
           const tipos =
             tipo === "todo"
-              ? ["voluntarios", "eventos", "beneficiarios", "donativos"]
+              ? [
+                  "voluntarios",
+                  "eventos",
+                  "beneficiarios",
+                  "donativos",
+                  "satisfaccion",
+                  "satisfaccion_especialistas",
+                  "escuelas",
+                ]
               : [tipo];
           const wb = XLSX.utils.book_new();
           let huboDatos = false;
@@ -956,6 +1009,9 @@
               <option value="eventos">Eventos y Visitas</option>
               <option value="beneficiarios">Beneficiarios</option>
               <option value="donativos">Donativos</option>
+              <option value="satisfaccion">Satisfacción de Beneficiarios</option>
+              <option value="satisfaccion_especialistas">Satisfacción de Especialistas</option>
+              <option value="escuelas">Escuelas</option>
             </select>
           </div>
           <div class="grid grid-cols-2 gap-4">

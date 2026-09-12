@@ -15,7 +15,19 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/output.css" />
+<<<<<<< HEAD
+=======
+    <!-- Editor de texto enriquecido para el campo "Descripción" de la Agenda (evento
+         operativo) -- mismo patrón que "Contenido" en admin/publicaciones.html, ver
+         inicializarEditorDescripcionEvento más abajo. -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css"
+    />
+>>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     <style>
+      /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
+      html, body { overflow-x: hidden; max-width: 100%; }
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -33,6 +45,78 @@
           background: #fff;
           z-index: 50;
         }
+      }
+
+      /* Editor de "Descripción" (Quill) y su vista previa -- mismas reglas que
+         #pub_contenido_editor_wrap/#pub_contenido_preview en admin/publicaciones.html. */
+      #ev_descripcion_editor_wrap .ql-toolbar {
+        border: none;
+        border-bottom: 1px solid #e2e8f0;
+        border-radius: 0.75rem 0.75rem 0 0;
+        background: #fff;
+      }
+      #ev_descripcion_editor_wrap .ql-container {
+        border: none;
+        border-radius: 0 0 0.75rem 0.75rem;
+        font-family: inherit;
+        font-size: 0.95rem;
+      }
+      #ev_descripcion_editor {
+        min-height: 110px;
+      }
+      /* Etiquetas en español para el selector de encabezados del toolbar -- espejo de las mismas
+         reglas en admin/publicaciones.html. */
+      #ev_descripcion_editor_wrap .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
+      #ev_descripcion_editor_wrap .ql-picker.ql-header .ql-picker-item[data-value="2"]::before {
+        content: "Título";
+      }
+      #ev_descripcion_editor_wrap .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
+      #ev_descripcion_editor_wrap .ql-picker.ql-header .ql-picker-item[data-value="3"]::before {
+        content: "Subtítulo";
+      }
+      #ev_descripcion_editor_wrap .ql-picker.ql-header .ql-picker-label:not([data-value])::before,
+      #ev_descripcion_editor_wrap .ql-picker.ql-header .ql-picker-item:not([data-value])::before {
+        content: "Párrafo";
+      }
+      /* Debe ser un espejo de las reglas de #det_contenido_texto en evento_detalle.html. */
+      #ev_descripcion_preview p {
+        margin: 0 0 0.9em;
+      }
+      #ev_descripcion_preview p:last-child {
+        margin-bottom: 0;
+      }
+      #ev_descripcion_preview ul,
+      #ev_descripcion_preview ol {
+        margin: 0 0 0.9em 1.25em;
+      }
+      #ev_descripcion_preview ul {
+        list-style: disc;
+      }
+      #ev_descripcion_preview ol {
+        list-style: decimal;
+      }
+      #ev_descripcion_preview a {
+        color: #be185d;
+        text-decoration: underline;
+      }
+      #ev_descripcion_preview h2,
+      #ev_descripcion_preview h3 {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-weight: 700;
+        color: #171c1f;
+        line-height: 1.3;
+      }
+      #ev_descripcion_preview h2 {
+        font-size: 1.4rem;
+        margin: 1.2em 0 0.5em;
+      }
+      #ev_descripcion_preview h3 {
+        font-size: 1.15rem;
+        margin: 1em 0 0.4em;
+      }
+      #ev_descripcion_preview h2:first-child,
+      #ev_descripcion_preview h3:first-child {
+        margin-top: 0;
       }
     </style>
   </head>
@@ -87,6 +171,10 @@
             <p class="text-slate-500 max-w-xl">
               Eventos, reuniones escolares y citas clínicas — todo en un solo
               lugar.
+            </p>
+            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
+              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
+              <span>Al agendar una cita clínica, verifica que el especialista y el beneficiario sean los correctos: un Especialista solo puede agendarse a sí mismo y solo ve a los beneficiarios que tiene asignados a su cargo.</span>
             </p>
           </div>
           <button
@@ -165,11 +253,11 @@
             <div
               class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6"
             >
-              <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <div class="flex items-center gap-3">
                   <button
                     onclick="cambiarMesCalendario(-1)"
-                    class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center transition-colors"
+                    class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center transition-colors shrink-0"
                   >
                     <span class="material-symbols-outlined text-lg"
                       >chevron_left</span
@@ -177,13 +265,14 @@
                   </button>
                   <h3
                     id="titulo_mes_calendario"
-                    class="text-lg font-bold text-slate-800 w-40 text-center"
+                    class="text-lg font-bold text-slate-800 text-center"
+                    style="min-width: 7rem"
                   >
                     -
                   </h3>
                   <button
                     onclick="cambiarMesCalendario(1)"
-                    class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center transition-colors"
+                    class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center transition-colors shrink-0"
                   >
                     <span class="material-symbols-outlined text-lg"
                       >chevron_right</span
@@ -414,6 +503,101 @@
                   class="w-full px-4 py-3 bg-[#f0f4f8] border-none rounded-xl outline-none"
                 />
               </div>
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1"
+                  >Descripción
+                  <span class="font-normal text-slate-400 normal-case"
+                    >(opcional)</span
+                  ></label
+                >
+                <!-- Editor de texto enriquecido (Quill) -- mismo patrón que "Contenido" en
+                     admin/publicaciones.html: guarda su HTML en el <textarea id="ev_descripcion">
+                     oculto de abajo, que sigue siendo el campo que en verdad lee/escribe el
+                     resto del código (editarActividad, el submit de formAgenda, etc.). -->
+                <div
+                  id="ev_descripcion_editor_wrap"
+                  class="bg-[#f0f4f8] rounded-xl overflow-hidden"
+                >
+                  <div id="ev_descripcion_editor"></div>
+                </div>
+                <textarea id="ev_descripcion" class="hidden"></textarea>
+
+                <!-- Vista previa en vivo: replica EXACTAMENTE el bloque de contenido de
+                     evento_detalle.html (SIN caja/fondo -- ver #ev_descripcion_preview en
+                     <style>) para que el staff vea cómo se va a ver en la página pública. -->
+                <div class="mt-3">
+                  <p
+                    class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 flex items-center gap-1"
+                  >
+                    <span class="material-symbols-outlined text-sm"
+                      >visibility</span
+                    >
+                    Así se verá en la página pública
+                  </p>
+                  <div class="p-4 border border-dashed border-slate-200 rounded-xl">
+                    <div
+                      id="ev_descripcion_preview"
+                      class="text-gray-800 text-base leading-relaxed"
+                    >
+                      <span class="text-gray-400 italic"
+                        >La vista previa aparecerá aquí mientras escribes...</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Categoría del evento: mismo catálogo y patrón de cuadrícula paginada (10 en
+                   10, con "Mostrando X–Y de Z" y flechas) que el selector de Categoría en
+                   Publicaciones -- ver renderChipsCategoriasEv más abajo. Es opcional, a
+                   diferencia de Publicaciones donde es obligatorio elegir al menos una. -->
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-sm font-bold text-slate-700"
+                    >Categoría
+                    <span class="font-normal text-slate-400 normal-case"
+                      >(opcional, puedes elegir varias)</span
+                    ></label
+                  >
+                  <div class="flex items-center gap-3">
+                    <span
+                      id="ev_contador_categorias"
+                      class="text-xs text-slate-400"
+                    ></span>
+                    <div id="ev_paginacion_categorias" class="flex gap-1.5"></div>
+                  </div>
+                </div>
+                <div id="ev_categorias_checks" class="flex flex-wrap gap-2">
+                  <p class="text-sm text-slate-400 italic">Cargando categorías...</p>
+                </div>
+
+                <!-- Mini-buscador estilo Google, igual que en Publicaciones: sugiere
+                     categorías ya existentes o permite registrar una nueva al vuelo. -->
+                <div class="relative mt-3 max-w-xs">
+                  <div
+                    class="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2.5 focus-within:ring-2 focus-within:ring-secondary/30"
+                  >
+                    <span class="material-symbols-outlined text-slate-400 text-[18px]"
+                      >search</span
+                    >
+                    <input
+                      type="text"
+                      id="ev_categoria_buscador"
+                      placeholder="Buscar o agregar categoría..."
+                      class="flex-1 border-none outline-none text-sm bg-transparent"
+                      oninput="filtrarSugerenciasCategoriaEv()"
+                      onfocus="filtrarSugerenciasCategoriaEv()"
+                      onblur="setTimeout(() => document.getElementById('ev_categoria_sugerencias').classList.add('hidden'), 150)"
+                      onkeydown="if(event.key==='Enter'){event.preventDefault(); agregarCategoriaDesdeBuscadorEv();}"
+                    />
+                  </div>
+                  <div
+                    id="ev_categoria_sugerencias"
+                    class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden max-h-48 overflow-y-auto"
+                  ></div>
+                </div>
+              </div>
+
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-sm font-bold text-slate-700 mb-1"
@@ -761,6 +945,11 @@
     <script src="/js/comun.js"></script>
     <script src="js/notificaciones.js"></script>
     <script src="/js/incluir.js"></script>
+    <!-- DOMPurify: sanea el HTML del editor de "Descripción" antes de inyectarlo en la vista
+         previa (ver sanitizarContenidoEnriquecido en comun.js). -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+    <!-- Quill: editor de texto enriquecido para "Descripción". -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
     <script>
       let _cloudinaryConfigCache = null;
       async function obtenerConfigCloudinary() {
@@ -779,6 +968,7 @@
       let todosLosBeneficiarios = [];
 
       document.addEventListener("DOMContentLoaded", async () => {
+        inicializarEditorDescripcionEvento();
         await incluirParcial("#sidebar-mount", "partials/navbar_admin.html");
         await incluirParcial("#header-mount", "partials/header_admin.html");
         incluirParcial("#footer-mount", "partials/footer_admin.html");
@@ -824,12 +1014,89 @@
         cargarDirectorios();
         cargarCalendario();
         cargarCatalogosModal();
+        cargarCategoriasCatalogo();
         cambiarVistaFormulario();
       });
 
+<<<<<<< HEAD
+=======
+      // ================= EDITOR DE TEXTO ENRIQUECIDO (Quill) PARA "DESCRIPCIÓN" =================
+      // Mismo patrón que el editor de "Contenido" en admin/publicaciones.html -- ver los
+      // comentarios allá para el detalle completo. Formato básico a propósito (títulos/
+      // subtítulos, negritas, cursiva, subrayado, listas, enlaces).
+      let quillDescripcionEvento = null;
+
+      function inicializarEditorDescripcionEvento() {
+        if (quillDescripcionEvento || typeof Quill === "undefined") return;
+        quillDescripcionEvento = new Quill("#ev_descripcion_editor", {
+          theme: "snow",
+          placeholder: "En qué consiste la actividad, a quién va dirigida, etc.",
+          modules: {
+            toolbar: [
+              [{ header: [2, 3, false] }],
+              ["bold", "italic", "underline"],
+              [{ list: "ordered" }, { list: "bullet" }],
+              ["link"],
+              ["clean"],
+            ],
+          },
+        });
+        quillDescripcionEvento.on("text-change", () => {
+          const vacio = quillDescripcionEvento.getText().trim() === "";
+          document.getElementById("ev_descripcion").value = vacio
+            ? ""
+            : quillDescripcionEvento.root.innerHTML;
+          actualizarVistaPreviaDescripcionEvento();
+        });
+      }
+
+      // Refleja en vivo el HTML del editor en la vista previa -- misma función de saneado
+      // (sanitizarContenidoEnriquecido, en comun.js) que usa la página pública.
+      function actualizarVistaPreviaDescripcionEvento() {
+        const html = document.getElementById("ev_descripcion").value;
+        const preview = document.getElementById("ev_descripcion_preview");
+        if (!html.trim()) {
+          preview.innerHTML =
+            '<span class="text-gray-400 italic">La vista previa aparecerá aquí mientras escribes...</span>';
+          return;
+        }
+        preview.innerHTML = sanitizarContenidoEnriquecido(html);
+      }
+
+      // Reemplaza el contenido del editor (vacío para "Nueva Actividad", o precargado al editar
+      // una existente). Contempla igual que en Publicaciones los dos casos posibles de
+      // "descripcionCruda": HTML real del editor, o texto plano "clásico" con saltos de línea
+      // reales (de antes de agregar este editor) -- ver el comentario completo en
+      // establecerContenidoEditor, en admin/publicaciones.html.
+      function establecerDescripcionEditorEvento(descripcionCruda) {
+        if (!quillDescripcionEvento) return;
+        quillDescripcionEvento.setText("");
+        const texto = descripcionCruda || "";
+        if (texto) {
+          // Ver el comentario completo en establecerContenidoEditor (admin/publicaciones.html):
+          // se sanea con sanitizarContenidoEnriquecido() antes de dangerouslyPasteHTML, sin
+          // confiar en que el HTML ya guardado sea seguro solo porque viene de la base de datos.
+          const html = esContenidoHtml(texto)
+            ? sanitizarContenidoEnriquecido(texto)
+            : escapeHtml(texto).replace(/\n/g, "<br>");
+          quillDescripcionEvento.clipboard.dangerouslyPasteHTML(html);
+        }
+        const vacio = quillDescripcionEvento.getText().trim() === "";
+        document.getElementById("ev_descripcion").value = vacio
+          ? ""
+          : quillDescripcionEvento.root.innerHTML;
+        actualizarVistaPreviaDescripcionEvento();
+      }
+
+      // ================= MODAL LÓGICA =================
+      // Abre el modal en modo "crear": limpia el formulario, resetea el título/botón a modo
+      // alta, fuerza el tipo "clinica" y lo bloquea si el usuario es psicólogo (solo puede
+      // agendar citas clínicas), y arranca con una fila de insumos vacía.
+>>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
       function abrirModalAgenda() {
         document.getElementById("edit_id").value = "";
         document.getElementById("formAgenda").reset();
+        establecerDescripcionEditorEvento("");
         document.getElementById("titulo_modal").innerText =
           "Agendar Nueva Actividad";
         document.getElementById("btn_submit_agenda").innerText =
@@ -856,6 +1123,12 @@
           .getElementById("ev_imagen_preview_wrap")
           .classList.add("hidden");
 
+        categoriasSeleccionadasEv = new Set();
+        paginaActualCategoriasEv = 0;
+        document.getElementById("ev_categoria_buscador").value = "";
+        document.getElementById("ev_categoria_sugerencias").classList.add("hidden");
+        renderChipsCategoriasEv();
+
         document.getElementById("modalAgenda").classList.remove("hidden");
         setTimeout(() => {
           document.getElementById("modalAgenda").classList.remove("opacity-0");
@@ -875,6 +1148,245 @@
         }, 300);
       }
 
+<<<<<<< HEAD
+=======
+      // ================= CATEGORÍA DEL EVENTO (catálogo compartido con Publicaciones) =================
+      // Mismo catálogo (/api/categorias) y mismo patrón de cuadrícula paginada + mini-buscador
+      // estilo Google que el selector de Categoría en publicaciones.html — aquí opcional, con
+      // el sufijo "Ev" en las funciones para no chocar con nada de esta misma página.
+      let categoriasCatalogoGlobal = [];
+      let categoriasSeleccionadasEv = new Set();
+      const CATEGORIAS_POR_PAGINA_EV = 10;
+      let paginaActualCategoriasEv = 0;
+
+      async function cargarCategoriasCatalogo() {
+        try {
+          const res = await fetch(`${API_URL}/api/categorias`);
+          const json = await res.json();
+          if (json.success) {
+            categoriasCatalogoGlobal = json.data;
+            renderChipsCategoriasEv();
+          }
+        } catch (e) {
+          console.error("Error al cargar categorías:", e);
+        }
+      }
+
+      function ordenarCatalogoCategorias() {
+        categoriasCatalogoGlobal.sort((a, b) =>
+          a.nombre_categoria.localeCompare(b.nombre_categoria, "es"),
+        );
+      }
+
+      // Mueve la paginación a la página donde cae "nombre" dentro del catálogo ya ordenado,
+      // para que una categoría recién agregada/seleccionada quede visible de inmediato.
+      function irAPaginaDeCategoriaEv(nombre) {
+        const idx = categoriasCatalogoGlobal.findIndex(
+          (c) => c.nombre_categoria === nombre,
+        );
+        paginaActualCategoriasEv =
+          idx >= 0 ? Math.floor(idx / CATEGORIAS_POR_PAGINA_EV) : 0;
+      }
+
+      // Pinta la cuadrícula de chips de categoría (de 10 en 10) y el contador "Mostrando X–Y
+      // de Z" con sus flechas de paginación — mismo patrón que renderChipsCategorias en
+      // publicaciones.html / Artículos Recientes en comunidad_blog.html.
+      function renderChipsCategoriasEv() {
+        const cont = document.getElementById("ev_categorias_checks");
+        const contador = document.getElementById("ev_contador_categorias");
+        if (!cont) return;
+        if (categoriasCatalogoGlobal.length === 0) {
+          cont.innerHTML =
+            '<p class="text-sm text-slate-400 italic">Aún no hay categorías — agrega la primera con el buscador de abajo.</p>';
+          if (contador) contador.innerText = "";
+          renderPaginacionCategoriasEv(0);
+          return;
+        }
+
+        const totalPaginas = Math.max(
+          1,
+          Math.ceil(categoriasCatalogoGlobal.length / CATEGORIAS_POR_PAGINA_EV),
+        );
+        if (paginaActualCategoriasEv > totalPaginas - 1) {
+          paginaActualCategoriasEv = totalPaginas - 1;
+        }
+        if (paginaActualCategoriasEv < 0) paginaActualCategoriasEv = 0;
+
+        const inicio = paginaActualCategoriasEv * CATEGORIAS_POR_PAGINA_EV;
+        const paginaDeCategorias = categoriasCatalogoGlobal.slice(
+          inicio,
+          inicio + CATEGORIAS_POR_PAGINA_EV,
+        );
+
+        if (contador) {
+          contador.innerText = `Mostrando ${inicio + 1}–${inicio + paginaDeCategorias.length} de ${categoriasCatalogoGlobal.length}`;
+        }
+
+        cont.innerHTML = paginaDeCategorias
+          .map((c) => {
+            const activa = categoriasSeleccionadasEv.has(c.nombre_categoria);
+            return `<button
+              type="button"
+              onclick="toggleCategoriaChipEv('${escapeAttrJs(c.nombre_categoria)}')"
+              class="whitespace-nowrap text-xs font-bold px-3 py-2 rounded-full border transition-all active:scale-95 ${
+                activa
+                  ? "bg-secondary text-white border-secondary"
+                  : "bg-[#f0f4f8] text-slate-600 border-transparent hover:bg-slate-200"
+              }"
+            >${escapeHtml(c.nombre_categoria)}</button>`;
+          })
+          .join("");
+
+        renderPaginacionCategoriasEv(totalPaginas);
+      }
+
+      function renderPaginacionCategoriasEv(totalPaginas) {
+        const cont = document.getElementById("ev_paginacion_categorias");
+        if (!cont) return;
+        if (totalPaginas <= 1) {
+          cont.innerHTML = "";
+          return;
+        }
+        const enPrimera = paginaActualCategoriasEv === 0;
+        const enUltima = paginaActualCategoriasEv >= totalPaginas - 1;
+        cont.innerHTML = `
+            <button type="button" onclick="cambiarPaginaCategoriasEv(-1)" ${enPrimera ? "disabled" : ""}
+                    class="w-7 h-7 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    aria-label="Categorías anteriores">
+              <span class="material-symbols-outlined text-sm">chevron_left</span>
+            </button>
+            <button type="button" onclick="cambiarPaginaCategoriasEv(1)" ${enUltima ? "disabled" : ""}
+                    class="w-7 h-7 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    aria-label="Siguientes categorías">
+              <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </button>`;
+      }
+
+      function cambiarPaginaCategoriasEv(direccion) {
+        paginaActualCategoriasEv += direccion;
+        renderChipsCategoriasEv();
+      }
+
+      function toggleCategoriaChipEv(nombre) {
+        if (categoriasSeleccionadasEv.has(nombre)) {
+          categoriasSeleccionadasEv.delete(nombre);
+        } else {
+          categoriasSeleccionadasEv.add(nombre);
+        }
+        renderChipsCategoriasEv();
+      }
+
+      // Sugerencias del catálogo estilo autocompletado de Google, igual que en Publicaciones.
+      function filtrarSugerenciasCategoriaEv() {
+        const input = document.getElementById("ev_categoria_buscador");
+        const texto = input.value.trim().toLowerCase();
+        const cont = document.getElementById("ev_categoria_sugerencias");
+
+        const coincidencias = categoriasCatalogoGlobal
+          .filter((c) => !categoriasSeleccionadasEv.has(c.nombre_categoria))
+          .filter((c) => !texto || c.nombre_categoria.toLowerCase().includes(texto))
+          .slice(0, 6);
+
+        let filas = coincidencias
+          .map(
+            (c) => `<button
+              type="button"
+              onclick="seleccionarCategoriaSugeridaEv('${escapeAttrJs(c.nombre_categoria)}')"
+              class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+            ><span class="material-symbols-outlined text-slate-400 text-[16px]">sell</span>${escapeHtml(c.nombre_categoria)}</button>`,
+          )
+          .join("");
+
+        const existeExacta = categoriasCatalogoGlobal.some(
+          (c) => c.nombre_categoria.toLowerCase() === texto,
+        );
+        if (texto && !existeExacta) {
+          const textoOriginal = input.value.trim();
+          filas += `<button
+            type="button"
+            onclick="seleccionarCategoriaSugeridaEv('${escapeAttrJs(textoOriginal)}')"
+            class="w-full text-left px-4 py-2 text-sm font-bold text-secondary hover:bg-slate-50 flex items-center gap-2 border-t border-slate-100"
+          ><span class="material-symbols-outlined text-[16px]">add_circle</span>Agregar "${escapeHtml(textoOriginal)}" como nueva categoría</button>`;
+        }
+
+        if (!filas) {
+          cont.classList.add("hidden");
+          cont.innerHTML = "";
+          return;
+        }
+        cont.innerHTML = filas;
+        cont.classList.remove("hidden");
+      }
+
+      // Selecciona una categoría existente, o la registra en el catálogo (get-or-create en el
+      // servidor) cuando no coincide con ninguna — queda disponible de inmediato, igual que en
+      // Publicaciones.
+      async function seleccionarCategoriaSugeridaEv(nombre) {
+        nombre = (nombre || "").trim();
+        if (!nombre) return;
+        const yaExiste = categoriasCatalogoGlobal.some(
+          (c) => c.nombre_categoria.toLowerCase() === nombre.toLowerCase(),
+        );
+        if (!yaExiste) {
+          try {
+            const res = await fetch(`${API_URL}/api/categorias`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", ...authHeaders() },
+              body: JSON.stringify({ nombre }),
+            });
+            const data = await res.json();
+            if (data.success && data.data) {
+              categoriasCatalogoGlobal.push(data.data);
+              nombre = data.data.nombre_categoria;
+            } else {
+              categoriasCatalogoGlobal.push({ id_categoria: null, nombre_categoria: nombre });
+            }
+          } catch (e) {
+            console.error("No se pudo registrar la categoría nueva:", e);
+            categoriasCatalogoGlobal.push({ id_categoria: null, nombre_categoria: nombre });
+          }
+        }
+        categoriasSeleccionadasEv.add(nombre);
+        document.getElementById("ev_categoria_buscador").value = "";
+        document.getElementById("ev_categoria_sugerencias").classList.add("hidden");
+        ordenarCatalogoCategorias();
+        irAPaginaDeCategoriaEv(nombre);
+        renderChipsCategoriasEv();
+      }
+
+      function agregarCategoriaDesdeBuscadorEv() {
+        const valor = document.getElementById("ev_categoria_buscador").value.trim();
+        if (valor) seleccionarCategoriaSugeridaEv(valor);
+      }
+
+      function obtenerCategoriasSeleccionadasEv() {
+        return [...categoriasSeleccionadasEv];
+      }
+
+      // Inversa: recibe "Infancia, Muralismo" (como viene guardado) y marca esos chips como
+      // seleccionados, saltando a la página donde cae la primera para que se vea de inmediato
+      // al abrir el modal de edición.
+      function marcarCategoriasSeleccionadasEv(categoriaStr) {
+        const partes = (categoriaStr || "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        categoriasSeleccionadasEv = new Set(partes);
+        partes.forEach((p) => {
+          if (!categoriasCatalogoGlobal.some((c) => c.nombre_categoria === p)) {
+            categoriasCatalogoGlobal.push({ id_categoria: null, nombre_categoria: p });
+          }
+        });
+        ordenarCatalogoCategorias();
+        if (partes.length > 0) irAPaginaDeCategoriaEv(partes[0]);
+        else paginaActualCategoriasEv = 0;
+        renderChipsCategoriasEv();
+      }
+
+      // Muestra la sub-sección del formulario correspondiente al tipo elegido (visita,
+      // evento o clínica) y ajusta qué campos son "required" según esa vista, para que el
+      // navegador no exija campos ocultos de las otras vistas.
+>>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
       function cambiarVistaFormulario() {
         const tipo = document.getElementById("tipo_agendamiento").value;
         document
@@ -1074,9 +1586,21 @@
                         </label>`;
             });
 
+<<<<<<< HEAD
             todosLosBeneficiarios = json.beneficiarios || [];
             poblarSelectorBeneficiarios();
 
+=======
+            // Beneficiarios
+            const selBen = document.getElementById("cli_beneficiario");
+            json.beneficiarios.forEach((b) => {
+              selBen.innerHTML += `<option value="${b.id_beneficiario}">${b.nombre_completo}</option>`;
+            });
+
+            // Un psicólogo solo puede agendarse a sí mismo: el select de especialista se
+            // bloquea con su propio nombre fijo (el backend ya filtró los beneficiarios de
+            // arriba a solo los suyos, y vuelve a validar todo esto también del lado servidor).
+>>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             if (esUsuarioPsicologo) {
               selPsi.value = userIdActual;
               selPsi.disabled = true;
@@ -1171,6 +1695,8 @@
             } else {
               document.getElementById("ev_titulo").value =
                 data.titulo_evento || "";
+              establecerDescripcionEditorEvento(data.descripcion || "");
+              marcarCategoriasSeleccionadasEv(data.categoria);
               if (data.url_imagen) {
                 document.getElementById("ev_url_imagen").value =
                   data.url_imagen;
@@ -1318,6 +1844,13 @@
               });
 
             payload.datos.titulo = document.getElementById("ev_titulo").value;
+            payload.datos.descripcion =
+              document.getElementById("ev_descripcion").value || null;
+            const categoriasEvSeleccionadas = obtenerCategoriasSeleccionadasEv();
+            payload.datos.categoria =
+              categoriasEvSeleccionadas.length > 0
+                ? categoriasEvSeleccionadas.join(", ")
+                : null;
             payload.datos.url_imagen =
               document.getElementById("ev_url_imagen").value || null;
             payload.datos.direccion_mapa =
@@ -1368,7 +1901,21 @@
           }
         });
 
+<<<<<<< HEAD
       async function completarVisita(id) {
+=======
+      // ================= LISTADO, FILTROS Y ELIMINAR =================
+      // Marca una visita de prospección como realizada: pide por prompt() cuántas personas
+      // asistieron de verdad y lo manda al backend para cerrar el registro. La escuela ya se
+      // crea (con datos mínimos) al agendar la visita, pero para que alguien realmente la
+      // complemente/confirme con lo que se acordó en la reunión, en cuanto el backend
+      // confirma que la visita quedó Realizada se manda a quien la marcó a Aliados y
+      // Donativos > Escuelas con el modal de esa escuela ya abierto en modo edición (ver
+      // guardarHandoffEscuela() en comun.js y manejarHandoffVisitaEscuela() en
+      // aliados_donativos.html) — antes esto se quedaba solo en la base de datos, sin que
+      // nadie lo notara ni lo revisara.
+      async function completarVisita(id, idEscuela) {
+>>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         const asistentesReales = prompt(
           "¿Cuántas personas asistieron realmente a esta visita?",
         );
@@ -1389,7 +1936,12 @@
           );
           const data = await res.json();
           if (data.success) {
-            recargarVistaActual();
+            if (idEscuela) {
+              guardarHandoffEscuela({ id_escuela: idEscuela, id_visita: id });
+              window.location.href = "aliados_donativos";
+            } else {
+              recargarVistaActual();
+            }
           } else
             alert(
               data.message || "No se pudo marcar la visita como realizada.",
@@ -1796,10 +2348,10 @@
                         ev.categoria === "evento"
                           ? ev.ya_asignado
                             ? `<span class="flex-1 md:flex-none text-xs font-bold text-green-700 bg-green-50 px-4 py-2.5 rounded-lg text-center border border-green-100">Ya estás en el equipo</span>`
-                            : `<button onclick="unirseAEvento(${ev.id})" class="flex-1 md:flex-none text-xs font-bold text-purple-700 hover:text-white bg-purple-50 hover:bg-purple-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Unirse</button>`
+                            : `<button onclick="unirseAEvento(${ev.id}, this)" class="flex-1 md:flex-none text-xs font-bold text-purple-700 hover:text-white bg-purple-50 hover:bg-purple-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Unirse</button>`
                           : ""
                       }
-                      ${ev.categoria === "visita" && ev.estatus !== "Realizado" ? `<button onclick="completarVisita(${ev.id})" class="flex-1 md:flex-none text-xs font-bold text-teal-700 hover:text-white bg-teal-50 hover:bg-teal-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Marcar Realizada</button>` : ""}
+                      ${ev.categoria === "visita" && ev.estatus !== "Realizado" ? `<button onclick="completarVisita(${ev.id}, ${ev.id_escuela || "null"})" class="flex-1 md:flex-none text-xs font-bold text-teal-700 hover:text-white bg-teal-50 hover:bg-teal-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Marcar Realizada</button>` : ""}
                       <button onclick="editarActividad(${ev.id}, '${ev.categoria}')" class="flex-1 md:flex-none text-xs font-bold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm">Modificar</button>
                       <button onclick="eliminarActividad(${ev.id}, '${ev.categoria}')" class="flex-1 md:flex-none text-xs font-bold text-red-600 hover:text-white bg-red-50 hover:bg-red-600 px-4 py-2.5 rounded-lg transition-colors shadow-sm flex items-center justify-center"><span class="material-symbols-outlined text-[16px]">delete</span></button>
                   </div>
@@ -1810,7 +2362,22 @@
           .join("");
       }
 
+<<<<<<< HEAD
       async function unirseAEvento(idEvento) {
+=======
+      // Permite que el usuario actual se agregue como voluntario/staff a un evento
+      // operativo existente, sin pasar por el modal de edición completo.
+      async function unirseAEvento(idEvento, btn) {
+        // Feedback inmediato: sin esto, el clic no mostraba ningún cambio hasta que
+        // terminaba de recargarse toda la vista (POST + 3 recargas), lo que se sentía
+        // como un retraso o un clic que "no hizo nada".
+        const textoOriginal = btn ? btn.innerText : "";
+        if (btn) {
+          btn.disabled = true;
+          btn.innerText = "Uniendo...";
+          btn.classList.add("opacity-60", "cursor-not-allowed");
+        }
+>>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         try {
           const res = await fetch(
             `${API_URL}/api/agenda/evento/${idEvento}/unirse`,
@@ -1821,10 +2388,20 @@
             recargarVistaActual();
           } else {
             alert(data.message || "No se pudo registrar tu participación.");
+            if (btn) {
+              btn.disabled = false;
+              btn.innerText = textoOriginal;
+              btn.classList.remove("opacity-60", "cursor-not-allowed");
+            }
           }
         } catch (e) {
           console.error(e);
           alert("Error de conexión.");
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = textoOriginal;
+            btn.classList.remove("opacity-60", "cursor-not-allowed");
+          }
         }
       }
 

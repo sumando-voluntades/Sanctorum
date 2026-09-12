@@ -14,8 +14,13 @@
   abre la barra lateral (partials/navbar_admin.html) llamando a toggleSidebarMovil() (en
   js/comun.js), ya que en teléfono esa barra empieza oculta fuera de la pantalla.
 -->
+<!-- transform/will-change: en algunos navegadores de Android, una barra "sticky" con
+     backdrop-blur puede tardar en repintarse durante un scroll rápido y da la sensación
+     de que "no se mueve con el usuario" (se queda estática o desaparece un instante).
+     Forzar su propia capa de composición (GPU) evita ese parpadeo. -->
 <header
   class="sticky top-0 z-40 flex justify-between items-center px-4 md:px-8 h-16 bg-white/70 backdrop-blur-md rounded-full mt-4 mx-4 shadow-sm font-plus"
+  style="transform: translateZ(0); will-change: transform; backface-visibility: hidden"
 >
   <div class="flex items-center flex-1 gap-2">
     <button

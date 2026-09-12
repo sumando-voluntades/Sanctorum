@@ -18,6 +18,14 @@
     <link rel="stylesheet" href="/css/output.css">
     </link>
     <style>
+      /* Auditoría de responsividad (móvil): sin esto, cualquier elemento que se pase del
+         ancho del viewport (por ejemplo el título si algún texto no cabe en una palabra)
+         hace que TODA la página se pueda desplazar horizontalmente, cortando de paso
+         otras secciones que en realidad sí son responsivas. */
+      html, body {
+        overflow-x: hidden;
+        max-width: 100%;
+      }
       body {
         font-family: "Quicksand", sans-serif;
       }
@@ -47,14 +55,15 @@
       <section
         class="relative max-w-7xl mx-auto px-8 py-16 lg:py-24 overflow-hidden"
       >
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div class="z-10">
             <span
               class="inline-block px-4 py-1 rounded-full bg-secondary-container/10 text-secondary font-bold text-sm mb-6"
               >Cultura de Paz en Familia</span
             >
             <h1
-              class="text-5xl lg:text-7xl font-extrabold text-on-surface leading-tight mb-8 tracking-tight"
+              class="text-4xl lg:text-7xl font-extrabold text-on-surface leading-tight mb-8 tracking-tight"
+              style="overflow-wrap: break-word"
             >
               Transformando realidades con
               <span
@@ -88,9 +97,9 @@
             <div
               class="absolute -top-10 -right-10 w-64 h-64 bg-primary/10 organic-shape-1 blur-3xl"
             ></div>
-            <div class="grid grid-cols-2 gap-4 relative">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative">
               <img
-                class="rounded-xl w-full h-80 object-cover shadow-2xl mt-12"
+                class="rounded-xl w-full h-80 object-cover shadow-2xl sm:mt-12"
                 data-alt="Community volunteers painting a vibrant mural on a public wall with warm sunlit atmosphere and smiles"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7gQhBwn5y25l2EMkZ03rdSH5aQNgxXTvoOuPpAHnjO1i1JwvqbqKBDIx9g9CNR6CM_MtHW0xs_HkramzyQydMgi-JYD-UziDVAZ7JlpzD1yMXV3l41crjgeJvX-nwLuqarzn5sAYHYoErW3zAdk8Ga1lja4Kn2tmRcsNADpRdXDMHkk3yqxw8F32aNLtWmfweZxus97MpS0y5KvlYxW5fadpy7l-B5LqGjfJ5kIbSjbwh33mcMXy3K3_aX5nbxXs0fkUZEdmVlOs"
               />
@@ -115,7 +124,7 @@
               la empatía y la acción solidaria.
             </p>
           </div>
-          <div class="grid md:grid-cols-3 gap-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div
               class="bg-white p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow"
             >
@@ -189,7 +198,7 @@
       <!-- Asistencia Psicológica (estadísticas reales) -->
       <section class="max-w-7xl mx-auto px-8 pb-12">
         <div class="bg-surface-container-highest rounded-xl p-10 md:p-14 relative overflow-hidden">
-          <div class="grid md:grid-cols-2 gap-10 items-center relative z-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center relative z-10">
             <div>
               <span class="inline-block px-4 py-1 rounded-full bg-secondary-container/10 text-secondary font-bold text-sm mb-4">Salud Mental</span>
               <h3 class="text-3xl md:text-4xl font-bold mb-4 text-on-surface">
@@ -207,7 +216,7 @@
                 <span class="material-symbols-outlined">arrow_forward</span>
               </a>
             </div>
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div class="bg-white rounded-2xl p-6 text-center shadow-sm">
                 <p id="stat_pacientes_activos" class="text-4xl font-extrabold text-secondary mb-1">--</p>
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Pacientes en atención actualmente</p>
@@ -269,8 +278,8 @@
         </div>
       </section>
       <!-- Financial Transparency -->
-      <section class="max-w-7xl mx-auto px-8 py-24">
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <section id="seccion_transparencia" class="max-w-7xl mx-auto px-8 py-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
             <h2 class="text-3xl md:text-4xl font-bold text-on-surface mb-6">
               Transparencia Financiera
@@ -321,7 +330,7 @@
       </section>
       <!-- Donations & Channeling -->
       <section class="max-w-7xl mx-auto px-8 py-12">
-        <div class="grid lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div class="bg-white p-12 rounded-xl shadow-sm">
             <h3
               class="text-2xl font-bold text-on-surface mb-6 flex items-center gap-3"
@@ -437,9 +446,10 @@
                 <a
                   class="text-secondary font-bold flex items-center gap-2 hover:underline"
                   href="mailto:sumandovoluntadesensanctorum@gmail.com"
+                  style="min-width: 0"
                 >
-                  <span class="material-symbols-outlined text-base">mail</span>
-                  sumandovoluntadesensanctorum@gmail.com
+                  <span class="material-symbols-outlined text-base shrink-0">mail</span>
+                  <span style="overflow-wrap: anywhere">sumandovoluntadesensanctorum@gmail.com</span>
                 </a>
               </div>
             </div>
@@ -491,7 +501,11 @@
                   const badge = esProximo
                       ? '<span class="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">Próximamente</span>'
                       : '<span class="bg-slate-800 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">Realizado</span>';
-                  const resumen = (n.contenido || '').substring(0, 90) + ((n.contenido || '').length > 90 ? '…' : '');
+                  // El contenido puede traer HTML real (editor con formato del panel de
+                  // admin), así que se quitan las etiquetas antes de recortar -- si no, se
+                  // podría cortar a media etiqueta y romper el resto de la tarjeta. Se escapa
+                  // al insertarlo (ver abajo) porque va directo a innerHTML.
+                  const resumen = recortarTexto(quitarEtiquetasHtml(n.contenido), 90);
                   const img = n.url_imagen || IMG_PLACEHOLDER_PROYECTO;
                   return `
                     <a href="evento_detalle?id=${n.id_publicacion}"
@@ -502,7 +516,7 @@
                       </div>
                       <div class="p-6">
                         <h3 class="text-lg font-bold mb-2 leading-snug line-clamp-2">${n.titulo}</h3>
-                        <p class="text-on-surface-variant text-sm leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-20 transition-all duration-300 overflow-hidden">${resumen || 'Toca para ver el detalle completo.'}</p>
+                        <p class="text-on-surface-variant text-sm leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-20 transition-all duration-300 overflow-hidden">${resumen ? escapeHtml(resumen) : 'Toca para ver el detalle completo.'}</p>
                         <span class="text-xs text-slate-400 font-bold mt-2 block">${fecha.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       </div>
                     </a>`;
@@ -601,13 +615,10 @@
               const res = await fetch(`${API_URL}/api/transparencia`);
               const json = await res.json();
               if (!json.success || json.data.length === 0) {
-                  lista.innerHTML = `
-                    <div class="bg-white/60 border border-slate-100 rounded-2xl p-5 text-sm text-on-surface-variant">
-                      Aún no hay donaciones registradas en la tabla <b>Donaciones</b> de la base de datos.
-                      En cuanto el equipo administrativo registre ingresos con su <b>categoría de gasto</b>
-                      (Especialistas, Insumos u Operación), esta gráfica se llenará automáticamente.
-                    </div>`;
-                  document.getElementById('donut_centro_valor').innerText = '$0';
+                  // Sin donaciones registradas todavía: no tiene sentido mostrarle al público
+                  // una sección de "Transparencia Financiera" vacía, así que se oculta por
+                  // completo (título, texto y gráfica de dona) hasta que haya datos reales.
+                  document.getElementById('seccion_transparencia').classList.add('hidden');
                   return;
               }
 
