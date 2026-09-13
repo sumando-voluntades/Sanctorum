@@ -99,30 +99,12 @@ const transporter = nodemailer.createTransport({
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
-<<<<<<< HEAD
-=======
-// Envía un correo sin bloquear la respuesta al cliente. El SMTP de Gmail puede tardar
-// varios segundos en responder; si cada ruta esperara (`await`) ese envío antes de
-// contestar, el botón que disparó la acción se sentiría "trabado" ese mismo tiempo aunque
-// la acción real (guardar en la base de datos) ya haya terminado. El correo es una
-// notificación secundaria: se dispara en segundo plano y cualquier falla solo se registra
-// en consola, nunca hace fallar la petición original.
 function enviarCorreoAsync(opciones, contexto) {
     transporter.sendMail(opciones).catch(err => {
         console.error(`No se pudo enviar el correo (${contexto || 'sin contexto'}):`, err);
     });
 }
 
-// ==========================================
-// ENCUESTA DE SATISFACCIÓN POST-CONSULTA (RF-15)
-// Requiere la tabla Encuestas_Satisfaccion — ver migracion_encuestas_satisfaccion.sql.
-// Se dispara desde POST /api/expedientes/:id/notas cuando asistencia === 'Asistió'.
-// ==========================================
-
-// Crea el registro de la encuesta (con un token de un solo uso) y le manda al tutor el
-// enlace por correo. No bloquea nada: si el beneficiario no tiene correo de tutor
-// registrado, o si la tabla todavía no existe (falta correr la migración), no hace nada —
-// nunca debe hacer fallar el guardado de la nota clínica que la dispara.
 async function enviarEncuestaSatisfaccion(idBeneficiario, idEspecialista) {
     const benRes = await pool.query('SELECT nombre_completo, nombre_tutor, correo_tutor FROM Beneficiarios WHERE id_beneficiario = $1', [idBeneficiario]);
     const ben = benRes.rows[0];
@@ -134,9 +116,6 @@ async function enviarEncuestaSatisfaccion(idBeneficiario, idEspecialista) {
         [idBeneficiario, idEspecialista || null, token]
     );
 
-    // Mismo dominio de producción provisional que usa el resto de los correos del sistema
-    // (ver Variables_de_Entorno_y_Checklist_Despliegue.docx, sección de CORS) — actualizar
-    // aquí también el día que se confirme el dominio final.
     const enlace = `https://sanctorum-sitio.vercel.app/encuesta_satisfaccion?token=${token}`;
     const contenido = `
         <p>Hola <b>${ben.nombre_tutor || 'tutor(a)'}</b>,</p>
@@ -154,8 +133,6 @@ async function enviarEncuestaSatisfaccion(idBeneficiario, idEspecialista) {
     }, 'encuesta de satisfacción');
 }
 
-// Avisa a Coordinadores y Administradores cuando llega una calificación insatisfactoria
-// (1 o 2 de 5), para que puedan darle seguimiento al caso.
 async function avisarEncuestaInsatisfactoria(idBeneficiario, calificacion, comentarios, detalle = {}) {
     const benRes = await pool.query('SELECT nombre_completo FROM Beneficiarios WHERE id_beneficiario = $1', [idBeneficiario]);
     const nombreBen = benRes.rows[0]?.nombre_completo || 'un beneficiario';
@@ -186,14 +163,6 @@ async function avisarEncuestaInsatisfactoria(idBeneficiario, calificacion, comen
     }, 'alerta de encuesta insatisfactoria');
 }
 
-// Si en "Material a utilizar" se escogió "Otro: escribir...", se da de alta un Insumo nuevo
-// (con el stock inicial igual a lo que se va a usar, para que quede en 0 tras el consumo) en
-// vez de fallar por no existir en el catálogo. Si ya viene un id de insumo real, se usa tal cual.
-// Valida que las URLs de archivos (foto de perfil, documento profesional, comprobante de
-// donativo, imagen de evento/galeria, documento de consentimiento) vengan de Cloudinary antes
-// de guardarlas — el frontend las renderiza tal cual en <a href> / <img src>. Se acepta un
-// valor vacio/nulo, o uno que empiece exactamente con "https://res.cloudinary.com/".
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 const PREFIJO_URL_CLOUDINARY = 'https://res.cloudinary.com/';
 function validarUrlCloudinaria(valor, nombreCampo) {
     if (valor === undefined || valor === null || valor === '') return { ok: true, valor: null };
@@ -201,10 +170,6 @@ function validarUrlCloudinaria(valor, nombreCampo) {
     return { ok: false, mensaje: `${nombreCampo} debe ser una URL de Cloudinary válida (empezar con ${PREFIJO_URL_CLOUDINARY}).` };
 }
 
-<<<<<<< HEAD
-=======
-// Igual que validarUrlCloudinaria pero para un arreglo de URLs (adjuntos de un Reporte de
-// Evento: fotos, video, documentos) — cada elemento debe ser una URL de Cloudinary válida.
 function validarUrlsCloudinariaArray(valor, nombreCampo) {
     if (valor === undefined || valor === null) return { ok: true, valor: [] };
     if (!Array.isArray(valor)) return { ok: false, mensaje: `${nombreCampo} debe ser una lista de URLs.` };
@@ -217,11 +182,6 @@ function validarUrlsCloudinariaArray(valor, nombreCampo) {
     return { ok: true, valor: limpio };
 }
 
-// Valida el formato del correo del remitente en POST /api/solicitudes (buzón público, sin
-// autenticación) antes de usarlo en el "to:" de nodemailer, que separa direcciones por coma
-// en un string de "to". Es una validación simple a propósito (no intenta ser 100% RFC 5322):
-// solo rechaza lo que permitiría inyectar más de un destinatario o caracteres de control.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 const FORMATO_CORREO_SIMPLE = /^[^\s,;<>]+@[^\s,;<>]+\.[^\s,;<>]+$/;
 function validarFormatoCorreo(valor) {
     return typeof valor === 'string' && FORMATO_CORREO_SIMPLE.test(valor.trim());
@@ -359,11 +319,6 @@ function verificarToken(req, res, next) {
     });
 }
 
-<<<<<<< HEAD
-=======
-// Igual que verificarToken, pero para rutas públicas que cambian de comportamiento si quien
-// pregunta ya está identificado (ej. /api/publicaciones filtrando por autor desde el panel).
-// No bloquea la petición: si no hay token, o es inválido/expiró, simplemente devuelve null.
 function usuarioOpcional(req) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -375,8 +330,6 @@ function usuarioOpcional(req) {
     }
 }
 
-// Roles: 1=Admin, 2=Especialista, 3=Coordinador, 4=Voluntario, 5=Donador
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 const ROL_ADMIN = 1, ROL_ESPECIALISTA = 2, ROL_COORDINADOR = 3, ROL_VOLUNTARIO = 4;
 
 function esPsicologo(usuario) {
@@ -401,13 +354,7 @@ function requiereRol(...rolesPermitidos) {
     };
 }
 
-<<<<<<< HEAD
-=======
-// Exige que, si el usuario no es Admin, su req.usuario.id coincida con el id_especialista
-// asignado al beneficiario del :id de la ruta — un Especialista solo puede leer/editar el
-// expediente clinico de sus propios pacientes.
 async function verificarOwnershipExpediente(req, res, next) {
-    // Coordinador tiene acceso completo al módulo de Expedientes, igual que Admin.
     if (req.usuario && (req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR)) return next();
     try {
         const result = await pool.query('SELECT id_especialista FROM Beneficiarios WHERE id_beneficiario = $1', [req.params.id]);
@@ -423,11 +370,6 @@ async function verificarOwnershipExpediente(req, res, next) {
     }
 }
 
-// Genera un middleware para rutas de una sola tabla que exige ser el autor original
-// (comparado por columnaAutor) o un Admin, para PUT/DELETE. Publicaciones/Historias_Exito, al
-// tener dos tablas posibles segun el body/query, resuelven esto en linea dentro del propio
-// handler en vez de usar este helper (ver mas abajo).
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 function verificarAutorORol(tabla, columnaId, columnaAutor) {
     return async (req, res, next) => {
         if (req.usuario && req.usuario.rol === ROL_ADMIN) return next();
@@ -460,18 +402,6 @@ app.post('/api/auth/recuperar', async (req, res) => {
 
         const contenidoCorreo = `<p>Hola <b>${voluntario.nombre_completo}</b>,</p><p>Tu nueva contraseña temporal es: <span style="background: #ffd9e2; padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 16px;">${tempPassword}</span></p><p>Cámbiala inmediatamente al iniciar sesión.</p>`;
         
-<<<<<<< HEAD
-        await transporter.sendMail({ 
-            from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`, 
-            to: correo, 
-            subject: 'Recuperación de Acceso', 
-            html: emailTemplate('Restablecimiento', contenidoCorreo) 
-        });
-
-=======
-        // Respondemos primero (el mensaje es siempre el mismo, exista o no la cuenta) y
-        // el correo real se envía después, sin bloquear la respuesta.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         res.json(MENSAJE_RECUPERAR_GENERICO);
         enviarCorreoAsync({
             from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
@@ -503,19 +433,6 @@ app.put('/api/auth/cambiar-password', verificarToken, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false }); }
 });
 
-<<<<<<< HEAD
-=======
-// ==========================================
-// MÓDULO DE VOLUNTARIADO Y DONADORES
-// ==========================================
-
-// Separa el texto compuesto "<cantidad> <unidad>" (p. ej. "25 Lt") que manda el formulario de
-// Donadores del panel (ver extraerCantidad() en voluntariado.html) en las dos partes reales que
-// alimentan Usuarios.cantidad_donada_valor (NUMERIC) y Usuarios.cantidad_donada_unidad (VARCHAR)
-// -- ver migracion_usuarios_cantidad_donada_split_v1.sql. Nunca lanza: si el texto no trae un
-// número reconocible al inicio, valor queda en null y el resto del guardado sigue su curso
-// normal (Usuarios.cantidad_donada, la columna de texto original, se sigue llenando igual que
-// siempre como caché de compatibilidad).
 function parsearCantidadDonada(cantidadStr) {
     const texto = (cantidadStr || '').trim();
     if (!texto) return { valor: null, unidad: null };
@@ -527,14 +444,6 @@ function parsearCantidadDonada(cantidadStr) {
     };
 }
 
-// 1. REGISTRAR NUEVO USUARIO (Con correo de confirmación de recibido)
-// Ruta publica (autorregistro de voluntarios/donadores desde como_ayudar), tambien usada por
-// el panel de Admin para dar de alta Coordinadores/Especialistas (voluntariado). Solo un
-// Admin/Coordinador con sesion valida puede pedir un rol de staff (2=Especialista,
-// 3=Coordinador); cualquier otro caso (publico, anonimo, o rol invalido) siempre cae a
-// Voluntario (4), salvo que pida explicitamente Donador (5). Nunca se permite crear un Admin
-// (1) por esta via, ni siquiera autenticado.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 app.post('/api/usuarios', async (req, res) => {
     const { nombre_completo, correo, telefono, especialidad, material, cantidad } = req.body;
     const usuarioSolicitante = usuarioOpcionalDesdeToken(req);
@@ -661,14 +570,8 @@ app.post('/api/entrevistas', async (req, res) => {
             <p style="font-style: italic; color: #877362; text-align: center; margin-top: 30px;">"Sumando Voluntades"</p>
         `;
 
-<<<<<<< HEAD
-        await transporter.sendMail({
-=======
-        // 4. Respondemos ya (lo importante — el evento y el estatus del usuario — quedó
-        // guardado) y el correo se envía después, sin bloquear al botón que disparó esto.
         res.json({ success: true });
         enviarCorreoAsync({
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
             to: correo,
             subject: tituloCorreo + ' - Sanctorum A.C.',
@@ -714,9 +617,6 @@ app.put('/api/voluntarios/:id/asignar', verificarToken, requiereRol(ROL_ADMIN, R
             </div>
         `;
 
-        // El perfil ya quedó activado y guardado; respondemos de inmediato para que el
-        // botón "Aprobar" no se quede esperando al envío del correo con las credenciales
-        // (Gmail puede tardar varios segundos). El correo se manda justo después, en segundo plano.
         res.json({ success: true });
         enviarCorreoAsync({
             from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
@@ -844,13 +744,6 @@ app.put('/api/usuarios/:id/perfil', verificarToken, async (req, res) => {
         return res.status(403).json({ success: false, message: 'No puedes editar el perfil de otro usuario.' });
     }
     const { telefono, biografia, nombre_completo, edad, genero } = req.body;
-    // Auditoría de seguridad: especialidad y correo NO se aceptan de un usuario editando su
-    // propio perfil. especialidad determina permisos reales (si contiene "psic" da acceso a
-    // Expedientes y Citas Clínicas vía esPsicologo()), así que cualquiera podía auto-asignarse
-    // ese acceso con solo escribir "Psicología" en su perfil. correo es el identificador de
-    // login y lo asigna la organización, no debe poder cambiarlo el propio usuario. Solo un
-    // Admin puede tocar estos dos campos (aquí mismo, editando el perfil de otro usuario, o
-    // desde Gestión de Voluntariado vía /api/usuarios/:id/modificar).
     const especialidad = req.usuario.rol === ROL_ADMIN ? req.body.especialidad : undefined;
     const correo = req.usuario.rol === ROL_ADMIN ? req.body.correo : undefined;
     try {
@@ -935,13 +828,9 @@ app.put('/api/usuarios/:id/documento_profesional', verificarToken, async (req, r
                     to: correos.join(','),
                     subject: 'Documento profesional pendiente de revisión - Sanctorum A.C.',
                     html: emailTemplate('Nuevo documento por revisar', contenidoAviso)
-<<<<<<< HEAD
-                });
-=======
                 }, 'aviso de documento pendiente');
             } else {
                 console.log('Aviso de documento pendiente: no hay ningún Admin/Coordinador con correo registrado, no se envió nada.');
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             }
         } catch (mailErr) {
             console.error("No se pudo preparar el aviso de documento pendiente:", mailErr);
@@ -1149,17 +1038,6 @@ app.delete('/api/activos_fijos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_
     }
 });
 
-<<<<<<< HEAD
-=======
-// ==========================================
-// MÓDULO DE ALIADOS Y DONATIVOS (Contactos_Externos + Donaciones monetarias/en especie
-// ligadas a un aliado externo — alimenta /api/transparencia en el sitio público)
-// ==========================================
-// Por default solo muestra aliados activos (?activo=false para solo archivados,
-// ?activo=todas para ambos) — mismo criterio que /api/agenda/directorio_escuelas. Si la
-// migración que agrega Contactos_Externos.activo todavía no corrió, se degrada a la
-// consulta original (sin esa columna) en vez de tumbar el módulo.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 app.get('/api/aliados', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     let filtroActivo = true;
     if (req.query.activo === 'false') filtroActivo = false;
@@ -1221,11 +1099,6 @@ app.put('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINAD
     }
 });
 
-<<<<<<< HEAD
-=======
-// Elimina un aliado. Falla con 409 si ya tiene donativos ligados (restricción de FK) — para
-// ese caso existe la opción de Archivar, que sí conserva el registro y su historial.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 app.delete('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Contactos_Externos WHERE id_contacto = $1', [req.params.id]);
@@ -1237,10 +1110,6 @@ app.delete('/api/aliados/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDI
     }
 });
 
-// Archiva o reactiva un aliado. Nunca se borra de la base cuando ya tiene historial ligado
-// (donativos, etc.): así se conserva ese registro pero deja de ofrecerse como opción activa
-// en el selector de "Aliado / Donante" al capturar un donativo nuevo. Mismo patrón que
-// /api/escuelas/:id/archivar.
 app.put('/api/aliados/:id/archivar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('UPDATE Contactos_Externos SET activo=$1 WHERE id_contacto=$2', [!!req.body.activo, req.params.id]);
@@ -1252,16 +1121,8 @@ app.put('/api/aliados/:id/archivar', verificarToken, requiereRol(ROL_ADMIN, ROL_
     }
 });
 
-<<<<<<< HEAD
-=======
-// Lista todos los donativos (monetarios o en especie) con el nombre del aliado y, si aplica,
-// del insumo relacionado y de quién lo registró.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 app.get('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
-        // Con try/catch degradado: si todavía no se corrió la migración que agrega
-        // id_usuario_registro, se sirve la lista igual pero sin esa columna (en vez de
-        // tumbar el módulo completo).
         try {
             const result = await pool.query(`
                 SELECT d.id_donacion, d.monto, d.metodo_pago, d.categoria_gasto, d.comprobante_url, d.fecha_donacion,
@@ -1316,8 +1177,6 @@ app.post('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADO
             );
             idInsumoFinal = nuevo.rows[0].id_insumo;
         }
-        // Igual que arriba: si id_usuario_registro todavía no existe (falta la migración),
-        // se degrada a insertar sin esa columna en vez de fallar el registro del donativo.
         try {
             await pool.query(
                 `INSERT INTO Donaciones (id_contacto, id_insumo, monto, metodo_pago, categoria_gasto, comprobante_url, fecha_donacion, id_usuario_registro)
@@ -1338,11 +1197,6 @@ app.post('/api/donativos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADO
     }
 });
 
-<<<<<<< HEAD
-=======
-// Corrige los datos de un donativo ya registrado (por ejemplo, un error de dedo en el
-// monto o la fecha). No cambia quién lo registró originalmente (id_usuario_registro se
-// conserva): esta ruta es para arreglar errores tipográficos, no para reasignar autoría.
 app.put('/api/donativos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { id_contacto, contacto_nuevo, id_insumo, insumo_nuevo, monto, metodo_pago, categoria_gasto, comprobante_url, fecha_donacion } = req.body;
     if ((!id_contacto && !(contacto_nuevo && contacto_nuevo.trim())) || !monto) {
@@ -1381,8 +1235,6 @@ app.put('/api/donativos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDIN
     }
 });
 
-// Elimina un donativo por id.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 app.delete('/api/donativos/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('DELETE FROM Donaciones WHERE id_donacion = $1', [req.params.id]);
@@ -1399,34 +1251,14 @@ app.get('/api/catalogos_agenda', verificarToken, async (req, res) => {
         const escuelas = await pool.query('SELECT * FROM Escuelas ORDER BY nombre_escuela ASC');
         const insumos = await pool.query('SELECT * FROM Insumos WHERE stock_actual > 0 ORDER BY nombre_insumo ASC');
         const voluntarios = await pool.query("SELECT id_usuario, nombre_completo, especialidad, id_rol FROM Usuarios WHERE estatus != 'Inactivo' ORDER BY nombre_completo ASC");
-<<<<<<< HEAD
-        const beneficiarios = await pool.query('SELECT id_beneficiario, nombre_completo, id_especialista FROM Beneficiarios ORDER BY nombre_completo ASC');
-        
-=======
-        // Un psicólogo solo debe ver, para agendar, a los beneficiarios que tiene asignados a
-        // su cargo (mismo criterio que /api/agenda/directorio_pacientes). Admin y Coordinador
-        // siguen viendo el catálogo completo.
         const beneficiarios = esPsicologo(req.usuario)
             ? await pool.query('SELECT id_beneficiario, nombre_completo FROM Beneficiarios WHERE id_especialista = $1 ORDER BY nombre_completo ASC', [req.usuario.id])
             : await pool.query('SELECT id_beneficiario, nombre_completo FROM Beneficiarios ORDER BY nombre_completo ASC');
 
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         res.json({ success: true, escuelas: escuelas.rows, insumos: insumos.rows, voluntarios: voluntarios.rows, beneficiarios: beneficiarios.rows });
     } catch (error) { console.error("Error catalogos:", error); res.status(500).json({ success: false }); }
 });
 
-<<<<<<< HEAD
-=======
-// ==========================================
-// AGENDA: DIRECTORIO DE ESCUELAS Y PACIENTES (Misión 1.5 - restructura según Figma)
-// No se crean tablas nuevas: se reutilizan Escuelas, Beneficiarios, Agenda_Visitas y Eventos.
-// ==========================================
-
-// Directorio de escuelas (panel lateral izquierdo). Por default solo muestra escuelas
-// activas (?activo=false para solo archivadas, ?activo=todas para ambas) — así Agenda,
-// que no manda este parámetro, nunca ofrece una escuela archivada para agendar una visita
-// nueva.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 app.get('/api/agenda/directorio_escuelas', async (req, res) => {
     try {
         let filtroActivo = true;
@@ -1448,12 +1280,6 @@ app.get('/api/agenda/directorio_escuelas', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-=======
-// Registra una escuela nueva SOLO con sus datos de contacto, sin programar ninguna visita —
-// para el registro formal que se hace una vez que la alianza con la escuela ya se concretó
-// (a diferencia de Agenda > "Visita de Prospección", que agenda la primera reunión pero no
-// sirve para capturar los datos de contacto con calma).
 app.post('/api/escuelas', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { nombre_escuela, contacto_nombre, puesto_contacto, telefono_escuela, ubicacion } = req.body;
     if (!nombre_escuela || !nombre_escuela.trim()) return res.status(400).json({ success: false, message: 'El nombre de la escuela es obligatorio.' });
@@ -1471,7 +1297,6 @@ app.post('/api/escuelas', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR
     }
 });
 
-// Actualiza los datos de contacto de una escuela ya registrada.
 app.put('/api/escuelas/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     const { nombre_escuela, contacto_nombre, puesto_contacto, telefono_escuela, ubicacion } = req.body;
     if (!nombre_escuela || !nombre_escuela.trim()) return res.status(400).json({ success: false, message: 'El nombre de la escuela es obligatorio.' });
@@ -1488,9 +1313,6 @@ app.put('/api/escuelas/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINA
     }
 });
 
-// Archiva o reactiva una escuela. Nunca se borra de la base: así se conserva intacto su
-// historial de visitas, eventos y beneficiarios ligados. Archivada, deja de aparecer en el
-// directorio activo (incluyendo el selector de Agenda para agendar visitas nuevas).
 app.put('/api/escuelas/:id/archivar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query('UPDATE Escuelas SET activo=$1 WHERE id_escuela=$2', [!!req.body.activo, req.params.id]);
@@ -1502,11 +1324,6 @@ app.put('/api/escuelas/:id/archivar', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
-// Fusiona dos escuelas duplicadas (mismo lugar, capturado con escritura distinta) en una
-// sola: reasigna Beneficiarios, Eventos y Agenda_Visitas de la escuela duplicada hacia la
-// escuela que se conserva, y archiva la duplicada (nunca se borra, igual que /archivar, para
-// no perder su nombre del historial). Solo Admin puede fusionar — reescribe varias tablas a
-// la vez y no tiene deshacer, así que se deja fuera del alcance normal de Coordinador.
 app.post('/api/escuelas/fusionar', verificarToken, requiereRol(ROL_ADMIN), async (req, res) => {
     const id_conservar = parseInt(req.body.id_conservar, 10);
     const id_duplicada = parseInt(req.body.id_duplicada, 10);
@@ -1539,8 +1356,6 @@ app.post('/api/escuelas/fusionar', verificarToken, requiereRol(ROL_ADMIN), async
     }
 });
 
-// Directorio de pacientes/beneficiarios (panel lateral izquierdo)
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 app.get('/api/agenda/directorio_pacientes', verificarToken, async (req, res) => {
     try {
         const filtrarPropios = esPsicologo(req.usuario);
@@ -1644,17 +1459,9 @@ app.get('/api/agenda', verificarToken, async (req, res) => {
         if (u.rol === ROL_ADMIN) {
             incluirVisitas = true;
         } else if (u.rol === ROL_COORDINADOR) {
-<<<<<<< HEAD
-            eventosQuery += ` AND e.tipo_evento != 'Cita Clínica'`;
-=======
-            // Coordinador: NUNCA citas clínicas. Ve los eventos operativos de especialistas,
-            // voluntarios, sin responsable capturado (eventos de antes de esta migración), y
-            // los suyos propios — pero NO los eventos a cargo de OTRO Coordinador (un
-            // coordinador no supervisa a otro coordinador). Solo SUS visitas de prospección.
             eventosQuery += ` AND e.tipo_evento != 'Cita Clínica'
                 AND (e.id_responsable IS NULL OR e.id_responsable = $1
                      OR e.id_responsable NOT IN (SELECT id_usuario FROM Usuarios WHERE id_rol = ${ROL_COORDINADOR}))`;
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             incluirVisitas = true;
             filtroVisitas = 'WHERE av.id_usuario_creador = $1';
             visitasParams.push(u.id);
@@ -1716,11 +1523,6 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
     if (esPsicologo(req.usuario) && tipo_registro !== 'clinica') {
         return res.status(403).json({ success: false, message: 'Como Psicólogo(a) solo puedes agendar Citas Clínicas.' });
     }
-<<<<<<< HEAD
-=======
-    // El especialista de una cita clínica agendada por un psicólogo siempre es él mismo —
-    // se ignora cualquier otro id_especialista que venga en el cuerpo — y el beneficiario
-    // debe estar asignado a su cargo (mismo criterio que el catálogo del modal).
     if (esPsicologo(req.usuario) && tipo_registro === 'clinica' && datos) {
         datos.id_especialista = req.usuario.id;
         const asignado = await pool.query('SELECT id_especialista FROM Beneficiarios WHERE id_beneficiario = $1', [datos.id_beneficiario]);
@@ -1728,8 +1530,6 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
             return res.status(403).json({ success: false, message: 'Ese beneficiario no está asignado a tu cargo.' });
         }
     }
-    // Valida url_imagen antes de abrir la transaccion.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     const chkUrlImagenAgendaPost = validarUrlCloudinaria(datos?.url_imagen, 'url_imagen');
     if (!chkUrlImagenAgendaPost.ok) return res.status(400).json({ success: false, message: chkUrlImagenAgendaPost.mensaje });
     try {
@@ -1785,18 +1585,11 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
             }
         } 
         else if (tipo_registro === 'evento') {
-            // id_responsable (quién está a cargo del evento) se guarda para que, en Agenda,
-            // un Coordinador deje de ver los eventos a cargo de OTRO Coordinador — ver
-            // migracion_eventos_responsable_v1.sql. Eventos creados antes de esa migración
-            // simplemente quedan con id_responsable en NULL (visibles para todos, como hoy).
             const e = await pool.query(
                 "INSERT INTO Eventos (titulo_evento, tipo_evento, fecha_realizacion, id_escuela, url_imagen, direccion_mapa, link_reunion, descripcion, categoria, id_responsable) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id_evento",
                 [datos.titulo, datos.tipo, `${datos.fecha} ${datos.hora}:00`, datos.id_escuela == "0" ? null : datos.id_escuela, chkUrlImagenAgendaPost.valor, datos.direccion_mapa || null, datos.link_reunion || null, datos.descripcion || null, datos.categoria || null, datos.responsable || null]
             );
             const id_evento = e.rows[0].id_evento;
-            // "categoria" se sigue guardando también como texto arriba (caché de lectura /
-            // compatibilidad con datos_demo_sanctorum.sql), pero Eventos_Categorias es ahora la
-            // fuente real de verdad para consultas y filtros (ver migracion_normalizacion_categorias_v1.sql).
             await registrarCategorias(datos.categoria, { tipo: 'evento', id: id_evento });
 
             const equipo = [datos.responsable, ...datos.voluntarios];
@@ -1827,10 +1620,6 @@ app.get('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
             const vis = await pool.query(`SELECT av.fecha_cita, av.asistentes_plan, av.asistentes_reales, av.estatus_alerta, av.id_evento_ejecucion, e.nombre_escuela, e.contacto_nombre, e.puesto_contacto, e.telefono_escuela, e.ubicacion FROM Agenda_Visitas av JOIN Escuelas e ON av.id_escuela = e.id_escuela WHERE av.id_visita = $1`, [id]);
             data = { ...vis.rows[0], tipo_registro: 'visita' };
         } else {
-            // "categoria" aquí se recalcula desde Eventos_Categorias (fuente real de verdad) en vez
-            // de leer la columna de texto tal cual -- al llevar el mismo alias que la columna real
-            // de Eventos, la sobreescribe en el objeto de resultado (pg asigna las propiedades en
-            // el orden de las columnas devueltas, así que la última con ese nombre gana).
             const ev = await pool.query(
                 `SELECT e.*,
                         (SELECT string_agg(c.nombre_categoria, ', ' ORDER BY c.nombre_categoria)
@@ -1860,10 +1649,6 @@ app.put('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
     if (esPsicologo(req.usuario) && tipo_registro !== 'clinica') {
         return res.status(403).json({ success: false, message: 'Como Psicólogo(a) solo puedes modificar Citas Clínicas.' });
     }
-<<<<<<< HEAD
-=======
-    // Mismo criterio que al crear: el especialista siempre es él mismo, y el beneficiario
-    // debe seguir asignado a su cargo.
     if (esPsicologo(req.usuario) && tipo_registro === 'clinica' && datos) {
         datos.id_especialista = req.usuario.id;
         const asignado = await pool.query('SELECT id_especialista FROM Beneficiarios WHERE id_beneficiario = $1', [datos.id_beneficiario]);
@@ -1871,8 +1656,6 @@ app.put('/api/agenda/:categoria/:id', verificarToken, async (req, res) => {
             return res.status(403).json({ success: false, message: 'Ese beneficiario no está asignado a tu cargo.' });
         }
     }
-    // Valida url_imagen antes de abrir la transaccion.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     const chkUrlImagenAgendaPut = validarUrlCloudinaria(datos?.url_imagen, 'url_imagen');
     if (!chkUrlImagenAgendaPut.ok) return res.status(400).json({ success: false, message: chkUrlImagenAgendaPut.mensaje });
     try {
@@ -1961,9 +1744,6 @@ app.delete('/api/agenda/:categoria/:id', verificarToken, requiereRol(ROL_ADMIN, 
 
 app.get('/api/catalogos_expedientes', async (req, res) => {
     try {
-        // Solo Especialistas cuya especialidad sea Psicología pueden quedar como
-        // "Especialista Asignado" de un expediente clínico — antes esta lista incluía
-        // a cualquier Especialista (ej. Pedagogía), que es un área fuera de su competencia.
         const especialistas = await pool.query(
             "SELECT id_usuario, nombre_completo FROM Usuarios WHERE id_rol = 2 AND especialidad ILIKE '%psic%' AND COALESCE(estatus,'Activo') != 'Inactivo' ORDER BY nombre_completo ASC"
         );
@@ -1975,25 +1755,13 @@ app.get('/api/catalogos_expedientes', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-app.get('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-    try {
-        const filtrarPorEspecialista = esPsicologo(req.usuario);
-=======
-// 2. Listado de expedientes (tabla principal)
 app.get('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), async (req, res) => {
     try {
-        // Un psicólogo (Especialista con especialidad "Psicología") solo ve SUS pacientes.
-        // Admin y Coordinador ven todos. Un Especialista que NO es psicólogo (ej. Pedagogía)
-        // no tiene ningún expediente clínico que le corresponda — antes, al no ser psicólogo,
-        // simplemente no se aplicaba ningún filtro y terminaba viendo TODOS los expedientes
-        // sin querer (bug), así que aquí se le niega el acceso explícitamente.
         const esCoordOAdmin = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
         if (!esCoordOAdmin && !esPsicologo(req.usuario)) {
             return res.status(403).json({ success: false, message: 'No tienes permiso para ver expedientes clínicos.' });
         }
         const filtrarPorEspecialista = !esCoordOAdmin && esPsicologo(req.usuario);
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         const params = [];
         let filtroWhere = '';
         if (filtrarPorEspecialista) {
@@ -2022,14 +1790,7 @@ app.get('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINAD
     }
 });
 
-<<<<<<< HEAD
-app.post('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-=======
-// 3. Crear nuevo expediente (beneficiario) — permite crear escuela nueva "al vuelo"
-// Solo Admin/Coordinador pueden dar de alta expedientes clínicos; los Especialistas
-// (incluidos los psicólogos) ya no pueden crear expedientes por su cuenta.
 app.post('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     const { nombre, fecha_nacimiento, genero, colonia_puebla, id_escuela, escuela_nueva, tutor, telefono_tutor, correo_tutor, id_especialista } = req.body;
     try {
         await pool.query('BEGIN');
@@ -2060,12 +1821,7 @@ app.post('/api/expedientes', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINA
     }
 });
 
-<<<<<<< HEAD
-app.put('/api/expedientes/:id/estatus', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-=======
-// 4. Cambiar estatus clínico (ACTIVO / EN PAUSA / ALTA)
 app.put('/api/expedientes/:id/estatus', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     const { estatus } = req.body;
     try {
         await pool.query('UPDATE Beneficiarios SET estatus = $1 WHERE id_beneficiario = $2', [estatus, req.params.id]);
@@ -2076,12 +1832,7 @@ app.put('/api/expedientes/:id/estatus', verificarToken, requiereRol(ROL_ADMIN, R
     }
 });
 
-<<<<<<< HEAD
-app.get('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-=======
-// 5. Notas de evolución — listar
 app.get('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     try {
         const result = await pool.query(`
             SELECT n.id_nota, n.fecha_atencion, n.contenido_nota, n.tipo_intervencion,
@@ -2105,11 +1856,7 @@ const MAPA_TIPO_INTERVENCION = {
     'Intervención': 'Crisis',
     'Cierre': 'Cierre'
 };
-<<<<<<< HEAD
-app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-=======
 app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     const { id_especialista, nota, tipo_sesion, modalidad, asistencia, nivel_riesgo } = req.body;
     const tipoIntervencion = MAPA_TIPO_INTERVENCION[tipo_sesion] || 'Seguimiento';
     try {
@@ -2121,9 +1868,6 @@ app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, RO
         );
         res.status(201).json({ success: true });
 
-        // Si el beneficiario asistió a la sesión, se le envía la encuesta de satisfacción
-        // (RF-15). Va después de responder y en segundo plano: nunca debe hacer más lento
-        // ni hacer fallar el guardado de la nota clínica.
         if (asistencia === 'Asistió') {
             enviarEncuestaSatisfaccion(req.params.id, id_especialista || req.usuario.id).catch(err => {
                 console.error("No se pudo preparar/enviar la encuesta de satisfacción:", err);
@@ -2135,12 +1879,7 @@ app.post('/api/expedientes/:id/notas', verificarToken, requiereRol(ROL_ADMIN, RO
     }
 });
 
-<<<<<<< HEAD
-app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-=======
-// 7. Documentos del expediente — listar
 app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     try {
         const result = await pool.query(
             "SELECT id_doc, nombre_archivo, url_archivo, fecha_subida, 'archivo' AS origen, NULL::int AS calificacion, NULL::text AS comentarios FROM Expedientes_Documentos WHERE id_beneficiario = $1",
@@ -2148,11 +1887,6 @@ app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN
         );
         let data = result.rows;
 
-        // Las encuestas de satisfacción ya respondidas (RF-15) también viven en la sección
-        // de Documentos. Si Encuestas_Satisfaccion todavía no existe (falta correr la
-        // migración), simplemente no se incluyen — nunca debe tumbar el listado real. Se
-        // intenta primero con las columnas de la migración v2 (trato del especialista,
-        // puntualidad, utilidad de la sesión, NPS) y se degrada si aún no existen.
         try {
             const enc = await pool.query(
                 `SELECT en.id_encuesta AS id_doc, 'Encuesta de Satisfacción' AS nombre_archivo, NULL AS url_archivo,
@@ -2190,12 +1924,7 @@ app.get('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN
     }
 });
 
-<<<<<<< HEAD
-app.post('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-=======
-// 8. Documentos del expediente — registrar (la subida física ya ocurrió vía Cloudinary desde el frontend)
 app.post('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     const { nombre_archivo, url_archivo } = req.body;
     try {
         await pool.query(
@@ -2209,12 +1938,7 @@ app.post('/api/expedientes/:id/documentos', verificarToken, requiereRol(ROL_ADMI
     }
 });
 
-<<<<<<< HEAD
-app.delete('/api/expedientes/:id/documentos/:id_doc', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-=======
-// 8b. Documentos del expediente — eliminar
 app.delete('/api/expedientes/:id/documentos/:id_doc', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     try {
         const result = await pool.query('DELETE FROM Expedientes_Documentos WHERE id_doc = $1 AND id_beneficiario = $2', [req.params.id_doc, req.params.id]);
         if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'Documento no encontrado.' });
@@ -2225,13 +1949,7 @@ app.delete('/api/expedientes/:id/documentos/:id_doc', verificarToken, requiereRo
     }
 });
 
-<<<<<<< HEAD
-app.put('/api/expedientes/:id/tutor', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-=======
-// 8c. Editar datos de contacto del tutor (nombre, teléfono, correo) y del beneficiario
-// (género, colonia) — necesario para emergencias y para completar el expediente.
 app.put('/api/expedientes/:id/tutor', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     const { tutor, telefono_tutor, correo_tutor, genero, colonia_puebla } = req.body;
     try {
         await pool.query(
@@ -2245,13 +1963,7 @@ app.put('/api/expedientes/:id/tutor', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
-<<<<<<< HEAD
-app.put('/api/expedientes/:id/especialista', verificarToken, requiereRol(ROL_ADMIN), async (req, res) => {
-=======
-// 4a-bis. Reasignar el especialista responsable de un expediente (Admin/Coordinador). Antes
-// de este endpoint no existia forma de cambiar el especialista de un expediente ya creado.
 app.put('/api/expedientes/:id/especialista', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     const { id_especialista } = req.body;
     try {
         const result = await pool.query(
@@ -2266,14 +1978,7 @@ app.put('/api/expedientes/:id/especialista', verificarToken, requiereRol(ROL_ADM
     }
 });
 
-<<<<<<< HEAD
-app.put('/api/expedientes/:id/datos', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA), async (req, res) => {
-=======
-// 4b. Editar los datos propios del beneficiario (nombre, fecha de nacimiento, escuela, género, colonia).
-//     La escuela se recibe como texto libre: si coincide (sin importar mayúsculas) con una escuela
-//     ya registrada se reutiliza esa fila; si no existe, se crea una nueva — igual que al abrir expediente.
 app.put('/api/expedientes/:id/datos', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA), verificarOwnershipExpediente, async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     const { nombre, fecha_nacimiento, genero, colonia_puebla, escuela_texto } = req.body;
     try {
         let idEscuelaFinal = null;
@@ -2316,24 +2021,11 @@ async function obtenerColumnaPkSolicitudes() {
     return _columnaPkSolicitudes;
 }
 
-// ==========================================
-// ENCUESTA DE SATISFACCIÓN — endpoints públicos (RF-15)
-// El "token" (generado con crypto.randomBytes en enviarEncuestaSatisfaccion) es la única
-// credencial: no requieren login, igual que el formulario público de solicitudes.
-// ==========================================
-
-// Lista de encuestas insatisfactorias (calificación general 1-2) aún no revisadas, para la
-// sección "Encuestas por revisar" del Perfil de Admin/Coordinador. Si la migración v2 no ha
-// corrido (faltan las columnas revisada/calificacion_especialista, etc.), se responde con una
-// lista vacía en vez de tronar.
 app.get('/api/encuestas/pendientes_revision', (req, res, next) => {
-    console.log('[DIAG pendientes_revision] llegó la petición. Authorization:', req.headers['authorization'] ? 'presente' : 'AUSENTE');
     next();
 }, verificarToken, (req, res, next) => {
-    console.log('[DIAG pendientes_revision] verificarToken OK. usuario:', JSON.stringify(req.usuario));
     next();
 }, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
-    console.log('[DIAG pendientes_revision] requiereRol OK, ejecutando query...');
     try {
         const result = await pool.query(`
             SELECT en.id_encuesta, en.calificacion, en.calificacion_especialista, en.calificacion_puntualidad,
@@ -2345,7 +2037,6 @@ app.get('/api/encuestas/pendientes_revision', (req, res, next) => {
             WHERE en.respondida = TRUE AND en.calificacion <= 2 AND COALESCE(en.revisada, FALSE) = FALSE
             ORDER BY en.fecha_respuesta DESC
         `);
-        console.log('[DIAG pendientes_revision] query OK, filas:', result.rows.length);
         res.json({ success: true, data: result.rows });
     } catch (error) {
         console.error('[DIAG pendientes_revision] ERROR EN QUERY:', error.message);
@@ -2353,7 +2044,6 @@ app.get('/api/encuestas/pendientes_revision', (req, res, next) => {
     }
 });
 
-// 1. Consultar (para precargar el formulario / bloquear un enlace ya usado).
 app.get('/api/encuestas/:token', async (req, res) => {
     try {
         const result = await pool.query(
@@ -2371,14 +2061,6 @@ app.get('/api/encuestas/:token', async (req, res) => {
     }
 });
 
-// 2. Responder. Calificación de 1 a 5; una calificación de 1 o 2 dispara el aviso a
-// Coordinadores/Administradores. Un token ya respondido no se puede volver a usar.
-// Preguntas ampliadas (RF-15 v2): además de la calificación general y los comentarios,
-// la encuesta pide trato del especialista, puntualidad, utilidad percibida de la sesión y
-// probabilidad de recomendar (NPS 0-10) — para que el resultado se pueda analizar con más
-// detalle en Reportes, no solo como un número suelto. Las 4 preguntas nuevas son columnas
-// opcionales a nivel de base de datos (por si la migración v2 aún no corrió), pero el
-// frontend las pide todas para maximizar qué tan completa queda cada respuesta.
 app.post('/api/encuestas/:token', async (req, res) => {
     const { comentarios, utilidad_sesion } = req.body;
     const calNum = parseInt(req.body.calificacion, 10);
@@ -2427,9 +2109,6 @@ app.post('/api/encuestas/:token', async (req, res) => {
             });
         }
     } catch (error) {
-        // Si la migración v2 (columnas nuevas) todavía no corrió, el UPDATE de arriba falla
-        // por columna inexistente — degradamos guardando solo lo que la tabla original soporta,
-        // en vez de perder la respuesta por completo.
         if (error.code === '42703') {
             try {
                 const actual2 = await pool.query('SELECT id_beneficiario FROM Encuestas_Satisfaccion WHERE token = $1', [req.params.token]);
@@ -2451,8 +2130,6 @@ app.post('/api/encuestas/:token', async (req, res) => {
     }
 });
 
-// Marca una encuesta insatisfactoria como revisada (deja de aparecer en Perfil y en la
-// campana de notificaciones). Guarda quién y cuándo la revisó.
 app.put('/api/encuestas/:id/revisar', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const result = await pool.query(
@@ -2468,9 +2145,6 @@ app.put('/api/encuestas/:id/revisar', verificarToken, requiereRol(ROL_ADMIN, ROL
     }
 });
 
-// Historial completo de encuestas de satisfacción respondidas para UN especialista, más su
-// promedio general — usado por el botón "Ver historial de encuestas" en Voluntariado
-// (solo visible ahí para Admin/Coordinador).
 app.get('/api/encuestas/especialista/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
     try {
         const historial = await pool.query(`
@@ -2483,8 +2157,6 @@ app.get('/api/encuestas/especialista/:id', verificarToken, requiereRol(ROL_ADMIN
             ORDER BY en.fecha_respuesta DESC
         `, [req.params.id]);
 
-        // Los promedios se calculan aquí (no en SQL) para que sea trivial ignorar los NULL
-        // de encuestas viejas (antes de la migración v2) sin complicar la query.
         const filas = historial.rows;
         const promedio = (campo) => {
             const valores = filas.map((f) => f[campo]).filter((v) => v !== null && v !== undefined);
@@ -2524,37 +2196,8 @@ app.post('/api/solicitudes', async (req, res) => {
             [nombre_contacto, telefono || null, correo, tipo_solicitud, mensaje]
         );
 
-<<<<<<< HEAD
-        try {
-            const contenido = `
-                <p>Hola <b>${escapeHtmlServidor(nombre_contacto)}</b>,</p>
-                <p>Hemos recibido tu solicitud de <b>${escapeHtmlServidor(tipo_solicitud)}</b>. Nuestro equipo la revisará y se pondrá en contacto contigo muy pronto.</p>
-                <p style="font-style: italic; color: #877362; text-align: center;">"Sumando Voluntades"</p>
-            `;
-            await transporter.sendMail({
-                from: `"Sanctorum A.C." <${process.env.EMAIL_USER}>`,
-                to: correo,
-                subject: 'Hemos recibido tu solicitud - Sanctorum A.C.',
-                html: emailTemplate('Solicitud Recibida', contenido)
-            });
-        } catch (mailErr) {
-            console.error("No se pudo enviar el correo de confirmación de solicitud:", mailErr);
-        }
-
-        try {
-            const esHistoria = tipo_solicitud === 'Compartir Historia de Éxito';
-            const filtroRol = esHistoria
-                ? "id_rol IN (1, 2, 3)"
-                : "id_rol IN (1, 3)";
-=======
-        // La solicitud ya quedó guardada — respondemos de inmediato. Este endpoint lo usa
-        // enviarSolicitudWeb() desde varios formularios públicos del sitio, así que esperar
-        // aquí a que salgan dos correos por SMTP (confirmación + aviso al staff) es lo que
-        // hacía sentir "trabados" esos botones. Ambos correos se disparan después, en
-        // segundo plano, sin bloquear la respuesta.
         res.status(201).json({ success: true, message: 'Solicitud enviada correctamente.' });
 
-        // Correo de confirmación automático al remitente.
         const contenido = `
             <p>Hola <b>${escapeHtmlServidor(nombre_contacto)}</b>,</p>
             <p>Hemos recibido tu solicitud de <b>${escapeHtmlServidor(tipo_solicitud)}</b>. Nuestro equipo la revisará y se pondrá en contacto contigo muy pronto.</p>
@@ -2567,24 +2210,12 @@ app.post('/api/solicitudes', async (req, res) => {
             html: emailTemplate('Solicitud Recibida', contenido)
         }, 'confirmación de solicitud web');
 
-        // Aviso al staff correspondiente: la bandeja de "Solicitudes de la Comunidad" es
-        // exclusiva de Admin/Coordinador (ver GET/PUT /api/solicitudes más abajo) — los
-        // Psicólogos ya no le dan seguimiento ahí, así que tampoco tiene sentido avisarles
-        // por correo de una solicitud que no van a poder ver ni atender dentro del sistema.
         try {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             const staff = await pool.query(
                 `SELECT correo FROM Usuarios
                  WHERE id_rol IN (1, 3) AND correo IS NOT NULL AND COALESCE(estatus,'Activo') != 'Inactivo'`
             );
-<<<<<<< HEAD
-            const correosStaff = staff.rows
-                .filter(u => u.rol !== ROL_ESPECIALISTA || esPsicologo(u))
-                .map(u => u.correo)
-                .filter(Boolean);
-=======
             const correosStaff = staff.rows.map(u => u.correo).filter(Boolean);
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             if (correosStaff.length > 0) {
                 const contenidoAvisoStaff = `
                     <p>Hola,</p>
@@ -2598,13 +2229,9 @@ app.post('/api/solicitudes', async (req, res) => {
                     to: correosStaff.join(','),
                     subject: `Nueva solicitud: ${tipo_solicitud} - Sanctorum A.C.`,
                     html: emailTemplate('Nueva solicitud recibida', contenidoAvisoStaff)
-<<<<<<< HEAD
-                });
-=======
                 }, 'aviso de nueva solicitud al staff');
             } else {
                 console.log(`Aviso de nueva solicitud (${tipo_solicitud}): no hay staff con correo registrado para este tipo, no se envió nada.`);
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             }
         } catch (mailErr) {
             console.error("No se pudo preparar el aviso de nueva solicitud al staff:", mailErr);
@@ -2615,21 +2242,7 @@ app.post('/api/solicitudes', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-app.get('/api/solicitudes', verificarToken, async (req, res) => {
-    const esStaffCompleto = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
-    if (!esStaffCompleto && !esPsicologo(req.usuario)) {
-        return res.status(403).json({ success: false, message: 'No tienes permiso para ver las solicitudes.' });
-    }
-=======
-// Bandeja de solicitudes para el panel administrativo (tarjeta "Solicitudes de la
-// Comunidad" en Perfil). Exclusiva de Admin/Coordinador. Antes un Psicólogo también
-// veía aquí las de "Compartir Historia de Éxito" (para redactarlas/publicarlas), pero
-// se retiró ese acceso: si Admin/Coordinador reciben una así, coordinan directamente
-// con el psicólogo fuera del sistema; él sigue pudiendo publicar la historia desde
-// Publicaciones, solo ya no a través de esta bandeja.
 app.get('/api/solicitudes', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     try {
         const result = await pool.query('SELECT * FROM Solicitudes_Web ORDER BY fecha_envio DESC');
         res.json({ success: true, data: result.rows });
@@ -2639,19 +2252,8 @@ app.get('/api/solicitudes', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINAD
     }
 });
 
-<<<<<<< HEAD
-app.put('/api/solicitudes/:id', verificarToken, async (req, res) => {
-    const esStaffCompleto = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
-    if (!esStaffCompleto && !esPsicologo(req.usuario)) {
-        return res.status(403).json({ success: false, message: 'No tienes permiso para actualizar solicitudes.' });
-    }
-    const { estatus } = req.body;
-=======
-// Marca una solicitud como atendida/descartada. Mismo alcance que el listado: exclusivo
-// de Admin/Coordinador.
 app.put('/api/solicitudes/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORDINADOR), async (req, res) => {
-    const { estatus } = req.body; // 'Atendida' | 'Descartada'
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
+    const { estatus } = req.body;
     if (!['Atendida', 'Descartada'].includes(estatus)) {
         return res.status(400).json({ success: false, message: 'Estatus inválido.' });
     }
@@ -2661,13 +2263,6 @@ app.put('/api/solicitudes/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_COORD
         const columnaId = await obtenerColumnaPkSolicitudes();
         const actual = await pool.query(`SELECT * FROM Solicitudes_Web WHERE ${columnaId} = $1`, [idNum]);
         if (actual.rows.length === 0) return res.status(404).json({ success: false, message: 'Solicitud no encontrada.' });
-<<<<<<< HEAD
-        const solicitud = actual.rows[0];
-        if (!esStaffCompleto && solicitud.tipo_solicitud !== 'Compartir Historia de Éxito') {
-            return res.status(403).json({ success: false, message: 'No tienes permiso para actualizar esta solicitud.' });
-        }
-=======
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         await pool.query(`UPDATE Solicitudes_Web SET estatus = $1 WHERE ${columnaId} = $2`, [estatus, idNum]);
         res.json({ success: true });
     } catch (error) {
@@ -2738,8 +2333,6 @@ app.get('/api/reportes/exportar', verificarToken, requiereRol(ROL_ADMIN, ROL_COO
         }
         if (tipo === 'donativos') {
             const f = construirFiltroFecha('d.fecha_donacion');
-            // Degrada sin registrado_por si todavía no se corrió la migración que agrega
-            // id_usuario_registro (mismo patrón que /api/donativos).
             try {
                 const result = await pool.query(`
                     SELECT d.fecha_donacion, c.nombre_aliado, d.monto, d.metodo_pago, d.categoria_gasto, i.nombre_insumo,
@@ -2764,9 +2357,6 @@ app.get('/api/reportes/exportar', verificarToken, requiereRol(ROL_ADMIN, ROL_COO
         }
         if (tipo === 'satisfaccion') {
             const f = construirFiltroFecha('en.fecha_respuesta');
-            // Primero se intenta con las columnas de la migración v2 (trato del especialista,
-            // puntualidad, utilidad de la sesión, NPS); si esas columnas no existen todavía,
-            // se degrada a solo calificación general + comentarios en vez de fallar.
             try {
                 const result = await pool.query(`
                     SELECT en.fecha_respuesta, b.nombre_completo AS beneficiario,
@@ -2793,16 +2383,12 @@ app.get('/api/reportes/exportar', verificarToken, requiereRol(ROL_ADMIN, ROL_COO
                     `, f.params);
                     return res.json({ success: true, data: result.rows });
                 } catch (encErr2) {
-                    // La tabla todavía no existe (falta correr la migración) — reportamos vacío
-                    // en vez de tumbar el reporte completo.
                     console.error("No se pudo incluir satisfacción en el reporte (¿falta la migración?):", encErr2.message);
                     return res.json({ success: true, data: [] });
                 }
             }
         }
         if (tipo === 'satisfaccion_especialistas') {
-            // Igual que 'satisfaccion': si las columnas de la migración v2 no existen todavía,
-            // degrada a solo el promedio general en vez de tumbar el reporte completo.
             const f = construirFiltroFecha('en.fecha_respuesta');
             try {
                 const result = await pool.query(`
@@ -2841,9 +2427,6 @@ app.get('/api/reportes/exportar', verificarToken, requiereRol(ROL_ADMIN, ROL_COO
             }
         }
         if (tipo === 'escuelas') {
-            // No se filtra por año/mes: una escuela no tiene una sola fecha representativa
-            // (se registró en un momento pero puede tener visitas en varios períodos), así
-            // que este reporte siempre trae el directorio completo.
             const result = await pool.query(`
                 SELECT e.nombre_escuela AS escuela, COALESCE(e.contacto_nombre, 'N/A') AS contacto,
                        COALESCE(e.puesto_contacto, '-') AS puesto, COALESCE(e.telefono_escuela, '-') AS telefono,
@@ -2886,10 +2469,6 @@ app.get('/api/dashboard/resumen', async (req, res) => {
             pool.query("SELECT COALESCE(SUM(monto),0) AS total FROM Donaciones WHERE date_trunc('month', fecha_donacion) = date_trunc('month', CURRENT_DATE)")
         ]);
 
-        // Encuestas de satisfacción insatisfactorias (calificación 1-2) sin revisar todavía —
-        // solo le interesa a Admin/Coordinador; para cualquier otro rol (o visitante anónimo)
-        // se manda 0 para que no aparezca en su campana de notificaciones. Va en try/catch
-        // aparte porque depende de columnas de la migración v2 que puede no haber corrido.
         let encuestasPorRevisar = 0;
         if (usuario && (usuario.rol === ROL_ADMIN || usuario.rol === ROL_COORDINADOR)) {
             try {
@@ -3248,35 +2827,6 @@ app.get('/api/eventos/:id', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-app.get('/api/publicaciones', async (req, res) => {
-    const { tipo, categoria, limite, incluir_historias } = req.query;
-    const usuario = usuarioOpcionalDesdeToken(req);
-=======
-// ==========================================
-// MÓDULO CMS: PUBLICACIONES
-// Tabla Publicaciones: id_publicacion, titulo, contenido, url_imagen,
-// tipo ('Aviso'|'Evento'|'Historia de Éxito'|libre), categoria, fecha_post,
-// url_documento_consentimiento, id_evento_relacionado, id_autor, id_editor.
-// Alimenta: carrusel de "Nuestros Proyectos" en index, comunidad_blog y evento_detalle.
-// Las Historias de Éxito se gestionan desde esta misma pantalla de administración pero, por
-// requerir datos de un beneficiario (consentimiento, id_beneficiario), viven en la tabla
-// Historias_Exito. Cada fila del listado trae "origen" ('publicacion' | 'historia') para que
-// el frontend sepa a qué endpoint mandar la edición/borrado.
-// ==========================================
-
-// 0. Categorías — catálogo persistente para el selector de Publicaciones y Eventos (antes las
-//    categorías "Otro" solo se guardaban como texto suelto y nunca se reutilizaban). Cualquier
-//    categoría nueva se registra aquí automáticamente al guardar una publicación o evento (ver
-//    registrarCategorias) y también puede registrarse al vuelo desde el mini-buscador del panel
-//    (POST get-or-create), para que quede disponible de inmediato.
-//
-//    Desde migracion_normalizacion_categorias_v1.sql, la relación real entre una publicación/
-//    evento y sus categorías vive en las tablas de unión Publicaciones_Categorias /
-//    Eventos_Categorias (normalizadas, con integridad referencial real contra esta tabla) — las
-//    columnas Publicaciones.categoria / Eventos.categoria (texto separado por comas) se conservan
-//    solo como caché de lectura y por compatibilidad con datos_demo_sanctorum.sql, pero ya no son
-//    la fuente de verdad para consultas ni filtros.
 app.get('/api/categorias', async (req, res) => {
     try {
         const result = await pool.query('SELECT id_categoria, nombre_categoria FROM Categorias ORDER BY nombre_categoria ASC');
@@ -3291,8 +2841,6 @@ app.post('/api/categorias', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALI
     const nombre = (req.body?.nombre || '').trim();
     if (!nombre) return res.status(400).json({ success: false, message: 'El nombre de la categoría es obligatorio.' });
     try {
-        // "Get or create" en una sola consulta: si ya existe (choca con el UNIQUE de
-        // nombre_categoria) el DO UPDATE la deja igual pero permite devolverla con RETURNING.
         const result = await pool.query(
             `INSERT INTO Categorias (nombre_categoria) VALUES ($1)
              ON CONFLICT (nombre_categoria) DO UPDATE SET nombre_categoria = EXCLUDED.nombre_categoria
@@ -3306,14 +2854,6 @@ app.post('/api/categorias', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALI
     }
 });
 
-// Registra en el catálogo Categorias cualquier categoría nueva que llegue en una publicación o
-// evento (string separado por comas, p.ej. "Infancia, Mi categoría nueva") y, si se le pasa a qué
-// entidad pertenece (segundo parámetro "entidad"), sincroniza también la tabla de unión
-// normalizada correspondiente (Publicaciones_Categorias / Eventos_Categorias) -- se hace con un
-// DELETE + INSERT del conjunto completo en cada guardado, porque es más simple y seguro que
-// calcular un diff, y el volumen de categorías por publicación/evento es siempre pequeño.
-// Nunca lanza: que falle el registro en el catálogo o la sincronización no debe tumbar el
-// guardado de la publicación/evento en sí (igual que antes).
 async function registrarCategorias(categoriaStr, entidad) {
     const nombres = (categoriaStr || '').split(',').map((s) => s.trim()).filter(Boolean);
     const idsCategoria = [];
@@ -3348,21 +2888,11 @@ async function registrarCategorias(categoriaStr, entidad) {
     }
 }
 
-// 1. Listar (público). Por defecto solo Publicaciones; con ?incluir_historias=1 (usado por el
-//    panel de administración) también trae las Historias de Éxito para gestionarlas juntas.
 app.get('/api/publicaciones', async (req, res) => {
     const { tipo, categoria, limite, incluir_historias } = req.query;
-    // incluir_historias=1 solo lo manda el panel de administración (la página pública jamás lo
-    // envía). En ese caso, si quien pregunta está identificado y es Voluntario o Especialista,
-    // limitamos el listado a lo que él mismo creó — Coordinador/Admin y la vista pública ven todo.
     const usuarioReq = incluir_historias ? usuarioOpcional(req) : null;
     const soloPropias = usuarioReq && (Number(usuarioReq.rol) === ROL_VOLUNTARIO || Number(usuarioReq.rol) === ROL_ESPECIALISTA);
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     try {
-        // "categoria" se recalcula desde Publicaciones_Categorias (fuente real de verdad, ver
-        // migracion_normalizacion_categorias_v1.sql) en vez de leerse tal cual de la columna de
-        // texto -- al llevar el mismo alias que la columna real, la sobreescribe en cada fila del
-        // resultado (pg asigna las propiedades en el orden de las columnas devueltas).
         let query = `SELECT p.*,
                             (SELECT string_agg(c.nombre_categoria, ', ' ORDER BY c.nombre_categoria)
                                FROM Publicaciones_Categorias pc JOIN Categorias c ON c.id_categoria = pc.id_categoria
@@ -3371,20 +2901,7 @@ app.get('/api/publicaciones', async (req, res) => {
                        FROM Publicaciones p`;
         const condiciones = [];
         const params = [];
-<<<<<<< HEAD
-
-        if (usuario && (Number(usuario.rol) === ROL_VOLUNTARIO || Number(usuario.rol) === ROL_ESPECIALISTA)) {
-            params.push(usuario.id);
-            condiciones.push(`id_autor = $${params.length}`);
-        }
-
-        if (tipo) { params.push(tipo); condiciones.push(`tipo = $${params.length}`); }
-        if (categoria) { params.push(`%${categoria}%`); condiciones.push(`categoria ILIKE $${params.length}`); }
-=======
         if (tipo) { params.push(tipo); condiciones.push(`p.tipo = $${params.length}`); }
-        // Antes esto buscaba coincidencia parcial (ILIKE) sobre el texto separado por comas, lo
-        // que podía dar falsos positivos entre categorías que se contienen entre sí. Con la tabla
-        // de unión ya se puede filtrar por igualdad exacta contra el nombre real de la categoría.
         if (categoria) {
             params.push(categoria);
             condiciones.push(`EXISTS (
@@ -3393,7 +2910,6 @@ app.get('/api/publicaciones', async (req, res) => {
             )`);
         }
         if (soloPropias) { params.push(usuarioReq.id); condiciones.push(`p.id_autor = $${params.length}`); }
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         if (condiciones.length > 0) query += ' WHERE ' + condiciones.join(' AND ');
         query += ' ORDER BY fecha_post DESC';
         if (limite) {
@@ -3404,10 +2920,7 @@ app.get('/api/publicaciones', async (req, res) => {
         let data = result.rows;
 
         if (incluir_historias) {
-<<<<<<< HEAD
-=======
             const histParams = [];
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             let histQuery = `
                 SELECT h.id_historia AS id_publicacion, h.titulo, h.contenido_postayuda AS contenido,
                        NULL::text AS url_imagen, 'Historia de Éxito' AS tipo, NULL::text AS categoria,
@@ -3415,20 +2928,9 @@ app.get('/api/publicaciones', async (req, res) => {
                        NULL::int AS id_evento_relacionado, h.id_autor, NULL::int AS id_editor,
                        h.id_beneficiario, h.contenido_preayuda, h.contenido_postayuda, h.consentimiento,
                        'historia' AS origen
-<<<<<<< HEAD
-                FROM Historias_Exito h
-            `;
-            const histParams = [];
-            if (usuario && (Number(usuario.rol) === ROL_VOLUNTARIO || Number(usuario.rol) === ROL_ESPECIALISTA)) {
-                histParams.push(usuario.id);
-                histQuery += ` WHERE h.id_autor = $1`;
-            }
-            histQuery += ` ORDER BY h.fecha_creacion DESC`;
-=======
                 FROM Historias_Exito h`;
             if (soloPropias) { histParams.push(usuarioReq.id); histQuery += ` WHERE h.id_autor = $${histParams.length}`; }
             histQuery += ' ORDER BY h.fecha_creacion DESC';
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             const hist = await pool.query(histQuery, histParams);
             data = [...data, ...hist.rows].sort((a, b) => new Date(b.fecha_post) - new Date(a.fecha_post));
         }
@@ -3502,19 +3004,9 @@ app.post('/api/publicaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECI
     }
 });
 
-<<<<<<< HEAD
-=======
-// 4. Actualizar — el body debe traer "origen" ('publicacion' | 'historia') para saber a qué
-//    tabla debe quedar el registro, y "origen_original" para saber en cuál vive HOY. Ahora que
-//    el <select> de Tipo ya no se bloquea al editar (ver publicaciones.html), origen puede venir
-//    distinto de origen_original: eso significa que el usuario cruzó de "Publicación normal" a
-//    "Historia de Éxito" (o viceversa), lo que implica mover el registro entre tablas —con IDs
-//    de columnas distintas (id_publicacion / id_historia)— en vez de un UPDATE normal.
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
 app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     const { titulo, contenido, url_imagen, url_video, tipo, categoria, url_documento_consentimiento, id_evento_relacionado,
             id_beneficiario, contenido_preayuda, contenido_postayuda, origen, origen_original } = req.body;
-    // Clientes viejos (sin origen_original) no cruzan tipos: se asume que el origen no cambió.
     const origenActual = origen_original || origen;
     const cruzaTablas = origen !== origenActual;
 
@@ -3525,7 +3017,6 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
     const chkDocConsentimientoPubPut = validarUrlCloudinaria(url_documento_consentimiento, 'url_documento_consentimiento');
     if (!chkDocConsentimientoPubPut.ok) return res.status(400).json({ success: false, message: chkDocConsentimientoPubPut.mensaje });
 
-    // --- Sigue siendo Historia de Éxito: UPDATE normal sobre Historias_Exito. ---
     if (origen === 'historia' && !cruzaTablas) {
         if (!puedePublicarHistoria(req.usuario)) return res.status(403).json({ success: false, message: 'Solo un psicólogo, coordinador o administrador puede editar una Historia de Éxito.' });
         if (!url_documento_consentimiento) return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
@@ -3549,14 +3040,11 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
         }
     }
 
-    // --- Sigue siendo Publicación normal (el tipo puede cambiar libremente entre
-    //     Aviso/Evento/Otro: es la misma tabla, no hay cruce). UPDATE normal. ---
     if (origen !== 'historia' && !cruzaTablas) {
         if (tipo === 'Historia de Éxito' && !url_documento_consentimiento) {
             return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
         }
         try {
-            // Solo el autor original o un Admin pueden editar esta publicación.
             if (req.usuario.rol !== ROL_ADMIN) {
                 const autorPub = await pool.query('SELECT id_autor FROM Publicaciones WHERE id_publicacion = $1', [req.params.id]);
                 if (autorPub.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
@@ -3577,17 +3065,12 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
         }
     }
 
-    // --- Cruce: de Publicación normal a Historia de Éxito. El registro cambia de tabla y de
-    //     id (id_publicacion -> id_historia), así que se valida como un alta nueva de historia
-    //     (mismos requisitos que POST) y se hace en una transacción: INSERT en Historias_Exito
-    //     + DELETE de Publicaciones. Si algo falla, no queda ni a medias ni duplicado. ---
     if (origen === 'historia' && cruzaTablas) {
         if (!puedePublicarHistoria(req.usuario)) return res.status(403).json({ success: false, message: 'Solo un psicólogo, coordinador o administrador puede publicar una Historia de Éxito.' });
         if (!url_documento_consentimiento) return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
         if (!id_beneficiario) return res.status(400).json({ success: false, message: 'Selecciona a qué beneficiario pertenece esta historia.' });
         if (!contenido_preayuda || !contenido_postayuda) return res.status(400).json({ success: false, message: 'Completa el contenido de "antes" y "después".' });
         try {
-            // La autoría a validar es la del registro ORIGINAL (todavía vive en Publicaciones).
             if (req.usuario.rol !== ROL_ADMIN) {
                 const autorOriginal = await pool.query('SELECT id_autor FROM Publicaciones WHERE id_publicacion = $1', [req.params.id]);
                 if (autorOriginal.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
@@ -3611,17 +3094,11 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
         }
     }
 
-    // --- Cruce: de Historia de Éxito a Publicación normal. Mismo principio al revés:
-    //     INSERT en Publicaciones + DELETE de Historias_Exito, en una transacción. ---
     if (!titulo || !tipo) return res.status(400).json({ success: false, message: 'Título y tipo son obligatorios.' });
     if (tipo === 'Historia de Éxito' && !url_documento_consentimiento) {
         return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
     }
     try {
-<<<<<<< HEAD
-=======
-        // La autoría a validar es la del registro ORIGINAL (todavía vive en Historias_Exito).
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         if (req.usuario.rol !== ROL_ADMIN) {
             const autorOriginal = await pool.query('SELECT id_autor FROM Historias_Exito WHERE id_historia = $1', [req.params.id]);
             if (autorOriginal.rows.length === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
@@ -3646,15 +3123,7 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
     }
 });
 
-<<<<<<< HEAD
-app.delete('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR), async (req, res) => {
-=======
-// 5. Eliminar — ?origen=historia borra de Historias_Exito, si no de Publicaciones. Se incluye
-//    ROL_VOLUNTARIO aquí porque un Voluntario sí puede publicar, y por lo tanto debe poder
-//    borrar (solo) lo que él mismo publicó, por si se equivocó — el filtro real de "solo el
-//    autor o un Admin" ocurre abajo.
 app.delete('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
     try {
         const esHistoria = req.query.origen === 'historia';
         const tablaPub = esHistoria ? 'Historias_Exito' : 'Publicaciones';
@@ -3762,26 +3231,7 @@ app.get('/api/eventos/:id/insumos_consumidos', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-app.get('/api/reportes_evento', verificarToken, async (req, res) => {
-    try {
-        const esStaffGeneral = req.usuario.rol === ROL_ADMIN || req.usuario.rol === ROL_COORDINADOR;
-        let filtroAutor = '';
-        const params = [];
-
-        if (!esStaffGeneral) {
-            params.push(req.usuario.id);
-            filtroAutor = 'WHERE r.id_usuario = $1';
-        }
-
-=======
-// Lista todos los reportes de evento con el título/fecha del evento, el nombre de quien
-// reportó, y el equipo de participantes (Participacion) como JSON agregado.
 app.get('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
-    // Voluntario/Especialista solo ven los reportes que ellos mismos generaron. Admin ve
-    // todos. Coordinador ve todos MENOS los de otros Coordinadores (sí ve los de
-    // especialistas, voluntarios, admin, y los suyos propios) — un coordinador no supervisa
-    // a otro coordinador.
     const soloPropios = req.usuario.rol !== ROL_ADMIN && req.usuario.rol !== ROL_COORDINADOR;
     try {
         const params = [];
@@ -3793,7 +3243,6 @@ app.get('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPEC
             params.push(req.usuario.id, ROL_COORDINADOR);
             filtro = `WHERE (u.id_rol IS DISTINCT FROM $${params.length} OR r.id_usuario = $${params.length - 1})`;
         }
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         const result = await pool.query(`
             SELECT r.*, e.titulo_evento, e.fecha_realizacion, u.nombre_completo AS autor,
                    COALESCE((
@@ -3804,11 +3253,7 @@ app.get('/api/reportes_evento', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPEC
             FROM Reportes_Evento r
             JOIN Eventos e ON r.id_evento = e.id_evento
             LEFT JOIN Usuarios u ON r.id_usuario = u.id_usuario
-<<<<<<< HEAD
-            ${filtroAutor}
-=======
             ${filtro}
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
             ORDER BY r.fecha_reporte DESC
         `, params);
         res.json({ success: true, data: result.rows });

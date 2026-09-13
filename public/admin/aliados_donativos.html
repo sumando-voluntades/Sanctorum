@@ -17,7 +17,11 @@
     <link rel="stylesheet" href="/css/output.css" />
     <style>
       /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
-      html, body { overflow-x: hidden; max-width: 100%; }
+      html,
+      body {
+        overflow-x: hidden;
+        max-width: 100%;
+      }
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -57,25 +61,51 @@
             <p class="text-slate-500 max-w-xl">
               Directorio de aliados externos y registro de donativos recibidos.
             </p>
-<<<<<<< HEAD
-             <!-- GUÍA CONTEXTUAL: ALIADOS Y DONATIVOS -->
-        <div class="mb-6 p-4 rounded-2xl bg-blue-50 border border-blue-100 flex items-start gap-3 shadow-sm">
-          <span class="material-symbols-outlined text-blue-600 mt-0.5">receipt_long</span>
-          <div class="text-xs text-slate-700 leading-relaxed space-y-1">
-            <p><strong class="text-blue-900 font-bold">Registro de apoyos y transparencia:</strong></p>
-            <ul class="list-disc list-inside space-y-0.5 text-slate-600">
-              <li><strong>Directorio:</strong> Registra a la persona u organización antes de vincular una aportación.</li>
-              <li><strong>Comprobantes:</strong> Adjunta siempre el recibo o fotografía del donativo para sustentar las métricas de transparencia.</li>
-              <li><strong>En especie:</strong> Vincula el insumo para actualizar automáticamente las existencias en almacén.</li>
-            </ul>
-          </div>
-        </div>
-=======
-            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
-              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
-              <span>Revisa el directorio antes de crear un aliado nuevo para no duplicarlo. Cada donativo registrado debe corresponder a un ingreso o aporte real ya recibido, no a uno prometido.</span>
+            <<<<<<< HEAD
+            <!-- GUÍA CONTEXTUAL: ALIADOS Y DONATIVOS -->
+            <div
+              class="mb-6 p-4 rounded-2xl bg-blue-50 border border-blue-100 flex items-start gap-3 shadow-sm"
+            >
+              <span class="material-symbols-outlined text-blue-600 mt-0.5"
+                >receipt_long</span
+              >
+              <div class="text-xs text-slate-700 leading-relaxed space-y-1">
+                <p>
+                  <strong class="text-blue-900 font-bold"
+                    >Registro de apoyos y transparencia:</strong
+                  >
+                </p>
+                <ul class="list-disc list-inside space-y-0.5 text-slate-600">
+                  <li>
+                    <strong>Directorio:</strong> Registra a la persona u
+                    organización antes de vincular una aportación.
+                  </li>
+                  <li>
+                    <strong>Comprobantes:</strong> Adjunta siempre el recibo o
+                    fotografía del donativo para sustentar las métricas de
+                    transparencia.
+                  </li>
+                  <li>
+                    <strong>En especie:</strong> Vincula el insumo para
+                    actualizar automáticamente las existencias en almacén.
+                  </li>
+                </ul>
+              </div>
+            </div>
+            =======
+            <p
+              class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl"
+            >
+              <span class="material-symbols-outlined text-[14px] mt-0.5"
+                >info</span
+              >
+              <span
+                >Revisa el directorio antes de crear un aliado nuevo para no
+                duplicarlo. Cada donativo registrado debe corresponder a un
+                ingreso o aporte real ya recibido, no a uno prometido.</span
+              >
             </p>
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
+            >>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
           </div>
           <button
             id="btn_nuevo_aliado"
@@ -127,7 +157,9 @@
 
         <div id="panel_aliados">
           <div class="flex justify-end mb-4">
-            <label class="flex items-center gap-2 text-xs font-bold text-slate-500 shrink-0 cursor-pointer">
+            <label
+              class="flex items-center gap-2 text-xs font-bold text-slate-500 shrink-0 cursor-pointer"
+            >
               <input
                 type="checkbox"
                 id="chk_mostrar_aliados_archivados"
@@ -255,10 +287,21 @@
         </div>
 
         <div id="panel_escuelas" class="hidden">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-            <p class="flex items-start gap-1.5 text-xs text-slate-400 max-w-2xl">
-              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
-              <span>También se registra una escuela nueva desde Agenda al programar una "Visita de Prospección". Una escuela nunca se elimina del todo: se archiva para conservar su historial y se puede reactivar cuando quieras.</span>
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4"
+          >
+            <p
+              class="flex items-start gap-1.5 text-xs text-slate-400 max-w-2xl"
+            >
+              <span class="material-symbols-outlined text-[14px] mt-0.5"
+                >info</span
+              >
+              <span
+                >También se registra una escuela nueva desde Agenda al programar
+                una "Visita de Prospección". Una escuela nunca se elimina del
+                todo: se archiva para conservar su historial y se puede
+                reactivar cuando quieras.</span
+              >
             </p>
             <div class="flex items-center gap-3 shrink-0">
               <!-- Fusionar duplicadas es delicado (reescribe historial) y por eso solo se
@@ -273,7 +316,9 @@
                 <span class="material-symbols-outlined text-[16px]">merge</span>
                 Fusionar duplicadas
               </button>
-              <label class="flex items-center gap-2 text-xs font-bold text-slate-500 cursor-pointer">
+              <label
+                class="flex items-center gap-2 text-xs font-bold text-slate-500 cursor-pointer"
+              >
                 <input
                   type="checkbox"
                   id="chk_mostrar_escuelas_archivadas"
@@ -849,7 +894,9 @@
           class="bg-gradient-to-r from-[#8a5100] to-[#f39200] px-8 py-6 text-white flex justify-between items-center"
         >
           <div>
-            <h3 class="text-2xl font-bold font-plus">Fusionar Escuelas Duplicadas</h3>
+            <h3 class="text-2xl font-bold font-plus">
+              Fusionar Escuelas Duplicadas
+            </h3>
           </div>
           <button
             onclick="cerrarModalFusionarEscuelas()"
@@ -859,11 +906,14 @@
           </button>
         </div>
         <form id="formFusionarEscuelas" class="p-8 space-y-4">
-          <p class="text-xs text-slate-500 bg-amber-50 border border-amber-100 rounded-xl p-3">
-            Usa esto cuando la misma escuela quedó registrada dos veces (por ejemplo, con el
-            nombre escrito de forma distinta). Todos los beneficiarios, eventos y visitas de la
-            escuela "duplicada" se pasan automáticamente a la escuela "a conservar", y la
-            duplicada se archiva (no se borra: su historial queda intacto). Esta acción no se
+          <p
+            class="text-xs text-slate-500 bg-amber-50 border border-amber-100 rounded-xl p-3"
+          >
+            Usa esto cuando la misma escuela quedó registrada dos veces (por
+            ejemplo, con el nombre escrito de forma distinta). Todos los
+            beneficiarios, eventos y visitas de la escuela "duplicada" se pasan
+            automáticamente a la escuela "a conservar", y la duplicada se
+            archiva (no se borra: su historial queda intacto). Esta acción no se
             puede deshacer.
           </p>
           <div>
@@ -1459,8 +1509,7 @@
       // Abre el modal de detalle de una escuela con su historial de visitas/eventos (mismo
       // endpoint que usa el panel derecho del Directorio de Escuelas en Agenda).
       async function verHistorialEscuela(id) {
-        document.getElementById("esc_detalle_nombre").innerText =
-          "Cargando...";
+        document.getElementById("esc_detalle_nombre").innerText = "Cargando...";
         document.getElementById("esc_detalle_contacto").innerText = "";
         document.getElementById("esc_detalle_lista").innerHTML =
           '<p class="text-slate-400 text-sm text-center py-6">Cargando...</p>';
@@ -1590,7 +1639,9 @@
       // Cierra el modal de escuela con la animación de fade/scale y resetea el formulario.
       function cerrarModalEscuela() {
         document.getElementById("modalEscuela").classList.add("opacity-0");
-        document.getElementById("modalEscuelaContent").classList.add("scale-95");
+        document
+          .getElementById("modalEscuelaContent")
+          .classList.add("scale-95");
         setTimeout(() => {
           document.getElementById("modalEscuela").classList.add("hidden");
           document.getElementById("formEscuela").reset();
@@ -1721,8 +1772,10 @@
         .getElementById("formFusionarEscuelas")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
-          const id_conservar = document.getElementById("fus_id_conservar").value;
-          const id_duplicada = document.getElementById("fus_id_duplicada").value;
+          const id_conservar =
+            document.getElementById("fus_id_conservar").value;
+          const id_duplicada =
+            document.getElementById("fus_id_duplicada").value;
           if (!id_conservar || !id_duplicada) return;
           if (id_conservar === id_duplicada) {
             alert("Selecciona dos escuelas distintas.");
@@ -1757,9 +1810,12 @@
                 `Escuelas fusionadas. Se reasignaron ${r.beneficiarios || 0} beneficiario(s), ${r.eventos || 0} evento(s) y ${r.visitas || 0} visita(s) de "${nombreDuplicada}" hacia "${nombreConservar}".`,
               );
               cerrarModalFusionarEscuelas();
-              document.getElementById("chk_mostrar_escuelas_archivadas").checked = true;
+              document.getElementById(
+                "chk_mostrar_escuelas_archivadas",
+              ).checked = true;
               cargarEscuelas();
-            } else alert(json.message || "No se pudieron fusionar las escuelas.");
+            } else
+              alert(json.message || "No se pudieron fusionar las escuelas.");
           } catch (error) {
             alert("Error de conexión.");
           } finally {
@@ -1935,7 +1991,9 @@
           document.getElementById("don_categoria").value = "Otro";
           document.getElementById("don_categoria_otro").value =
             item.categoria_gasto;
-          document.getElementById("don_categoria_otro").classList.remove("hidden");
+          document
+            .getElementById("don_categoria_otro")
+            .classList.remove("hidden");
         }
         document.getElementById("don_id_insumo").value = item.id_insumo || "";
         document.getElementById("don_fecha").value = item.fecha_donacion
@@ -1944,7 +2002,9 @@
         document.getElementById("don_comprobante_url").value =
           item.comprobante_url || "";
         document.getElementById("don_comprobante_nombre").innerText =
-          item.comprobante_url ? "Comprobante ya guardado (sube uno nuevo para reemplazarlo)" : "";
+          item.comprobante_url
+            ? "Comprobante ya guardado (sube uno nuevo para reemplazarlo)"
+            : "";
 
         document.getElementById("modalDonativoTitulo").innerText =
           "Editar Donativo";

@@ -24,7 +24,11 @@
     />
     <style>
       /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
-      html, body { overflow-x: hidden; max-width: 100%; }
+      html,
+      body {
+        overflow-x: hidden;
+        max-width: 100%;
+      }
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -52,8 +56,20 @@
       .chips-categoria {
         overflow: hidden;
         max-width: 100%;
-        -webkit-mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
-        mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+        -webkit-mask-image: linear-gradient(
+          to right,
+          transparent,
+          black 12px,
+          black calc(100% - 12px),
+          transparent
+        );
+        mask-image: linear-gradient(
+          to right,
+          transparent,
+          black 12px,
+          black calc(100% - 12px),
+          transparent
+        );
       }
       .chips-categoria-track {
         display: flex;
@@ -67,8 +83,12 @@
         animation-play-state: paused;
       }
       @keyframes chips-categoria-desliz {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
       }
 
       /* Editor de contenido (Quill) y su vista previa: el toolbar de Quill trae su propio look
@@ -92,16 +112,28 @@
       /* Etiquetas en español para el selector de encabezados del toolbar (Quill trae "Heading 1"/
          "Heading 2"/"Normal" en inglés por defecto). Debe ser un espejo de las mismas reglas en
          admin/agenda.html. */
-      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
-      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-item[data-value="2"]::before {
+      #pub_contenido_editor_wrap
+        .ql-picker.ql-header
+        .ql-picker-label[data-value="2"]::before,
+      #pub_contenido_editor_wrap
+        .ql-picker.ql-header
+        .ql-picker-item[data-value="2"]::before {
         content: "Título";
       }
-      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
-      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-item[data-value="3"]::before {
+      #pub_contenido_editor_wrap
+        .ql-picker.ql-header
+        .ql-picker-label[data-value="3"]::before,
+      #pub_contenido_editor_wrap
+        .ql-picker.ql-header
+        .ql-picker-item[data-value="3"]::before {
         content: "Subtítulo";
       }
-      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-label:not([data-value])::before,
-      #pub_contenido_editor_wrap .ql-picker.ql-header .ql-picker-item:not([data-value])::before {
+      #pub_contenido_editor_wrap
+        .ql-picker.ql-header
+        .ql-picker-label:not([data-value])::before,
+      #pub_contenido_editor_wrap
+        .ql-picker.ql-header
+        .ql-picker-item:not([data-value])::before {
         content: "Párrafo";
       }
       /* La vista previa debe verse EXACTAMENTE como se va a ver en la página pública -- estas
@@ -161,27 +193,55 @@
             <h2
               class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2"
             >
-        Publicaciones
+              Publicaciones
             </h2>
-                <!-- GUÍA CONTEXTUAL: PUBLICACIONES -->
-        <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-100 flex items-start gap-3 shadow-sm">
-          <span class="material-symbols-outlined text-rose-600 mt-0.5">verified_user</span>
-          <div class="text-xs text-slate-700 leading-relaxed space-y-1">
-            <p><strong class="text-rose-900 font-bold">Lineamientos de difusión y privacidad:</strong></p>
-            <ul class="list-disc list-inside space-y-0.5 text-slate-600">
-              <li><strong>Avisos y Eventos:</strong> Se sincronizan con la página comunitaria abierta. Verifica redacción y fechas antes de publicar.</li>
-              <li><strong>Historias de Éxito:</strong> Por normativa de protección de datos, requieren obligatoriamente adjuntar el documento de consentimiento firmado.</li>
-              <li><strong>Privacidad:</strong> Voluntarios y especialistas únicamente tienen visibilidad de sus publicaciones propias.</li>
-            </ul>
-          </div>
-        </div>
+            <!-- GUÍA CONTEXTUAL: PUBLICACIONES -->
+            <div
+              class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-100 flex items-start gap-3 shadow-sm"
+            >
+              <span class="material-symbols-outlined text-rose-600 mt-0.5"
+                >verified_user</span
+              >
+              <div class="text-xs text-slate-700 leading-relaxed space-y-1">
+                <p>
+                  <strong class="text-rose-900 font-bold"
+                    >Lineamientos de difusión y privacidad:</strong
+                  >
+                </p>
+                <ul class="list-disc list-inside space-y-0.5 text-slate-600">
+                  <li>
+                    <strong>Avisos y Eventos:</strong> Se sincronizan con la
+                    página comunitaria abierta. Verifica redacción y fechas
+                    antes de publicar.
+                  </li>
+                  <li>
+                    <strong>Historias de Éxito:</strong> Por normativa de
+                    protección de datos, requieren obligatoriamente adjuntar el
+                    documento de consentimiento firmado.
+                  </li>
+                  <li>
+                    <strong>Privacidad:</strong> Voluntarios y especialistas
+                    únicamente tienen visibilidad de sus publicaciones propias.
+                  </li>
+                </ul>
+              </div>
+            </div>
             <p class="text-slate-500 max-w-xl">
               Noticias, avisos y eventos que alimentan la página pública (Inicio
               y Comunidad).
             </p>
-            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
-              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
-              <span>Voluntarios y Especialistas solo ven las publicaciones que ellos mismos crearon; Coordinadores y Administradores ven todas. El contenido se muestra tal cual en la página pública, revisa la redacción antes de publicar.</span>
+            <p
+              class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl"
+            >
+              <span class="material-symbols-outlined text-[14px] mt-0.5"
+                >info</span
+              >
+              <span
+                >Voluntarios y Especialistas solo ven las publicaciones que
+                ellos mismos crearon; Coordinadores y Administradores ven todas.
+                El contenido se muestra tal cual en la página pública, revisa la
+                redacción antes de publicar.</span
+              >
             </p>
           </div>
           <button
@@ -470,11 +530,10 @@
                      chips se generan dinámicamente desde el catálogo en categoriasCatalogoGlobal
                      (ver cargarCategoriasCatalogo/renderChipsCategorias), ya no son 5 checkboxes
                      fijos. -->
-                <div
-                  id="pub_categorias_checks"
-                  class="flex flex-wrap gap-2"
-                >
-                  <p class="text-sm text-slate-400 italic">Cargando categorías...</p>
+                <div id="pub_categorias_checks" class="flex flex-wrap gap-2">
+                  <p class="text-sm text-slate-400 italic">
+                    Cargando categorías...
+                  </p>
                 </div>
 
                 <!-- Mini-buscador estilo Google: sugiere categorías ya existentes según lo que
@@ -484,7 +543,8 @@
                   <div
                     class="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2.5 focus-within:ring-2 focus-within:ring-secondary/30"
                   >
-                    <span class="material-symbols-outlined text-slate-400 text-[18px]"
+                    <span
+                      class="material-symbols-outlined text-slate-400 text-[18px]"
                       >search</span
                     >
                     <input
@@ -494,8 +554,21 @@
                       class="flex-1 border-none outline-none text-sm bg-transparent"
                       oninput="filtrarSugerenciasCategoria()"
                       onfocus="filtrarSugerenciasCategoria()"
-                      onblur="setTimeout(() => document.getElementById('pub_categoria_sugerencias').classList.add('hidden'), 150)"
-                      onkeydown="if(event.key==='Enter'){event.preventDefault(); agregarCategoriaDesdeBuscador();}"
+                      onblur="
+                        setTimeout(
+                          () =>
+                            document
+                              .getElementById('pub_categoria_sugerencias')
+                              .classList.add('hidden'),
+                          150,
+                        )
+                      "
+                      onkeydown="
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                          agregarCategoriaDesdeBuscador();
+                        }
+                      "
                     />
                   </div>
                   <div
@@ -523,7 +596,8 @@
                     >Contenido</label
                   >
                   <span class="text-xs text-slate-400"
-                    >Los "Enters" se respetan tal cual en la página pública</span
+                    >Los "Enters" se respetan tal cual en la página
+                    pública</span
                   >
                 </div>
                 <!-- Editor de texto enriquecido (Quill, ver <head> y inicializarEditorContenido
@@ -557,13 +631,16 @@
                     >
                     Así se verá en la página pública
                   </p>
-                  <div class="p-4 border border-dashed border-slate-200 rounded-xl">
+                  <div
+                    class="p-4 border border-dashed border-slate-200 rounded-xl"
+                  >
                     <div
                       id="pub_contenido_preview"
                       class="text-gray-800 text-base leading-relaxed"
                     >
                       <span class="text-gray-400 italic"
-                        >La vista previa aparecerá aquí mientras escribes...</span
+                        >La vista previa aparecerá aquí mientras
+                        escribes...</span
                       >
                     </div>
                   </div>
@@ -748,7 +825,9 @@
                       <span
                         class="material-symbols-outlined align-middle text-[18px] mr-1"
                         >download</span
-                      ><span id="texto_btn_descargar_redes">Descargar Imagen</span>
+                      ><span id="texto_btn_descargar_redes"
+                        >Descargar Imagen</span
+                      >
                     </a>
                   </div>
                 </div>
@@ -1189,7 +1268,9 @@
 
         const coincidencias = categoriasCatalogoGlobal
           .filter((c) => !categoriasSeleccionadasPub.has(c.nombre_categoria))
-          .filter((c) => !texto || c.nombre_categoria.toLowerCase().includes(texto))
+          .filter(
+            (c) => !texto || c.nombre_categoria.toLowerCase().includes(texto),
+          )
           .slice(0, 6);
 
         let filas = coincidencias
@@ -1244,17 +1325,25 @@
               categoriasCatalogoGlobal.push(data.data);
               nombre = data.data.nombre_categoria;
             } else {
-              categoriasCatalogoGlobal.push({ id_categoria: null, nombre_categoria: nombre });
+              categoriasCatalogoGlobal.push({
+                id_categoria: null,
+                nombre_categoria: nombre,
+              });
             }
             actualizarSelectFiltroCategoria();
           } catch (e) {
             console.error("No se pudo registrar la categoría nueva:", e);
-            categoriasCatalogoGlobal.push({ id_categoria: null, nombre_categoria: nombre });
+            categoriasCatalogoGlobal.push({
+              id_categoria: null,
+              nombre_categoria: nombre,
+            });
           }
         }
         categoriasSeleccionadasPub.add(nombre);
         document.getElementById("pub_categoria_buscador").value = "";
-        document.getElementById("pub_categoria_sugerencias").classList.add("hidden");
+        document
+          .getElementById("pub_categoria_sugerencias")
+          .classList.add("hidden");
         // Reordena y salta a la página donde quedó, para que se vea de inmediato aunque el
         // catálogo ya tenga más de una página.
         ordenarCatalogoCategorias();
@@ -1264,7 +1353,9 @@
 
       // Atajo para el Enter dentro del buscador: agrega/selecciona lo que esté escrito.
       function agregarCategoriaDesdeBuscador() {
-        const valor = document.getElementById("pub_categoria_buscador").value.trim();
+        const valor = document
+          .getElementById("pub_categoria_buscador")
+          .value.trim();
         if (valor) seleccionarCategoriaSugerida(valor);
       }
 
@@ -1285,7 +1376,10 @@
         categoriasSeleccionadasPub = new Set(partes);
         partes.forEach((p) => {
           if (!categoriasCatalogoGlobal.some((c) => c.nombre_categoria === p)) {
-            categoriasCatalogoGlobal.push({ id_categoria: null, nombre_categoria: p });
+            categoriasCatalogoGlobal.push({
+              id_categoria: null,
+              nombre_categoria: p,
+            });
           }
         });
         ordenarCatalogoCategorias();
@@ -1485,14 +1579,10 @@
       async function cargarPublicaciones() {
         try {
           const res = await fetch(
-<<<<<<< HEAD
-            `${API_URL}/api/publicaciones?incluir_historias=1`,{
-              headers: authHeaders()
-            }
-=======
             `${API_URL}/api/publicaciones?incluir_historias=1`,
-            { headers: authHeaders() },
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
+            {
+              headers: authHeaders(),
+            },
           );
           const json = await res.json();
           if (json.success) {
@@ -1675,7 +1765,9 @@
         categoriasSeleccionadasPub = new Set();
         paginaActualCategorias = 0;
         document.getElementById("pub_categoria_buscador").value = "";
-        document.getElementById("pub_categoria_sugerencias").classList.add("hidden");
+        document
+          .getElementById("pub_categoria_sugerencias")
+          .classList.add("hidden");
         renderChipsCategorias();
         document.getElementById("pub_tipo_otro").value = "";
         document.getElementById("pub_tipo_otro").classList.add("hidden");
@@ -1735,7 +1827,9 @@
         categoriasSeleccionadasPub = new Set();
         paginaActualCategorias = 0;
         document.getElementById("pub_categoria_buscador").value = "";
-        document.getElementById("pub_categoria_sugerencias").classList.add("hidden");
+        document
+          .getElementById("pub_categoria_sugerencias")
+          .classList.add("hidden");
         renderChipsCategorias();
 
         if (pub.origen === "historia") {
@@ -1908,7 +2002,10 @@
               }),
             });
           } catch (e) {
-            console.error("No se pudo registrar una foto adicional pendiente:", e);
+            console.error(
+              "No se pudo registrar una foto adicional pendiente:",
+              e,
+            );
           }
         }
         galeriaPendienteNueva = [];
@@ -2356,7 +2453,11 @@
         // 4. Frase institucional en la parte inferior
         ctx.fillStyle = "#FFFFFF";
         ctx.font = "bold 28px Quicksand, sans-serif";
-        ctx.fillText('"LA SALUD MENTAL ES RESPONSABILIDAD EN SOCIEDAD"', 90, 950);
+        ctx.fillText(
+          '"LA SALUD MENTAL ES RESPONSABILIDAD EN SOCIEDAD"',
+          90,
+          950,
+        );
 
         // 5. Logo en la esquina inferior derecha del marco
         // OJO: la ruta debe ser absoluta y con la mayúscula exacta del archivo real
@@ -2378,7 +2479,10 @@
             altoLogo,
           );
         } catch (e) {
-          console.warn("No se pudo cargar el logo para la tarjeta de redes:", e);
+          console.warn(
+            "No se pudo cargar el logo para la tarjeta de redes:",
+            e,
+          );
         }
       }
 
@@ -2423,7 +2527,9 @@
       async function generarImagenRedes() {
         const fuentes = recolectarFuentesParaRedes();
         if (fuentes.length === 0) {
-          alert("Primero sube una fotografía, un video o alguna foto adicional.");
+          alert(
+            "Primero sube una fotografía, un video o alguna foto adicional.",
+          );
           return;
         }
 
@@ -2466,7 +2572,10 @@
             await dibujarTarjetaRedes(ctx, url);
             generadas.push({ nombre, canvas });
           } catch (error) {
-            console.error(`No se pudo generar la tarjeta de "${nombre}":`, error);
+            console.error(
+              `No se pudo generar la tarjeta de "${nombre}":`,
+              error,
+            );
             fallidas.push(nombre);
           }
         }

@@ -114,6 +114,62 @@ function sanitizarContenidoEnriquecido(html) {
     });
 }
 
+// ================= CONTENIDO ENRIQUECIDO DE PUBLICACIONES =================
+// El campo "Contenido" de una Publicación se escribe con un editor de texto con formato
+// (negritas, listas, enlaces...) en el panel de admin (ver Quill en admin/publicaciones.html),
+// así que puede traer HTML real. Las publicaciones guardadas ANTES de agregar ese editor siguen
+// teniendo texto plano con saltos de línea reales (un "\n" por línea). Estas funciones son
+// compartidas por todas las páginas públicas que leen ese campo, para que ambos casos se vean
+// bien sin duplicar esta lógica en cada archivo.
+
+// true si "texto" trae HTML real (viene del editor con formato); false si es texto plano
+// "clásico". No es un parser completo, solo un indicio suficiente para decidir cómo pintarlo.
+function esContenidoHtml(texto) {
+    return /<\/?[a-z][\s\S]*>/i.test(String(texto ?? ''));
+}
+
+// Quita etiquetas HTML y decodifica las entidades más comunes que deja el editor, dejando solo
+// texto plano legible (para extractos/resúmenes en tarjetas y carruseles -- nunca para pintar
+// contenido completo, para eso usa sanitizarContenidoEnriquecido). Los cierres de bloque se
+// cambian por un espacio para que dos párrafos pegados no queden como "palabra1palabra2".
+function quitarEtiquetasHtml(html) {
+    return String(html ?? '')
+        .replace(/<\/(p|div|li|h[1-6])>/gi, ' ')
+        .replace(/<br\s*\/?>/gi, ' ')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/&amp;/gi, '&')
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>')
+        .replace(/&quot;/gi, '"')
+        .replace(/&#39;/gi, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+// Recorta un texto plano a "longitud" caracteres con "…" al final si hizo falta.
+function recortarTexto(texto, longitud) {
+    const limpio = String(texto ?? '').trim();
+    if (limpio.length <= longitud) return limpio;
+    return limpio.substring(0, longitud).trim() + '…';
+}
+
+// Sanea el HTML del editor antes de inyectarlo con innerHTML en la página pública, permitiendo
+// solo las etiquetas que el editor realmente puede generar (ver el toolbar de Quill en
+// admin/publicaciones.html y admin/agenda.html): títulos/subtítulos (h2/h3), negritas, cursiva,
+// subrayado, listas y enlaces. Usa DOMPurify (cargado por CDN en las páginas que lo necesitan).
+// Si por lo que sea la librería no cargó, no se arriesga a inyectar HTML sin filtrar -- se cae a
+// texto plano escapado, igual que se hacía antes de tener el editor.
+function sanitizarContenidoEnriquecido(html) {
+    if (typeof DOMPurify === 'undefined') {
+        return escapeHtml(quitarEtiquetasHtml(html)).replace(/\n/g, '<br>');
+    }
+    return DOMPurify.sanitize(String(html ?? ''), {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ol', 'ul', 'li', 'a', 'h2', 'h3'],
+        ALLOWED_ATTR: ['href', 'target', 'rel'],
+    });
+}
+
 // ================= AUTENTICACIÓN =================
 function decodeJWT(token) {
     let base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
@@ -141,15 +197,6 @@ const ROL_ADMIN = 1, ROL_ESPECIALISTA = 2, ROL_COORDINADOR = 3, ROL_VOLUNTARIO =
 function permisosPorPagina(rol, especialidad) {
     return {
         dashboard: [ROL_ADMIN, ROL_COORDINADOR],
-<<<<<<< HEAD
-        // expedientes: se retira de las rutas activas
-        herramientas: [ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO],
-=======
-        // Coordinador tiene acceso completo al módulo de Expedientes, igual que Admin.
-        // Un Especialista solo entra si es psicólogo (los demás, ej. Pedagogía, no tienen
-        // ningún expediente clínico que les corresponda).
-        expedientes: esPsico ? [ROL_ADMIN, ROL_COORDINADOR, ROL_ESPECIALISTA] : [ROL_ADMIN, ROL_COORDINADOR],
->>>>>>> a0cb2ef6def42bf87fb2cbcb8dd9ea544076d7a0
         voluntariado: [ROL_ADMIN, ROL_COORDINADOR],
         inventario: [ROL_ADMIN, ROL_COORDINADOR],
         agenda: [ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO],
