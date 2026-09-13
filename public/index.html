@@ -36,10 +36,6 @@
           "GRAD" 0,
           "opsz" 24;
       }
-      .glass-header {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(24px);
-      }
       .organic-shape-1 {
         border-radius: 60% 40% 70% 30% / 30% 60% 40% 70%;
       }
@@ -101,12 +97,12 @@
               <img
                 class="rounded-xl w-full h-80 object-cover shadow-2xl sm:mt-12"
                 data-alt="Community volunteers painting a vibrant mural on a public wall with warm sunlit atmosphere and smiles"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7gQhBwn5y25l2EMkZ03rdSH5aQNgxXTvoOuPpAHnjO1i1JwvqbqKBDIx9g9CNR6CM_MtHW0xs_HkramzyQydMgi-JYD-UziDVAZ7JlpzD1yMXV3l41crjgeJvX-nwLuqarzn5sAYHYoErW3zAdk8Ga1lja4Kn2tmRcsNADpRdXDMHkk3yqxw8F32aNLtWmfweZxus97MpS0y5KvlYxW5fadpy7l-B5LqGjfJ5kIbSjbwh33mcMXy3K3_aX5nbxXs0fkUZEdmVlOs"
+                src="/assets/pintura_index.jpeg"
               />
               <img
                 class="rounded-xl w-full h-80 object-cover shadow-2xl"
                 data-alt="A group of diverse children playing and laughing together in a sun-drenched community park during a workshop"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuASwY8Qlw5ef0Om1PaSuv_KmuvY2NCeI6h-h1AAynPf3HtRwbEU17QKWSzcwztsCcQJJ32MSgl-xqjTgA71R9HuNPv9SScxqiIpGwCxk5ooRzgnhZyBzUjJkDfyiIgGw6CssXKo32QQPjUnvvO8M0Oybb2QyqveRlT1PqnRyowAJRVHVaX1h1VrpvAMN8M7nas9gIuMiIqIxbesF9yJn-ENQScnkx-5t6u5Hq7uu2kadLLgA7CTR7mitgSI85o6cQy-dbYNpQPyeU0"
+                src="/assets/ninos_index.jpeg"
               />
             </div>
           </div>
@@ -347,21 +343,32 @@
             <ul class="space-y-4 mb-10">
               <li class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary text-sm"
-                  >check_circle</span
-                >
-                Pintura y Brochas para Muralismo
+                  >check_circle</span>
+                <b>Insumos para muralismo y arte: </b>Pintura vinílica/exterior, lienzos, brochas y rodillos.
               </li>
               <li class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary text-sm"
                   >check_circle</span
                 >
-                Alimentos No Perecederos
+                <b>Material didáctico: </b>Herramientas para psicoeducación en escuelas.
               </li>
               <li class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary text-sm"
                   >check_circle</span
                 >
-                Útiles Escolares y Didácticos
+                <b>Equipo tecnológico: </b>Laptops, proyectores y bocinas portátiles.
+              </li>
+              <li class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-sm"
+                  >check_circle</span
+                >
+                <b>Papelería y registro: </b>Hojas, libretas, carpetas y artículos de oficina.
+              </li>
+              <li class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-sm"
+                  >check_circle</span
+                >
+                <b>Identidad visual: </b>Playeras, pines, stickers y banners.
               </li>
             </ul>
             <a
@@ -573,28 +580,6 @@
           copiarTextoConFallback(clabe, 'CLABE copiada al portapapeles: ' + clabe);
       }
 
-      // Comparte la página actual usando la Web Share API nativa si está
-      // disponible; si no, o si falla de forma síncrona, recurre al helper
-      // de copiado/prompt como respaldo.
-      function compartirPagina() {
-          const datosCompartir = {
-              title: 'Sumando Voluntades Sanctórum',
-              text: 'Conoce y apoya a Sumando Voluntades Sanctórum A.C.',
-              url: window.location.href
-          };
-          try {
-              if (navigator.share) {
-                  navigator.share(datosCompartir).catch(() => { /* el usuario canceló el share */ });
-              } else {
-                  copiarTextoConFallback(window.location.href, 'Enlace copiado al portapapeles. ¡Compártelo con quien quieras!');
-              }
-          } catch (errorSincrono) {
-              // Algunos navegadores lanzan el error de forma síncrona (no como promesa rechazada),
-              // por ejemplo si la página no corre en un contexto seguro (https o localhost).
-              console.error('navigator.share falló de forma síncrona, usando respaldo:', errorSincrono);
-              copiarTextoConFallback(window.location.href, 'Enlace copiado al portapapeles. ¡Compártelo con quien quieras!');
-          }
-      }
 
       // ---------- TRANSPARENCIA FINANCIERA (RF-09) ----------
       const ESTILOS_CATEGORIA = {

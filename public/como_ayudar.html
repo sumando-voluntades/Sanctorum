@@ -41,10 +41,6 @@
         background-color: #f6fafe;
         color: #171c1f;
       }
-      .glass-effect {
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-      }
       .asymmetric-shape {
         border-radius: 4rem 2rem 5rem 2rem;
       }
@@ -504,38 +500,6 @@
           clabe,
           "CLABE copiada al portapapeles: " + clabe,
         );
-      }
-
-      // Comparte la página actual usando la Web Share API nativa si está
-      // disponible; si no, o si falla de forma síncrona, recurre al helper
-      // de copiado/prompt como respaldo.
-      function compartirPaginaAyudar() {
-        const datosCompartir = {
-          title: "Cómo Ayudar - Sumando Voluntades Sanctórum",
-          text: "Conoce las formas de apoyar a Sumando Voluntades Sanctórum A.C.",
-          url: window.location.href,
-        };
-        try {
-          if (navigator.share) {
-            navigator.share(datosCompartir).catch(() => {
-              /* el usuario canceló el share */
-            });
-          } else {
-            copiarTextoConFallback(
-              window.location.href,
-              "Enlace copiado al portapapeles. ¡Compártelo con quien quieras!",
-            );
-          }
-        } catch (errorSincrono) {
-          console.error(
-            "navigator.share falló de forma síncrona, usando respaldo:",
-            errorSincrono,
-          );
-          copiarTextoConFallback(
-            window.location.href,
-            "Enlace copiado al portapapeles. ¡Compártelo con quien quieras!",
-          );
-        }
       }
 
       // ---------- FORMULARIO: AGENDAR ENTREGA DE DONACIÓN EN ESPECIE ----------

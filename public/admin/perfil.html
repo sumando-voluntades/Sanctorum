@@ -593,7 +593,6 @@
 
         <!-- TARJETA: SEGURIDAD -->
         <div
-          id="seccion_seguridad"
           class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 scroll-mt-24"
         >
           <h4
@@ -814,8 +813,7 @@
       // de una encuesta de satisfacción. A diferencia de la versión anterior, SIEMPRE muestra
       // los 6 campos posibles -- con "Sin dato registrado" cuando el campo no se llenó, en vez
       // de ocultar la fila por completo -- para que se note de un vistazo qué tan completa
-      // quedó la respuesta. Reutilizada tal cual en expedientes.html (ver
-      // construirHtmlEncuestaDetalle ahí) para el botón "Ver encuesta completa" de esa página.
+      // quedó la respuesta.
       function construirHtmlEncuestaDetalle(enc) {
         const sinDato =
           '<span class="text-slate-400 font-normal italic">Sin dato registrado</span>';
@@ -1380,46 +1378,21 @@
       const DESTINO_POR_TIPO_SOLICITUD = {
         "Compartir Historia de Éxito": "publicaciones",
         "Donación en Especie": "aliados_donativos",
-        "Ayuda Psicológica": "expedientes",
       };
 
-      // Solo Admin o el propio Psicólogo pueden crear un expediente (ver permisosPorPagina
-      // en comun.js y requiereRol en server.js) — un Coordinador ve las solicitudes de Ayuda
-      // Psicológica para darles seguimiento, pero no tiene acceso a Expedientes.
-      function usuarioPuedeCrearExpediente() {
-        if (!perfilActual) return false;
-        return (
-          perfilActual.id_rol === 1 ||
-          (perfilActual.id_rol === 2 &&
-            (perfilActual.especialidad || "").toLowerCase().includes("psic"))
-        );
-      }
-
       // Botón "Atender": en vez de marcar la solicitud como Atendida de inmediato, manda al
-      // staff a la página donde se gestiona de verdad (Publicaciones, Aliados y Donativos, o
-      // Expedientes) con el modal de "nuevo" ya abierto y precargado con los datos de la
-      // solicitud (ver manejarHandoffSolicitud() en cada una de esas páginas). Esa página es
-      // la que, al guardar con éxito, marca esta solicitud como Atendida — así el estatus
-      // solo cambia cuando la gestión ya quedó hecha de verdad, no antes.
+      // staff a la página donde se gestiona de verdad (Publicaciones o Aliados y Donativos)
+      // con el modal de "nuevo" ya abierto y precargado con los datos de la solicitud (ver
+      // manejarHandoffSolicitud() en cada una de esas páginas). Esa página es la que, al
+      // guardar con éxito, marca esta solicitud como Atendida — así el estatus solo cambia
+      // cuando la gestión ya quedó hecha de verdad, no antes. Los tipos de solicitud sin un
+      // destino específico en DESTINO_POR_TIPO_SOLICITUD (por ejemplo, Ayuda Psicológica) se
+      // marcan como Atendida directamente al hacer clic en "Atender".
       function atenderSolicitud(idSolicitud) {
         const solicitud = solicitudesComunidadGlobal.find(
           (s) => (s.id_solicitud ?? s.id) === idSolicitud,
         );
         if (!solicitud) return;
-
-        if (
-          solicitud.tipo_solicitud === "Ayuda Psicológica" &&
-          !usuarioPuedeCrearExpediente()
-        ) {
-          if (
-            confirm(
-              "Solo un Admin o un Psicólogo puede crear el expediente clínico de esta solicitud. ¿La marcas como atendida de todas formas (por ejemplo, si ya la gestionaste por otro medio)?",
-            )
-          ) {
-            revisarSolicitud(idSolicitud, "Atendida");
-          }
-          return;
-        }
 
         const destino = DESTINO_POR_TIPO_SOLICITUD[solicitud.tipo_solicitud];
         if (!destino) {
