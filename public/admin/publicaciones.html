@@ -397,16 +397,38 @@
                 envió la solicitud, sin revisar — léelo, edítalo y anonimízalo
                 antes de publicar.
               </div>
-              <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1"
-                  >Beneficiario</label
-                >
-                <select
-                  id="pub_id_beneficiario"
-                  class="w-full px-4 py-3 bg-white border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30"
-                >
-                  <option value="">Selecciona un beneficiario...</option>
-                </select>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-1"
+                    >Nombre o alias del beneficiario</label
+                  >
+                  <!-- Antes era un <select> que vinculaba a un registro real de Beneficiarios
+                       (id_beneficiario). Ya no hay forma de dar de alta un beneficiario nuevo
+                       en el sistema (esa gestión se retiró junto con Expedientes), así que ese
+                       selector solo podía ofrecer el mismo conjunto congelado de siempre. Ahora
+                       se escribe el nombre o alias directamente aquí — usa algo que proteja la
+                       identidad (un alias, solo el nombre de pila), igual que antes se mostraba
+                       solo el primer nombre del beneficiario vinculado. -->
+                  <input
+                    type="text"
+                    id="pub_nombre_beneficiario"
+                    class="w-full px-4 py-3 bg-white border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30"
+                    placeholder="Ej. Ana, o un alias..."
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-bold text-slate-700 mb-1"
+                    >Edad <span class="font-normal text-slate-400 normal-case">(opcional)</span></label
+                  >
+                  <input
+                    type="number"
+                    id="pub_edad_beneficiario"
+                    min="0"
+                    max="120"
+                    class="w-full px-4 py-3 bg-white border-none rounded-xl outline-none focus:ring-2 focus:ring-secondary/30"
+                    placeholder="Ej. 12"
+                  />
+                </div>
               </div>
               <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1"
@@ -831,7 +853,6 @@
         }
         cargarPublicaciones();
         cargarEventosParaRelacionar();
-        cargarBeneficiariosParaHistoria();
         cargarCategoriasCatalogo();
         manejarHandoffSolicitud();
       });
@@ -889,29 +910,9 @@
         }
       }
 
-      // Llena el <select> de "Beneficiario" del bloque de Historia de Éxito con la lista de
-      // beneficiarios existentes.
-      async function cargarBeneficiariosParaHistoria() {
-        try {
-          const res = await fetch(`${API_URL}/api/beneficiarios`, {
-            headers: authHeaders(),
-          });
-          const json = await res.json();
-          const sel = document.getElementById("pub_id_beneficiario");
-          if (json.success && sel) {
-            sel.innerHTML =
-              '<option value="">Selecciona un beneficiario...</option>' +
-              json.data
-                .map(
-                  (b) =>
-                    `<option value="${b.id_beneficiario}">${b.nombre_completo}</option>`,
-                )
-                .join("");
-          }
-        } catch (e) {
-          console.error("Error al cargar beneficiarios:", e);
-        }
-      }
+      // cargarBeneficiariosParaHistoria() se retiró: el bloque de Historia de Éxito ya no
+      // vincula a un registro de Beneficiarios (ver el campo "Nombre o alias del beneficiario"
+      // más arriba en el HTML), así que no hace falta precargar ningún <select>.
 
       // Muestra el bloque de campos de "Historia de Éxito" (y el de consentimiento) u oculta
       // ambos y muestra los campos normales de publicación, según el tipo elegido; ajusta
@@ -1603,7 +1604,8 @@
         document.getElementById("consentimiento_nombre_archivo").innerText = "";
         actualizarPreviewConsentimiento("");
         document.getElementById("pub_evento_relacionado").value = "";
-        document.getElementById("pub_id_beneficiario").value = "";
+        document.getElementById("pub_nombre_beneficiario").value = "";
+        document.getElementById("pub_edad_beneficiario").value = "";
         document.getElementById("pub_contenido_preayuda").value = "";
         document.getElementById("pub_contenido_postayuda").value = "";
         cambiarTipoPublicacion();
@@ -1656,8 +1658,27 @@
         renderChipsCategorias();
 
         if (pub.origen === "historia") {
-          document.getElementById("pub_id_beneficiario").value =
-            pub.id_beneficiario || "";
+          // Historias antiguas (antes de este cambio) no tienen nombre_beneficiario/
+          // edad_beneficiario propios: venían vinculadas a un registro real de Beneficiarios.
+          // Si faltan, se precargan con los datos de ese registro vinculado (nombre_beneficiario_
+          // vinculado / fecha_nacimiento, calculada a edad) para no dejar el campo vacío al
+          // editar; al guardar, quedan migradas a los campos libres.
+          let edadPrecargada = pub.edad_beneficiario;
+          if (
+            (edadPrecargada === null || edadPrecargada === undefined) &&
+            pub.fecha_nacimiento_beneficiario_vinculado
+          ) {
+            const hoy = new Date();
+            const nac = new Date(pub.fecha_nacimiento_beneficiario_vinculado);
+            edadPrecargada = hoy.getFullYear() - nac.getFullYear();
+            const m = hoy.getMonth() - nac.getMonth();
+            if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate()))
+              edadPrecargada--;
+          }
+          document.getElementById("pub_nombre_beneficiario").value =
+            pub.nombre_beneficiario || pub.nombre_beneficiario_vinculado || "";
+          document.getElementById("pub_edad_beneficiario").value =
+            edadPrecargada ?? "";
           document.getElementById("pub_contenido_preayuda").value =
             pub.contenido_preayuda || "";
           document.getElementById("pub_contenido_postayuda").value =
@@ -2051,17 +2072,23 @@
 
         let payload;
         if (esHistoria) {
-          if (!document.getElementById("pub_id_beneficiario").value) {
-            alert("Selecciona a qué beneficiario pertenece esta historia.");
+          const nombreBenefTrim = document
+            .getElementById("pub_nombre_beneficiario")
+            .value.trim();
+          if (!nombreBenefTrim) {
+            alert("Escribe el nombre o alias del beneficiario de esta historia.");
             return;
           }
+          const edadBenefRaw = document.getElementById(
+            "pub_edad_beneficiario",
+          ).value;
           payload = {
             titulo: document.getElementById("pub_titulo").value,
             tipo: tipoSeleccionado,
             origen: "historia",
             origen_original: origenExistente || undefined,
-            id_beneficiario: document.getElementById("pub_id_beneficiario")
-              .value,
+            nombre_beneficiario: nombreBenefTrim,
+            edad_beneficiario: edadBenefRaw === "" ? null : Number(edadBenefRaw),
             contenido_preayuda: document.getElementById(
               "pub_contenido_preayuda",
             ).value,

@@ -2661,14 +2661,22 @@ app.get('/api/publicaciones', async (req, res) => {
 
         if (incluir_historias) {
             const histParams = [];
+            // LEFT JOIN Beneficiarios solo para historias antiguas que todavía traen id_beneficiario
+            // (de cuando el bloque de Historia de Éxito vinculaba a un registro real): permite
+            // precargar su nombre/edad como valor inicial al editar, aunque nombre_beneficiario /
+            // edad_beneficiario (los campos libres, usados por historias nuevas) estén vacíos.
             let histQuery = `
                 SELECT h.id_historia AS id_publicacion, h.titulo, h.contenido_postayuda AS contenido,
                        NULL::text AS url_imagen, 'Historia de Éxito' AS tipo, NULL::text AS categoria,
                        h.fecha_creacion AS fecha_post, h.url_documento_consentimiento,
                        NULL::int AS id_evento_relacionado, h.id_autor, NULL::int AS id_editor,
-                       h.id_beneficiario, h.contenido_preayuda, h.contenido_postayuda, h.consentimiento,
+                       h.id_beneficiario, h.nombre_beneficiario, h.edad_beneficiario,
+                       b_legacy.nombre_completo AS nombre_beneficiario_vinculado,
+                       b_legacy.fecha_nacimiento AS fecha_nacimiento_beneficiario_vinculado,
+                       h.contenido_preayuda, h.contenido_postayuda, h.consentimiento,
                        'historia' AS origen
-                FROM Historias_Exito h`;
+                FROM Historias_Exito h
+                LEFT JOIN Beneficiarios b_legacy ON h.id_beneficiario = b_legacy.id_beneficiario`;
             if (soloPropias) { histParams.push(usuarioReq.id); histQuery += ` WHERE h.id_autor = $${histParams.length}`; }
             histQuery += ' ORDER BY h.fecha_creacion DESC';
             const hist = await pool.query(histQuery, histParams);
@@ -2702,7 +2710,7 @@ app.get('/api/publicaciones/:id', async (req, res) => {
 
 app.post('/api/publicaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     const { titulo, contenido, url_imagen, url_video, tipo, categoria, url_documento_consentimiento, id_evento_relacionado,
-            id_beneficiario, contenido_preayuda, contenido_postayuda } = req.body;
+            nombre_beneficiario, edad_beneficiario, contenido_preayuda, contenido_postayuda } = req.body;
     if (!titulo || !tipo) return res.status(400).json({ success: false, message: 'Título y tipo son obligatorios.' });
 
     const chkImagenPub = validarUrlCloudinaria(url_imagen, 'url_imagen');
@@ -2715,13 +2723,17 @@ app.post('/api/publicaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECI
     if (tipo === 'Historia de Éxito') {
         if (!puedePublicarHistoria(req.usuario)) return res.status(403).json({ success: false, message: 'Solo un psicólogo, coordinador o administrador puede publicar una Historia de Éxito.' });
         if (!url_documento_consentimiento) return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
-        if (!id_beneficiario) return res.status(400).json({ success: false, message: 'Selecciona a qué beneficiario pertenece esta historia.' });
+        if (!nombre_beneficiario) return res.status(400).json({ success: false, message: 'Escribe el nombre o alias del beneficiario de esta historia.' });
         if (!contenido_preayuda || !contenido_postayuda) return res.status(400).json({ success: false, message: 'Completa el contenido de "antes" y "después".' });
         try {
             const result = await pool.query(
-                `INSERT INTO Historias_Exito (id_beneficiario, id_autor, titulo, contenido_preayuda, contenido_postayuda, consentimiento, url_documento_consentimiento, fecha_creacion)
-                 VALUES ($1, $2, $3, $4, $5, TRUE, $6, CURRENT_TIMESTAMP) RETURNING id_historia`,
-                [id_beneficiario, req.usuario.id, titulo, contenido_preayuda, contenido_postayuda, chkDocConsentimientoPub.valor]
+                // Historia de Éxito ya no se vincula a un registro de Beneficiarios (id_beneficiario
+                // se deja en NULL para historias nuevas): esa gestión se retiró junto con Expedientes,
+                // así que no hay forma de dar de alta un beneficiario nuevo. En su lugar se guarda un
+                // nombre/alias y edad libres, escritos directamente por quien publica.
+                `INSERT INTO Historias_Exito (id_autor, titulo, contenido_preayuda, contenido_postayuda, consentimiento, url_documento_consentimiento, fecha_creacion, nombre_beneficiario, edad_beneficiario)
+                 VALUES ($1, $2, $3, $4, TRUE, $5, CURRENT_TIMESTAMP, $6, $7) RETURNING id_historia`,
+                [req.usuario.id, titulo, contenido_preayuda, contenido_postayuda, chkDocConsentimientoPub.valor, nombre_beneficiario, edad_beneficiario || null]
             );
             return res.status(201).json({ success: true, id: result.rows[0].id_historia, origen: 'historia' });
         } catch (error) {
@@ -2746,7 +2758,7 @@ app.post('/api/publicaciones', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECI
 
 app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESPECIALISTA, ROL_COORDINADOR, ROL_VOLUNTARIO), async (req, res) => {
     const { titulo, contenido, url_imagen, url_video, tipo, categoria, url_documento_consentimiento, id_evento_relacionado,
-            id_beneficiario, contenido_preayuda, contenido_postayuda, origen, origen_original } = req.body;
+            nombre_beneficiario, edad_beneficiario, contenido_preayuda, contenido_postayuda, origen, origen_original } = req.body;
     const origenActual = origen_original || origen;
     const cruzaTablas = origen !== origenActual;
 
@@ -2769,8 +2781,8 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
                 }
             }
             const result = await pool.query(
-                `UPDATE Historias_Exito SET titulo=$1, contenido_preayuda=$2, contenido_postayuda=$3, url_documento_consentimiento=$4, id_beneficiario=$5, consentimiento=TRUE WHERE id_historia=$6`,
-                [titulo, contenido_preayuda, contenido_postayuda, chkDocConsentimientoPubPut.valor, id_beneficiario, req.params.id]
+                `UPDATE Historias_Exito SET titulo=$1, contenido_preayuda=$2, contenido_postayuda=$3, url_documento_consentimiento=$4, nombre_beneficiario=$5, edad_beneficiario=$6, consentimiento=TRUE WHERE id_historia=$7`,
+                [titulo, contenido_preayuda, contenido_postayuda, chkDocConsentimientoPubPut.valor, nombre_beneficiario || null, edad_beneficiario || null, req.params.id]
             );
             if (result.rowCount === 0) return res.status(404).json({ success: false, message: 'No encontrado.' });
             return res.json({ success: true, origen: 'historia', id: Number(req.params.id) });
@@ -2808,7 +2820,7 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
     if (origen === 'historia' && cruzaTablas) {
         if (!puedePublicarHistoria(req.usuario)) return res.status(403).json({ success: false, message: 'Solo un psicólogo, coordinador o administrador puede publicar una Historia de Éxito.' });
         if (!url_documento_consentimiento) return res.status(400).json({ success: false, message: 'Para publicar una Historia de Éxito debes subir el documento de consentimiento.' });
-        if (!id_beneficiario) return res.status(400).json({ success: false, message: 'Selecciona a qué beneficiario pertenece esta historia.' });
+        if (!nombre_beneficiario) return res.status(400).json({ success: false, message: 'Escribe el nombre o alias del beneficiario de esta historia.' });
         if (!contenido_preayuda || !contenido_postayuda) return res.status(400).json({ success: false, message: 'Completa el contenido de "antes" y "después".' });
         try {
             if (req.usuario.rol !== ROL_ADMIN) {
@@ -2820,9 +2832,9 @@ app.put('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_ESP
             }
             await pool.query('BEGIN');
             const insertado = await pool.query(
-                `INSERT INTO Historias_Exito (id_beneficiario, id_autor, titulo, contenido_preayuda, contenido_postayuda, consentimiento, url_documento_consentimiento, fecha_creacion)
-                 VALUES ($1, $2, $3, $4, $5, TRUE, $6, CURRENT_TIMESTAMP) RETURNING id_historia`,
-                [id_beneficiario, req.usuario.id, titulo, contenido_preayuda, contenido_postayuda, chkDocConsentimientoPubPut.valor]
+                `INSERT INTO Historias_Exito (id_autor, titulo, contenido_preayuda, contenido_postayuda, consentimiento, url_documento_consentimiento, fecha_creacion, nombre_beneficiario, edad_beneficiario)
+                 VALUES ($1, $2, $3, $4, TRUE, $5, CURRENT_TIMESTAMP, $6, $7) RETURNING id_historia`,
+                [req.usuario.id, titulo, contenido_preayuda, contenido_postayuda, chkDocConsentimientoPubPut.valor, nombre_beneficiario, edad_beneficiario || null]
             );
             await pool.query('DELETE FROM Publicaciones WHERE id_publicacion = $1', [req.params.id]);
             await pool.query('COMMIT');
@@ -2888,17 +2900,23 @@ app.delete('/api/publicaciones/:id', verificarToken, requiereRol(ROL_ADMIN, ROL_
 
 app.get('/api/historias_exito', async (req, res) => {
     try {
+        // LEFT JOIN (no JOIN): las historias nuevas ya no se vinculan a un registro de
+        // Beneficiarios (id_beneficiario queda NULL; en su lugar traen nombre_beneficiario /
+        // edad_beneficiario libres). Con INNER JOIN, esas historias nuevas desaparecerían por
+        // completo de esta lista pública. COALESCE prioriza el nombre libre sobre el vinculado,
+        // para las historias antiguas que todavía tengan ambos.
         const result = await pool.query(`
             SELECT h.id_historia, h.titulo, h.contenido_preayuda, h.contenido_postayuda,
-                   b.nombre_completo AS nombre_completo_interno, b.fecha_nacimiento
+                   COALESCE(h.nombre_beneficiario, b.nombre_completo) AS nombre_completo_interno,
+                   h.edad_beneficiario, b.fecha_nacimiento
             FROM Historias_Exito h
-            JOIN Beneficiarios b ON h.id_beneficiario = b.id_beneficiario
+            LEFT JOIN Beneficiarios b ON h.id_beneficiario = b.id_beneficiario
             WHERE h.consentimiento = TRUE
             ORDER BY h.id_historia DESC
         `);
         const data = result.rows.map(r => {
-            let edad = null;
-            if (r.fecha_nacimiento) {
+            let edad = r.edad_beneficiario ?? null;
+            if (edad === null && r.fecha_nacimiento) {
                 const hoy = new Date();
                 const nac = new Date(r.fecha_nacimiento);
                 edad = hoy.getFullYear() - nac.getFullYear();
