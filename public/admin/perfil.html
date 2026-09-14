@@ -59,7 +59,11 @@
           <span>Aquí solo puedes editar tu propia cuenta. Si necesitas corregir el perfil de otro usuario, pide a un Administrador que lo haga desde Gestión de Voluntariado.</span>
         </p>
 
-        <!-- TARJETA: ENCUESTAS DE SATISFACCIÓN POR REVISAR (solo Admin/Coordinador) -->
+        <!-- Encuestas de Satisfacción: función desactivada por completo, ya no se usará.
+        Se comentan la tarjeta "Encuestas por Revisar" y el modal "Ver Encuesta" (nunca se
+        muestran de todas formas: el disparador que los activaba, más abajo en
+        DOMContentLoaded, también está comentado). Ver también server.js (rutas /api/encuestas*),
+        dashboard.html/voluntariado.html y notificaciones.js para el resto de la desactivación.
         <div
           id="tarjeta_encuestas_revisar"
           class="hidden bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8"
@@ -78,10 +82,10 @@
           <p class="text-xs text-slate-400 mb-5">
             Respuestas con calificación general de 1 o 2 estrellas. Márcalas como revisadas una vez que le des seguimiento al caso.
           </p>
-          <!-- Carrusel horizontal (mismo patrón que "Solicitudes de la Comunidad" más abajo):
+          Carrusel horizontal (mismo patrón que "Solicitudes de la Comunidad" más abajo):
              en vez de apilar todas las tarjetas en una columna, se muestran ~5 por fila y el
-             resto se alcanza deslizando a la derecha con las flechas -- sin límite de cuántas
-             se pueden ver, a diferencia del carrusel de Solicitudes. -->
+             resto se alcanza deslizando a la derecha con las flechas, sin límite de cuántas
+             se pueden ver, a diferencia del carrusel de Solicitudes.
           <div class="relative">
             <div
               id="lista_encuestas_revisar"
@@ -115,7 +119,7 @@
           </div>
         </div>
 
-        <!-- MODAL: VER ENCUESTA COMPLETA (solo lectura) -->
+        MODAL: VER ENCUESTA COMPLETA (solo lectura)
         <div
           id="modalVerEncuesta"
           class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300"
@@ -143,6 +147,7 @@
             <div id="ve_cuerpo" class="p-8 overflow-y-auto space-y-4"></div>
           </div>
         </div>
+        -->
 
         <!-- TARJETA PRINCIPAL: DATOS + FOTO -->
         <div
@@ -706,13 +711,17 @@
 
         cargarPerfil();
         cargarNotificaciones();
-        if (usuarioActual.rol === 1 || usuarioActual.rol === 3) {
-          document.getElementById("tarjeta_encuestas_revisar").classList.remove("hidden");
-          cargarEncuestasPorRevisar();
-        }
+        // Encuestas de Satisfacción: desactivado, ya no se usará (ver nota en la tarjeta
+        // comentada arriba). Antes aquí se mostraba "tarjeta_encuestas_revisar" y se llamaba
+        // cargarEncuestasPorRevisar() para Admin/Coordinador.
       });
 
       // ---------- ENCUESTAS DE SATISFACCIÓN POR REVISAR (solo Admin/Coordinador) ----------
+      // FUNCIÓN DESACTIVADA POR COMPLETO — ya no se usará. Las funciones siguientes quedan
+      // comentadas de bloque completo porque ya no tienen ningún punto de entrada (el
+      // disparador de arriba, en DOMContentLoaded, está comentado) ni markup al que apuntar
+      // (la tarjeta y el modal también están comentados más arriba).
+      /*
       // Se guarda en memoria la última respuesta del backend para que "Ver completa" no
       // tenga que volver a pedirla: solo busca por id_encuesta en este arreglo.
       let encuestasPorRevisarGlobal = [];
@@ -900,6 +909,7 @@
           btn.innerText = "Marcar revisada";
         }
       }
+      */
 
       // 2. CARGAR PERFIL REAL DESDE LA BASE DE DATOS (no solo lo que trae el token)
       async function cargarPerfil() {

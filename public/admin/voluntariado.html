@@ -848,7 +848,10 @@
       </div>
     </div>
 
-    <!-- MODAL: HISTORIAL DE ENCUESTAS DE SATISFACCIÓN DE UN ESPECIALISTA (solo lectura) -->
+    <!-- Encuestas de Satisfacción: función desactivada por completo, ya no se usará.
+    Modal "Historial de Encuestas" comentado (ver también las funciones
+    verHistorialEncuestasEspecialista/cerrarModalHistorialEncuestas más abajo, el botón que
+    lo abría, y server.js/perfil.html/dashboard.html/notificaciones.js).
     <div
       id="modalHistorialEncuestas"
       class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300"
@@ -876,6 +879,7 @@
         <div id="he_cuerpo" class="p-8 overflow-y-auto space-y-3"></div>
       </div>
     </div>
+    -->
 
     <!-- LÓGICA DE JAVASCRIPT -->
     <script src="/js/comun.js"></script>
@@ -896,7 +900,6 @@
         }
         try {
           const payload = decodeJWT(token);
-          rolActualUsuario = payload.rol;
           aplicarRestriccionesNav(payload.rol, payload.especialidad);
           document.getElementById("nav_user_name").innerText =
             payload.nombre.split(" ")[0];
@@ -915,10 +918,6 @@
       // viven en js/comun.js (generalizadas para toda la app, no solo esta página — ver el
       // comentario ahí) en vez de copiadas aquí.
       let voluntariosGlobales = [];
-      // Rol (1=Admin, 2=Especialista, 3=Coordinador, 4=Voluntario, 5=Donador) del usuario
-      // que tiene la sesión abierta — se llena en el DOMContentLoaded de más abajo. Se usa
-      // para decidir si se muestra el botón "Ver Historial de Encuestas" en cada tarjeta.
-      let rolActualUsuario = null;
 
       // --- MANEJO DE MODALES ---
       function abrirModal(modalId, contentId) {
@@ -941,8 +940,10 @@
       }
 
       // --- HISTORIAL DE ENCUESTAS DE SATISFACCIÓN (solo Admin/Coordinador) ---
-      // Abre el modal con el promedio y el historial completo de encuestas respondidas
-      // sobre un especialista (botón "Ver Historial de Encuestas" de su tarjeta).
+      // FUNCIÓN DESACTIVADA POR COMPLETO — ya no se usará (el modal al que apuntan y el botón
+      // que las invocaba también están comentados). Se conservan comentadas por si se
+      // reactiva más adelante.
+      /*
       async function verHistorialEncuestasEspecialista(idUsuario, nombre) {
         document.getElementById("he_nombre").innerText = nombre;
         document.getElementById("he_resumen").innerText = "Cargando...";
@@ -1041,6 +1042,7 @@
             .classList.add("hidden");
         }, 300);
       }
+      */
 
       // --- LÓGICA DE INTERFAZ DINÁMICA (VOLUNTARIO VS DONADOR) ---
       // Ajusta el formulario (registro/aprobación/modificación, según "prefix") cuando
@@ -1300,25 +1302,9 @@
                     </div>`;
                 }
               }
-              // Un Especialista (id_rol 2) solo atiende beneficiarios clínicamente si su
-              // especialidad es de psicología (mismo criterio que esPsicologo() en server.js:
-              // especialidad contiene "psic", insensible a mayúsculas) -- un Especialista de
-              // otra área (ej. Pedagogía) no tiene encuestas de satisfacción que revisar, así
-              // que ese botón no le aplica y antes se mostraba igual por error (la condición
-              // solo miraba id_rol === 2, sin ver la especialidad).
-              const esEspecialistaPsicologo =
-                vol.id_rol === 2 &&
-                (vol.especialidad || "").toLowerCase().includes("psic");
-
-              // Historial de encuestas de satisfacción: solo aplica a un Especialista
-              // psicólogo, y solo lo puede ver quien ya puede ver el módulo de encuestas
-              // por revisar (Admin/Coordinador).
-              if (
-                esEspecialistaPsicologo &&
-                (rolActualUsuario === 1 || rolActualUsuario === 3)
-              ) {
-                botonesActivo += `<button onclick="verHistorialEncuestasEspecialista(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}')" class="w-full py-2 mb-2 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">reviews</span> Ver Historial de Encuestas</button>`;
-              }
+              // Encuestas de Satisfacción desactivado por completo (ya no se usará): se quita
+              // el botón "Ver Historial de Encuestas" y la variable esEspecialistaPsicologo que
+              // solo existía para decidir si se mostraba (era su único uso en este archivo).
               if (vol.id_rol !== 5) {
                 botonesActivo += `<button onclick="abrirModalAsignarActivo(${vol.id_usuario})" class="w-full py-2 mb-3 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-[#f39200] hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">assignment_ind</span> Asignar a Proyecto</button>`;
               }

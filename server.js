@@ -105,6 +105,11 @@ function enviarCorreoAsync(opciones, contexto) {
     });
 }
 
+// Encuestas de Satisfacción: función desactivada por completo, ya no se usará. Se comentan
+// estos dos helpers de correo (enviarEncuestaSatisfaccion ya no tenía ningún llamador incluso
+// antes de esta desactivación; avisarEncuestaInsatisfactoria se llamaba solo desde
+// POST /api/encuestas/:token, también comentada más abajo) y las 5 rutas /api/encuestas*.
+/*
 async function enviarEncuestaSatisfaccion(idBeneficiario, idEspecialista) {
     const benRes = await pool.query('SELECT nombre_completo, nombre_tutor, correo_tutor FROM Beneficiarios WHERE id_beneficiario = $1', [idBeneficiario]);
     const ben = benRes.rows[0];
@@ -162,6 +167,7 @@ async function avisarEncuestaInsatisfactoria(idBeneficiario, calificacion, comen
         html: emailTemplate('Encuesta con calificación baja', contenido)
     }, 'alerta de encuesta insatisfactoria');
 }
+*/
 
 const PREFIJO_URL_CLOUDINARY = 'https://res.cloudinary.com/';
 function validarUrlCloudinaria(valor, nombreCampo) {
@@ -1340,6 +1346,9 @@ app.post('/api/escuelas/fusionar', verificarToken, requiereRol(ROL_ADMIN), async
     }
 });
 
+/* Directorio de Pacientes retirado por completo del código (ya no se usará): esta ruta ya no
+tiene ningún llamador en el frontend (la pestaña "Pacientes" de agenda.html está comentada y su
+fetch a este endpoint también). Se conserva comentada como referencia histórica.
 app.get('/api/agenda/directorio_pacientes', verificarToken, async (req, res) => {
     try {
         const filtrarPropios = esPsicologo(req.usuario);
@@ -1364,6 +1373,7 @@ app.get('/api/agenda/directorio_pacientes', verificarToken, async (req, res) => 
         res.status(500).json({ success: false });
     }
 });
+*/
 
 app.get('/api/agenda/escuela/:id/eventos', async (req, res) => {
     try {
@@ -1395,6 +1405,9 @@ app.get('/api/agenda/escuela/:id/eventos', async (req, res) => {
     }
 });
 
+/* Ficha de Paciente y sus citas, retirada por completo del código (ya no se usará): ya no tiene
+ningún llamador en el frontend (seleccionarPaciente() en agenda.html quedó inalcanzable al
+comentarse la pestaña "Pacientes"). Se conserva comentada como referencia histórica.
 app.get('/api/agenda/paciente/:id/citas', verificarToken, async (req, res) => {
     try {
         const paciente = await pool.query(`
@@ -1419,6 +1432,7 @@ app.get('/api/agenda/paciente/:id/citas', verificarToken, async (req, res) => {
         res.status(500).json({ success: false });
     }
 });
+*/
 
 app.get('/api/agenda', verificarToken, async (req, res) => {
     try {
@@ -1449,19 +1463,12 @@ app.get('/api/agenda', verificarToken, async (req, res) => {
             incluirVisitas = true;
             filtroVisitas = 'WHERE av.id_usuario_creador = $1';
             visitasParams.push(u.id);
-        } else if (esPsicologo(u)) {
-            eventosQuery = `
-                SELECT e.id_evento as id, e.titulo_evento as titulo, e.tipo_evento as tipo, e.fecha_realizacion as fecha,
-                       COALESCE(b.nombre_completo, 'Sede S.A.C.') as lugar, 'evento' as categoria,
-                       (SELECT COUNT(*) FROM Participacion p WHERE p.id_evento = e.id_evento) as num_asistentes,
-                       0 as num_insumos
-                FROM Eventos e
-                JOIN Participacion part ON part.id_evento = e.id_evento AND part.id_usuario = $1
-                LEFT JOIN Asistencia_Beneficiarios ab ON e.id_evento = ab.id_evento
-                LEFT JOIN Beneficiarios b ON ab.id_beneficiario = b.id_beneficiario
-                WHERE e.tipo_evento = 'Cita Clínica'
-            `;
-            incluirVisitas = false;
+        // Cita Clínica fue retirada por completo del código: antes, un Psicólogo tenía aquí una
+        // rama dedicada que le mostraba ÚNICAMENTE eventos tipo_evento = 'Cita Clínica'. Como ya
+        // no se pueden crear citas clínicas nuevas, esa rama dejaría a cualquier Psicólogo con
+        // el calendario permanentemente vacío de aquí en adelante. Se quitó la rama para que
+        // caiga en el mismo trato que cualquier otro Especialista (rama de abajo): ve todos los
+        // eventos excepto Cita Clínica, igual que sus colegas no-psicólogos.
         } else if (u.rol === ROL_ESPECIALISTA) {
             eventosQuery += ` AND e.tipo_evento != 'Cita Clínica'`;
             incluirVisitas = false;
@@ -1504,16 +1511,12 @@ app.get('/api/agenda', verificarToken, async (req, res) => {
 
 app.post('/api/agenda', verificarToken, async (req, res) => {
     const { tipo_registro, datos } = req.body;
-    if (esPsicologo(req.usuario) && tipo_registro !== 'clinica') {
-        return res.status(403).json({ success: false, message: 'Como Psicólogo(a) solo puedes agendar Citas Clínicas.' });
-    }
-    if (esPsicologo(req.usuario) && tipo_registro === 'clinica' && datos) {
-        datos.id_especialista = req.usuario.id;
-        const asignado = await pool.query('SELECT id_especialista FROM Beneficiarios WHERE id_beneficiario = $1', [datos.id_beneficiario]);
-        if (asignado.rows.length === 0 || asignado.rows[0].id_especialista !== req.usuario.id) {
-            return res.status(403).json({ success: false, message: 'Ese beneficiario no está asignado a tu cargo.' });
-        }
-    }
+    // Cita Clínica fue retirada por completo del código: antes, un Psicólogo tenía prohibido
+    // agendar cualquier otra cosa aquí (solo 'clinica'), con una verificación extra de que el
+    // beneficiario estuviera a su cargo. Como ya no existe forma de agendar una Cita Clínica
+    // desde el frontend, esa restricción ahora rechazaría CUALQUIER intento de un Psicólogo de
+    // agendar una Visita o un Evento (siempre con 403), dejándolo sin poder usar esta función en
+    // absoluto. Se quitó para que un Psicólogo pueda agendar como cualquier otro Especialista.
     const chkUrlImagenAgendaPost = validarUrlCloudinaria(datos?.url_imagen, 'url_imagen');
     if (!chkUrlImagenAgendaPost.ok) return res.status(400).json({ success: false, message: chkUrlImagenAgendaPost.mensaje });
     try {
@@ -1527,6 +1530,12 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
             await pool.query("INSERT INTO Agenda_Visitas (id_escuela, fecha_cita, estatus_alerta, id_usuario_creador, es_prospeccion, asistentes_plan) VALUES ($1, $2, 'Pendiente', $3, TRUE, $4)", 
                 [esc.rows[0].id_escuela, `${datos.fecha} ${datos.hora}:00`, req.usuario.id, datos.asistentes_plan || null]);
         } 
+        /* Cita Clínica fue retirada por completo del código: ya no existe forma de que
+        tipo_registro llegue como 'clinica' desde el frontend (la opción se quitó del selector
+        y las restricciones del Psicólogo también se quitaron más arriba). Se conserva esta rama
+        comentada solo como referencia histórica de cómo se creaba/notificaba una cita clínica; si
+        alguien la invocara directamente por API, simplemente no entraría a ninguna rama del
+        if/else y la transacción haría COMMIT sin insertar nada (comportamiento inocuo).
         else if (tipo_registro === 'clinica') {
             const modalidadCita = datos.modalidad === 'En línea' ? 'En línea' : 'Presencial';
             const ubicacionCita = modalidadCita === 'Presencial' ? (datos.ubicacion || null) : null;
@@ -1567,7 +1576,7 @@ app.post('/api/agenda', verificarToken, async (req, res) => {
             } catch (mailErr) {
                 console.error("No se pudo preparar el correo de cita clínica al tutor:", mailErr);
             }
-        } 
+        } */
         else if (tipo_registro === 'evento') {
             const e = await pool.query(
                 "INSERT INTO Eventos (titulo_evento, tipo_evento, fecha_realizacion, id_escuela, url_imagen, direccion_mapa, link_reunion, descripcion, categoria, id_responsable) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id_evento",
@@ -1744,6 +1753,13 @@ async function obtenerColumnaPkSolicitudes() {
     return _columnaPkSolicitudes;
 }
 
+// Encuestas de Satisfacción: función desactivada por completo, ya no se usará. Se comentan
+// las 5 rutas /api/encuestas* (revisión de encuestas insatisfactorias, el formulario público
+// por token, y el historial por especialista). Ver también los dos helpers de correo
+// comentados más arriba (enviarEncuestaSatisfaccion / avisarEncuestaInsatisfactoria) y el
+// resto de la desactivación en perfil.html, voluntariado.html, notificaciones.js y
+// encuesta_satisfaccion.html.
+/*
 app.get('/api/encuestas/pendientes_revision', (req, res, next) => {
     next();
 }, verificarToken, (req, res, next) => {
@@ -1903,6 +1919,7 @@ app.get('/api/encuestas/especialista/:id', verificarToken, requiereRol(ROL_ADMIN
         res.status(500).json({ success: false, message: 'Ocurrió un error interno. Intenta de nuevo más tarde.' });
     }
 });
+*/
 
 app.post('/api/solicitudes', async (req, res) => {
     const { nombre_contacto, telefono, correo, tipo_solicitud, mensaje } = req.body;

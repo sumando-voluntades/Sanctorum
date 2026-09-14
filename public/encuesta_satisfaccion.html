@@ -301,7 +301,11 @@
           document.getElementById("formEncuesta").classList.remove("hidden");
         } catch (e) {
           console.error(e);
-          mostrarFinal("No se pudo cargar la encuesta. Intenta de nuevo más tarde.", true);
+          // Encuestas de Satisfacción fue desactivado por completo (ya no se usará): las rutas
+          // /api/encuestas/* en el backend están comentadas, así que cualquier enlace de
+          // encuesta (nuevo o de los ya enviados antes) siempre cae aquí. El mensaje ya no dice
+          // "intenta de nuevo más tarde" porque no es un error transitorio.
+          mostrarFinal("Ya no estamos recolectando encuestas de satisfacción por este medio. Gracias por tu interés.", true);
         }
       });
 

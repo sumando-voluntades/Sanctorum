@@ -173,18 +173,22 @@
                     muralistas; aparta materiales de almacén y permite que el
                     voluntariado se sume al equipo.
                   </li>
+                  <!-- Cita Clínica: ya no se agenda desde aquí (opción comentada en el modal
+                  más abajo), así que se quita de esta guía para no anunciar algo que no existe.
                   <li>
                     <strong>Cita Clínica:</strong> Exclusiva para psicólogos;
                     vinculada de forma confidencial a los beneficiarios
                     asignados a su cargo.
                   </li>
+                  -->
                 </ul>
               </div>
             </div>
             <p class="text-slate-500 max-w-xl">
-              Eventos, reuniones escolares y citas clínicas — todo en un solo
-              lugar.
+              Eventos y reuniones escolares — todo en un solo lugar.
             </p>
+            <!-- Nota de confidencialidad de Citas Clínicas: ya no aplica, esa opción se quitó
+            del formulario de "Agendar Actividad".
             <p
               class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl"
             >
@@ -198,6 +202,7 @@
                 asignados a su cargo.</span
               >
             </p>
+            -->
           </div>
           <button
             id="btn_agendar_actividad"
@@ -226,6 +231,7 @@
                 >
                 Escuelas
               </button>
+              <!-- ============ PANEL IZQUIERDO: DIRECTORIOS (toda la altura)
               <button
                 id="tabDirPacientes"
                 onclick="cambiarTabDirectorio('pacientes')"
@@ -237,6 +243,7 @@
                 >
                 Pacientes
               </button>
+              ============ -->
             </div>
             <div class="p-4 shrink-0 space-y-2">
               <div class="relative">
@@ -331,7 +338,7 @@
                   Actividades Generales
                 </h3>
                 <p class="text-slate-400 text-sm mt-1">
-                  Selecciona una escuela o un paciente a la izquierda para ver
+                  Selecciona una escuela a la izquierda para ver
                   su información específica, o revisa aquí todas las actividades
                   agendadas.
                 </p>
@@ -424,9 +431,11 @@
                 <option value="evento" selected>
                   Evento Operativo (Taller, Plática, Jornada Muralista)
                 </option>
+                <!-- =================
                 <option value="clinica">
                   Cita Clínica (Atención Psicológica a Beneficiario)
                 </option>
+                ================= -->
               </select>
             </div>
 
@@ -1023,7 +1032,7 @@
         marcarLinkActivoAdmin("#sidebar-mount [data-pagina]");
 
         document.getElementById("buscador_principal").placeholder =
-          "Buscar escuela, paciente o actividad...";
+          "Buscar escuela o actividad...";
         document
           .getElementById("buscador_principal")
           .addEventListener("input", (e) => buscarGlobalAgenda(e.target.value));
@@ -1133,17 +1142,12 @@
           "Agendar Nueva Actividad";
         document.getElementById("btn_submit_agenda").innerText =
           "Guardar Actividad";
-        document.getElementById("tipo_agendamiento").disabled =
-          esUsuarioPsicologo;
-        if (esUsuarioPsicologo) {
-          document.getElementById("tipo_agendamiento").value = "clinica";
-          const selPsi = document.getElementById("cli_especialista");
-          if (selPsi) {
-            selPsi.value = userIdActual;
-            selPsi.disabled = true;
-          }
-          poblarSelectorBeneficiarios();
-        }
+        // Cita Clínica fue retirada por completo del código: antes, a un Psicólogo se le
+        // fijaba aquí tipo_agendamiento="clinica" y se deshabilitaba el selector. Como esa
+        // opción ya no existe en el <select> (ver más abajo), esa asignación fallaba en
+        // silencio y dejaba al Psicólogo con el selector bloqueado en "Evento Operativo" sin
+        // poder cambiarlo — no podía agendar Visitas de Prospección. Ahora usa el mismo
+        // selector normal que Admin/Coordinador.
         cambiarVistaFormulario();
         cambiarModalidadClinica();
 
@@ -1693,21 +1697,16 @@
               document.getElementById("vis_asistentes_plan").value =
                 data.asistentes_plan || "";
             } else if (data.tipo_registro === "clinica") {
-              document.getElementById("cli_titulo").value =
-                data.titulo_evento || "";
-              document.getElementById("cli_beneficiario").value =
-                data.id_beneficiario || "";
-              document.getElementById("cli_especialista").value =
-                data.id_especialista || "";
-              document.getElementById("cli_modalidad_online").checked =
-                data.modalidad === "En línea";
-              document.getElementById("cli_modalidad_presencial").checked =
-                data.modalidad !== "En línea";
-              document.getElementById("cli_ubicacion").value =
-                data.direccion_mapa || "";
-              document.getElementById("cli_link_reunion").value =
-                data.link_reunion || "";
-              cambiarModalidadClinica();
+              // Cita Clínica fue retirada por completo del código (ya no se agenda ni se edita
+              // desde aquí). Esta rama solo se alcanza al pulsar "Editar" sobre una cita clínica
+              // histórica ya existente: como el formulario clínico (vista_clinica / campos cli_*)
+              // también fue retirado, no hay dónde mostrar sus datos. En vez de dejar el selector
+              // "tipo_agendamiento" bloqueado en "Evento Operativo" mostrando un formulario vacío
+              // y engañoso (el bug que tenía antes), se avisa y no se abre el modal.
+              alert(
+                "Esta es una Cita Clínica registrada antes de retirar esa función. Ya no se puede editar desde aquí.",
+              );
+              return;
             } else {
               document.getElementById("ev_titulo").value =
                 data.titulo_evento || "";
@@ -1981,18 +1980,18 @@
 
       async function cargarDirectorios() {
         try {
-          const [resEsc, resPac] = await Promise.all([
+          const [resEsc] = await Promise.all([
             fetch(`${API_URL}/api/agenda/directorio_escuelas`, {
               headers: authHeaders(),
             }),
-            fetch(`${API_URL}/api/agenda/directorio_pacientes`, {
-              headers: authHeaders(),
-            }),
+            // Directorio de Pacientes: ya no se pide (pestaña comentada, ver
+            // restringirPestanaPacientes/cambiarTabDirectorio más abajo).
+            // fetch(`${API_URL}/api/agenda/directorio_pacientes`, {
+            //   headers: authHeaders(),
+            // }),
           ]);
           const jsonEsc = await resEsc.json();
-          const jsonPac = await resPac.json();
           if (jsonEsc.success) directorioEscuelas = jsonEsc.data;
-          if (jsonPac.success) directorioPacientes = jsonPac.data;
           renderDirectorio();
         } catch (e) {
           console.error("Error al cargar directorios:", e);
@@ -2001,14 +2000,14 @@
         }
       }
 
+      // El directorio de Pacientes y la pestaña que lo mostraba fueron comentados (ya no
+      // se usan): esta función ahora no tiene nada que restringir, pero se conserva por si
+      // se reactiva más adelante. Antes hacía document.getElementById("tabDirPacientes").remove(),
+      // lo cual ahora lanzaría un error (ese botón ya no existe en el HTML) y tumbaba la carga
+      // de la página completa para cualquier rol sin acceso a Pacientes (Voluntariado,
+      // Especialista no-psicólogo) — quedaban regresados al login por el catch de más arriba.
       function restringirPestanaPacientes(rol, especialidad) {
-        const esPsico =
-          rol === 2 && (especialidad || "").toLowerCase().includes("psic");
-        const puedeVerPacientes = rol === 1 || rol === 3 || esPsico;
-        if (!puedeVerPacientes) {
-          cambiarTabDirectorio("escuelas");
-          document.getElementById("tabDirPacientes").remove();
-        }
+        return;
       }
 
       function cambiarTabDirectorio(tab) {
@@ -2019,10 +2018,12 @@
         btnEsc.classList.toggle("border-primary", tab === "escuelas");
         btnEsc.classList.toggle("text-slate-400", tab !== "escuelas");
         btnEsc.classList.toggle("border-transparent", tab !== "escuelas");
-        btnPac.classList.toggle("text-primary", tab === "pacientes");
-        btnPac.classList.toggle("border-primary", tab === "pacientes");
-        btnPac.classList.toggle("text-slate-400", tab !== "pacientes");
-        btnPac.classList.toggle("border-transparent", tab !== "pacientes");
+        // btnPac ya no existe en el HTML (pestaña Pacientes comentada) — se protege con "?."
+        // para que seguir clicando "Escuelas" no truene.
+        btnPac?.classList.toggle("text-primary", tab === "pacientes");
+        btnPac?.classList.toggle("border-primary", tab === "pacientes");
+        btnPac?.classList.toggle("text-slate-400", tab !== "pacientes");
+        btnPac?.classList.toggle("border-transparent", tab !== "pacientes");
         document.getElementById("buscador_directorio").value = "";
         renderDirectorio();
       }
