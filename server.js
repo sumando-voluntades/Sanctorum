@@ -3119,6 +3119,12 @@ app.delete('/api/reportes_evento/:id', verificarToken, requiereRol(ROL_ADMIN, RO
     }
 });
 
+/* /api/estadisticas_psicologia retirado: alimentaba las tarjetas "Beneficiarios en atención
+actualmente" / "...ayudados con éxito" del index público (contaban Beneficiarios con estatus
+ACTIVO/ALTA), que se quitaron porque siempre mostraban 0 — ya no hay forma de dar de alta un
+beneficiario nuevo en el sistema (esa gestión se retiró junto con Expedientes), así que ese
+conteo nunca podía crecer. Sin llamadores desde que se quitó cargarEstadisticasPsicologia() de
+index.html. Se conserva comentada como referencia histórica.
 app.get('/api/estadisticas_psicologia', async (req, res) => {
     try {
         const [activos, exitosos] = await Promise.all([
@@ -3137,6 +3143,7 @@ app.get('/api/estadisticas_psicologia', async (req, res) => {
         res.status(500).json({ success: false });
     }
 });
+*/
 
 app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
