@@ -1121,9 +1121,9 @@
               cE++;
               btnAccion = `
                 <div class="flex gap-2 w-full">
-                    <button onclick="abrirModalEntrevista(${vol.id_usuario}, '${escapeAttrJs(vol.correo)}', '${escapeAttrJs(vol.nombre_completo)}')" class="flex-1 py-2 bg-slate-100 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-200">Reagendar</button>
-                    <button onclick="abrirModalProyecto(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}', ${vol.id_rol}, '${escapeAttrJs(vol.especialidad)}', '${escapeAttrJs(vol.material_donado \vert{}\vert{} "")}', '${escapeAttrJs(vol.cantidad_donada || "")}')" class="flex-1 py-2 bg-green-100 text-green-700 font-bold rounded-xl text-xs hover:bg-green-500 hover:text-white">Aprobar</button>
-                </div>`;
+    <button onclick="abrirModalEntrevista(${vol.id_usuario}, '${escapeAttrJs(vol.correo)}', '${escapeAttrJs(vol.nombre_completo)}')" class="flex-1 py-2 bg-slate-100 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-200">Reagendar</button>
+    <button onclick="abrirModalProyecto(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}', ${vol.id_rol}, '${escapeAttrJs(vol.especialidad)}', '${escapeAttrJs(vol.material_donado || "")}', '${escapeAttrJs(vol.cantidad_donada || "")}')" class="flex-1 py-2 bg-green-100 text-green-700 font-bold rounded-xl text-xs hover:bg-green-500 hover:text-white">Aprobar</button>
+</div>`;
             } else if (status === "Inactivo") {
               cI++;
               btnAccion = `
@@ -1348,7 +1348,10 @@
             const resultado = await res.json().catch(() => ({}));
 
             if (!res.ok || !resultado.success) {
-              alert(resultado.message || "No se pudo registrar al integrante. Verifica que el correo no esté repetido.");
+              alert(
+                resultado.message ||
+                  "No se pudo registrar al integrante. Verifica que el correo no esté repetido.",
+              );
               return;
             }
 
