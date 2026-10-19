@@ -1,4 +1,3 @@
-<!-- Gestión de Voluntariado - Admin Portal -->
 <!doctype html>
 
 <html class="light" lang="es">
@@ -17,13 +16,12 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
       rel="stylesheet"
     />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-      rel="stylesheet"
-    />
     <style>
-      /* Salvaguarda de responsividad: evita scroll horizontal accidental en móvil. */
-      html, body { overflow-x: hidden; max-width: 100%; }
+      html,
+      body {
+        overflow-x: hidden;
+        max-width: 100%;
+      }
       @media (min-width: 768px) {
         #sidebar-mount {
           position: fixed;
@@ -61,14 +59,10 @@
 
     <main class="md:ml-72 min-h-screen flex flex-col">
       <div id="header-mount"></div>
-      <!-- Content Area -->
       <div class="p-8 flex-1">
-        <!-- Title Section -->
         <div
           class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10"
         >
-
-        
           <div>
             <h2
               class="text-2xl md:text-4xl font-bold text-primary font-plus tracking-tight mb-2"
@@ -79,9 +73,17 @@
               Organiza, supervisa y conecta a nuestra red de voluntarios con las
               necesidades de la comunidad.
             </p>
-            <p class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl">
-              <span class="material-symbols-outlined text-[14px] mt-0.5">info</span>
-              <span>Aprobar una solicitud no crea la cuenta del usuario: usa "Nuevo Registro" con su correo institucional de Sanctorum para darlo de alta en el sistema.</span>
+            <p
+              class="flex items-start gap-1.5 text-xs text-slate-400 mt-2 max-w-xl"
+            >
+              <span class="material-symbols-outlined text-[14px] mt-0.5"
+                >info</span
+              >
+              <span
+                >Aprobar una solicitud no crea la cuenta del usuario: usa "Nuevo
+                Registro" con su correo institucional de Sanctorum para darlo de
+                alta en el sistema.</span
+              >
             </p>
           </div>
           <button
@@ -92,7 +94,7 @@
             Nuevo Registro
           </button>
         </div>
-        <!-- BARRA DE FILTROS GLOBAL -->
+
         <div
           class="flex flex-wrap gap-4 mb-8 bg-surface-container-lowest p-4 rounded-2xl shadow-[0_10px_30px_rgba(23,28,31,0.03)] items-center"
         >
@@ -164,9 +166,7 @@
           </button>
         </div>
 
-        <!-- Kanban Board -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          <!-- Column 1: Nuevas Solicitudes -->
           <div class="flex flex-col gap-6">
             <div class="flex items-center justify-between px-2">
               <div class="flex items-center gap-2">
@@ -186,7 +186,6 @@
             <div id="columna_nuevas_solicitudes" class="space-y-6"></div>
           </div>
 
-          <!-- Column 2: En Proceso de Entrevista -->
           <div class="flex flex-col gap-6">
             <div class="flex items-center justify-between px-2">
               <div class="flex items-center gap-2">
@@ -206,7 +205,6 @@
             <div id="columna_proceso_entrevista" class="space-y-6"></div>
           </div>
 
-          <!-- Column 3: Voluntarios Activos -->
           <div class="flex flex-col gap-6">
             <div class="flex items-center justify-between px-2">
               <div class="flex items-center gap-2">
@@ -226,7 +224,6 @@
             <div id="columna_voluntarios_activos" class="space-y-6"></div>
           </div>
 
-          <!-- Column 4: Archivo Inactivo -->
           <div
             class="flex flex-col gap-6 opacity-70 hover:opacity-100 transition-opacity"
           >
@@ -252,9 +249,6 @@
       <div id="footer-mount"></div>
     </main>
 
-    <!-- ==================== ZONA DE MODALES (VENTANAS EMERGENTES) ==================== -->
-
-    <!-- MODAL: ELIMINAR USUARIO -->
     <div
       id="modalEliminar"
       class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all"
@@ -291,7 +285,6 @@
       </div>
     </div>
 
-    <!-- MODAL: INACTIVAR USUARIO -->
     <div
       id="modalInactivar"
       class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all"
@@ -406,7 +399,6 @@
       </div>
     </div>
 
-    <!-- MODAL: ASIGNAR PROYECTO (PARA USUARIOS YA ACTIVOS) -->
     <div
       id="modalAsignarActivo"
       class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all"
@@ -448,7 +440,6 @@
       </div>
     </div>
 
-    <!-- MODAL: MODIFICAR ROL -->
     <div
       id="modalModificar"
       class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all"
@@ -559,6 +550,33 @@
             </div>
           </div>
 
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-2"
+              >Fotografía del Integrante (Aparece en Nosotros)</label
+            >
+            <div class="flex items-center gap-3">
+              <input
+                type="file"
+                id="mod_input_foto"
+                accept="image/*"
+                class="hidden"
+                onchange="subirFotoIntegranteAdmin(event)"
+              />
+              <button
+                type="button"
+                id="btn_subir_foto_admin"
+                onclick="document.getElementById('mod_input_foto').click()"
+                class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 transition-all flex items-center gap-1.5"
+              >
+                <span class="material-symbols-outlined text-sm">upload</span>
+                Subir Foto a Cloudinary
+              </button>
+              <span id="estado_foto_admin" class="text-xs text-slate-400"
+                >Sin cambios</span
+              >
+            </div>
+          </div>
+
           <button
             type="submit"
             class="w-full py-3 bg-slate-800 text-white font-bold rounded-full shadow-lg mt-4"
@@ -569,7 +587,6 @@
       </div>
     </div>
 
-    <!-- APROBACIÓN, ENTREVISTA Y NUEVO REGISTRO SE MANTIENEN IGUAL QUE ANTES (Solo ajustando estilos de modal flotantes para abrir y cerrar) -->
     <div
       id="modalProyecto"
       class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden transition-all duration-300 opacity-0"
@@ -601,7 +618,6 @@
               <label class="block text-sm font-bold text-slate-700 mb-1"
                 >Confirmar Rol</label
               >
-              <!-- AQUÍ ESTABA EL ERROR DE TYPO: AHORA ES proy_rol -->
               <select
                 id="proy_rol"
                 onchange="toggleDonadorFields('proy')"
@@ -628,7 +644,6 @@
             </div>
           </div>
 
-          <!-- CAMPOS OCULTOS DE DONADOR -->
           <div
             id="proy_donador_fields"
             class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden bg-emerald-50 p-4 rounded-xl border border-emerald-100 mt-2"
@@ -743,7 +758,10 @@
                 class="w-full px-4 py-2 bg-[#f0f4f8] border-none rounded-full outline-none"
               />
               <p class="text-xs text-slate-500 mt-1 ml-1">
-                Usa el correo institucional generado por Sanctorum para este perfil, no el correo personal de la solicitud original. Los perfiles nuevos deben registrarse aquí (botón "Nuevo Registro") con ese correo.
+                Usa el correo institucional generado por Sanctorum para este
+                perfil, no el correo personal de la solicitud original. Los
+                perfiles nuevos deben registrarse aquí (botón "Nuevo Registro")
+                con ese correo.
               </p>
             </div>
             <div>
@@ -787,7 +805,6 @@
             </div>
           </div>
 
-          <!-- CAMPOS OCULTOS DE DONADOR -->
           <div
             id="reg_donador_fields"
             class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden bg-amber-50 p-4 rounded-xl border border-amber-100"
@@ -848,45 +865,10 @@
       </div>
     </div>
 
-    <!-- Encuestas de Satisfacción: función desactivada por completo, ya no se usará.
-    Modal "Historial de Encuestas" comentado (ver también las funciones
-    verHistorialEncuestasEspecialista/cerrarModalHistorialEncuestas más abajo, el botón que
-    lo abría, y server.js/perfil.html/dashboard.html/notificaciones.js).
-    <div
-      id="modalHistorialEncuestas"
-      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden opacity-0 transition-all duration-300"
-    >
-      <div
-        class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[85vh] flex flex-col"
-        id="modalHistorialEncuestasContent"
-      >
-        <div
-          class="bg-gradient-to-r from-primary to-[#f39200] px-8 py-6 text-white flex justify-between items-center"
-        >
-          <div>
-            <h3 id="he_nombre" class="text-2xl font-bold font-plus">
-              Historial de Encuestas
-            </h3>
-            <p id="he_resumen" class="text-white/80 text-sm mt-1"></p>
-          </div>
-          <button
-            onclick="cerrarModalHistorialEncuestas()"
-            class="text-white/80 hover:text-white"
-          >
-            <span class="material-symbols-outlined text-3xl">close</span>
-          </button>
-        </div>
-        <div id="he_cuerpo" class="p-8 overflow-y-auto space-y-3"></div>
-      </div>
-    </div>
-    -->
-
-    <!-- LÓGICA DE JAVASCRIPT -->
     <script src="/js/comun.js"></script>
     <script src="js/notificaciones.js"></script>
     <script src="/js/incluir.js"></script>
     <script>
-      // 1. Proteger ruta
       document.addEventListener("DOMContentLoaded", async () => {
         await incluirParcial("#sidebar-mount", "partials/navbar_admin.html");
         await incluirParcial("#header-mount", "partials/header_admin.html");
@@ -901,25 +883,26 @@
         try {
           const payload = decodeJWT(token);
           aplicarRestriccionesNav(payload.rol, payload.especialidad);
-          document.getElementById("nav_user_name").innerText =
-            payload.nombre.split(" ")[0];
+          const navUserName = document.getElementById("nav_user_name");
+          if (navUserName) navUserName.innerText = payload.nombre.split(" ")[0];
           verificarAccesoDocumento(payload);
         } catch (e) {
           window.location.href = "login";
         }
         cargarNotificaciones();
+
+        const buscadorPrincipal = document.getElementById("buscador_principal");
+        if (buscadorPrincipal) {
+          buscadorPrincipal.addEventListener("input", () =>
+            cargarVoluntariosKanban(false),
+          );
+        }
+
+        cargarVoluntariosKanban(true);
       });
 
-      // H6 (auditoria de seguridad): esta vista renderiza con innerHTML datos que vienen de un
-      // formulario PUBLICO de autorregistro (nombre, correo, especialidad, material donado...),
-      // sin ningun escape. Un atacante anonimo podia autorregistrarse con un "nombre" que
-      // contuviera HTML/JS y ejecutar codigo en la sesion del Admin/Coordinador que abriera este
-      // panel (robando, por ejemplo, el token de localStorage). escapeHtml()/escapeAttrJs() ahora
-      // viven en js/comun.js (generalizadas para toda la app, no solo esta página — ver el
-      // comentario ahí) en vez de copiadas aquí.
       let voluntariosGlobales = [];
 
-      // --- MANEJO DE MODALES ---
       function abrirModal(modalId, contentId) {
         document.getElementById(modalId).classList.remove("hidden");
         setTimeout(() => {
@@ -939,116 +922,6 @@
         }, 300);
       }
 
-      // --- HISTORIAL DE ENCUESTAS DE SATISFACCIÓN (solo Admin/Coordinador) ---
-      // FUNCIÓN DESACTIVADA POR COMPLETO — ya no se usará (el modal al que apuntan y el botón
-      // que las invocaba también están comentados). Se conservan comentadas por si se
-      // reactiva más adelante.
-      /*
-      async function verHistorialEncuestasEspecialista(idUsuario, nombre) {
-        document.getElementById("he_nombre").innerText = nombre;
-        document.getElementById("he_resumen").innerText = "Cargando...";
-        document.getElementById("he_cuerpo").innerHTML =
-          '<p class="text-slate-400 text-sm text-center py-6">Cargando...</p>';
-        document.getElementById("modalHistorialEncuestas").classList.remove("hidden");
-        setTimeout(() => {
-          document
-            .getElementById("modalHistorialEncuestas")
-            .classList.remove("opacity-0");
-          document
-            .getElementById("modalHistorialEncuestasContent")
-            .classList.remove("scale-95");
-        }, 10);
-        try {
-          const res = await fetch(
-            `${API_URL}/api/encuestas/especialista/${idUsuario}`,
-            { headers: authHeaders() },
-          );
-          const json = await res.json();
-          if (!json.success) {
-            document.getElementById("he_resumen").innerText = "";
-            document.getElementById("he_cuerpo").innerHTML =
-              '<p class="text-red-400 text-sm text-center py-6">No se pudo cargar el historial.</p>';
-            return;
-          }
-          const r = json.resumen;
-          const promedioTxt = (v) => (v === null || v === undefined ? "N/A" : v);
-          document.getElementById("he_resumen").innerText =
-            `${r.total_respondidas} encuesta(s) respondida(s) · Promedio general: ${promedioTxt(r.promedio_general)}/5`;
-
-          if (json.historial.length === 0) {
-            document.getElementById("he_cuerpo").innerHTML =
-              '<p class="text-slate-400 text-sm text-center py-6">Este especialista no tiene encuestas respondidas todavía.</p>';
-            return;
-          }
-
-          const resumenExtra = `
-            <div class="grid grid-cols-2 gap-3 mb-4">
-              <div class="p-3 bg-slate-50 rounded-xl text-center">
-                <p class="text-lg font-bold text-slate-800">${promedioTxt(r.promedio_trato)}</p>
-                <p class="text-[11px] text-slate-400 font-bold uppercase">Trato (1-5)</p>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl text-center">
-                <p class="text-lg font-bold text-slate-800">${promedioTxt(r.promedio_puntualidad)}</p>
-                <p class="text-[11px] text-slate-400 font-bold uppercase">Puntualidad (1-5)</p>
-              </div>
-              <div class="p-3 bg-slate-50 rounded-xl text-center">
-                <p class="text-lg font-bold text-slate-800">${promedioTxt(r.promedio_nps)}</p>
-                <p class="text-[11px] text-slate-400 font-bold uppercase">NPS (0-10)</p>
-              </div>
-              <div class="p-3 ${r.respuestas_negativas > 0 ? "bg-red-50" : "bg-slate-50"} rounded-xl text-center">
-                <p class="text-lg font-bold ${r.respuestas_negativas > 0 ? "text-red-600" : "text-slate-800"}">${r.respuestas_negativas}</p>
-                <p class="text-[11px] text-slate-400 font-bold uppercase">Respuestas negativas</p>
-              </div>
-            </div>`;
-
-          const filas = json.historial
-            .map((enc) => {
-              const fecha = enc.fecha_respuesta
-                ? new Date(enc.fecha_respuesta).toLocaleDateString("es-MX")
-                : "-";
-              const estrellas =
-                "★".repeat(enc.calificacion) + "☆".repeat(5 - enc.calificacion);
-              return `
-                <div class="p-3 bg-slate-50 rounded-xl">
-                  <div class="flex items-center justify-between gap-3">
-                    <p class="text-sm font-bold text-slate-700">${escapeHtml(enc.beneficiario)}</p>
-                    <span class="text-red-500 text-sm">${estrellas}</span>
-                  </div>
-                  <p class="text-[11px] text-slate-400 mt-0.5">${fecha}</p>
-                  ${enc.comentarios ? `<p class="text-xs text-slate-600 italic mt-1">"${escapeHtml(enc.comentarios)}"</p>` : ""}
-                </div>`;
-            })
-            .join("");
-
-          document.getElementById("he_cuerpo").innerHTML = resumenExtra + filas;
-        } catch (e) {
-          console.error("Error al cargar historial de encuestas:", e);
-          document.getElementById("he_resumen").innerText = "";
-          document.getElementById("he_cuerpo").innerHTML =
-            '<p class="text-red-400 text-sm text-center py-6">Error de conexión.</p>';
-        }
-      }
-
-      function cerrarModalHistorialEncuestas() {
-        document
-          .getElementById("modalHistorialEncuestas")
-          .classList.add("opacity-0");
-        document
-          .getElementById("modalHistorialEncuestasContent")
-          .classList.add("scale-95");
-        setTimeout(() => {
-          document
-            .getElementById("modalHistorialEncuestas")
-            .classList.add("hidden");
-        }, 300);
-      }
-      */
-
-      // --- LÓGICA DE INTERFAZ DINÁMICA (VOLUNTARIO VS DONADOR) ---
-      // Ajusta el formulario (registro/aprobación/modificación, según "prefix") cuando
-      // cambia el rol elegido: si es Donador (id_rol 5) muestra los campos de material/
-      // cantidad donada y cambia las opciones de "especialidad" a tipo de donador; para
-      // cualquier otro rol muestra los campos de proyecto y las especialidades normales.
       function toggleDonadorFields(prefix) {
         const rol = document.getElementById(`${prefix}_rol`).value;
         const esp = document.getElementById(`${prefix}_especialidad`);
@@ -1056,7 +929,6 @@
         const divProyecto = document.getElementById(`${prefix}_proyecto_div`);
 
         if (rol === "5") {
-          // Es Donador
           esp.innerHTML =
             '<option value="Persona Individual">Persona Individual</option><option value="Compañía">Compañía</option><option value="Institución">Institución</option>';
           if (divDonador) {
@@ -1065,7 +937,6 @@
           }
           if (divProyecto) divProyecto.classList.add("hidden");
         } else {
-          // Es Voluntario, Especialista o Coordinador
           if (rol === "2") {
             esp.innerHTML =
               '<option value="Psicología">Psicología</option><option value="Psiquiatría">Psiquiatría</option><option value="Trabajo Social">Trabajo Social</option><option value="Pedagogía">Pedagogía</option><option value="__otro__">+ Agregar otra especialidad...</option>';
@@ -1083,10 +954,6 @@
         prepararCampoOtraEspecialidad(prefix);
       }
 
-      // Agrega (una sola vez) un campo de texto libre que aparece cuando el usuario elige
-      // "+ Agregar otra especialidad..." — así el admin ya no depende de una lista fija
-      // hardcodeada (Psicología/Muralismo) y puede registrar cualquier especialidad nueva
-      // directamente desde el formulario, sin tocar la base de datos manualmente.
       function prepararCampoOtraEspecialidad(prefix) {
         const esp = document.getElementById(`${prefix}_especialidad`);
         if (!esp) return;
@@ -1112,7 +979,6 @@
         inputOtro.classList.add("hidden");
       }
 
-      // Devuelve el valor real de especialidad a guardar, considerando si se usó "Otra...".
       function obtenerEspecialidadReal(prefix) {
         const esp = document.getElementById(`${prefix}_especialidad`);
         if (esp.value === "__otro__") {
@@ -1126,13 +992,13 @@
         return esp.value;
       }
 
-      // Vuelve a pintar el kanban con los filtros actuales, sin volver a pedir los datos al servidor.
       function aplicarFiltrosGlobales() {
         cargarVoluntariosKanban(false);
       }
-      // Resetea buscador y todos los <select> de filtro, y vuelve a pintar el kanban completo.
+
       function limpiarFiltros() {
-        document.getElementById("buscador_principal").value = "";
+        const bp = document.getElementById("buscador_principal");
+        if (bp) bp.value = "";
         document.getElementById("filtro_rol").value = "Todos";
         document.getElementById("filtro_especialidad").value = "Todas";
         document.getElementById("filtro_fecha").value = "Todas";
@@ -1140,9 +1006,6 @@
         aplicarFiltrosGlobales();
       }
 
-      // --- CARGAR EL KANBAN ---
-      // Aprueba o rechaza el documento profesional de un voluntario/especialista activo,
-      // pidiendo confirmación antes; se usa desde las tarjetas de la columna "Activos".
       async function revisarDocumentoVoluntario(idUsuario, estatus) {
         const accion = estatus === "Aprobado" ? "aprobar" : "rechazar";
         if (
@@ -1172,14 +1035,6 @@
         }
       }
 
-      // Función central del tablero: trae (si hace falta) la lista completa de usuarios con
-      // rol de voluntariado, aplica los filtros locales (texto, rol, especialidad, fecha de
-      // registro, estatus de proyecto) y reparte cada tarjeta en su columna según su
-      // "estatus" (Nuevo / Entrevista / Activo / Inactivo), armando por cada una los
-      // botones de acción disponibles según el rol (Donador, Especialista/Coordinador con
-      // documento profesional, Voluntario con proyecto asignado). Todo el texto dinámico
-      // se pasa por escapeHtml()/escapeAttrJs() porque viene de un formulario público de
-      // autorregistro (ver comentario de seguridad más arriba).
       async function cargarVoluntariosKanban(forzarFetch = false) {
         try {
           if (voluntariosGlobales.length === 0 || forzarFetch) {
@@ -1191,13 +1046,18 @@
               voluntariosGlobales = result.data;
           }
 
-          const textoBusqueda = document
-            .getElementById("buscador_principal")
-            .value.toLowerCase();
-          const fRol = document.getElementById("filtro_rol").value;
-          const fEsp = document.getElementById("filtro_especialidad").value;
-          const fFecha = document.getElementById("filtro_fecha").value;
-          const fProy = document.getElementById("filtro_proyecto").value;
+          const textoBusqueda = (
+            document.getElementById("buscador_principal")?.value ||
+            document.getElementById("buscador_voluntarios")?.value ||
+            ""
+          ).toLowerCase();
+          const fRol = document.getElementById("filtro_rol")?.value || "Todos";
+          const fEsp =
+            document.getElementById("filtro_especialidad")?.value || "Todas";
+          const fFecha =
+            document.getElementById("filtro_fecha")?.value || "Todas";
+          const fProy =
+            document.getElementById("filtro_proyecto")?.value || "Todos";
 
           const colNuevas = document.getElementById(
             "columna_nuevas_solicitudes",
@@ -1262,7 +1122,7 @@
               btnAccion = `
                 <div class="flex gap-2 w-full">
                     <button onclick="abrirModalEntrevista(${vol.id_usuario}, '${escapeAttrJs(vol.correo)}', '${escapeAttrJs(vol.nombre_completo)}')" class="flex-1 py-2 bg-slate-100 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-200">Reagendar</button>
-                    <button onclick="abrirModalProyecto(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}', ${vol.id_rol}, '${escapeAttrJs(vol.especialidad)}', '${escapeAttrJs(vol.material_donado || "")}', '${escapeAttrJs(vol.cantidad_donada || "")}')" class="flex-1 py-2 bg-green-100 text-green-700 font-bold rounded-xl text-xs hover:bg-green-500 hover:text-white">Aprobar</button>
+                    <button onclick="abrirModalProyecto(${vol.id_usuario}, '${escapeAttrJs(vol.nombre_completo)}', ${vol.id_rol}, '${escapeAttrJs(vol.especialidad)}', '${escapeAttrJs(vol.material_donado \vert{}\vert{} "")}', '${escapeAttrJs(vol.cantidad_donada || "")}')" class="flex-1 py-2 bg-green-100 text-green-700 font-bold rounded-xl text-xs hover:bg-green-500 hover:text-white">Aprobar</button>
                 </div>`;
             } else if (status === "Inactivo") {
               cI++;
@@ -1275,7 +1135,6 @@
               cA++;
               let botonesActivo = ``;
               if (vol.id_rol === 2 || vol.id_rol === 3) {
-                // Especialista o Coordinador: seguimiento del documento profesional
                 const estatusDoc =
                   vol.documento_profesional_estatus || "Pendiente";
                 const estiloDoc =
@@ -1302,9 +1161,6 @@
                     </div>`;
                 }
               }
-              // Encuestas de Satisfacción desactivado por completo (ya no se usará): se quita
-              // el botón "Ver Historial de Encuestas" y la variable esEspecialistaPsicologo que
-              // solo existía para decidir si se mostraba (era su único uso en este archivo).
               if (vol.id_rol !== 5) {
                 botonesActivo += `<button onclick="abrirModalAsignarActivo(${vol.id_usuario})" class="w-full py-2 mb-3 bg-[#f0f4f8] text-slate-600 font-bold rounded-full text-xs hover:bg-[#f39200] hover:text-white transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">assignment_ind</span> Asignar a Proyecto</button>`;
               }
@@ -1317,8 +1173,7 @@
             }
 
             let colorBadge = "bg-slate-100 text-slate-600";
-            if (vol.id_rol === 5)
-              colorBadge = "bg-amber-100 text-amber-700"; // Donador
+            if (vol.id_rol === 5) colorBadge = "bg-amber-100 text-amber-700";
             else if (vol.especialidad === "Psicología")
               colorBadge = "bg-blue-100 text-blue-700";
             else if (vol.especialidad === "Muralismo")
@@ -1331,8 +1186,6 @@
               extraBadge = `<div class="mt-2 text-[10px] text-slate-500 font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">work</span> ${escapeHtml(vol.proyectos)}</div>`;
             }
 
-            // Avatar: si el usuario ya subió una foto de perfil (foto_perfil_url), se muestra
-            // esa foto real; si no, se cae al círculo con la inicial del nombre de siempre.
             const avatarHtml = vol.foto_perfil_url
               ? `<img src="${escapeHtml(vol.foto_perfil_url)}" alt="${escapeHtml(vol.nombre_completo)}" class="w-12 h-12 rounded-full object-cover border border-slate-100">`
               : `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xl">${escapeHtml(vol.nombre_completo.charAt(0))}</div>`;
@@ -1346,7 +1199,7 @@
               <h4 class="text-lg font-bold text-slate-800 mb-1">${escapeHtml(vol.nombre_completo)}</h4>
               <div class="flex flex-wrap gap-2 mb-2"><span class="px-3 py-1 ${colorBadge} text-[10px] font-bold uppercase rounded-full tracking-wide">${vol.id_rol === 5 ? "Donador - " + escapeHtml(vol.especialidad) : escapeHtml(vol.especialidad) || "General"}</span></div>
               ${extraBadge}
-              
+
               <div id="contacto_${vol.id_usuario}" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out mt-4">
                   <div class="bg-slate-50 p-3 rounded-lg mb-4 text-xs text-slate-600 space-y-2">
                       <p class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">mail</span> ${escapeHtml(vol.correo)}</p>
@@ -1374,15 +1227,6 @@
         }
       }
 
-      const inputBuscador = document.getElementById("buscador_principal");
-      if (inputBuscador) {
-        inputBuscador.addEventListener("input", () => {
-          cargarVoluntariosKanban(false);
-        });
-      }
-
-      // Expande/colapsa la mini-tarjeta de datos de contacto (correo/teléfono) dentro de
-      // una tarjeta del kanban, animando con max-height en vez de hidden.
       function toggleContacto(id) {
         const el = document.getElementById(id);
         if (el.style.maxHeight && el.style.maxHeight !== "0px")
@@ -1390,13 +1234,11 @@
         else el.style.maxHeight = el.scrollHeight + "px";
       }
 
-      // Guarda el id/nombre del usuario a eliminar y abre el modal de confirmación.
       function prepararEliminar(id, nombre) {
         document.getElementById("elim_id").value = id;
         document.getElementById("elim_nombre").innerText = nombre;
         abrirModal("modalEliminar", "modalEliminarContent");
       }
-      // Elimina definitivamente la petición/usuario confirmado en el modal.
       async function ejecutarEliminar() {
         await fetch(
           `${API_URL}/api/usuarios/${document.getElementById("elim_id").value}`,
@@ -1406,13 +1248,11 @@
         cargarVoluntariosKanban(true);
       }
 
-      // Guarda el id/nombre del usuario a inactivar y abre el modal de confirmación.
       function prepararInactivar(id, nombre) {
         document.getElementById("inac_id").value = id;
         document.getElementById("inac_nombre").innerText = nombre;
         abrirModal("modalInactivar", "modalInactivarContent");
       }
-      // Mueve al usuario confirmado en el modal a la columna "Inactivo" (conserva su historial).
       async function ejecutarInactivar() {
         await fetch(
           `${API_URL}/api/usuarios/${document.getElementById("inac_id").value}/inactivo`,
@@ -1422,7 +1262,6 @@
         cargarVoluntariosKanban(true);
       }
 
-      // Regresa a un usuario inactivo a la columna de Activos.
       async function reactivarUsuario(id) {
         await fetch(`${API_URL}/api/usuarios/${id}/reactivar`, {
           method: "PUT",
@@ -1431,7 +1270,6 @@
         cargarVoluntariosKanban(true);
       }
 
-      // Abre el modal para vincular a un voluntario activo con un proyecto/evento existente.
       async function abrirModalAsignarActivo(id_usuario) {
         document.getElementById("asig_act_id").value = id_usuario;
         const res = await fetch(`${API_URL}/api/proyectos`);
@@ -1446,7 +1284,6 @@
         abrirModal("modalAsignarActivo", "modalAsignarActivoContent");
       }
 
-      // Envía la vinculación de "Asignar a Proyecto" del modal anterior.
       document
         .getElementById("formAsignarActivo")
         .addEventListener("submit", async (e) => {
@@ -1465,10 +1302,6 @@
           cerrarModal("modalAsignarActivo", "modalAsignarActivoContent");
         });
 
-      // --- MANEJO DE ENVÍO DE FORMULARIOS ---
-      // Extrae material+cantidad del formulario indicado por "prefix", pero solo si el rol
-      // seleccionado en ese formulario es Donador (id 5); para cualquier otro rol regresa
-      // valores vacíos porque esos campos no aplican.
       function extraerCantidad(prefix) {
         if (document.getElementById(`${prefix}_rol`).value !== "5")
           return { mat: "", cant: "" };
@@ -1481,14 +1314,12 @@
         };
       }
 
-      // Abre el modal de "Nuevo Integrante" con el rol por defecto en Voluntario.
       function abrirModalRegistro() {
         document.getElementById("reg_rol").value = "4";
-        toggleDonadorFields("reg"); // Default voluntario
+        toggleDonadorFields("reg");
         abrirModal("modalRegistro", "modalContent");
       }
-      // Da de alta manualmente a un nuevo integrante (voluntario, donador, coordinador o
-      // especialista) directamente desde el panel de Admin, sin pasar por autorregistro público.
+
       document
         .getElementById("formRegistro")
         .addEventListener("submit", async (e) => {
@@ -1496,36 +1327,48 @@
           const btn = e.target.querySelector('button[type="submit"]');
           btn.innerText = "Creando...";
           btn.disabled = true;
+
           const { mat, cant } = extraerCantidad("reg");
           const data = {
-            nombre_completo: document.getElementById("reg_nombre").value,
-            correo: document.getElementById("reg_correo").value,
-            telefono: document.getElementById("reg_telefono").value,
+            nombre_completo: document.getElementById("reg_nombre").value.trim(),
+            correo: document.getElementById("reg_correo").value.trim(),
+            telefono: document.getElementById("reg_telefono").value.trim(),
             especialidad: obtenerEspecialidadReal("reg"),
             id_rol: parseInt(document.getElementById("reg_rol").value),
             material: mat,
             cantidad: cant,
           };
-          await fetch(`${API_URL}/api/usuarios`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", ...authHeaders() },
-            body: JSON.stringify(data),
-          });
-          btn.innerText = "Guardar y Avisar";
-          btn.disabled = false;
-          cerrarModal("modalRegistro", "modalContent");
-          cargarVoluntariosKanban(true);
+
+          try {
+            const res = await fetch(`${API_URL}/api/usuarios`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", ...authHeaders() },
+              body: JSON.stringify(data),
+            });
+            const resultado = await res.json().catch(() => ({}));
+
+            if (!res.ok || !resultado.success) {
+              alert(resultado.message || "No se pudo registrar al integrante. Verifica que el correo no esté repetido.");
+              return;
+            }
+
+            cerrarModal("modalRegistro", "modalContent");
+            cargarVoluntariosKanban(true);
+          } catch (err) {
+            alert("Error de conexión con el servidor.");
+          } finally {
+            btn.innerText = "Guardar y Avisar";
+            btn.disabled = false;
+          }
         });
 
-      // Abre el modal de "Agendar Entrevista" precargado con el usuario indicado.
       function abrirModalEntrevista(id, correo, nombre) {
         document.getElementById("ent_id_usuario").value = id;
         document.getElementById("ent_correo").value = correo;
         document.getElementById("entrevista_nombre").innerText = nombre;
         abrirModal("modalEntrevista", "modalEntrevistaContent");
       }
-      // Envía la invitación a entrevista (fecha, hora, link de videollamada) al backend,
-      // que se encarga de avisar al candidato por correo.
+
       document
         .getElementById("formEntrevista")
         .addEventListener("submit", async (e) => {
@@ -1552,9 +1395,6 @@
           cargarVoluntariosKanban(true);
         });
 
-      // Abre el modal de "Aprobación Oficial" (mover de Entrevista a Activo), precargado con
-      // el rol/especialidad/datos de donación actuales del candidato y el catálogo de
-      // proyectos disponibles para vincularlo de una vez.
       async function abrirModalProyecto(
         id_usuario,
         nombre,
@@ -1567,7 +1407,6 @@
         document.getElementById("proyecto_nombre_voluntario").innerText =
           nombre;
 
-        // Aquí también corregimos el ID a proy_rol
         document.getElementById("proy_rol").value = rolActual || 4;
         toggleDonadorFields("proy");
         document.getElementById("proy_especialidad").value =
@@ -1598,7 +1437,6 @@
         abrirModal("modalProyecto", "modalProyectoContent");
       }
 
-      // Submit del modal con manejo de errores (try/catch)
       document
         .getElementById("formProyecto")
         .addEventListener("submit", async (e) => {
@@ -1611,7 +1449,6 @@
             const { mat, cant } = extraerCantidad("proy");
             const data = {
               id_proyecto: document.getElementById("proy_id_evento").value,
-              // Aquí también leemos del ID correcto proy_rol
               id_rol: parseInt(document.getElementById("proy_rol").value),
               especialidad: obtenerEspecialidadReal("proy"),
               material: mat,
@@ -1639,8 +1476,6 @@
           }
         });
 
-      // Abre el modal de "Modificar Perfil" de un usuario activo, precargado con su rol y
-      // especialidad actuales; si es Donador también muestra su historial de donaciones.
       function prepararModificar(
         id,
         rolActual,
@@ -1653,6 +1488,9 @@
         toggleDonadorFields("mod");
         document.getElementById("mod_especialidad").value =
           espActual || "General";
+        const estadoFoto = document.getElementById("estado_foto_admin");
+        if (estadoFoto) estadoFoto.innerText = "Sin cambios";
+
         if (rolActual === 5) {
           document.getElementById("mod_material").value = matActual;
           const partes = cantActual.split(" ");
@@ -1670,8 +1508,72 @@
         abrirModal("modalModificar", "modalModificarContent");
       }
 
-      // ================= HISTORIAL DE DONACIONES (acumulativo, no sobreescribe) =================
-      // Trae y pinta la lista de donaciones ya registradas de este usuario, más recientes primero.
+      async function subirFotoIntegranteAdmin(event) {
+        const file = event.target.files[0];
+        const idUsuario = document.getElementById("mod_id").value;
+        if (!file || !idUsuario) return;
+
+        const estado = document.getElementById("estado_foto_admin");
+        const btn = document.getElementById("btn_subir_foto_admin");
+        estado.innerText = "Subiendo imagen...";
+        btn.disabled = true;
+
+        try {
+          const cfgRes = await fetch(`${API_URL}/api/config/cloudinary`);
+          const cfg = await cfgRes.json();
+
+          if (!cfg.cloud_name || !cfg.upload_preset) {
+            estado.innerText = "Falta config Cloudinary";
+            btn.disabled = false;
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", cfg.upload_preset);
+
+          const cloudRes = await fetch(
+            `https://api.cloudinary.com/v1_1/${cfg.cloud_name}/image/upload`,
+            {
+              method: "POST",
+              body: formData,
+            },
+          );
+          const cloudData = await cloudRes.json();
+
+          if (cloudData.secure_url) {
+            const saveRes = await fetch(
+              `${API_URL}/api/usuarios/${idUsuario}/foto`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  ...authHeaders(),
+                },
+                body: JSON.stringify({
+                  foto_perfil_url: cloudData.secure_url,
+                }),
+              },
+            );
+            const saveJson = await saveRes.json();
+            if (saveJson.success) {
+              estado.innerText = "¡Foto actualizada!";
+              cargarVoluntariosKanban(true);
+            } else {
+              estado.innerText = saveJson.message || "Error al guardar";
+            }
+          } else {
+            estado.innerText = "Error en Cloudinary";
+          }
+        } catch (err) {
+          console.error(err);
+          estado.innerText = "Error al subir foto";
+        } finally {
+          btn.disabled = false;
+          event.target.value = "";
+        }
+      }
+
       async function cargarHistorialDonaciones(idUsuario) {
         const cont = document.getElementById("mod_historial_donaciones");
         cont.innerHTML =
@@ -1710,8 +1612,6 @@
         }
       }
 
-      // Registra una nueva donación en el historial del donador (no reemplaza las
-      // anteriores, se van acumulando) y limpia los campos de material/cantidad del formulario.
       async function agregarDonacionHistorial() {
         const idUsuario = document.getElementById("mod_id").value;
         const material = document.getElementById("mod_material").value.trim();
@@ -1747,7 +1647,6 @@
         }
       }
 
-      // Envía los cambios de rol/especialidad/donación del modal "Modificar Perfil".
       document
         .getElementById("formModificar")
         .addEventListener("submit", async (e) => {
@@ -1770,12 +1669,6 @@
           cerrarModal("modalModificar", "modalModificarContent");
           cargarVoluntariosKanban(true);
         });
-
-      // Segundo listener de DOMContentLoaded (independiente del que valida la sesión más
-      // arriba): dispara la primera carga real del tablero, forzando el fetch al servidor.
-      document.addEventListener("DOMContentLoaded", () =>
-        cargarVoluntariosKanban(true),
-      );
     </script>
   </body>
 </html>
